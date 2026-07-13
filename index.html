@@ -470,6 +470,69 @@ body{
 .pdv{font:600 15px Inter;color:var(--ink);margin-top:3px}
 .svcic{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;background:var(--info-bg);color:var(--info-text)}
 
+/* ── suất ăn cần chuẩn bị (mobile nhận từ catering) ── */
+.grpsel{display:flex;gap:8px}
+.grpbtn{flex:1;text-align:left;padding:10px 14px;border-radius:var(--r-md);background:var(--surface-2);
+  border:1px solid var(--line);transition:background 160ms ease,border-color 160ms ease,transform 140ms var(--ease-out)}
+.grpbtn b{display:block;font:700 14px Inter;color:var(--ink)}
+.grpbtn span{display:block;font:500 11px Inter;color:var(--n500);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grpbtn.on{background:var(--info-bg);border-color:var(--info)}
+.grpbtn.on b{color:var(--info-text)}
+.grpbtn:active{transform:scale(.98)}
+.mealtotal{position:relative;isolation:isolate;overflow:hidden;border-radius:var(--r-xl);color:#fff;padding:18px;
+  background:linear-gradient(148deg,#4F46E5,#7C3AED 55%,#9333EA);box-shadow:0 16px 40px rgba(88,28,180,.34)}
+.mt-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.mt-lab{font:600 12px/16px Inter;color:rgba(255,255,255,.85);letter-spacing:.3px}
+.mt-sub{font:500 13px/18px Inter;color:rgba(255,255,255,.75);margin-top:3px}
+.mt-num{flex:none;display:flex;align-items:baseline;gap:5px}
+.mt-num b{font-family:"Plus Jakarta Sans";font-weight:800;font-size:40px;line-height:44px}
+.mt-num span{font:600 14px Inter;color:rgba(255,255,255,.85)}
+.mt-break{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.2)}
+.mtpill{flex:1;text-align:center;background:rgba(255,255,255,.14);border-radius:var(--r-md);padding:8px 6px}
+.mtpill b{display:block;font-family:"Plus Jakarta Sans";font-weight:800;font-size:18px}
+.mtpill span{display:block;font:500 11px Inter;color:rgba(255,255,255,.82);margin-top:1px}
+.mt-plus{color:rgba(255,255,255,.65);font:700 15px Inter;flex:none}
+.mealcard{padding:14px 16px}
+.mealhd{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.mh-num{width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center;
+  background:var(--info-bg);color:var(--info-text);font:800 14px "Plus Jakarta Sans"}
+.mh-tx{flex:1;min-width:0}
+.mh-tx b{display:block;font:700 15px Inter;color:var(--ink)}
+.mh-tx span{display:block;font:500 12px Inter;color:var(--n500)}
+.mh-total{font-family:"Plus Jakarta Sans";font-weight:800;font-size:22px;color:var(--ink);flex:none}
+.legmeal{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--n100)}
+.lm-l b{font:700 14px Inter;color:var(--ink)}
+.lm-l span{font:500 12px Inter;color:var(--n500);margin-left:8px}
+.lm-n{font:800 16px "Plus Jakarta Sans";color:var(--info-text)}
+.typechips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--n100)}
+.tchip{font:600 12px Inter;background:var(--info-bg);color:var(--info-text);padding:5px 10px;border-radius:var(--r-pill)}
+.quotarow{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--n100)}
+.qic{width:34px;height:34px;border-radius:9px;flex:none;display:grid;place-items:center;background:var(--warning-bg);color:var(--warning-text)}
+.ql{flex:1;font:600 14px Inter;color:var(--ink)}
+.qn{font:800 16px "Plus Jakarta Sans";color:var(--warning-text)}
+.mealnote{font:500 12px/17px Inter;color:var(--ink-3);margin-top:10px}
+.ctimeline{margin:10px 0 2px}
+.ctrack{position:relative;height:38px;background:var(--n100);border-radius:var(--r-sm);overflow:hidden}
+.cwin{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,var(--n200),var(--n200) 3px,transparent 3px,transparent 7px)}
+.cwin.hit{background:var(--warning-bg)}
+.cwlab{position:absolute;bottom:2px;left:0;right:0;text-align:center;font:700 9px Inter;color:var(--warning-text)}
+.cduty{position:absolute;top:9px;height:20px;border-radius:var(--r-pill);background:var(--grad-brand);
+  border:1.5px solid #fff;box-shadow:0 2px 8px rgba(240,40,35,.4)}
+.chours{position:relative;height:14px;margin-top:3px}
+.chours span{position:absolute;transform:translateX(-50%);font:600 10px Inter;color:var(--ink-3)}
+.chours span:first-child{transform:none}
+.chours span:last-child{transform:translateX(-100%)}
+.winchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.wchip{display:inline-flex;align-items:center;gap:5px;font:600 12px Inter;color:var(--ink-3);
+  background:var(--surface-2);border:1px solid var(--line);padding:6px 11px;border-radius:var(--r-pill)}
+.wchip.on{color:var(--warning-text);background:var(--warning-bg);border-color:transparent}
+.cockcalc{display:flex;align-items:baseline;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--n100)}
+.cockcalc span{font:500 13px Inter;color:var(--ink-2)}
+.cockcalc b{font-family:"Plus Jakarta Sans";font-weight:800;font-size:20px;color:var(--brand)}
+.cockcrew{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.cchip{display:inline-flex;align-items:center;gap:6px;font:600 12px Inter;color:var(--n700);background:var(--n100);padding:6px 11px;border-radius:var(--r-pill)}
+.cchip svg{color:var(--n500)}
+
 /* ── equipment ── */
 .station .h{display:flex;align-items:center;gap:12px;padding:16px;min-height:var(--touch)}
 .glyph{width:var(--touch);height:var(--touch);flex:none;border-radius:var(--r-md);background:var(--info-bg);color:var(--info-text);
@@ -1050,8 +1113,8 @@ const LEGS2 = [
 ];
 LEGS2.forEach(l => l.ssrCount = l.ssrWchr+l.ssrUmnr+l.ssrMeda+l.ssrInf);
 const GROUPS = [
-  {id:"G1", route:"SGN · PQC · BMV · SGN", legs:LEGS},
-  {id:"G2", route:"SGN · HAN · SGN",       legs:LEGS2},
+  {id:"G1", ac:"A321neo", route:"SGN · PQC · BMV · SGN", legs:LEGS},
+  {id:"G2", ac:"A321neo", route:"SGN · HAN · SGN",       legs:LEGS2},
 ];
 const ALL_LEGS = [...LEGS, ...LEGS2];
 const ROTATION = {aircraftType:"A321neo", registration:"VN-A653", reportAt: LEGS[0].std - REPORT_OFFSET_MINUTES*MIN, dutyEndAt: LEGS2[1].sta + 30*MIN};
@@ -1108,6 +1171,53 @@ function buildManifest(leg){
   });
   leg._manifest = {seats, map, occ, cols:SEAT_COLS};
   return leg._manifest;
+}
+
+/* ── Suất ăn: ① = premeal (mỗi chặng) + định mức (nhóm/loại tàu) + tổ bay (giờ trực) ──
+   Số do bộ phận catering (Web Portal UC-06) chuẩn bị & cung cấp; mobile chỉ NHẬN xem. */
+const AC_QUOTA = {   // định mức đem thêm theo loại tàu (bán trên chuyến)
+  "A321neo": [["Suất nóng", 30], ["Bánh mì", 25], ["Trà sữa", 20]],
+  "A320neo": [["Suất nóng", 24], ["Bánh mì", 20], ["Trà sữa", 16]],
+};
+const MEAL_WINDOWS = [   // 4 khung giờ ăn (BR-017)
+  {id:"s", label:"Sáng",  range:"06:00–08:00", segs:[[360,480]]},
+  {id:"t", label:"Trưa",  range:"11:00–13:00", segs:[[660,780]]},
+  {id:"c", label:"Tối",   range:"17:00–19:00", segs:[[1020,1140]]},
+  {id:"k", label:"Khuya", range:"22:00–04:00", segs:[[1320,1440],[0,240]]},
+];
+const minsOfDay = ms => { const d = new Date(ms); return d.getHours()*60 + d.getMinutes(); };
+const ovl = (a1,a2,b1,b2) => Math.max(0, Math.min(a2,b2) - Math.max(a1,b1));
+
+// premeal (suất đặt trước) của 1 chặng → tổng + theo loại, lấy từ manifest
+function premealOf(leg){
+  const man = buildManifest(leg);
+  const byType = {}; let total = 0;
+  Object.values(man.map).forEach(p => { if (!p) return;
+    p.services.forEach(([code,label]) => { if (code === "DUTY") return; byType[label] = (byType[label]||0)+1; total++; });
+  });
+  return {total, byType:Object.entries(byType).sort((a,b)=>b[1]-a[1])};
+}
+
+// suất tổ bay: FlightDutyPeriod (60' trước STD đầu → 15' sau STA cuối) ∩ khung giờ ăn × phi công
+function cockpitCalc(group){
+  const legs = group.legs;
+  const dutyStart = minsOfDay(legs[0].std) - 60;
+  const dutyEnd   = minsOfDay(legs[legs.length-1].sta) + 15;
+  const hits = MEAL_WINDOWS.map(w => {
+    const over = w.segs.reduce((s,[a,b]) => s + ovl(dutyStart, dutyEnd, a, b), 0);
+    return {...w, over, hit: over > 10};   // bỏ giao ~10'
+  });
+  const nWin = hits.filter(h => h.hit).length;
+  return {dutyStart, dutyEnd, hits, nWin, crew: COCKPIT, total: nWin * COCKPIT.length};
+}
+
+function groupMeals(group){
+  const premeal = group.legs.map(l => ({leg:l, ...premealOf(l)}));
+  const premealTotal = premeal.reduce((s,p) => s + p.total, 0);
+  const quota = AC_QUOTA[group.ac] || [];
+  const quotaTotal = quota.reduce((s,q) => s + q[1], 0);
+  const cockpit = cockpitCalc(group);
+  return {premeal, premealTotal, quota, quotaTotal, cockpit, total: premealTotal + quotaTotal + cockpit.total};
 }
 const groundMinutes = (prevSta,nextStd) => Math.max(0, Math.round((nextStd-prevSta)/MIN));
 const isTightGround = m => m < TIGHT_GROUND_MINUTES;
@@ -1272,6 +1382,7 @@ function buildView(path){
     "/login": Login, "/forgot": Forgot, "/unlock": Unlock,
     "/home": Home, "/profile": Profile,
     "/crew": CrewWork, "/work": EquipWork, "/notifications": Notifications,
+    "/crew/meals": MealPrep,
     "/crew/flights": CrewFlights,
     "/scan": ScanScreen, "/passenger": PassengerScreen,
     "/equipment/base": BaseScreen, "/equipment/not-service": NotService,
@@ -1715,6 +1826,15 @@ function CrewDashboard(v){
   /* ── tải gói bay — CTA chính, đậm ── */
   body.appendChild(st(packCTA()));
 
+  /* nhận số suất ăn do catering chuẩn bị (UC-06) */
+  const mealTot = GROUPS.reduce((s,g) => s + groupMeals(g).total, 0);
+  body.appendChild(st(h("button",{class:"seatentry", onClick:()=>go("/crew/meals")},
+    h("span",{class:"si", style:"background:var(--warning)"}, svg(I.food,22)),
+    h("div",{style:"flex:1;text-align:left;min-width:0"},
+      h("b",{},"Suất ăn cần chuẩn bị"),
+      h("span",{}, `${mealTot} suất · ${GROUPS.length} nhóm · nhận từ catering`)),
+    h("span",{class:"chev"}, svg(I.chev,20)))));
+
   v.appendChild(body);
 }
 
@@ -2060,6 +2180,93 @@ function SeatScreen(v, path){
   ));
   v.appendChild(body);
   swap(S.paxView === "list" ? "list" : "map");
+}
+
+/* ── /crew/meals — mobile NHẬN số suất ăn từ catering (UC-06 → UC-21) ── */
+function mtPill(lab,n){ return h("span",{class:"mtpill"}, h("b",{},String(n)), h("span",{},lab)); }
+function mealHd(num,title,sub,total){
+  return h("div",{class:"mealhd"},
+    h("span",{class:"mh-num"},num),
+    h("div",{class:"mh-tx"}, h("b",{},title), h("span",{},sub)),
+    h("span",{class:"mh-total"}, String(total)));
+}
+function cockpitTimeline(cc){
+  const pct = m => Math.max(0,Math.min(1440,m))/1440*100;
+  const track = h("div",{class:"ctrack"});
+  MEAL_WINDOWS.forEach(w => w.segs.forEach(([a,b]) => {
+    const hit = cc.hits.find(h2 => h2.id === w.id).hit;
+    track.appendChild(h("div",{class:"cwin"+(hit?" hit":""), style:`left:${pct(a)}%;width:${pct(b)-pct(a)}%`},
+      hit ? h("span",{class:"cwlab"}, w.label) : null));
+  }));
+  track.appendChild(h("div",{class:"cduty", style:`left:${pct(cc.dutyStart)}%;width:${pct(cc.dutyEnd)-pct(cc.dutyStart)}%`}));
+  const hours = h("div",{class:"chours"}, ...[0,6,12,18,24].map(hh =>
+    h("span",{style:`left:${hh/24*100}%`}, `${pad(hh)}h`)));
+  return h("div",{class:"ctimeline"}, track, hours);
+}
+function mealSections(g){
+  const m = groupMeals(g);
+  const hm = min => `${pad(Math.floor(((min%1440)+1440)%1440/60))}:${pad(((min%60)+60)%60)}`;
+  const out = [];
+
+  out.push(h("section",{class:"mealtotal"},
+    h("div",{class:"mt-top"},
+      h("div",{style:"min-width:0"},
+        h("div",{class:"mt-lab"},"Tổng suất ăn cần chuẩn bị"),
+        h("div",{class:"mt-sub"}, `${g.ac} · ${g.route}`)),
+      h("div",{class:"mt-num"}, h("b",{}, String(m.total)), h("span",{},"suất"))),
+    h("div",{class:"mt-break"},
+      mtPill("Đặt trước", m.premealTotal), h("span",{class:"mt-plus"},"+"),
+      mtPill("Định mức", m.quotaTotal),   h("span",{class:"mt-plus"},"+"),
+      mtPill("Tổ bay", m.cockpit.total))));
+
+  const combined = {};
+  m.premeal.forEach(p => p.byType.forEach(([lab,n]) => combined[lab] = (combined[lab]||0)+n));
+  out.push(h("section",{class:"card mealcard"},
+    mealHd("①","Suất ăn đặt trước","theo từng chặng (premeal)", m.premealTotal),
+    ...m.premeal.map(p => h("div",{class:"legmeal"},
+      h("div",{class:"lm-l"}, h("b",{}, p.leg.flightNo), h("span",{}, `${p.leg.origin} → ${p.leg.destination} · ${hhmm(p.leg.std)}`)),
+      h("span",{class:"lm-n"}, String(p.total)))),
+    h("div",{class:"typechips"}, ...Object.entries(combined).sort((a,b)=>b[1]-a[1]).map(([lab,n]) =>
+      h("span",{class:"tchip"}, `${lab} · ${n}`)))));
+
+  out.push(h("section",{class:"card mealcard"},
+    mealHd("②","Định mức đem thêm",`bán trên chuyến · ${g.ac}`, m.quotaTotal),
+    ...m.quota.map(([lab,n]) => h("div",{class:"quotarow"},
+      h("span",{class:"qic"}, svg(I.food,18)),
+      h("span",{class:"ql"}, lab),
+      h("b",{class:"qn"}, String(n)))),
+    h("p",{class:"mealnote"},"Áp cho cả nhóm chặng · nạp 1 lần đầu nhóm.")));
+
+  const cc = m.cockpit;
+  out.push(h("section",{class:"card mealcard"},
+    mealHd("③","Suất ăn tổ bay","phi công · theo giờ trực", cc.total),
+    h("p",{class:"mealnote", style:"margin:0 0 4px"}, `Giờ trực ${hm(cc.dutyStart)} → ${hm(cc.dutyEnd)} (60′ trước STD đầu → 15′ sau STA cuối)`),
+    cockpitTimeline(cc),
+    h("div",{class:"winchips"}, ...cc.hits.map(w =>
+      h("span",{class:"wchip"+(w.hit?" on":"")}, svg(w.hit?I.check:I.x,13), w.label))),
+    h("div",{class:"cockcalc"},
+      h("span",{}, `${cc.nWin} bữa × ${cc.crew.length} người`),
+      h("b",{}, `${cc.total} suất`)),
+    h("div",{class:"cockcrew"}, ...cc.crew.map(c => h("span",{class:"cchip"},
+      svg(I.plane,13), `${c.role} · ${c.name}`)))));
+
+  out.push(h("p",{class:"protoline"}, h("span",{class:"protodot"}, svg(I.warn,13)),
+    "Số do bộ phận catering chuẩn bị (Web Portal · UC-06) — tổ bay nhận & đối chiếu"));
+  return out;
+}
+function MealPrep(v){
+  if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
+  bar(v,{title:"Suất ăn cần chuẩn bị", subtitle:"Nhận từ bộ phận catering", onBack:()=>back("/crew")});
+  const body = h("div",{class:"body pad-tabs white", style:"padding-top:14px;display:flex;flex-direction:column;gap:14px"});
+  let gi = S.mealGroup || 0;
+  const content = h("div",{style:"display:flex;flex-direction:column;gap:14px"});
+  const segEls = GROUPS.map((g,i) => h("button",{class:"grpbtn"+(i===gi?" on":""),
+    onClick:()=>{ gi=i; S.mealGroup=i; segEls.forEach((e,j)=>e.classList.toggle("on", j===i)); content.replaceChildren(...mealSections(GROUPS[i])); }},
+    h("b",{}, `Nhóm ${i+1}`), h("span",{}, g.route)));
+  body.appendChild(h("div",{class:"grpsel"}, ...segEls));
+  body.appendChild(content);
+  content.replaceChildren(...mealSections(GROUPS[gi]));
+  v.appendChild(body);
 }
 
 /* Legend + lưới ghế (2 khoang: SkyBoss, Phổ thông) */
