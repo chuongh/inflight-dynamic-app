@@ -1,0 +1,2046 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<!-- viewport-fit=cover: cho phép nội dung chui xuống dưới notch / Dynamic Island,
+     rồi ta tự chừa chỗ bằng env(safe-area-inset-*). maximum-scale=1 chặn iOS
+     auto-zoom khi focus input (kèm input font-size >= 16px, cả hai đều cần). -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Inflight Dynamic"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="theme-color" content="#7A0000" id="theme-color"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23F02823'/%3E%3Ctext x='90' y='120' font-family='system-ui' font-size='84' font-weight='800' fill='white' text-anchor='middle'%3EVJ%3C/text%3E%3C/svg%3E"/>
+<title>Inflight Dynamic App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap&subset=vietnamese" rel="stylesheet">
+<style>
+:root{
+  --brand:#F02823; --brand-dark:#B70005; --brand-accent:#FFDD32; --brand-green:#87DC00; --on-brand:#FFF;
+  --red-400:#FC6859; --red-500:#F02823; --red-600:#DD1D1A; --red-700:#CA1010; --red-800:#B70005; --red-900:#7A0000;
+  --n0:#FFF; --n50:#F8FAFC; --n100:#F1F5F9; --n200:#E2E8F0; --n300:#CBD5E1;
+  --n400:#94A3B8; --n500:#64748B; --n600:#475569; --n700:#334155; --n800:#1E293B; --n900:#0F172A;
+  --ink:var(--n900); --ink-2:var(--n600); --ink-3:var(--n400);
+  --surface:var(--n100); --surface-2:var(--n50); --line:var(--n200);
+  --success:#16A34A; --success-bg:#DCFCE7; --success-text:#15803D;
+  --warning:#F59E0B; --warning-bg:#FEF3C7; --warning-text:#B45309;
+  --danger:#EF4444;  --danger-bg:#FEE2E2;  --danger-text:#B91C1C;
+  --info:#4F46E5;    --info-bg:#EEF2FF;    --info-text:#4338CA;
+  --r-xs:6px;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-2xl:28px;--r-pill:999px;
+  --e1:0 1px 2px rgba(15,23,42,.06); --e2:0 2px 8px rgba(15,23,42,.08);
+  --e3:0 8px 24px rgba(15,23,42,.10); --e4:0 16px 48px rgba(15,23,42,.14);
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1);
+  --touch:44px; --glove:56px;
+  --hdr-grad:linear-gradient(158deg,var(--red-900) 0%,var(--red-800) 26%,var(--red-700) 46%,var(--red-600) 66%,var(--red-500) 100%);
+  --grad-brand:linear-gradient(135deg,var(--brand),var(--brand-dark));
+  --grad-sunset:linear-gradient(135deg,var(--brand),var(--brand-accent));
+}
+/* ═══ safe area: iPhone notch / Dynamic Island / home indicator ═══
+   Fallback 0px cho trình duyệt desktop và Android không có env(). */
+:root{
+  --sa-top:env(safe-area-inset-top,0px);
+  --sa-bot:env(safe-area-inset-bottom,0px);
+  --sa-l:env(safe-area-inset-left,0px);
+  --sa-r:env(safe-area-inset-right,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+input{font:inherit;color:inherit;background:none;border:0;outline:0;width:100%;border-radius:0;-webkit-appearance:none}
+
+html,body{height:100%;overflow:hidden}
+body{
+  font:400 16px/1.5 Inter,system-ui,-apple-system,sans-serif;
+  background:var(--n0);color:var(--ink);
+  /* 100dvh theo thanh URL Safari khi nó co lại; 100vh là fallback */
+  height:100vh;height:100dvh;
+  overscroll-behavior:none;              /* chặn pull-to-refresh + rubber-band toàn trang */
+  -webkit-font-smoothing:antialiased;
+  -webkit-user-select:none;user-select:none;   /* app, không phải trang tài liệu */
+}
+.dsp{font-family:"Plus Jakarta Sans",Inter,sans-serif;font-weight:800}
+.hdg{font-family:"Plus Jakarta Sans",Inter,sans-serif;font-weight:700}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ═══ app shell ═══ */
+#stack{
+  position:relative;width:100%;height:100%;overflow:hidden;background:var(--n0);
+  /* Trên tablet/desktop: khoá bề rộng như một máy điện thoại, canh giữa. */
+  max-width:520px;margin:0 auto;
+}
+#views{position:absolute;inset:0;overflow:hidden}
+@media (min-width:560px){
+  body{background:#0b1120}
+  #stack{box-shadow:0 0 60px rgba(0,0,0,.5)}
+}
+
+/* view stack + direction-aware transition */
+.view{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--surface-2);will-change:transform,opacity}
+.view.push-in{animation:pushIn 320ms var(--ease-out) both}
+.view.push-out{animation:pushOut 320ms var(--ease-out) both}
+.view.pop-in{animation:popIn 300ms var(--ease-out) both}
+.view.pop-out{animation:popOut 300ms var(--ease-out) both}
+.view.fade-in{animation:fadeIn 260ms var(--ease-out) both}
+@keyframes pushIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes pushOut{from{transform:translateX(0);opacity:1}to{transform:translateX(-26%);opacity:.55}}
+@keyframes popIn{from{transform:translateX(-26%);opacity:.55}to{transform:translateX(0);opacity:1}}
+@keyframes popOut{from{transform:translateX(0)}to{transform:translateX(100%)}}
+@keyframes fadeIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+
+/* ── headers ── */
+/* max(): trong Safari thường safe-area-inset-top = 0 (thanh URL đã chiếm chỗ),
+   ở chế độ standalone nó là ~59px. max() cho cả hai một khoảng thở tối thiểu. */
+.hero{position:relative;isolation:isolate;overflow:hidden;color:#fff;flex:none;background:var(--hdr-grad);
+  padding:calc(max(var(--sa-top),10px) + 22px) calc(var(--sa-r) + 20px) 64px calc(var(--sa-l) + 20px)}
+.hero::before{content:"";position:absolute;inset:-30% -25% -55% -25%;z-index:-1;
+  background:radial-gradient(46% 42% at 90% 98%,rgba(252,104,89,.55),transparent 66%),
+             radial-gradient(48% 44% at 74% 92%,rgba(240,40,35,.85),transparent 70%),
+             radial-gradient(40% 34% at 98% 16%,rgba(79,70,229,.38),transparent 72%),
+             radial-gradient(34% 30% at 2% 90%,rgba(67,56,202,.30),transparent 74%);
+  animation:aurora 20s var(--ease-in-out) infinite alternate}
+@keyframes aurora{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-16px,-10px,0) scale(1.09)}}
+.hero .edge{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--grad-sunset);opacity:.9}
+.hero .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.hero .hello{font:500 14px/22px Inter;color:#fff}
+.hero .name{font-size:24px;line-height:32px;letter-spacing:-.24px;text-transform:uppercase;margin-top:2px}
+.avatar{width:var(--touch);height:var(--touch);border-radius:var(--r-pill);flex:none;display:grid;place-items:center;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.34);backdrop-filter:blur(12px) saturate(180%);
+  color:#fff;font:700 15px Inter;transition:transform 160ms var(--ease-out)}
+.avatar:active{transform:scale(.94)}
+
+/* compact bar = ScreenHeader */
+.bar{position:relative;isolation:isolate;overflow:hidden;color:#fff;background:var(--hdr-grad);flex:none;
+  padding:calc(max(var(--sa-top),10px) + 14px) calc(var(--sa-r) + 16px) 14px calc(var(--sa-l) + 16px);
+  display:flex;align-items:center;gap:10px}
+.bar::before{content:"";position:absolute;inset:-60% -20% -60% -20%;z-index:-1;
+  background:radial-gradient(50% 60% at 92% 90%,rgba(240,40,35,.8),transparent 70%),
+             radial-gradient(40% 50% at 100% 0%,rgba(79,70,229,.34),transparent 74%)}
+.bar .edge{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--grad-sunset);opacity:.85}
+.bar .back{width:34px;height:34px;display:grid;place-items:center;border-radius:var(--r-pill);margin-left:-6px;
+  transition:transform 160ms var(--ease-out),background 200ms ease}
+.bar .back:active{transform:scale(.9);background:rgba(255,255,255,.16)}
+.bar .ttl{flex:1;min-width:0}
+.bar .ttl b{display:block;font-family:"Plus Jakarta Sans";font-weight:700;font-size:20px;line-height:28px;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .ttl span{display:block;font:500 13px/20px Inter;color:#fff}
+.bar .act{font:600 11px/16px Inter;letter-spacing:.88px;text-transform:uppercase;background:rgba(255,255,255,.2);
+  padding:9px 12px;border-radius:var(--r-md);flex:none}
+
+/* ── scroll body ── */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;background:transparent;
+  padding:0 calc(var(--sa-r) + 20px) calc(var(--sa-bot) + 24px) calc(var(--sa-l) + 20px);
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.body::-webkit-scrollbar{display:none}
+/* .body là flex column ở vài màn. Không có dòng này, con của nó bị co lại
+   (flex-shrink mặc định = 1) thay vì tràn ra để cuộn — thẻ bị bẹp, chữ bị cắt. */
+.body > *{flex:none}
+.body > .finder{flex:1 1 auto}   /* khung ngắm PHẢI giãn — ngoại lệ duy nhất */
+.body.pad-tabs{padding-bottom:calc(var(--sa-bot) + 104px)}
+.body.white{background:var(--n0)}
+
+/* Thẻ trèo lên header: KHÔNG dùng margin âm trên con của .body — overflow của
+   .body sẽ cắt cụt nó. Kéo cả .body lên, để nền trong suốt cho đỏ lộ ra hai bên. */
+.body.overlap{margin-top:-42px}
+.pull{position:relative;z-index:10}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:24px 2px 12px}
+.sec h2{font-family:"Plus Jakarta Sans";font-weight:700;font-size:18px;line-height:26px}
+.sec .hint{font:500 12px/16px Inter;color:var(--n500)}
+
+/* ── card primitives ── */
+.card{background:var(--n0);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--e1)}
+.card.lift{box-shadow:var(--e3);border-radius:var(--r-xl)}
+.rule{height:1px;background:var(--line)}
+.press{transition:transform 160ms var(--ease-out)}
+.press:active{transform:scale(.975)}
+
+/* ── buttons ── */
+.cta{width:100%;min-height:var(--glove);border-radius:var(--r-lg);background:var(--grad-brand);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;font:700 19px/24px Inter;
+  box-shadow:0 10px 26px rgba(240,40,35,.3);transition:transform 160ms var(--ease-out),opacity 200ms ease}
+.cta:active{transform:scale(.975)}
+.cta:disabled{opacity:.4;box-shadow:none;cursor:not-allowed}
+.cta.ghost{background:var(--n0);color:var(--info-text);border:1px solid var(--line);box-shadow:var(--e1);font-size:16px;font-weight:600;min-height:var(--touch)}
+.link{font:600 14px/22px Inter;color:var(--info-text)}
+.link.muted{color:var(--ink-2)}
+
+/* ── form ── */
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font:600 13px/20px Inter;color:var(--ink-2)}
+.field .box{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:13px 16px;transition:border-color 200ms ease,box-shadow 200ms ease}
+.field .box:focus-within{border-color:var(--info);box-shadow:0 0 0 3px var(--info-bg)}
+.field input{font:500 16px/26px Inter}
+.field input::placeholder{color:var(--ink-3)}
+.field .toggle{font:600 13px Inter;color:var(--n500);flex:none}
+
+/* ── chips / pills ── */
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r-pill);padding:5px 11px;font:600 12px/16px Inter}
+.chip.info{background:var(--info-bg);color:var(--info-text)}
+.chip.ok{background:var(--success-bg);color:var(--success-text)}
+.chip.warn{background:var(--warning-bg);color:var(--warning-text)}
+.chip.bad{background:var(--danger-bg);color:var(--danger-text)}
+.dot{width:8px;height:8px;border-radius:var(--r-pill);flex:none}
+
+/* ── banners ── */
+.banner{display:flex;gap:11px;border-radius:var(--r-md);padding:13px 14px;border:1px solid;align-items:flex-start}
+.banner b{display:block;font:600 14px/22px Inter}
+.banner span{display:block;font:400 13px/20px Inter;margin-top:1px;opacity:.92}
+.banner.ok{background:var(--success-bg);border-color:var(--success);color:var(--success-text)}
+.banner.warn{background:var(--warning-bg);border-color:var(--warning);color:var(--warning-text)}
+.banner.bad{background:var(--danger-bg);border-color:var(--danger);color:var(--danger-text)}
+.banner.info{background:var(--info-bg);border-color:var(--info);color:var(--info-text)}
+
+/* ── tabs ── */
+.tabs{position:absolute;left:0;right:0;bottom:0;z-index:40;display:flex;
+  padding:10px calc(var(--sa-r) + 24px) calc(var(--sa-bot) + 12px) calc(var(--sa-l) + 24px);
+  background:rgba(255,255,255,.76);backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);box-shadow:0 -1px 0 var(--line)}
+.tab{flex:1;min-height:var(--touch);display:flex;flex-direction:column;align-items:center;gap:4px;
+  font:600 11px/16px Inter;color:var(--n500);transition:color 200ms ease,transform 160ms var(--ease-out)}
+.tab:active{transform:scale(.94)}
+.tab.on{color:var(--info-text)}
+.tab .pip{width:22px;height:3px;border-radius:var(--r-pill);background:transparent;transition:background 200ms ease}
+.tab.on .pip{background:var(--info)}
+
+/* ── equipment ── */
+.station .h{display:flex;align-items:center;gap:12px;padding:16px;min-height:var(--touch)}
+.glyph{width:var(--touch);height:var(--touch);flex:none;border-radius:var(--r-md);background:var(--info-bg);color:var(--info-text);
+  display:grid;place-items:center;font-family:"Plus Jakarta Sans";font-weight:800;font-size:13px}
+.station .who{flex:1;min-width:0}
+.station .who b{display:block;font-family:"Plus Jakarta Sans";font-weight:800;font-size:20px;line-height:28px}
+.station .who span{display:block;font:400 13px/20px Inter;color:var(--n500)}
+.station .chg{font:600 11px/16px Inter;letter-spacing:.88px;text-transform:uppercase;color:var(--info-text);
+  background:var(--info-bg);padding:10px 13px;border-radius:var(--r-md);flex:none}
+.readiness{padding:16px}
+.dial{position:relative;width:78px;height:78px;flex:none}
+.dial svg{transform:rotate(-90deg);display:block}
+.dial .val{position:absolute;inset:0;display:grid;place-items:center;font-family:"Plus Jakarta Sans";font-weight:800;font-size:20px}
+.distbar{display:flex;height:10px;border-radius:var(--r-pill);overflow:hidden;margin-top:16px;background:var(--n100);gap:2px}
+.distbar span{transition:flex-grow 900ms var(--ease-out)}
+.legend{display:flex;gap:14px;margin-top:11px;flex-wrap:wrap}
+.legend b{display:flex;align-items:center;gap:6px;font:500 12px/16px Inter;color:var(--ink-2)}
+.legend i{width:8px;height:8px;border-radius:2px;display:block}
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{border-radius:var(--r-lg);padding:14px;border:1px solid var(--line);background:var(--n0);box-shadow:var(--e1);
+  position:relative;overflow:hidden;min-height:var(--touch);transition:transform 160ms var(--ease-out)}
+.tile:active{transform:scale(.975)}
+.tile .v{font-family:"Plus Jakarta Sans";font-weight:800;font-size:30px;line-height:38px;letter-spacing:-.3px}
+.tile .l{font:500 12px/16px Inter;color:var(--n500);margin-top:2px}
+.tile.warn{grid-column:1/-1;display:flex;align-items:center;gap:14px;border-color:var(--warning);
+  background:linear-gradient(135deg,var(--warning-bg),var(--n0) 140%)}
+.tile.warn .v,.tile.warn .l{color:var(--warning-text)}
+.tile.warn .v{font-size:24px;line-height:32px}
+.tile.warn .l{font-size:13px;line-height:20px}
+.tile.warn .ico{width:var(--touch);height:var(--touch);flex:none;border-radius:var(--r-md);display:grid;place-items:center;
+  background:var(--warning);color:#fff;animation:breathe 3.4s var(--ease-in-out) infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+.scan{position:relative;overflow:hidden;isolation:isolate;width:100%;padding:26px 20px;border-radius:var(--r-xl);color:#fff;
+  background:var(--grad-brand);box-shadow:0 12px 32px rgba(240,40,35,.34);
+  display:flex;flex-direction:column;align-items:center;gap:12px;transition:transform 160ms var(--ease-out)}
+.scan:active{transform:scale(.975)}
+.scan .rings{position:relative;width:64px;height:64px;display:grid;place-items:center}
+.scan .rings i{position:absolute;inset:0;border-radius:var(--r-pill);border:2px solid rgba(255,255,255,.62);
+  animation:radiate 2.6s var(--ease-out) infinite}
+.scan .rings i:nth-child(2){animation-delay:.65s}
+.scan .rings i:nth-child(3){animation-delay:1.3s}
+@keyframes radiate{0%{transform:scale(.62);opacity:0}22%{opacity:.78}100%{transform:scale(1.5);opacity:0}}
+.scan .core{position:relative;z-index:1;width:36px;height:36px;border-radius:var(--r-pill);background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.48);display:grid;place-items:center}
+.scan .lbl{font:700 19px/24px Inter}
+.scan .sub{font:500 13px/20px Inter;margin-top:-4px}
+
+/* ── list rows ── */
+.row{display:flex;align-items:center;gap:12px;min-height:var(--touch);background:var(--n0);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:12px;box-shadow:var(--e1);transition:transform 160ms var(--ease-out);width:100%;text-align:left}
+.row:active{transform:scale(.985)}
+.row .main{flex:1;min-width:0}
+.row .main b{display:block;font:700 16px/26px Inter}
+.row .main span{display:block;font:400 12px/16px Inter;color:var(--n500)}
+.row .tail{font:600 12px/16px Inter;color:var(--n500);flex:none}
+
+/* ── module grid ── */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mod{border-radius:var(--r-lg);border:1px solid var(--line);background:var(--n0);box-shadow:var(--e1);padding:16px;
+  display:flex;flex-direction:column;gap:10px;align-items:flex-start;min-height:118px;position:relative;
+  transition:transform 160ms var(--ease-out)}
+.mod:active{transform:scale(.975)}
+.mod .ic{width:var(--touch);height:var(--touch);border-radius:var(--r-md);background:var(--info-bg);color:var(--info-text);
+  display:grid;place-items:center}
+.mod b{font:600 15px/22px Inter}
+.mod.off{opacity:.55;cursor:not-allowed}
+.mod.off:active{transform:none}
+.mod .soon{position:absolute;top:12px;right:12px;font:600 10px/14px Inter;letter-spacing:.5px;text-transform:uppercase;
+  background:var(--n100);color:var(--n500);padding:3px 7px;border-radius:var(--r-pill)}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CREW — boarding pass, duty rail, timeline
+   Indigo cầm toàn bộ bề mặt dữ liệu. Trắng trên #4338CA = 7.90:1,
+   trên #4F46E5 = 6.29:1 — cả hai cõng được chữ nhỏ.
+   ═══════════════════════════════════════════════════════════════════ */
+.count{font-family:"Plus Jakarta Sans";font-weight:800;letter-spacing:-.02em;
+  font-size:44px;line-height:50px;font-variant-numeric:tabular-nums}
+
+/* ── boarding pass ── */
+.pass{position:relative;isolation:isolate;overflow:hidden;border-radius:var(--r-xl);color:#fff;
+  background:linear-gradient(150deg,var(--info-text) 0%,var(--info) 58%,var(--info-text) 100%);
+  box-shadow:0 14px 40px rgba(67,56,202,.32), var(--e2)}
+.pass::before{content:"";position:absolute;inset:-40% -20%;z-index:-1;
+  background:radial-gradient(44% 40% at 86% 6%,rgba(255,255,255,.20),transparent 68%),
+             radial-gradient(40% 36% at 6% 92%,rgba(240,40,35,.28),transparent 72%);
+  animation:aurora 22s var(--ease-in-out) infinite alternate}
+.pass .top{padding:18px 18px 12px}
+.pass .kick{font:600 11px/16px Inter;letter-spacing:.88px;text-transform:uppercase;opacity:.86}
+.pass .sub{font:500 13px/20px Inter;opacity:.9;margin-top:2px}
+
+/* răng cưa vé: hai nửa hình tròn màu nền + đường đứt */
+.pass .tear{position:relative;height:1px;margin:4px 0 0}
+.pass .tear::before,.pass .tear::after{content:"";position:absolute;top:-11px;width:22px;height:22px;
+  border-radius:var(--r-pill);background:var(--surface-2)}
+.pass .tear::before{left:-11px}
+.pass .tear::after{right:-11px}
+.pass .tear i{position:absolute;left:14px;right:14px;top:0;height:0;
+  border-top:2px dashed rgba(255,255,255,.34)}
+.pass .bot{padding:16px 18px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pass .tag{font:600 12px/16px Inter;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.24);
+  padding:6px 10px;border-radius:var(--r-pill);backdrop-filter:blur(8px)}
+
+/* ── đường bay có máy bay chạy ── */
+.arc{display:block;width:100%;height:64px;margin-top:6px}
+.arc .track{stroke:rgba(255,255,255,.34);stroke-width:2;stroke-dasharray:1 6;stroke-linecap:round;fill:none}
+.arc .glow{stroke:rgba(255,255,255,.9);stroke-width:2.5;stroke-linecap:round;fill:none;
+  stroke-dasharray:var(--arclen);stroke-dashoffset:var(--arclen);
+  animation:draw 5.5s var(--ease-in-out) infinite}
+@keyframes draw{
+  0%{stroke-dashoffset:var(--arclen)}
+  55%{stroke-dashoffset:0}
+  75%,100%{stroke-dashoffset:calc(var(--arclen) * -1)}
+}
+.arc .node{fill:#fff}
+.arc .iata{font:700 13px "Plus Jakarta Sans",Inter;fill:#fff;letter-spacing:.4px}
+.arc .hhmm{font:500 10px Inter;fill:rgba(255,255,255,.82)}
+
+/* ── duty rail ──
+   Nút đặt theo TỶ LỆ THỜI GIAN THẬT, không chia đều: 05:30 → 12:35 là trục.
+   Nhãn dưới mỗi nút sẽ chồng nhau (VJ872 cách báo cáo có 14%), nên chỉ ghi
+   hai đầu mút + một dòng chú thích "tiếp theo". */
+.rail{position:relative;height:12px;margin:16px 6px 0}
+.rail .track,.rail .fill{position:absolute;left:0;top:4px;height:4px;border-radius:var(--r-pill)}
+.rail .track{right:0;background:var(--n200)}
+.rail .fill{width:0;background:linear-gradient(90deg,var(--info),var(--info-text));
+  transition:width 800ms var(--ease-out)}
+.rail .n{position:absolute;top:0;width:12px;height:12px;border-radius:var(--r-pill);transform:translateX(-50%);
+  background:var(--n0);border:2px solid var(--n300);transition:border-color 300ms ease,background 300ms ease}
+.rail .n.done{background:var(--info);border-color:var(--info)}
+.rail .n.now{border-color:var(--brand);animation:pulse 2.2s var(--ease-out) infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(240,40,35,.5)}70%,100%{box-shadow:0 0 0 9px rgba(240,40,35,0)}}
+.railfoot{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:12px 4px 0}
+.railfoot .t{font:600 11px/16px Inter;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.railfoot .next{font:600 12px/16px Inter;color:var(--info-text);background:var(--info-bg);
+  padding:5px 10px;border-radius:var(--r-pill)}
+
+/* ── stat trio ── */
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.trio div{background:var(--n0);padding:13px 10px;text-align:center}
+.trio b{display:block;font-family:"Plus Jakarta Sans";font-weight:800;font-size:19px;line-height:26px;letter-spacing:-.2px}
+.trio span{display:block;font:500 11px/16px Inter;color:var(--n500);margin-top:1px}
+
+/* ── crew avatar stack ── */
+.faces{display:flex;align-items:center}
+.faces .f{width:34px;height:34px;border-radius:var(--r-pill);display:grid;place-items:center;flex:none;
+  font:700 12px Inter;color:#fff;border:2px solid var(--n0);margin-left:-9px;
+  background:linear-gradient(140deg,var(--info),var(--info-text))}
+.faces .f:first-child{margin-left:0}
+.faces .f.lead{background:var(--grad-brand)}
+.faces .more{margin-left:-9px;width:34px;height:34px;border-radius:var(--r-pill);border:2px solid var(--n0);
+  background:var(--n100);color:var(--ink-2);display:grid;place-items:center;font:700 11px Inter}
+
+/* ── hero vòng bay: nhiều chặng trong MỘT hình ──
+   Trục ngang LÀ thời gian thật. Bề rộng cung = thời lượng bay; bề rộng đoạn
+   phẳng = thời gian nghỉ sân. Nét liền = đã tải gói bay, nét đứt = chưa. */
+.rot{display:block;width:100%;height:116px;overflow:visible}
+.rot .leg{stroke:#fff;stroke-width:2.5;stroke-linecap:round;fill:none;
+  transition:stroke 400ms ease,stroke-dasharray 400ms ease,opacity 400ms ease}
+.rot .leg.pending{stroke:rgba(255,255,255,.55);stroke-dasharray:5 6}
+.rot .leg.delayed{stroke:var(--brand-accent)}
+.rot .grd{stroke:rgba(255,255,255,.45);stroke-width:2;stroke-linecap:round;fill:none;stroke-dasharray:1 5}
+.rot .grd.tight{stroke:var(--brand-accent);stroke-dasharray:none}
+.rot .stop{fill:var(--info-text);stroke:#fff;stroke-width:2.5}
+.rot .iata{font:800 13px "Plus Jakarta Sans",Inter;fill:#fff;letter-spacing:.3px}
+.rot .hhmm{font:500 9.5px Inter;fill:rgba(255,255,255,.86);font-variant-numeric:tabular-nums}
+.rot .flt{font:700 10px Inter;fill:#fff;letter-spacing:.3px}
+.rot .gmin{font:600 9px Inter;fill:rgba(255,255,255,.82)}
+.rot .now{stroke:var(--brand-accent);stroke-width:1.5;stroke-dasharray:3 3}
+.rot .nowdot{fill:var(--brand-accent)}
+/* Chấm sáng bò dọc cung sắp bay. animateMotion chạy ở mọi Safari, khác với
+   offset-path (chỉ 16+). */
+.rot .spark{fill:#fff;opacity:.9}
+
+.rotfoot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ── danh sách chuyến trên màn chính ──
+   `downloaded` là dữ liệu THẬT trên từng chặng (mockPack.legs[].downloaded);
+   fetchPack báo onLegDone(i,total) nên các hàng sáng dần khi tải. */
+.flist{background:var(--n0);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--e1);overflow:hidden}
+.fl{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;
+  transition:background 180ms ease,transform 160ms var(--ease-out)}
+.fl + .fl{border-top:1px solid var(--n100)}
+.fl:active{transform:scale(.985);background:var(--n50)}
+.fl .clock{flex:none;width:46px;font-variant-numeric:tabular-nums}
+.fl .clock b{display:block;font:700 14px/20px Inter}
+.fl .clock span{display:block;font:500 12px/18px Inter;color:var(--ink-3)}
+.fl .core{flex:1;min-width:0}
+.fl .core .r{display:flex;align-items:center;gap:7px}
+.fl .core .no{font-family:"Plus Jakarta Sans";font-weight:800;font-size:15px;line-height:22px;letter-spacing:-.1px}
+.fl .core .od{font:500 13px/20px Inter;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl .core .sub{display:flex;align-items:center;gap:6px;margin-top:3px}
+.fl .dl{flex:none;width:28px;height:28px;border-radius:var(--r-pill);display:grid;place-items:center}
+.fl .dl.on{background:var(--info-bg);color:var(--info-text)}
+.fl .dl.off{background:var(--n100);color:var(--ink-3)}
+.fl .dl.busy{background:var(--info-bg);color:var(--info-text);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fl .chev{flex:none;color:var(--n300)}
+
+.mini{font:600 11px/16px Inter;padding:3px 7px;border-radius:var(--r-pill)}
+.mini.on{background:var(--info-bg);color:var(--info-text)}
+.mini.off{background:var(--n100);color:var(--n500)}
+
+/* ── timeline (crew/flights) ── */
+.tl{position:relative;padding-left:34px}
+.tl::before{content:"";position:absolute;left:11px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.tl .stop{position:relative;margin-bottom:10px}
+.tl .stop::before{content:"";position:absolute;left:-28px;top:20px;width:12px;height:12px;border-radius:var(--r-pill);
+  background:var(--n0);border:3px solid var(--info)}
+.tl .stop.delayed::before{border-color:var(--warning)}
+.tl .gap{position:relative;display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:6px 0;
+  font:600 11px/16px Inter;color:var(--n500)}
+.tl .gap::before{content:"";position:absolute;left:-24px;top:0;bottom:0;width:2px;
+  background:repeating-linear-gradient(180deg,var(--n300) 0 4px,transparent 4px 8px)}
+.tl .gap.tight{color:var(--warning-text)}
+
+.legcard{border-radius:var(--r-lg);border:1px solid var(--line);background:var(--n0);box-shadow:var(--e1);
+  padding:14px;display:flex;flex-direction:column;gap:11px;transition:transform 160ms var(--ease-out)}
+.legcard:active{transform:scale(.985)}
+.legcard .hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.legcard .no{font-family:"Plus Jakarta Sans";font-weight:800;font-size:19px;line-height:26px;letter-spacing:-.2px}
+.legcard .od{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.legcard .pt{text-align:center}
+.legcard .pt b{display:block;font-family:"Plus Jakarta Sans";font-weight:700;font-size:20px;line-height:28px}
+.legcard .pt span{display:block;font:500 12px/16px Inter;color:var(--n500);font-variant-numeric:tabular-nums}
+.legcard .mid{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.legcard .mid .dur{font:600 10px/14px Inter;color:var(--n500)}
+/* Đường đứt vẽ bằng border, máy bay là icon thật — không kéo méo như SVG
+   preserveAspectRatio="none" sẽ làm. */
+.legcard .dash{position:relative;width:100%;height:16px}
+.legcard .dash::before{content:"";position:absolute;top:50%;left:0;right:0;border-top:1.5px dashed var(--n300)}
+.legcard .dash .pl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:var(--n0);padding:0 5px;color:var(--info);display:grid}
+
+.load{display:flex;flex-direction:column;gap:5px}
+.load .lb{display:flex;justify-content:space-between;font:500 11px/16px Inter;color:var(--n500)}
+.load .tr{height:7px;border-radius:var(--r-pill);background:var(--n100);overflow:hidden}
+.load .tr i{display:block;height:100%;width:0;border-radius:var(--r-pill);
+  background:linear-gradient(90deg,var(--info),var(--info-text));transition:width 800ms var(--ease-out)}
+.load .tr i.hot{background:linear-gradient(90deg,var(--brand),var(--brand-dark))}
+
+.pack{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--n0)}
+.pack .txt{flex:1;min-width:0}
+.pack .txt b{display:block;font:600 14px/22px Inter}
+.pack .txt span{display:block;font:400 12px/16px Inter;color:var(--n500)}
+.pack .btn{font:600 13px Inter;color:var(--info-text);background:var(--info-bg);padding:9px 13px;border-radius:var(--r-sm);flex:none}
+.prog{height:6px;border-radius:var(--r-pill);background:var(--n100);overflow:hidden;margin-top:6px}
+.prog i{display:block;height:100%;background:var(--info);border-radius:var(--r-pill);transition:width 300ms var(--ease-out)}
+
+/* ── viewfinder ── */
+.finder{flex:1;min-height:240px;border-radius:var(--r-lg);background:var(--n900);display:grid;place-items:center;position:relative;overflow:hidden}
+.finder .frame{width:190px;height:190px;border-radius:var(--r-lg);border:3px solid rgba(255,255,255,.85);position:relative}
+.finder .laser{position:absolute;left:6px;right:6px;height:2px;background:var(--brand);box-shadow:0 0 12px 2px rgba(240,40,35,.8);
+  animation:sweep 2.4s var(--ease-in-out) infinite alternate}
+@keyframes sweep{from{top:8px}to{top:176px}}
+.finder .cap{position:absolute;bottom:16px;font:500 13px Inter;color:rgba(255,255,255,.75)}
+
+/* ── centred states ── */
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;background:var(--n0)}
+
+/* ── login / auth ── */
+.auth{flex:1;display:flex;flex-direction:column;background:var(--n0);overflow-y:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.auth::-webkit-scrollbar{display:none}
+.auth:not(.aurora){padding:0 calc(var(--sa-r) + 28px) calc(var(--sa-bot) + 24px) calc(var(--sa-l) + 28px)}
+.logo{width:56px;height:56px;border-radius:var(--r-md);background:var(--grad-brand);display:grid;place-items:center;
+  color:#fff;font-family:"Plus Jakarta Sans";font-weight:800;font-size:22px;box-shadow:0 8px 20px rgba(240,40,35,.3)}
+
+/* ═ Aurora hero: full-bleed brand gradient behind a frosted white sheet ═ */
+.auth.aurora{position:relative;isolation:isolate;overflow-x:hidden;
+  background:
+    radial-gradient(130% 92% at 6% -10%, rgba(255,221,50,.20), transparent 50%),
+    radial-gradient(120% 85% at 112% 4%, rgba(129,140,248,.55), transparent 58%),
+    linear-gradient(158deg,#7A0000 0%,#B70005 20%,#8E0E4E 46%,#5A44D6 74%,#4F46E5 100%)}
+.auth.aurora::before,.auth.aurora::after{content:"";position:absolute;z-index:-1;border-radius:var(--r-pill);
+  filter:blur(48px);opacity:.55;pointer-events:none}
+.auth.aurora::before{width:280px;height:280px;top:-64px;left:-72px;
+  background:radial-gradient(circle,#FF5A4D,transparent 68%);animation:auroraFloat 15s var(--ease-in-out) infinite}
+.auth.aurora::after{width:330px;height:330px;top:48px;right:-116px;
+  background:radial-gradient(circle,#6366F1,transparent 66%);animation:auroraFloat 19s var(--ease-in-out) infinite reverse}
+@keyframes auroraFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(20px,28px,0)}}
+
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff;
+  padding:calc(var(--sa-top) + 54px) 28px 30px;gap:16px}
+.logo-hero{width:76px;height:76px;border-radius:22px;display:grid;place-items:center;color:#fff;
+  font-family:"Plus Jakarta Sans";font-weight:800;font-size:29px;letter-spacing:.5px;
+  background:linear-gradient(150deg,rgba(255,255,255,.42),rgba(255,255,255,.16));
+  border:1px solid rgba(255,255,255,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 16px 40px rgba(0,0,0,.30),inset 0 1.5px 0 rgba(255,255,255,.7),0 0 0 6px rgba(255,255,255,.06)}
+.protobadge{display:inline-flex;align-items:center;gap:8px;max-width:308px;margin-top:2px;
+  padding:8px 14px;border-radius:var(--r-pill);text-align:left;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.30);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  color:rgba(255,255,255,.94);font:600 11.5px/15px Inter}
+.protobadge svg{flex:none;opacity:.95}
+
+/* frosted white sheet that holds the form */
+.sheet{flex:1;display:flex;flex-direction:column;margin-top:6px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(28px) saturate(150%);
+  -webkit-backdrop-filter:blur(28px) saturate(150%);border-top:1px solid rgba(255,255,255,.6);
+  border-radius:28px 28px 0 0;box-shadow:0 -14px 44px rgba(15,23,42,.26);
+  padding:26px calc(var(--sa-r) + 26px) calc(var(--sa-bot) + 22px) calc(var(--sa-l) + 26px)}
+.sheet .field .box{background:#fff;border-color:var(--n200);box-shadow:var(--e1)}
+/* neutral "waiting" state instead of a washed-out red on load */
+.sheet .cta:disabled{background:var(--n200);color:var(--n400);opacity:1;box-shadow:none}
+
+/* Face ID shortcut button (inside sheet) */
+.faceid{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;min-height:var(--glove);
+  border-radius:var(--r-lg);background:var(--info-bg);color:var(--info-text);font:700 16px Inter;
+  border:1px solid rgba(79,70,229,.24);transition:transform 160ms var(--ease-out),background 200ms ease}
+.faceid:active{transform:scale(.975)}
+.faceid .g{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--info);color:#fff}
+
+/* big Face ID target for the unlock screen */
+.faceid-xl{width:136px;height:136px;border-radius:36px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(150deg,rgba(255,255,255,.26),rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.44);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 52px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.55);
+  transition:transform 180ms var(--ease-out)}
+.faceid-xl:active{transform:scale(.94)}
+
+/* labelled divider */
+.authdiv{display:flex;align-items:center;gap:12px;color:var(--ink-3);font:600 12px Inter;margin:18px 0}
+.authdiv::before,.authdiv::after{content:"";height:1px;flex:1;background:var(--line)}
+
+.demo{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.demo button{font:600 11px/16px ui-monospace,monospace;background:var(--info-bg);color:var(--info-text);
+  padding:6px 9px;border-radius:var(--r-pill);transition:transform 160ms var(--ease-out)}
+.demo button:active{transform:scale(.94)}
+.demotog{font:600 12px Inter;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px}
+
+/* ── inspector: bottom sheet ── */
+.fab{position:absolute;z-index:60;right:calc(var(--sa-r) + 16px);bottom:calc(var(--sa-bot) + 84px);
+  width:var(--touch);height:var(--touch);border-radius:var(--r-pill);background:var(--n900);color:#fff;
+  display:grid;place-items:center;font:700 15px Inter;box-shadow:var(--e3);
+  transition:transform 160ms var(--ease-out),opacity 200ms ease}
+.fab:active{transform:scale(.9)}
+.fab[hidden]{display:none}
+
+.scrim{position:absolute;inset:0;z-index:70;background:rgba(15,23,42,.5);opacity:0;pointer-events:none;
+  transition:opacity 260ms var(--ease-out);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.scrim.on{opacity:1;pointer-events:auto}
+
+.insp{
+  position:absolute;left:0;right:0;bottom:0;z-index:75;max-height:82%;
+  background:#0e1626;border-top:1px solid #222d45;border-radius:22px 22px 0 0;color:#c3ccdb;
+  font-size:13.5px;line-height:21px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:8px calc(var(--sa-r) + 20px) calc(var(--sa-bot) + 20px) calc(var(--sa-l) + 20px);
+  /* translateY(100%) = tự chiều cao mình, không cần biết cao bao nhiêu */
+  transform:translateY(100%);transition:transform 320ms var(--ease-drawer,cubic-bezier(.32,.72,0,1))}
+.insp.on{transform:translateY(0)}
+.insp .grab{width:36px;height:4px;border-radius:var(--r-pill);background:#2a3552;margin:6px auto 14px}
+.insp h3{font-family:"Plus Jakarta Sans";font-weight:800;font-size:15px;color:#fff;margin-bottom:4px}
+.insp .lead{font-size:12.5px;line-height:19px;color:#7d8aa1;margin-bottom:14px}
+.insp .blk{border-top:1px solid #1d2740;padding-top:14px;margin-top:14px}
+.insp .k{font:600 10px/14px ui-monospace,monospace;letter-spacing:.6px;text-transform:uppercase;color:#5b6883;margin-bottom:7px}
+.insp .v{font:500 13px ui-monospace,monospace;color:#e2e8f0;word-break:break-all}
+.insp .tags{display:flex;gap:5px;flex-wrap:wrap}
+.insp .tag{font:600 11px/16px ui-monospace,monospace;padding:3px 8px;border-radius:var(--r-pill);background:#1a2338;color:#a5b4fc;border:1px solid #2a3552}
+.insp .tag.prim{background:var(--info);color:#fff;border-color:var(--info)}
+.insp .tag.no{background:#1a1420;color:#6b7280;border-color:#2a2130;text-decoration:line-through}
+.insp .tag.dash{background:#0f2318;color:#4ade80;border-color:#1d4230}
+.insp ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.insp li{font:500 12px/18px ui-monospace,monospace;color:#94a3b8;padding-left:14px;position:relative}
+.insp li::before{content:"›";position:absolute;left:0;color:#4f46e5}
+.insp .src{font:500 11px/17px ui-monospace,monospace;color:#5b6883;margin-top:8px}
+.insp .note{background:#1a1408;border:1px solid #40320f;border-radius:10px;padding:10px 12px;margin-top:12px;
+  color:#fcd34d;font-size:12px;line-height:18px}
+.stackbar{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.stackbar i{font:500 11px/16px ui-monospace,monospace;background:#141c2e;border:1px solid #253049;padding:3px 7px;border-radius:5px;color:#7d8aa1;font-style:normal}
+.stackbar i:last-child{background:var(--info);border-color:var(--info);color:#fff}
+.ctlrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ctlrow button{font:600 11.5px Inter;border:1px solid #2e3a54;background:#141c2e;color:#c3ccdb;padding:7px 11px;border-radius:var(--r-pill)}
+.ctlrow button:active{transform:scale(.96)}
+
+/* ── stagger vào màn: 55ms/phần tử, dịch lên 10px. Không chặn tương tác. ── */
+.st{opacity:0;transform:translateY(10px);animation:rise 420ms var(--ease-out) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .view{animation:none!important}
+  .st{opacity:1;transform:none;animation:none}
+  .arc .glow{stroke-dashoffset:0;animation:none}
+  .rail .n.now b{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div id="stack">
+<!-- #stack là gốc toạ độ: FAB và sheet bám vào cột app, không bám mép viewport.
+     #views là nơi duy nhất bị xoá/vẽ lại — chrome nằm ngoài nó. -->
+<div id="views"></div>
+<button class="fab" id="fab" aria-label="Mở Inspector">ⓘ</button>
+<div class="scrim" id="scrim"></div>
+
+<aside class="insp" id="insp" aria-hidden="true">
+    <div class="grab"></div>
+    <h3>Prototype Inspector</h3>
+    <div class="lead">Cửa sổ nhìn vào registry. Mọi thứ trên màn hình được suy ra từ đây — không màn hình nào hardcode.</div>
+
+    <div class="blk" style="border:0;padding:0;margin:0">
+      <div class="k">Route stack</div>
+      <div class="stackbar" id="i-stack"></div>
+    </div>
+
+    <div class="blk">
+      <div class="k">Session</div>
+      <div class="v" id="i-user">— chưa đăng nhập —</div>
+    </div>
+
+    <div class="blk">
+      <div class="k">Roles · precedence quyết định dashboard</div>
+      <div class="tags" id="i-roles"></div>
+      <div class="src" id="i-dash"></div>
+    </div>
+
+    <div class="blk">
+      <div class="k">Modules nhìn thấy · modulesForRoles()</div>
+      <div class="tags" id="i-mods"></div>
+    </div>
+
+    <div class="blk">
+      <div class="k">Permissions · quyết định hành động</div>
+      <ul id="i-perms"></ul>
+    </div>
+
+    <div class="blk">
+      <div class="k">Điều khiển demo</div>
+      <div class="ctlrow">
+        <button id="c-reset">↺ Đăng xuất</button>
+        <button id="c-jump">⏩ Nhảy qua giờ báo cáo</button>
+        <button id="c-close">✕ Đóng</button>
+      </div>
+      <div class="note" id="i-note">
+        <b>Lưu ý từ source:</b> <code>DEMO_USERS</code> chỉ có 6 mã. <code>ramp_driver</code>, <code>catering</code>, <code>engineer</code> chưa có mã demo nào — mã lạ rơi về <code>cabin_crew</code> theo <code>resolveUser()</code>.
+      </div>
+    </div>
+</aside>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   1. DỮ LIỆU & LUẬT — chép nguyên từ source
+   ═══════════════════════════════════════════════════════════════════ */
+
+// src/lib/modules/types.ts
+const ROLES = ["purser","cabin_crew","gate_supervisor","ground_staff","ramp_driver","catering","engineer","equipment_manager"];
+const ROLE_PRECEDENCE = ROLES;
+
+// src/lib/modules/registry.ts
+const MODULES = [
+  {id:"crew_ops",   title:"Tổ bay",            icon:"plane", roles:["purser","cabin_crew"],              route:"/crew/flights"},
+  {id:"ground_ops", title:"Mặt đất",           icon:"scan",  roles:["ground_staff","gate_supervisor"],   route:"/scan"},
+  {id:"ops_ride",   title:"Xe vận hành",       icon:"car",   roles:["ramp_driver"],                      route:null},
+  {id:"catering",   title:"Suất ăn & Hàng hoá",icon:"food",  roles:["catering"],                         route:null},
+  {id:"devices",    title:"Thiết bị",          icon:"cube",  roles:["engineer"],                         route:null},
+  {id:"equipment",  title:"Quản lý thiết bị",  icon:"tag",   roles:["equipment_manager"],                route:null},
+];
+const modulesForRoles = roles => roles.length ? MODULES.filter(m => m.roles.some(r => roles.includes(r))) : [];
+const canAccessModule = (roles,id) => { const m = MODULES.find(x=>x.id===id); return m ? m.roles.some(r=>roles.includes(r)) : false; };
+
+// src/lib/modules/permissions.ts
+const CREW_1 = ["crew_ops.pack.download","crew_ops.pax.view_sensitive","safety.report.submit"];
+const CREW_2 = ["crew_ops.duty.assign_stations","crew_ops.voyage.sign","crew_ops.bob.close"];
+const ROLE_PERMISSIONS = {
+  purser:[...CREW_1,...CREW_2],
+  cabin_crew:[...CREW_1],
+  gate_supervisor:["ground_ops.scan","ground_ops.wrongboarding.accept","safety.report.submit"],
+  ground_staff:["ground_ops.scan","safety.report.submit"],
+  ramp_driver:["safety.report.submit"],
+  catering:["safety.report.submit"],
+  engineer:["safety.report.submit"],
+  equipment_manager:["equipment.identify","equipment.register","safety.report.submit"],
+};
+const permsFor = roles => [...new Set(roles.flatMap(r => ROLE_PERMISSIONS[r] ?? []))];
+const hasPermission = (roles,p) => roles.some(r => (ROLE_PERMISSIONS[r]??[]).includes(p));
+
+// src/lib/modules/dashboards.ts
+const ROLE_DASHBOARDS = { purser:"CrewDashboard", cabin_crew:"CrewDashboard", equipment_manager:"EquipmentDashboard" };
+const resolvePrimaryRole = roles => ROLE_PRECEDENCE.find(r => roles.includes(r)) ?? null;
+
+// src/lib/mock/users.ts
+const DEMO_USERS = {
+  purser:     {employeeCode:"purser",     displayName:"Nguyễn Văn A",  roles:["purser","cabin_crew"]},
+  cabincrew:  {employeeCode:"cabincrew",  displayName:"Trần Thị B",    roles:["cabin_crew"]},
+  groundstaff:{employeeCode:"groundstaff",displayName:"Lê Văn C",      roles:["ground_staff"]},
+  gatesup:    {employeeCode:"gatesup",    displayName:"Phạm Thị D",    roles:["gate_supervisor","ground_staff"]},
+  vj001042:   {employeeCode:"VJ001042",   displayName:"Nguyễn Văn An", roles:["purser","cabin_crew"]},
+  equipment:  {employeeCode:"equipment",  displayName:"Phạm Minh D",   roles:["equipment_manager"]},
+};
+function resolveUser(code){
+  const key = code.trim().toLowerCase();
+  const d = DEMO_USERS[key];
+  if (d) return {...d, roles:[...d.roles]};
+  const trimmed = code.trim();
+  return {employeeCode:trimmed, displayName:trimmed, roles:["cabin_crew"]};
+}
+
+// src/features/equipment/data/repo.ts — SEED
+const SEED = [
+  {type:"trolley",code:"F-102",tagUid:"04:1B:7E:2A:01",size:"full",status:"repairing",  manufacturer:"Zodiac",      partNo:"AT-7840",serialNumber:"SN-883015",yearOfManufacture:2018,yearOfExpiry:2029,registrationLocation:"SGN",station:"SGN",statusSince:1780000000000},
+  {type:"trolley",code:"H-045",tagUid:"04:1B:7E:2A:02",size:"half",status:"not-service",manufacturer:"Mallaghan",   partNo:"AT-7602",serialNumber:"SN-881120",yearOfManufacture:2020,registrationLocation:"SGN",station:"SGN",defectReason:"Bánh xe gãy",statusSince:1779000000000},
+  {type:"trolley",code:"F-018",tagUid:"04:1B:7E:2A:03",size:"full",status:"not-service",manufacturer:"Zodiac",      partNo:"AT-7840",serialNumber:"SN-883200",yearOfManufacture:2019,registrationLocation:"SGN",station:"SGN",defectReason:"Khoá cửa hỏng",statusSince:1778000000000},
+  {type:"trolley",code:"F-008",tagUid:"04:1B:7E:2A:04",size:"full",status:"service",    manufacturer:"JBT AeroTech",partNo:"AT-7710",serialNumber:"SN-882100",yearOfManufacture:2021,registrationLocation:"CXR",station:"SGN",statusSince:1781000000000},
+  {type:"trolley",code:"H-007",tagUid:"04:1B:7E:2A:05",size:"half",status:"service",    manufacturer:"Zodiac",      partNo:"AT-7602",serialNumber:"SN-881500",yearOfManufacture:2022,registrationLocation:"SGN",station:"SGN",statusSince:1781500000000},
+  {type:"trolley",code:"F-023",tagUid:"04:1B:7E:2A:06",size:"full",status:"service",    manufacturer:"Mallaghan",   partNo:"AT-7900",serialNumber:"SN-884000",yearOfManufacture:2023,registrationLocation:"HAN",station:"HAN",statusSince:1782000000000},
+  {type:"trolley",code:"H-009",tagUid:"04:1B:7E:2A:07",size:"half",status:"not-service",manufacturer:"Zodiac",      partNo:"AT-7602",serialNumber:"SN-881900",yearOfManufacture:2020,registrationLocation:"HAN",station:"HAN",defectReason:"Chốt gãy",statusSince:1777000000000},
+  {type:"trolley",code:"F-050",tagUid:"04:1B:7E:2A:08",size:"full",status:"repairing",  manufacturer:"JBT AeroTech",partNo:"AT-7710",serialNumber:"SN-882600",yearOfManufacture:2021,registrationLocation:"CXR",station:"CXR",statusSince:1780500000000},
+  {type:"pos", code:"POS-0001",status:"service",    manufacturer:"Ingenico",serialNumber:"SN-P970001",imei:"351000000000001",yearOfManufacture:2022,holder:"Nguyen T. Anh",registrationLocation:"SGN",station:"SGN",statusSince:1781000000000},
+  {type:"ipad",code:"IPD-0011",status:"not-service",manufacturer:"Apple",   serialNumber:"SN-I880011",imei:"990000000000011",yearOfManufacture:2022,holder:"Do T. Minh",   registrationLocation:"CXR",station:"CXR",defectReason:"Màn hình nứt",statusSince:1779500000000},
+];
+let ITEMS = SEED.map(e=>({...e}));
+const isTrolley = e => e.type === "trolley";
+
+// src/features/equipment/data/stats.ts
+const DAY_MS = 86400000;
+const countAtStation = st => ITEMS.filter(e=>isTrolley(e)&&e.station===st).length;
+const notServiceAt   = st => ITEMS.filter(e=>isTrolley(e)&&e.station===st&&e.status==="not-service").sort((a,b)=>a.statusSince-b.statusSince);
+const repairingAt    = st => ITEMS.filter(e=>isTrolley(e)&&e.station===st&&e.status==="repairing").length;
+const sizeSplitAt    = st => {const t=ITEMS.filter(e=>isTrolley(e)&&e.station===st);
+  return {full:t.filter(e=>e.size==="full").length, half:t.filter(e=>e.size==="half").length};};
+const stationsWithCounts = () => {
+  const c = new Map();
+  ITEMS.filter(isTrolley).forEach(e=>c.set(e.station,(c.get(e.station)??0)+1));
+  return [...c.entries()].map(([station,count])=>({station,count}))
+    .sort((a,b)=>b.count-a.count || a.station.localeCompare(b.station));
+};
+const daysWaiting = (e,now) => Math.floor((now - e.statusSince)/DAY_MS);
+const byCode = code => ITEMS.find(e=>e.code.toLowerCase()===code.toLowerCase());
+// nextCode() — mã cấp lúc lưu, không giữ chỗ trước
+function nextCode(size){
+  const p = size==="full" ? "F" : "H";
+  let highest = 0, len = 3;
+  ITEMS.forEach(e=>{ if(e.type!=="trolley"||e.size!==size) return;
+    const np = e.code.slice(p.length+1); const n = parseInt(np,10);
+    if(!Number.isNaN(n)){ highest=Math.max(highest,n); len=Math.max(len,np.length); }});
+  return `${p}-${String(highest+1).padStart(len,"0")}`;
+}
+
+// src/features/crew-ops — mockPack + domain/time
+const MIN = 60000, HOUR = 3600000;
+const PACK_SIZE_MB = 12.4, REPORT_OFFSET_MINUTES = 60, TIGHT_GROUND_MINUTES = 30;
+const DAY0 = new Date(2026,6,10,0,0,0).getTime();   // nửa đêm ngày trực
+const at = (h,m) => DAY0 + h*HOUR + m*MIN;
+const LEGS = [
+  {id:"VJ872",flightNo:"VJ872",origin:"SGN",destination:"PQC",std:at(6,30),sta:at(7,35),status:"upcoming",pob:149,capacity:230,ssrWchr:2,ssrUmnr:1,ssrMeda:1,ssrInf:2},
+  {id:"VJ873",flightNo:"VJ873",origin:"PQC",destination:"BMV",std:at(8,20),sta:at(9,50),status:"upcoming",pob:88, capacity:230,ssrWchr:1,ssrUmnr:0,ssrMeda:0,ssrInf:1},
+  {id:"VJ874",flightNo:"VJ874",origin:"BMV",destination:"SGN",std:at(10,55),sta:at(12,5),status:"delayed", pob:201,capacity:230,ssrWchr:0,ssrUmnr:1,ssrMeda:1,ssrInf:3},
+];
+LEGS.forEach(l => l.ssrCount = l.ssrWchr+l.ssrUmnr+l.ssrMeda+l.ssrInf);
+const ROTATION = {aircraftType:"A321neo", registration:"VN-A653", reportAt: LEGS[0].std - REPORT_OFFSET_MINUTES*MIN, dutyEndAt: LEGS[2].sta + 30*MIN};
+const CREW = [
+  {id:"C1",name:"Nguyễn Văn A",position:"Purser",station:"L1"},
+  {id:"C2",name:"Trần Thị B",position:"Cabin Crew",station:"R1"},
+  {id:"C3",name:"Phạm Thị D",position:"Cabin Crew",station:"L2"},
+  {id:"C4",name:"Đỗ Văn E",position:"Cabin Crew",station:"R2"},
+  {id:"C5",name:"Vũ Thị F",position:"Cabin Crew",station:"L3"},
+];
+const groundMinutes = (prevSta,nextStd) => Math.max(0, Math.round((nextStd-prevSta)/MIN));
+const isTightGround = m => m < TIGHT_GROUND_MINUTES;
+const pad = n => String(n).padStart(2,"0");
+const formatCountdown = ms => { const t=Math.max(0,Math.floor(ms/1000));
+  return `${pad(Math.floor(t/3600))}:${pad(Math.floor(t%3600/60))}:${pad(t%60)}`; };
+const hhmm = ms => { const d=new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+
+// deriveAlerts — dẫn xuất, không bịa
+function deriveAlerts(packState){
+  const a = [];
+  LEGS.forEach(l=>{
+    if (l.status==="cancelled") a.push({sev:"bad", text:`${l.flightNo} bị huỷ`});
+    else if (l.status==="delayed") a.push({sev:"warn", text:`${l.flightNo} bị trễ`});
+  });
+  for(let i=0;i<LEGS.length-1;i++){
+    const m = groundMinutes(LEGS[i].sta, LEGS[i+1].std);
+    if (isTightGround(m)) a.push({sev:"warn", text:`Quay đầu gấp tại ${LEGS[i].destination} · ${m}′`});
+  }
+  if (packState==="missing") a.push({sev:"warn", text:"Chưa tải gói bay"});
+  if (packState==="stale")   a.push({sev:"warn", text:"Gói bay đã cũ"});
+  return a.sort((x,y)=> (x.sev==="bad"?0:1) - (y.sev==="bad"?0:1));
+}
+
+// src/lib/mock — scan, passenger, flight
+const activeFlight = {code:"VJ872", from:"SGN", to:"HAN", scannedCount:128};
+const nextScanResult = i => i % 2 === 0 ? {kind:"correct"} : {kind:"wrong", scannedFlight:"VJ156"};
+const PASSENGER = {name:"John Smith",seat:"12A",pnr:"8KL3M",status:"CKIN",dob:"15/08/1980",
+  ssr:"Wheelchair Assistance (WCHR)",preMeal:"Seafood Meal",merchandise:"Đã đặt",transit:"VJ122 → HAN"};
+
+/* ═══════════════════════════════════════════════════════════════════
+   2. STATE + ROUTER
+   ═══════════════════════════════════════════════════════════════════ */
+const S = {
+  session: {employeeCode:null, displayName:null, roles:[], baseStation:"SGN"},
+  stack: ["/login"],
+  tab: "home",
+  simNow: ROTATION.reportAt - 45*MIN,   // mô phỏng: 45' trước giờ báo cáo
+  pack: {state:"missing", done:0, total:3, syncedAt:null},
+  scan: {count:activeFlight.scannedCount, result:null},
+  equip: {outcome:null},
+  reg: {size:"full", manufacturer:"", partNo:"", serial:"", year:"", loc:"SGN", issued:null},
+  login: {code:"", pw:"", show:false},
+};
+const route = () => S.stack[S.stack.length-1];
+const DARK_BAR = new Set(["/login","/forgot","/unlock"]);
+const AURORA = new Set(["/login","/unlock"]);   // full-bleed brand gradient hero
+
+let animating = false;
+function go(path, mode="push"){
+  if (animating || path === route()) return;
+  if (mode==="push") S.stack.push(path);
+  else if (mode==="replace") S.stack[S.stack.length-1] = path;
+  else if (mode==="reset") S.stack = [path];
+  transition(mode==="push" ? "push" : "fade");
+}
+function back(fallback="/home"){
+  if (animating) return;
+  if (S.stack.length > 1) { S.stack.pop(); transition("pop"); }
+  else { S.stack = [fallback]; transition("fade"); }
+}
+function refresh(){ // re-render màn hiện tại, không animation
+  const stack = document.getElementById("views");
+  stack.innerHTML = "";
+  stack.appendChild(buildView(route()));
+  paintChrome();
+}
+function transition(kind){
+  const stack = document.getElementById("views");
+  const old = stack.lastElementChild;
+  const next = buildView(route());
+  animating = true;
+  if (kind === "push"){
+    next.classList.add("push-in"); old?.classList.add("push-out");
+    stack.appendChild(next);
+  } else if (kind === "pop"){
+    next.classList.add("pop-in"); old?.classList.add("pop-out");
+    stack.insertBefore(next, old);
+  } else {
+    next.classList.add("fade-in"); stack.appendChild(next);
+  }
+  paintChrome();
+  setTimeout(()=>{ old?.remove(); animating=false; }, 340);
+}
+function paintChrome(){
+  // theme-color nhuộm thanh trạng thái iOS: trắng ở màn auth, đỏ thẫm ở màn có header.
+  // red-900 chứ không phải brand — nó là màu THẬT ở mép trên của gradient.
+  document.getElementById("theme-color")
+    .setAttribute("content", AURORA.has(route()) ? "#7A0000" : DARK_BAR.has(route()) ? "#FFFFFF" : "#7A0000");
+  document.documentElement.style.colorScheme = "light";
+  renderInspector();
+}
+
+/* tiện ích dựng DOM */
+function h(tag, attrs = {}, ...kids){
+  const el = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)){
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (v !== null && v !== undefined && v !== false) el.setAttribute(k, v);
+  }
+  kids.flat().forEach(k => k != null && el.appendChild(typeof k === "string" ? document.createTextNode(k) : k));
+  return el;
+}
+const svg = (s, size=22) => {
+  const w = document.createElement("span");
+  w.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s}</svg>`;
+  w.style.display = "grid"; return w;
+};
+const I = {
+  back:  `<path d="M15 18l-6-6 6-6"/>`,
+  arrow: `<path d="M5 12h14M13 6l6 6-6 6"/>`,
+  home:  `<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H10v6H4a1 1 0 0 1-1-1v-9.5Z"/>`,
+  user:  `<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>`,
+  plane: `<path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a.5.5 0 0 0-.5.8L8 11l-2 2H4l-1 1 3 1 1 3 1-1v-2l2-2 3.9 3.7a.5.5 0 0 0 .8-.5Z"/>`,
+  scan:  `<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M3 12h18"/>`,
+  car:   `<path d="M5 17h14M6 17v2M18 17v2M4 13l1.5-5A2 2 0 0 1 7.4 6.5h9.2A2 2 0 0 1 18.5 8L20 13M4 13h16v4H4z"/><circle cx="7.5" cy="15" r="0"/>`,
+  food:  `<path d="M4 3v8a3 3 0 0 0 6 0V3M7 11v10M17 3c-1.5 0-3 2-3 5s1.5 4 3 4v9"/>`,
+  cube:  `<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5M12 13v8"/>`,
+  tag:   `<path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.2"/>`,
+  lock:  `<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>`,
+  finger:`<path d="M5 8a10 10 0 0 1 0 8M9.5 6a15 15 0 0 1 0 12M14 4.5a20 20 0 0 1 0 15M18.5 3a25 25 0 0 1 0 18"/>`,
+  faceid:`<path d="M4 8V6a2 2 0 0 1 2-2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M20 16v2a2 2 0 0 1-2 2h-2"/><path d="M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1.4"/><path d="M15 10v1.4"/><path d="M12 10v3l-1 1"/><path d="M9.4 15.2a3.6 3.6 0 0 0 5.2 0"/>`,
+  warn:  `<path d="M12 3 2 20h20L12 3Z"/><path d="M12 9v5M12 17h.01"/>`,
+  down:  `<path d="M12 3v12M7 11l5 5 5-5M4 21h16"/>`,
+  check: `<path d="M20 6 9 17l-5-5"/>`,
+  cal:   `<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/>`,
+  chev:  `<path d="M9 6l6 6-6 6"/>`,
+  clock: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>`,
+  wheel: `<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>`,
+  spin:  `<path d="M21 12a9 9 0 1 1-6.2-8.55" opacity=".95"/>`,
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   3. MÀN HÌNH
+   ═══════════════════════════════════════════════════════════════════ */
+function buildView(path){
+  const v = h("div", {class:"view"});
+  ({
+    "/login": Login, "/forgot": Forgot, "/unlock": Unlock,
+    "/home": Home, "/profile": Profile,
+    "/crew/flights": CrewFlights,
+    "/scan": ScanScreen, "/passenger": PassengerScreen,
+    "/equipment/base": BaseScreen, "/equipment/not-service": NotService,
+    "/equipment/register": RegisterScreen,
+  // Tra bảng khớp chính xác TRƯỚC, rồi mới tới prefix — nếu không "/crew/flights"
+  // sẽ bị "/crew/flight" nuốt mất.
+  }[path] ?? (
+    path.startsWith("/crew/flight/")  ? FlightDetail :
+    path.startsWith("/equipment/")    ? DeviceScreen : NotFound
+  ))(v, path);
+  return v;
+}
+
+/* ── ScreenHeader ───────────────────────────────────────────────── */
+function bar(v, {title, subtitle, onBack, action, onAction}){
+  v.appendChild(h("div",{class:"bar"},
+    h("span",{class:"edge"}),
+    onBack ? h("button",{class:"back", "aria-label":"Quay lại", onClick:onBack}, svg(I.back,24)) : null,
+    h("div",{class:"ttl"}, h("b",{},title), subtitle ? h("span",{},subtitle) : null),
+    action ? h("button",{class:"act", onClick:onAction}, action) : null,
+  ));
+}
+
+/* ── LOGIN ──────────────────────────────────────────────────────── */
+function Login(v){
+  v.style.background = "var(--n0)";
+  const can = () => S.login.code.trim() && S.login.pw.trim();
+  const submit = () => { if (!can()) return; signIn(S.login.code); };
+
+  const cta = h("button",{class:"cta", disabled:!can(), onClick:submit}, "Đăng nhập", svg(I.arrow,18));
+  const sync = () => { cta.disabled = !can(); };
+
+  const codeIn = h("input",{value:S.login.code, placeholder:"VJ001042", autocapitalize:"characters",
+    onInput:e=>{S.login.code = e.target.value; sync();}});
+  const pwIn = h("input",{type:"password", value:S.login.pw, placeholder:"Nhập mật khẩu",
+    onInput:e=>{S.login.pw = e.target.value; sync();}});
+  const toggle = h("button",{class:"toggle", onClick:()=>{
+    S.login.show = !S.login.show; pwIn.type = S.login.show ? "text" : "password";
+    toggle.textContent = S.login.show ? "Ẩn" : "Hiện";
+  }},"Hiện");
+
+  const fill = code => { S.login.code = code; S.login.pw = "demo"; codeIn.value = code; pwIn.value = "demo"; sync(); };
+
+  // Face ID shortcut → biometric unlock
+  const faceBtn = h("button",{class:"faceid", onClick:()=>go("/unlock")},
+    h("span",{class:"g"}, svg(I.faceid,18)), "Đăng nhập bằng Face ID");
+
+  // demo codes, tucked behind a toggle so they don't clutter the flow
+  const demoRow = h("div",{class:"demo"},
+    ...Object.keys(DEMO_USERS).map(k => h("button",{onClick:()=>fill(k)}, k)),
+    h("button",{style:"background:var(--n100);color:var(--n500)", onClick:()=>fill("VJ999999")},"VJ999999 ↯"),
+  );
+  demoRow.style.display = "flex";
+  const demoChev = svg(I.chev,14);
+  demoChev.style.cssText = "transition:transform 200ms var(--ease-out);transform:rotate(-90deg)";
+  const demoTog = h("button",{class:"demotog", onClick:()=>{
+    const open = demoRow.style.display === "none";
+    demoRow.style.display = open ? "flex" : "none";
+    demoChev.style.transform = open ? "rotate(-90deg)" : "rotate(90deg)";
+  }}, "Mã demo (thử nhanh)", demoChev);
+
+  v.appendChild(h("div",{class:"auth aurora"},
+    h("div",{class:"hero"},
+      h("div",{class:"logo-hero"},"VJ"),
+      h("div",{},
+        h("div",{class:"dsp", style:"font-size:22px;line-height:28px"},"Inflight Dynamic App"),
+        h("div",{style:"font:500 14px/22px Inter;color:rgba(255,255,255,.82);margin-top:2px"},"Ứng dụng vận hành nhân viên"),
+      ),
+      h("div",{class:"protobadge"}, svg(I.warn,14), "Đây là bản prototype thử nghiệm, không phải bản chính thức"),
+    ),
+
+    h("div",{class:"sheet"},
+      h("h1",{class:"dsp", style:"font-size:26px;line-height:32px"},"Đăng nhập"),
+      h("p",{style:"font:400 15px/24px Inter;color:var(--ink-2);margin-top:4px"},"Dùng tài khoản nhân viên Vietjet của bạn"),
+
+      h("div",{style:"display:flex;flex-direction:column;gap:16px;margin-top:22px"},
+        h("div",{class:"field"}, h("label",{},"Mã nhân viên"), h("div",{class:"box"}, codeIn)),
+        h("div",{class:"field"},
+          h("div",{style:"display:flex;justify-content:space-between;align-items:baseline"},
+            h("label",{},"Mật khẩu"),
+            h("button",{class:"link muted", style:"font-size:13px", onClick:()=>go("/forgot")},"Quên mật khẩu?")),
+          h("div",{class:"box"}, pwIn, toggle)),
+      ),
+
+      h("div",{style:"margin-top:12px"}, demoTog, demoRow),
+
+      h("div",{style:"margin-top:20px"}, cta),
+      h("div",{class:"authdiv"},"hoặc"),
+      faceBtn,
+
+      h("div",{style:"margin-top:auto;display:grid;place-items:center;padding-top:24px"},
+        h("span",{style:"font:500 12px Inter;color:var(--ink-3)"},"v1.0.0 · MVP · SGN pilot"),
+      ),
+    ),
+  ));
+}
+
+function signIn(code){
+  const id = resolveUser(code);
+  S.session = {...id, baseStation:"SGN"};
+  S.stack = ["/home"]; S.tab = "home";
+  transition("fade");
+}
+function signOut(){
+  S.session = {employeeCode:null, displayName:null, roles:[], baseStation:"SGN"};
+  S.login = {code:"", pw:"", show:false};
+  S.pack = {state:"missing", done:0, total:3, syncedAt:null};
+  S.scan = {count:activeFlight.scannedCount, result:null};
+  S.equip.outcome = null; S.reg.issued = null;
+  ITEMS = SEED.map(e=>({...e}));
+  S.stack = ["/login"]; transition("fade");
+}
+
+function Forgot(v){
+  v.style.background = "var(--n0)";
+  let code = "";
+  const cta = h("button",{class:"cta", disabled:true, onClick:()=>back("/login")},"Gửi hướng dẫn đặt lại", svg(I.arrow,18));
+  v.appendChild(h("div",{class:"auth"},
+    h("div",{style:"padding-top:62px"},
+      h("button",{class:"back", style:"color:var(--ink);width:34px;height:34px;display:grid;place-items:center", onClick:()=>back("/login")}, svg(I.back,26))),
+    h("h1",{class:"dsp", style:"font-size:30px;line-height:38px;margin-top:20px"},"Quên mật khẩu?"),
+    h("p",{style:"font:400 16px/26px Inter;color:var(--ink-2);margin-top:12px"},
+      "Nhập mã nhân viên của bạn. Chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu tới email công ty đã đăng ký."),
+    h("div",{class:"field", style:"margin-top:34px"},
+      h("label",{},"Mã nhân viên"),
+      h("div",{class:"box"}, h("input",{placeholder:"VJ000000", onInput:e=>{code=e.target.value; cta.disabled = !code.trim();}})),
+    ),
+    h("div",{style:"margin-top:22px"}, cta),
+    h("div",{style:"margin-top:auto;display:grid;place-items:center;gap:18px;padding-top:34px"},
+      h("p",{style:"font:400 13px/20px Inter;color:var(--ink-3);text-align:center"},"Không nhận được email? Liên hệ IT Helpdesk (ext. 1800)."),
+      h("button",{class:"link", onClick:()=>back("/login")},"‹  Quay lại đăng nhập"),
+    ),
+  ));
+}
+
+function Unlock(v){
+  const M = {name:"Nguyễn Văn An", code:"VJ001042", role:"Purser", station:"SGN"};
+  v.appendChild(h("div",{class:"auth aurora", style:"align-items:center"},
+    h("div",{class:"hero", style:"flex:1;justify-content:center;gap:26px"},
+      h("div",{class:"logo-hero"},"VJ"),
+      h("div",{},
+        h("div",{class:"dsp", style:"font-size:22px;line-height:30px"},`Xin chào, ${M.name}`),
+        h("div",{style:"font:500 14px/22px Inter;color:rgba(255,255,255,.82);margin-top:4px"},`${M.code} · ${M.role} · ${M.station}`),
+      ),
+      h("button",{class:"faceid-xl", onClick:()=>signIn(M.code)}, svg(I.faceid,64)),
+      h("div",{style:"font:600 16px/24px Inter;color:#fff"},"Chạm để quét Face ID"),
+    ),
+    h("div",{style:"display:grid;place-items:center;gap:16px;padding-bottom:calc(var(--sa-bot) + 30px)"},
+      h("div",{style:"display:flex;align-items:center;gap:14px"},
+        h("button",{class:"link", style:"color:#fff", onClick:()=>go("/login","reset")},"Dùng mật khẩu"),
+        h("span",{style:"color:rgba(255,255,255,.5)"},"·"),
+        h("button",{class:"link", style:"color:#fff", onClick:()=>signIn(M.code)},"Thử lại Face ID"),
+      ),
+      h("button",{style:"font:500 13px Inter;color:rgba(255,255,255,.72)", onClick:()=>go("/login","reset")},"Không phải bạn?  Đăng xuất"),
+    ),
+  ));
+}
+
+/* ── TABS SHELL ─────────────────────────────────────────────────── */
+function tabbar(v){
+  const mk = (id,label,icon,onClick) =>
+    h("button",{class:"tab"+(S.tab===id?" on":""), onClick}, svg(icon,22), label, h("span",{class:"pip"}));
+  v.appendChild(h("nav",{class:"tabs"},
+    mk("home","Trang chủ",I.home, ()=>{ if(S.tab!=="home"){S.tab="home"; go("/home","reset");} }),
+    mk("profile","Hồ sơ",I.user, ()=>{ if(S.tab!=="profile"){S.tab="profile"; go("/profile","reset");} }),
+  ));
+}
+
+/* ── HOME = role-resolved dashboard slot ────────────────────────── */
+function Home(v){
+  const primary = resolvePrimaryRole(S.session.roles);
+  const dash = primary && ROLE_DASHBOARDS[primary];
+  if (dash === "CrewDashboard") CrewDashboard(v);
+  else if (dash === "EquipmentDashboard") EquipmentDashboard(v);
+  else ModuleGridDashboard(v);
+  tabbar(v);
+}
+
+/* Logo Vietjet: chữ trên nền đỏ đã là đỏ, nên logo lộn ngược — chữ trắng,
+   ngôi sao vàng brand-accent. Đây là bề mặt accent nhỏ, đúng guideline. */
+function vjLogo(){
+  const w = h("div");
+  w.innerHTML = `
+    <svg width="104" height="22" viewBox="0 0 104 22" fill="none" aria-label="Vietjet Air">
+      <path d="M1 2.5 8.6 19h2.4L18.6 2.5h-3.4L9.8 15.2 4.4 2.5H1Z" fill="#fff"/>
+      <text x="21" y="17" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="15.5"
+            font-weight="800" letter-spacing=".2" fill="#fff">ietjet</text>
+      <path d="M92.4 3.4 94 7.2l4.1.3-3.1 2.7 1 4-3.6-2.2-3.6 2.2 1-4-3.1-2.7 4.1-.3 1.6-3.8Z"
+            fill="#FFDD32"/>
+    </svg>`;
+  return w.firstElementChild;
+}
+
+function heroHeader(v, hello, name){
+  v.appendChild(h("header",{class:"hero"},
+    h("span",{class:"edge"}),
+    h("div",{style:"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px"},
+      vjLogo(),
+      h("button",{class:"avatar", "aria-label":"Hồ sơ", onClick:()=>{S.tab="profile"; go("/profile","reset");}},
+        (name??"?").trim().split(/\s+/).slice(-2).map(w=>w[0]).join("").toUpperCase())),
+    h("div",{class:"row"},
+      h("div",{}, h("div",{class:"hello"},hello), h("div",{class:"name dsp"}, name ?? "")),
+    ),
+  ));
+}
+
+/* ── ModuleGridDashboard ────────────────────────────────────────── */
+function ModuleGridDashboard(v){
+  heroHeader(v, "Xin chào", S.session.displayName);
+  const mods = modulesForRoles(S.session.roles);
+  const body = h("div",{class:"body pad-tabs"});
+  body.appendChild(h("div",{class:"sec"}, h("h2",{},"Chức năng"),
+    h("span",{class:"hint"}, `${mods.length} module`)));
+
+  if (!mods.length){
+    body.appendChild(h("div",{class:"card", style:"padding:28px;text-align:center"},
+      h("div",{style:"display:grid;place-items:center;color:var(--ink-3);margin-bottom:10px"}, svg(I.lock,32)),
+      h("p",{style:"font:400 14px/22px Inter;color:var(--ink-2)"},"Vai trò của bạn chưa được gán module nào")));
+  } else {
+    body.appendChild(h("div",{class:"grid"}, ...mods.map(m =>
+      h("button",{class:"mod"+(m.route?"":" off"), disabled:!m.route, onClick: m.route ? ()=>go(m.route) : null},
+        m.route ? null : h("span",{class:"soon"},"Sắp có"),
+        h("span",{class:"ic"}, svg(I[m.icon] ?? I.cube, 22)),
+        h("b",{}, m.title),
+        h("span",{style:"font:500 11px/16px ui-monospace,monospace;color:var(--ink-3)"}, m.id),
+      ))));
+  }
+  v.appendChild(body);
+}
+
+/* ── CrewDashboard ──────────────────────────────────────────────── */
+/* Cung bay có nét vẽ chạy. --arclen đo bằng getTotalLength() sau khi gắn vào
+   DOM — không đoán bằng tay, vì đường cong Bézier đổi độ dài theo viewBox. */
+function routeArc(leg){
+  const wrap = h("div");
+  wrap.innerHTML = `
+    <svg class="arc" viewBox="0 0 300 64" aria-hidden="true">
+      <path class="track" d="M24 46 Q150 2 276 46"/>
+      <path class="glow"  d="M24 46 Q150 2 276 46"/>
+      <circle class="node" cx="24" cy="46" r="4"/>
+      <circle class="node" cx="276" cy="46" r="4"/>
+      <text class="iata" x="24"  y="24" text-anchor="middle">${leg.origin}</text>
+      <text class="iata" x="276" y="24" text-anchor="middle">${leg.destination}</text>
+      <text class="hhmm" x="24"  y="62" text-anchor="middle">${hhmm(leg.std)}</text>
+      <text class="hhmm" x="276" y="62" text-anchor="middle">${hhmm(leg.sta)}</text>
+    </svg>`;
+  const svgEl = wrap.firstElementChild;
+  requestAnimationFrame(()=>{
+    const len = svgEl.querySelector(".glow").getTotalLength();
+    svgEl.style.setProperty("--arclen", len);
+  });
+  return svgEl;
+}
+
+/* Ray ca trực: báo cáo → 3 chặng → hết ca, đặt theo tỷ lệ thời gian thật. */
+function dutyRail(){
+  const t0 = ROTATION.reportAt, t1 = ROTATION.dutyEndAt, span = t1 - t0;
+  const nodes = [
+    {t:t0, l:"Báo cáo"},
+    ...LEGS.map(l => ({t:l.std, l:l.flightNo})),
+    {t:t1, l:"Hết ca"},
+  ];
+  const firstPending = nodes.findIndex(n => S.simNow < n.t);
+  const pct = Math.min(100, Math.max(0, (S.simNow - t0) / span * 100));
+
+  const fill = h("div",{class:"fill"});
+  const rail = h("div",{class:"rail"}, h("div",{class:"track"}), fill,
+    ...nodes.map((n,i) => h("div",{
+      class:"n" + (S.simNow >= n.t ? " done" : "") + (i === firstPending ? " now" : ""),
+      style:`left:${(n.t - t0) / span * 100}%`,
+      title:`${n.l} · ${hhmm(n.t)}`,
+    })));
+  requestAnimationFrame(()=>{ fill.style.width = pct + "%"; });
+
+  const upcoming = firstPending === -1 ? null : nodes[firstPending];
+  return h("div",{}, rail, h("div",{class:"railfoot"},
+    h("span",{class:"t"}, hhmm(t0)),
+    upcoming
+      ? h("span",{class:"next"}, `Tiếp theo: ${upcoming.l} · ${hhmm(upcoming.t)}`)
+      : h("span",{class:"next"},"Đã hết ca"),
+    h("span",{class:"t"}, hhmm(t1))));
+}
+
+function CrewDashboard(v){
+  heroHeader(v, "Chào buổi sáng", S.session.displayName);
+  const body = h("div",{class:"body pad-tabs overlap", style:"display:flex;flex-direction:column;gap:14px;padding-top:0"});
+  let n = 0;
+  const st = el => { el.classList.add("st"); el.style.animationDelay = (n++ * 55) + "ms"; return el; };
+
+  const remaining = Math.max(0, ROTATION.reportAt - S.simNow);
+  const passed = remaining === 0;
+  const leg = LEGS[0];
+
+  /* ── boarding pass ── */
+  const cd = h("div",{class:"count"}, formatCountdown(remaining));
+  const pass = h("section",{class:"pass pull"},
+    h("div",{class:"top"},
+      h("div",{style:"display:flex;align-items:flex-start;justify-content:space-between;gap:10px"},
+        h("div",{},
+          h("div",{class:"kick"}, passed ? "Đã tới giờ báo cáo" : "Báo cáo sau"),
+          passed
+            ? h("div",{style:"display:flex;align-items:center;gap:8px;margin-top:4px"}, svg(I.warn,22),
+                h("span",{class:"dsp", style:"font-size:26px;line-height:34px"}, hhmm(ROTATION.reportAt)))
+            : cd),
+        h("span",{class:"tag"}, leg.flightNo)),
+      routeArc(leg)),
+    h("div",{class:"tear"}, h("i")),
+    h("div",{class:"bot"},
+      h("span",{class:"tag"}, ROTATION.aircraftType),
+      h("span",{class:"tag"}, ROTATION.registration),
+      h("span",{class:"tag", style:"margin-left:auto;display:flex;align-items:center;gap:6px"},
+        h("span",{class:"dot", style:"background:var(--brand-green)"}), "Đúng giờ")),
+  );
+  if (!passed) pass._tick = () => { cd.textContent = formatCountdown(Math.max(0, ROTATION.reportAt - S.simNow)); };
+  body.appendChild(st(pass));
+
+  /* ── ray ca trực ── */
+  body.appendChild(st(h("section",{class:"card", style:"padding:14px 12px 12px"},
+    h("div",{style:"display:flex;align-items:baseline;justify-content:space-between;margin:0 4px 10px"},
+      h("b",{class:"hdg", style:"font-size:15px"},"Ca trực"),
+      h("span",{style:"font:500 12px Inter;color:var(--n500)"}, `${hhmm(ROTATION.reportAt)} – ${hhmm(ROTATION.dutyEndAt)}`)),
+    dutyRail())));
+
+  /* ── ba con số ── */
+  const blockMin = LEGS.reduce((s,l)=>s + Math.round((l.sta-l.std)/MIN), 0);
+  const pax = LEGS.reduce((s,l)=>s+l.pob, 0);
+  const ssrTot = LEGS.reduce((s,l)=>s+l.ssrCount, 0);
+  body.appendChild(st(h("div",{class:"trio"},
+    h("div",{}, h("b",{}, `${Math.floor(blockMin/60)}h${pad(blockMin%60)}`), h("span",{},"Giờ bay")),
+    h("div",{}, h("b",{}, String(pax)), h("span",{},"Khách cả ca")),
+    h("div",{}, h("b",{}, String(ssrTot)), h("span",{},"Suất SSR")),
+  )));
+
+  body.appendChild(st(packStrip()));
+
+  /* ── chuyến bay của tôi — ngay trên màn chính ── */
+  body.appendChild(st(h("div",{style:"display:flex;align-items:baseline;justify-content:space-between;margin:8px 2px -4px"},
+    h("b",{class:"hdg", style:"font-size:15px"},"Chuyến bay của tôi"),
+    h("button",{class:"link", style:"font-size:13px", onClick:()=>go("/crew/flights")},"Xem cả ca ›"))));
+  body.appendChild(st(flightList()));
+
+  /* ── cần chú ý ── */
+  const alerts = deriveAlerts(S.pack.state);
+  if (alerts.length) body.appendChild(st(h("section",{class:"card", style:"padding:4px 14px"},
+    ...alerts.map((a,i) => h("div",{style:`display:flex;align-items:center;gap:10px;padding:11px 0;${i?"border-top:1px solid var(--n100)":""}`},
+      h("span",{style:`color:var(--${a.sev==="bad"?"danger":"warning"})`}, svg(I.warn,18)),
+      h("span",{style:"font:600 14px/22px Inter;flex:1"}, a.text)))
+  )));
+
+  /* ── SSR ── */
+  const ssr = LEGS.reduce((s,l)=>({wchr:s.wchr+l.ssrWchr, umnr:s.umnr+l.ssrUmnr, meda:s.meda+l.ssrMeda, inf:s.inf+l.ssrInf}),{wchr:0,umnr:0,meda:0,inf:0});
+  body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:10px"},"Dịch vụ đặc biệt"),
+    h("div",{style:"display:flex;gap:6px;flex-wrap:wrap"},
+      h("span",{class:"chip info"}, svg(I.wheel,14), `${ssr.wchr} xe lăn`),
+      h("span",{class:"chip info"}, `${ssr.umnr} trẻ đi một mình`),
+      h("span",{class:"chip info"}, `${ssr.meda} ca y tế`),
+      h("span",{class:"chip info"}, `${ssr.inf} trẻ sơ sinh`),
+    ))));
+
+  /* ── tổ bay: chồng avatar ── */
+  const faces = h("div",{class:"faces"},
+    ...CREW.slice(0,4).map((c,i) => h("span",{class:"f"+(i===0?" lead":"")},
+      c.name.trim().split(/\s+/).slice(-1)[0][0])),
+    CREW.length > 4 ? h("span",{class:"more"}, `+${CREW.length-4}`) : null);
+  body.appendChild(st(h("section",{class:"card", style:"padding:14px;display:flex;align-items:center;gap:12px"},
+    faces,
+    h("div",{style:"flex:1"},
+      h("b",{class:"hdg", style:"font-size:15px;display:block"},"Tổ bay"),
+      h("span",{style:"font:400 12px/16px Inter;color:var(--n500)"},
+        `${CREW.length} người · ${CREW[0].name} (Purser)`)),
+    h("span",{style:"color:var(--ink-3)"}, svg(I.chev,18)))));
+
+  v.appendChild(body);
+}
+
+/* Chặng i đã tải khi fetchPack đã báo onLegDone cho nó. done là số chặng xong. */
+const legDownloaded = i => S.pack.state === "ready" || S.pack.done > i;
+
+/* ═══ Hero vòng bay — cả rotation trong một hình ═══
+   Trục x là thời gian thật từ STD chặng đầu tới STA chặng cuối, nên cung bay
+   và đoạn nghỉ sân có bề rộng đúng tỉ lệ thời lượng. Không chia đều: nghỉ 65′
+   ở BMV phải trông dài hơn nghỉ 45′ ở PQC, vì nó dài hơn thật. */
+function rotationHero(){
+  const L = 22, R = 298, BASE = 76, CY = 16;      // CY: control-point Y của Bézier bậc 2
+  const t0 = LEGS[0].std, t1 = LEGS[LEGS.length-1].sta, span = t1 - t0;
+  const x = t => L + (t - t0) / span * (R - L);
+  const arc = l => `M${x(l.std).toFixed(1)} ${BASE} Q${((x(l.std)+x(l.sta))/2).toFixed(1)} ${CY} ${x(l.sta).toFixed(1)} ${BASE}`;
+
+  const flying = LEGS.find(l => S.simNow >= l.std && S.simNow < l.sta);
+  const nextLeg = LEGS.find(l => S.simNow < l.std);
+  const inDuty = S.simNow >= t0 && S.simNow <= t1;
+
+  let g = "";
+
+  // cung bay + số hiệu
+  LEGS.forEach((l,i) => {
+    const cls = ["leg", legDownloaded(i) ? "" : "pending", l.status === "delayed" ? "delayed" : ""].join(" ").trim();
+    const mid = (x(l.std) + x(l.sta)) / 2;
+    g += `<path class="${cls}" d="${arc(l)}"/>`;
+    g += `<text class="flt" x="${mid.toFixed(1)}" y="40" text-anchor="middle">${l.flightNo}</text>`;
+  });
+
+  // đoạn nghỉ sân, vẽ phẳng trên baseline
+  for (let i = 0; i < LEGS.length - 1; i++){
+    const a = LEGS[i], b = LEGS[i+1];
+    const m = groundMinutes(a.sta, b.std);
+    g += `<path class="grd${isTightGround(m) ? " tight" : ""}" d="M${x(a.sta).toFixed(1)} ${BASE} H${x(b.std).toFixed(1)}"/>`;
+    g += `<text class="gmin" x="${((x(a.sta)+x(b.std))/2).toFixed(1)}" y="${BASE - 8}" text-anchor="middle">${m}′</text>`;
+  }
+
+  // điểm dừng: mỗi mốc thời gian một chấm; nhãn sân bay gộp ở giữa cặp đến/đi
+  const stops = [{t:t0, iata:LEGS[0].origin}];
+  LEGS.forEach((l,i) => {
+    const next = LEGS[i+1];
+    stops.push(next
+      ? {t:l.sta, t2:next.std, iata:l.destination}   // sân quay đầu: có cả giờ đến và giờ đi
+      : {t:l.sta, iata:l.destination});
+  });
+  stops.forEach(s => {
+    g += `<circle class="stop" cx="${x(s.t).toFixed(1)}" cy="${BASE}" r="4"/>`;
+    if (s.t2 !== undefined) g += `<circle class="stop" cx="${x(s.t2).toFixed(1)}" cy="${BASE}" r="4"/>`;
+    const cx = s.t2 !== undefined ? (x(s.t) + x(s.t2)) / 2 : x(s.t);
+    const anchor = s.t2 === undefined && s.t === t0 ? "start" : s.t2 === undefined ? "end" : "middle";
+    const lx = anchor === "start" ? x(s.t) - 6 : anchor === "end" ? x(s.t) + 6 : cx;
+    g += `<text class="iata" x="${lx.toFixed(1)}" y="95" text-anchor="${anchor}">${s.iata}</text>`;
+    g += `<text class="hhmm" x="${lx.toFixed(1)}" y="107" text-anchor="${anchor}">${
+      s.t2 !== undefined ? `${hhmm(s.t)}–${hhmm(s.t2)}` : hhmm(s.t)}</text>`;
+  });
+
+  // mốc "bây giờ"
+  if (inDuty){
+    const nx = x(S.simNow).toFixed(1);
+    g += `<path class="now" d="M${nx} 22 V${BASE + 6}"/><circle class="nowdot" cx="${nx}" cy="${BASE}" r="3.5"/>`;
+  }
+
+  // đốm sáng bò dọc chặng sắp bay — animateMotion chạy trên mọi Safari
+  const spark = flying ?? nextLeg;
+  if (spark) g += `<circle class="spark" r="2.6">
+      <animateMotion dur="3.2s" repeatCount="indefinite" path="${arc(spark)}"/></circle>`;
+
+  const wrap = h("div");
+  wrap.innerHTML = `<svg class="rot" viewBox="0 0 320 116" aria-label="Vòng bay hôm nay">${g}</svg>`;
+
+  const blockMin = LEGS.reduce((s,l)=>s + Math.round((l.sta-l.std)/MIN), 0);
+  const pax = LEGS.reduce((s,l)=>s+l.pob, 0);
+
+  return h("section",{class:"pass"},
+    h("div",{class:"top"},
+      h("div",{style:"display:flex;align-items:flex-start;justify-content:space-between;gap:10px"},
+        h("div",{},
+          h("div",{class:"kick"},"Vòng bay hôm nay"),
+          h("div",{class:"dsp", style:"font-size:22px;line-height:30px;letter-spacing:-.2px"},
+            `${LEGS[0].origin} → ${LEGS.map(l=>l.destination).join(" → ")}`)),
+        h("span",{class:"tag"}, `${LEGS.length} chặng`)),
+      wrap.firstElementChild),
+    h("div",{class:"tear"}, h("i")),
+    h("div",{class:"bot rotfoot"},
+      h("span",{class:"tag"}, ROTATION.aircraftType),
+      h("span",{class:"tag"}, ROTATION.registration),
+      h("span",{class:"tag"}, `${Math.floor(blockMin/60)}h${pad(blockMin%60)} bay`),
+      h("span",{class:"tag"}, `${pax} khách`),
+      h("span",{class:"tag", style:"margin-left:auto;display:flex;align-items:center;gap:6px"},
+        h("span",{class:"dot", style:`background:var(--${flying ? "brand-accent" : "brand-green"})`}),
+        flying ? `Đang bay ${flying.flightNo}` : inDuty ? "Nghỉ sân" : "Chưa khởi hành")),
+  );
+}
+
+const STATUS_CHIP = {
+  upcoming:  ["info","Đúng giờ"],
+  delayed:   ["warn","Trễ"],
+  flown:     ["ok","Đã bay"],
+  cancelled: ["bad","Huỷ"],
+};
+
+function flightList(){
+  const list = h("div",{class:"flist"});
+  LEGS.forEach((l,i) => {
+    const done = legDownloaded(i);
+    const busy = S.pack.state === "downloading" && S.pack.done === i;
+    const chip = STATUS_CHIP[l.status];
+
+    list.appendChild(h("button",{class:"fl", onClick:()=>go(`/crew/flight/${l.flightNo}`)},
+      h("div",{class:"clock"}, h("b",{}, hhmm(l.std)), h("span",{}, hhmm(l.sta))),
+      h("div",{class:"core"},
+        h("div",{class:"r"},
+          h("span",{class:"no"}, l.flightNo),
+          h("span",{class:"od"}, `${l.origin} → ${l.destination}`)),
+        h("div",{class:"sub"},
+          h("span",{class:"mini "+(l.status==="upcoming"?"on":"off"),
+            style: l.status!=="upcoming" ? `background:var(--${chip[0]==="warn"?"warning":chip[0]==="bad"?"danger":"success"}-bg);color:var(--${chip[0]==="warn"?"warning":chip[0]==="bad"?"danger":"success"}-text)` : ""},
+            chip[1]),
+          h("span",{style:"font:500 12px/16px Inter;color:var(--ink-3)"},
+            `${l.pob} khách${l.ssrCount ? ` · ${l.ssrCount} SSR` : ""}`))),
+      h("span",{class:"dl "+(busy ? "busy" : done ? "on" : "off"),
+        title: done ? "Đã tải" : busy ? "Đang tải" : "Chưa tải"},
+        svg(busy ? I.spin : done ? I.check : I.down, 16)),
+      h("span",{class:"chev"}, svg(I.chev,18)),
+    ));
+  });
+  return list;
+}
+
+/* ── /crew/flight/:no ── */
+function FlightDetail(v, path){
+  if (!canAccessModule(S.session.roles,"crew_ops")) return NoAccess(v);
+  const no = decodeURIComponent(path.split("/")[3]);
+  const l = LEGS.find(x => x.flightNo === no);
+  bar(v,{title: no, subtitle: l ? `${l.origin} → ${l.destination}` : undefined, onBack:()=>back("/home")});
+  if (!l){ v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng này."))); return; }
+
+  const i = LEGS.indexOf(l), done = legDownloaded(i);
+  const mins = Math.round((l.sta - l.std)/MIN);
+  const pct = Math.round(l.pob / l.capacity * 100);
+  const chip = STATUS_CHIP[l.status];
+
+  const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
+  let n = 0;
+  const st = el => { el.classList.add("st"); el.style.animationDelay = (n++ * 55) + "ms"; return el; };
+
+  /* boarding pass của riêng chặng này */
+  body.appendChild(st(h("section",{class:"pass"},
+    h("div",{class:"top"},
+      h("div",{style:"display:flex;align-items:flex-start;justify-content:space-between;gap:10px"},
+        h("div",{},
+          h("div",{class:"kick"},"Chặng"),
+          h("div",{class:"dsp", style:"font-size:30px;line-height:38px;letter-spacing:-.3px"}, l.flightNo)),
+        h("span",{class:"tag"}, `${Math.floor(mins/60)}h${pad(mins%60)}`)),
+      routeArc(l)),
+    h("div",{class:"tear"}, h("i")),
+    h("div",{class:"bot"},
+      h("span",{class:"tag"}, ROTATION.aircraftType),
+      h("span",{class:"tag"}, ROTATION.registration),
+      h("span",{class:"tag", style:"margin-left:auto"}, chip[1])),
+  )));
+
+  /* trạng thái gói bay của chặng */
+  body.appendChild(st(h("div",{class:"pack"},
+    h("span",{style:`color:var(--${done?"info":"ink-3"})`}, svg(done ? I.check : I.down, 22)),
+    h("div",{class:"txt"},
+      h("b",{}, done ? "Đã tải về máy" : "Chưa tải gói bay"),
+      h("span",{}, done ? "Xem được khi không có mạng" : "Cần mạng để mở danh sách khách")),
+    done ? null : h("button",{class:"btn", onClick:startDownload},"Tải"),
+  )));
+
+  /* hệ số tải */
+  const bar_ = h("i",{class: pct>=85 ? "hot" : ""});
+  requestAnimationFrame(()=>{ bar_.style.width = pct + "%"; });
+  body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
+    h("div",{class:"load"},
+      h("div",{class:"lb"},
+        h("span",{style:"font-weight:600;color:var(--ink)"},"Hệ số tải"),
+        h("span",{style: pct>=85 ? "color:var(--danger-text);font-weight:700" : ""}, `${l.pob}/${l.capacity} · ${pct}%`)),
+      h("div",{class:"tr"}, bar_)),
+    pct>=85 ? h("p",{style:"font:500 12px/18px Inter;color:var(--danger-text);margin-top:8px"},
+      "Chuyến gần đầy — khoang hành lý trên sẽ chật.") : null,
+  )));
+
+  /* giờ giấc */
+  const rows = [
+    ["Khởi hành (STD)", `${hhmm(l.std)} · ${l.origin}`],
+    ["Hạ cánh (STA)", `${hhmm(l.sta)} · ${l.destination}`],
+    ["Thời gian bay", `${Math.floor(mins/60)}h${pad(mins%60)}`],
+    ["Tàu bay", `${ROTATION.aircraftType} · ${ROTATION.registration}`],
+  ];
+  const card = h("section",{class:"card", style:"padding:4px 14px"});
+  rows.forEach(([k,val],idx) => card.appendChild(
+    h("div",{style:`display:flex;justify-content:space-between;gap:14px;padding:11px 0;${idx?"border-top:1px solid var(--n100)":""}`},
+      h("span",{style:"font:400 14px Inter;color:var(--n500)"},k),
+      h("span",{style:"font:600 14px Inter;text-align:right"},val))));
+  body.appendChild(st(card));
+
+  /* SSR chi tiết */
+  const ssrRows = [
+    ["WCHR", "Xe lăn", l.ssrWchr], ["UMNR","Trẻ đi một mình", l.ssrUmnr],
+    ["MEDA","Ca y tế", l.ssrMeda], ["INF","Trẻ sơ sinh", l.ssrInf],
+  ].filter(r => r[2] > 0);
+  body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
+    h("div",{style:"display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"},
+      h("b",{class:"hdg", style:"font-size:15px"},"Dịch vụ đặc biệt"),
+      h("span",{class:"chip "+(l.ssrCount?"warn":"ok")}, `${l.ssrCount} suất`)),
+    ...(ssrRows.length
+      ? ssrRows.map(([code,label,cnt]) => h("div",{style:"display:flex;align-items:center;gap:10px;padding:8px 0"},
+          h("span",{class:"mini "+(code==="MEDA"?"off":"on"),
+            style: code==="MEDA" ? "background:var(--warning-bg);color:var(--warning-text)" : ""}, code),
+          h("span",{style:"flex:1;font:500 14px Inter"}, label),
+          h("b",{style:"font:700 15px Inter;font-variant-numeric:tabular-nums"}, String(cnt))))
+      : [h("p",{style:"font:400 13px Inter;color:var(--ink-2)"},"Không có dịch vụ đặc biệt")]),
+  )));
+
+  v.appendChild(body);
+}
+
+function packStrip(){
+  const p = S.pack;
+  const el = h("div",{class:"pack"});
+  const icon = h("span",{style:"color:var(--info)"}, svg(p.state==="ready"?I.check:I.down,22));
+  const txt = h("div",{class:"txt"});
+  el.appendChild(icon); el.appendChild(txt);
+
+  if (p.state === "missing"){
+    txt.appendChild(h("b",{},"Tải gói bay"));
+    txt.appendChild(h("span",{},`${PACK_SIZE_MB} MB · 3 chặng`));
+    el.appendChild(h("button",{class:"btn", onClick:startDownload},"Tải"));
+  } else if (p.state === "downloading"){
+    txt.appendChild(h("b",{},`Đang tải… ${p.done}/${p.total} chặng`));
+    const bar = h("div",{class:"prog"}, h("i",{style:`width:${p.done/p.total*100}%`}));
+    txt.appendChild(bar);
+    el.appendChild(h("button",{class:"btn", onClick:()=>{ S.pack={state:"missing",done:0,total:3,syncedAt:null}; refresh(); }},"Huỷ"));
+  } else {
+    txt.appendChild(h("b",{},`Đã tải · ${hhmm(p.syncedAt)}`));
+    txt.appendChild(h("span",{},`${PACK_SIZE_MB} MB · sẵn sàng offline`));
+    el.appendChild(h("button",{class:"btn", onClick:startDownload},"Tải lại"));
+  }
+  return el;
+}
+function startDownload(){
+  if (!hasPermission(S.session.roles,"crew_ops.pack.download")) return;
+  S.pack = {state:"downloading", done:0, total:3, syncedAt:null};
+  refresh();
+  const step = i => setTimeout(()=>{
+    S.pack.done = i;
+    if (i === 3){ S.pack = {state:"ready", done:3, total:3, syncedAt:S.simNow}; refresh(); }
+    else { refresh(); step(i+1); }
+  }, 600);
+  step(1);
+}
+
+/* ── crew/flights ───────────────────────────────────────────────── */
+function CrewFlights(v){
+  if (!canAccessModule(S.session.roles,"crew_ops")) return NoAccess(v);
+  bar(v,{title:"Chuyến bay của tôi", onBack:()=>back("/home")});
+  const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
+  let n = 0;
+  const st = el => { el.classList.add("st"); el.style.animationDelay = (n++ * 55) + "ms"; return el; };
+
+  body.appendChild(st(rotationHero()));
+  body.appendChild(st(packStrip()));
+  body.appendChild(st(h("p",{style:"font:500 12px/18px Inter;color:var(--ink-3);text-align:center;margin:-2px 8px 2px"},
+    "Nét liền trên vòng bay = chặng đã tải về máy. Nét đứt = chưa tải.")));
+
+  const tl = h("div",{class:"tl", style:"margin-top:6px"});
+  LEGS.forEach((l,i) => {
+    const chip = STATUS_CHIP[l.status];
+    const mins = Math.round((l.sta - l.std)/MIN);
+    const pct = Math.round(l.pob / l.capacity * 100);
+
+    const bar = h("i",{class: pct >= 85 ? "hot" : ""});
+    requestAnimationFrame(()=>{ bar.style.width = pct + "%"; });
+
+    const stop = h("div",{class:"stop"+(l.status==="delayed"?" delayed":"")},
+      h("button",{class:"legcard", style:"width:100%;text-align:left", onClick:()=>go(`/crew/flight/${l.flightNo}`)},
+        // Chip "chưa tải" bỏ đi: nét cung trên hero đã nói điều đó rồi.
+        h("div",{class:"hd"},
+          h("span",{class:"no"}, l.flightNo),
+          h("span",{class:"chip "+chip[0]}, chip[1])),
+
+        h("div",{class:"od"},
+          h("div",{class:"pt"}, h("b",{}, l.origin), h("span",{}, hhmm(l.std))),
+          h("div",{class:"mid"},
+            h("span",{class:"dur"}, `${Math.floor(mins/60)}h${pad(mins%60)}`),
+            h("div",{class:"dash"}, h("span",{class:"pl"}, svg(I.plane,15)))),
+          h("div",{class:"pt"}, h("b",{}, l.destination), h("span",{}, hhmm(l.sta)))),
+
+        h("div",{class:"load"},
+          h("div",{class:"lb"},
+            h("span",{}, `${l.pob}/${l.capacity} khách`),
+            h("span",{style: pct>=85 ? "color:var(--danger-text);font-weight:700" : ""}, `${pct}%`)),
+          h("div",{class:"tr"}, bar)),
+
+        l.ssrCount ? h("div",{style:"display:flex;gap:6px;flex-wrap:wrap"},
+          l.ssrWchr ? h("span",{class:"chip info"}, `${l.ssrWchr} WCHR`) : null,
+          l.ssrUmnr ? h("span",{class:"chip info"}, `${l.ssrUmnr} UMNR`) : null,
+          l.ssrMeda ? h("span",{class:"chip warn"}, `${l.ssrMeda} MEDA`) : null,
+          l.ssrInf  ? h("span",{class:"chip info"}, `${l.ssrInf} INF`)  : null,
+        ) : h("span",{class:"chip ok", style:"align-self:flex-start"},"Không có SSR"),
+      ));
+    tl.appendChild(st(stop));
+
+    const next = LEGS[i+1];
+    if (next){
+      const m = groundMinutes(l.sta, next.std);
+      const tight = isTightGround(m);
+      tl.appendChild(st(h("div",{class:"gap"+(tight?" tight":"")},
+        svg(I.clock,14),
+        h("span",{}, tight ? `Quay đầu gấp · ${m}′` : `Nghỉ sân tại ${l.destination} · ${m}′`))));
+    }
+  });
+  body.appendChild(tl);
+  v.appendChild(body);
+}
+
+/* ── EquipmentDashboard ─────────────────────────────────────────── */
+function EquipmentDashboard(v){
+  heroHeader(v, "Chào buổi trưa", S.session.displayName);
+  const st = S.session.baseStation;
+  const total = countAtStation(st), awaiting = notServiceAt(st).length,
+        repairing = repairingAt(st), {full,half} = sizeSplitAt(st);
+  const ready = total - awaiting - repairing;
+  const pct = total ? Math.round(ready/total*100) : 0;
+
+  const body = h("div",{class:"body pad-tabs overlap", style:"padding-top:0"});
+
+  // station + readiness card
+  const C = 2*Math.PI*32;
+  body.appendChild(h("section",{class:"card lift pull station", style:"overflow:hidden"},
+    h("button",{class:"h press", style:"width:100%;text-align:left", onClick:()=>go("/equipment/base")},
+      h("span",{class:"glyph"}, st),
+      h("span",{class:"who"},
+        h("b",{}, {SGN:"Tân Sơn Nhất",HAN:"Nội Bài",CXR:"Cam Ranh"}[st] ?? st),
+        h("span",{},"Ca 06:00 – 14:00 · Sân đỗ B")),
+      h("span",{class:"chg"},"Đổi")),
+    h("div",{class:"rule"}),
+    h("div",{class:"readiness"},
+      h("div",{style:"display:flex;align-items:center;gap:16px"},
+        h("div",{class:"dial", html:`
+          <svg width="78" height="78" viewBox="0 0 78 78">
+            <circle cx="39" cy="39" r="32" fill="none" stroke="var(--n200)" stroke-width="8"/>
+            <circle cx="39" cy="39" r="32" fill="none" stroke="var(--success)" stroke-width="8" stroke-linecap="round"
+              stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}" style="transition:stroke-dashoffset 900ms var(--ease-out)"/>
+          </svg><div class="val"><span class="tnum">${pct}</span>%</div>`}),
+        h("div",{style:"flex:1"},
+          h("div",{class:"hdg", style:"font-size:16px;line-height:26px"}, `${total} xe đẩy tại ${st}`),
+          h("div",{style:"font:400 13px/20px Inter;color:var(--ink-2)"}, `${ready} sẵn sàng khai thác ngay`)),
+      ),
+      h("div",{class:"distbar"},
+        h("span",{style:`flex-grow:${ready};background:var(--success)`}),
+        h("span",{style:`flex-grow:${awaiting};background:var(--warning)`}),
+        h("span",{style:`flex-grow:${repairing};background:var(--info)`})),
+      h("div",{class:"legend"},
+        h("b",{}, h("i",{style:"background:var(--success)"}), `Sẵn sàng ${ready}`),
+        h("b",{}, h("i",{style:"background:var(--warning)"}), `Chờ sửa ${awaiting}`),
+        h("b",{}, h("i",{style:"background:var(--info)"}), `Đang sửa ${repairing}`)),
+    )));
+
+  body.appendChild(h("div",{class:"sec"}, h("h2",{},"Tình trạng đội xe"), h("span",{class:"hint"},"Chạm để mở")));
+  body.appendChild(h("div",{class:"bento"},
+    h("button",{class:"tile warn", onClick:()=>go("/equipment/not-service")},
+      h("span",{class:"ico"}, svg(I.warn,22)),
+      h("span",{style:"flex:1;text-align:left"},
+        h("span",{class:"v tnum", style:"display:block"}, String(awaiting)),
+        h("span",{class:"l", style:"display:block"},"Chờ gửi sửa — cần xử lý")),
+      h("span",{style:"opacity:.55;color:var(--warning-text)"}, svg(I.chev,18))),
+    h("div",{class:"tile"}, h("div",{class:"v tnum"},String(repairing)), h("div",{class:"l"},"Đang sửa")),
+    h("div",{class:"tile"},
+      h("div",{}, h("span",{class:"v tnum"},String(full)),
+        h("span",{class:"v", style:"color:var(--n300)"}," / "),
+        h("span",{class:"v tnum"},String(half))),
+      h("div",{class:"l"},"Full / Half")),
+  ));
+
+  body.appendChild(h("div",{class:"sec"}, h("h2",{},"Kiểm tra cart"), h("span",{class:"hint"},"Chạm thẻ NFC")));
+  body.appendChild(h("button",{class:"scan", onClick:identifyTap},
+    h("div",{class:"rings"}, h("i"),h("i"),h("i"), h("span",{class:"core"}, svg(I.finger,18))),
+    h("span",{class:"lbl"},"Chạm để kiểm tra"),
+    h("span",{class:"sub"},"Đưa máy lại gần tag trên thân cart")));
+
+  const o = S.equip.outcome;
+  if (o) body.appendChild(outcomeBanner(o));
+
+  // register — permission-gated
+  if (hasPermission(S.session.roles,"equipment.register")){
+    body.appendChild(h("button",{class:"cta ghost", style:"margin-top:12px", onClick:()=>go("/equipment/register")},
+      "Đăng ký trolley cart mới",
+      h("span",{class:"chip info", style:"margin-left:4px;font-size:10px"},"batch")));
+  }
+  v.appendChild(body);
+}
+
+// useIdentifyTap — vòng qua các kết quả có thật trong source
+let tapN = 0;
+function identifyTap(){
+  const seq = [
+    {kind:"found", code:"H-045"},
+    {kind:"unregistered", tagUid:"04:1B:7E:2A:F9"},
+    {kind:"found", code:"F-102"},
+    {kind:"read_failed"},
+    {kind:"recalled", previousCode:"F-018"},
+    {kind:"unavailable"},
+  ];
+  const o = seq[tapN++ % seq.length];
+  if (o.kind === "found"){ S.equip.outcome = null; go(`/equipment/${o.code}`); return; }
+  S.equip.outcome = o; refresh();
+}
+function outcomeBanner(o){
+  const wrap = h("div",{style:"display:flex;flex-direction:column;gap:10px;margin-top:12px"});
+  if (o.kind === "recalled") wrap.appendChild(h("div",{class:"banner bad"}, svg(I.warn,18),
+    h("div",{}, h("b",{},`Tag này đã bị thu hồi (từng thuộc ${o.previousCode}). Dùng tag khác.`))));
+  if (o.kind === "read_failed") wrap.appendChild(h("div",{class:"banner bad"}, svg(I.warn,18),
+    h("div",{}, h("b",{},"Không đọc được tag. Chạm lại."))));
+  if (o.kind === "unavailable") wrap.appendChild(h("div",{class:"banner bad"}, svg(I.warn,18),
+    h("div",{}, h("b",{},"Máy không hỗ trợ NFC. Dùng quét QR hoặc nhập mã."))));
+  if (o.kind === "unregistered"){
+    wrap.appendChild(h("div",{class:"banner warn"}, svg(I.warn,18),
+      h("div",{}, h("b",{},"Cart này chưa định danh"), h("span",{},`Tag ${o.tagUid} chưa gắn với thiết bị nào.`))));
+    if (hasPermission(S.session.roles,"equipment.register"))
+      wrap.appendChild(h("button",{class:"cta ghost", onClick:()=>go("/equipment/register")},"Đăng ký cart này"));
+  }
+  return wrap;
+}
+
+/* ── equipment/base ─────────────────────────────────────────────── */
+function BaseScreen(v){
+  if (!canAccessModule(S.session.roles,"equipment")) return NoAccess(v);
+  bar(v,{title:"Chọn base airport", onBack:()=>back("/home")});
+  const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:8px;padding-top:16px"});
+  stationsWithCounts().forEach(({station,count}) => {
+    body.appendChild(h("button",{class:"row", onClick:()=>{ S.session.baseStation = station; back("/home"); }},
+      h("div",{class:"main"}, h("b",{},station),
+        h("span",{}, {SGN:"Tân Sơn Nhất",HAN:"Nội Bài",CXR:"Cam Ranh"}[station] ?? "")),
+      station === S.session.baseStation ? h("span",{class:"chip ok"},"Đang chọn") : null,
+      h("span",{class:"tail"}, `${count} trolley`)));
+  });
+  v.appendChild(body);
+}
+
+/* ── equipment/not-service ──────────────────────────────────────── */
+function NotService(v){
+  if (!canAccessModule(S.session.roles,"equipment")) return NoAccess(v);
+  const st = S.session.baseStation;
+  bar(v,{title:`Chờ gửi sửa tại ${st}`, onBack:()=>back("/home")});
+  const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:8px;padding-top:16px"});
+  const carts = notServiceAt(st), now = Date.now();
+  if (!carts.length) body.appendChild(h("p",{style:"text-align:center;font:400 14px Inter;color:var(--n500);padding:40px 0"},
+    `Không có cart nào chờ sửa tại ${st}`));
+  carts.forEach(c => body.appendChild(
+    h("button",{class:"row", onClick:()=>go(`/equipment/${c.code}`)},
+      h("div",{class:"main"}, h("b",{},c.code), h("span",{}, `${c.defectReason ?? "—"} · ${c.manufacturer}`)),
+      h("span",{class:"tail", style:"color:var(--warning-text);font-weight:700"}, `${daysWaiting(c,now)} ngày`))));
+  body.appendChild(h("p",{style:"font:400 12px/18px Inter;color:var(--ink-3);margin-top:8px;text-align:center"},
+    "Chỉ đọc · sắp theo thời gian chờ lâu nhất. Cart đang sửa không nằm trong danh sách này."));
+  v.appendChild(body);
+}
+
+/* ── equipment/[code] ───────────────────────────────────────────── */
+function DeviceScreen(v, path){
+  if (!canAccessModule(S.session.roles,"equipment")) return NoAccess(v);
+  const code = decodeURIComponent(path.split("/")[2]);
+  const e = byCode(code);
+  bar(v,{title: code, onBack:()=>back("/home")});
+  if (!e){ v.appendChild(h("div",{class:"body white"},
+    h("p",{style:"padding:20px 0;font:400 14px Inter;color:var(--n500)"},"Không có thiết bị nào đăng ký với mã này."))); return; }
+
+  const STATUS = {service:["ok","Service"], "not-service":["warn","Not-service"], repairing:["info","Repairing"]}[e.status];
+  const body = h("div",{class:"body white", style:"padding-top:20px"});
+  body.appendChild(h("div",{style:"display:flex;align-items:center;justify-content:space-between;gap:10px"},
+    h("h1",{class:"dsp", style:"font-size:30px;line-height:38px"}, e.code),
+    h("span",{class:"chip "+STATUS[0]}, STATUS[1])));
+  if (e.defectReason) body.appendChild(h("div",{class:"banner warn", style:"margin-top:14px"}, svg(I.wheel,18),
+    h("div",{}, h("b",{},e.defectReason), h("span",{},`Chờ ${daysWaiting(e,Date.now())} ngày tại ${e.station}`))));
+
+  const rows = [["Nhà sản xuất", e.manufacturer], ["Năm sản xuất", String(e.yearOfManufacture)]];
+  if (isTrolley(e)) rows.push(["Part No", e.partNo], ["Serial Number", e.serialNumber], ["Kích cỡ", e.size==="full"?"Full-size":"Half-size"], ["Tag UID", e.tagUid]);
+  else rows.push(["Serial Number", e.serialNumber ?? "—"], ["IMEI", e.imei ?? "—"], ["Người giữ", e.holder ?? "—"]);
+  rows.push(["Địa điểm nhận", e.registrationLocation], ["Trạm hiện tại", e.station]);
+
+  const list = h("div",{style:"margin-top:18px"});
+  rows.forEach(([k,val]) => list.appendChild(h("div",{style:"display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--n100)"},
+    h("span",{style:"font:400 14px Inter;color:var(--n500)"},k),
+    h("span",{style:"font:600 14px Inter;text-align:right"},val))));
+  body.appendChild(list);
+  v.appendChild(body);
+}
+
+/* ── equipment/register ─────────────────────────────────────────── */
+function RegisterScreen(v){
+  if (!hasPermission(S.session.roles,"equipment.register")) return NoPermission(v);
+  bar(v,{title:"Đăng ký trolley mới", onBack:()=>{ S.reg.issued=null; back("/home"); }});
+  const body = h("div",{class:"body white", style:"padding-top:18px;display:flex;flex-direction:column;gap:16px"});
+
+  if (S.reg.issued){
+    const code = S.reg.issued;
+    body.appendChild(h("div",{class:"banner ok"}, svg(I.check,20),
+      h("div",{}, h("b",{},"Đã đăng ký"), h("span",{},`Khắc/dán ${code} lên cart trước khi chuyển đi.`))));
+    body.appendChild(h("div",{class:"card", style:"padding:24px;text-align:center"},
+      h("div",{style:"font:600 11px/16px Inter;letter-spacing:.88px;text-transform:uppercase;color:var(--ink-3)"},"Mã được cấp"),
+      h("div",{class:"dsp", style:"font-size:36px;line-height:44px;margin-top:6px"}, code)));
+    body.appendChild(h("button",{class:"cta", onClick:()=>{ S.reg = {size:"full",manufacturer:"",partNo:"",serial:"",year:"",loc:"SGN",issued:null}; refresh(); }},
+      "Định danh cart tiếp theo"));
+    body.appendChild(h("button",{class:"cta ghost", onClick:()=>{ S.reg.issued=null; back("/home"); }},"Về dashboard"));
+    v.appendChild(body); return;
+  }
+
+  const errBox = h("div");
+  const mk = (key,label,ph,type="text") => {
+    const inp = h("input",{value:S.reg[key], placeholder:ph, type, onInput:e=>{S.reg[key]=e.target.value; sync();}});
+    return h("div",{class:"field"}, h("label",{},label), h("div",{class:"box"}, inp));
+  };
+  const sizeBtn = sz => h("button",{
+    style:`flex:1;min-height:${52}px;border-radius:var(--r-lg);font:600 15px Inter;border:1px solid ${S.reg.size===sz?"var(--info)":"var(--line)"};
+           background:${S.reg.size===sz?"var(--info-bg)":"var(--n0)"};color:${S.reg.size===sz?"var(--info-text)":"var(--ink-2)"}`,
+    onClick:()=>{S.reg.size=sz; refresh();}}, sz==="full"?"Full-size":"Half-size");
+
+  const cta = h("button",{class:"cta", onClick:save},"Lưu hồ sơ");
+  const sync = () => { cta.disabled = !(S.reg.manufacturer.trim() && S.reg.partNo.trim() && S.reg.serial.trim() && S.reg.year.trim()); };
+
+  function save(){
+    errBox.innerHTML = "";
+    const dup = ITEMS.find(e => e.manufacturer.toLowerCase()===S.reg.manufacturer.trim().toLowerCase()
+      && (e.serialNumber??"").toLowerCase()===S.reg.serial.trim().toLowerCase());
+    if (dup){
+      errBox.appendChild(h("div",{class:"banner bad"}, svg(I.warn,18),
+        h("div",{}, h("b",{},"Cart này đã tồn tại"),
+          h("span",{},`Serial ${dup.serialNumber} của ${dup.manufacturer} đã được đăng ký là ${dup.code}.`))));
+      return;
+    }
+    const code = nextCode(S.reg.size);
+    ITEMS.push({type:"trolley", code, tagUid:`04:1B:7E:2A:${(ITEMS.length+10).toString(16).toUpperCase()}`,
+      size:S.reg.size, status:"service", manufacturer:S.reg.manufacturer.trim(), partNo:S.reg.partNo.trim(),
+      serialNumber:S.reg.serial.trim(), yearOfManufacture:Number(S.reg.year), registrationLocation:S.reg.loc,
+      station:S.reg.loc, statusSince:Date.now()});
+    S.reg.issued = code; refresh();
+  }
+
+  body.appendChild(h("div",{class:"banner info"}, svg(I.tag,18),
+    h("div",{}, h("b",{},"Nhiệm vụ theo lô"), h("span",{},"Mã F-x/H-x cấp sau khi lưu — không giữ chỗ trước."))));
+  body.appendChild(h("div",{class:"field"}, h("label",{},"Kích cỡ trolley"),
+    h("div",{style:"display:flex;gap:10px"}, sizeBtn("full"), sizeBtn("half"))));
+  body.appendChild(mk("manufacturer","Nhà sản xuất","Zodiac / Mallaghan / JBT AeroTech"));
+  body.appendChild(mk("partNo","Part No","AT-7840"));
+  body.appendChild(mk("serial","Serial Number","SN-883015"));
+  body.appendChild(mk("year","Năm sản xuất","2024","number"));
+  body.appendChild(h("div",{class:"field"}, h("label",{},"Địa điểm nhận"),
+    h("div",{style:"display:flex;gap:8px"}, ...["SGN","HAN","CXR"].map(s =>
+      h("button",{style:`flex:1;min-height:44px;border-radius:var(--r-md);font:600 14px Inter;
+        border:1px solid ${S.reg.loc===s?"var(--info)":"var(--line)"};background:${S.reg.loc===s?"var(--info-bg)":"var(--n0)"};
+        color:${S.reg.loc===s?"var(--info-text)":"var(--ink-2)"}`, onClick:()=>{S.reg.loc=s; refresh();}}, s)))));
+  body.appendChild(errBox);
+  body.appendChild(cta);
+  body.appendChild(h("p",{style:"font:400 12px/18px Inter;color:var(--ink-3);text-align:center;padding-bottom:12px"},
+    "Thử lại với Zodiac + SN-883015 để thấy chặn trùng hồ sơ."));
+  sync();
+  v.appendChild(body);
+}
+
+/* ── scan (ground_ops) ──────────────────────────────────────────── */
+function ScanScreen(v){
+  if (!canAccessModule(S.session.roles,"ground_ops")) return NoAccess(v);
+  bar(v,{title:"Scan boarding pass", subtitle:`${activeFlight.code} · ${activeFlight.from}→${activeFlight.to}`,
+    onBack:()=>back("/home"), action:"đổi", onAction:()=>back("/home")});
+  const body = h("div",{class:"body white", style:"display:flex;flex-direction:column;gap:16px;padding-top:16px"});
+
+  body.appendChild(h("div",{class:"finder"},
+    h("div",{class:"frame"}, h("div",{class:"laser"})),
+    h("span",{class:"cap"}, `${activeFlight.code} · ${activeFlight.from}→${activeFlight.to}`)));
+
+  const r = S.scan.result;
+  if (r?.kind === "correct") body.appendChild(h("div",{class:"banner ok"}, svg(I.check,20),
+    h("div",{}, h("b",{},"Đúng chuyến"), h("span",{},"Hành khách thuộc chuyến đang phục vụ. Đã ghi nhận lên tàu."))));
+  if (r?.kind === "wrong") body.appendChild(h("div",{class:"banner bad"}, svg(I.warn,20),
+    h("div",{}, h("b",{},"Sai chuyến"),
+      h("span",{},`HK thuộc ${r.scannedFlight}, không phải ${activeFlight.code}. Đã gửi cảnh báo tới supervisor.`))));
+
+  // supervisor-only action, permission-gated
+  if (r?.kind === "wrong" && hasPermission(S.session.roles,"ground_ops.wrongboarding.accept"))
+    body.appendChild(h("button",{class:"cta ghost", style:"color:var(--danger-text);border-color:var(--danger)"},
+      "Duyệt ngoại lệ (supervisor)"));
+
+  const doScan = () => { S.scan.result = nextScanResult(S.scan.count); S.scan.count++; refresh(); };
+
+  body.appendChild(h("div",{style:"display:flex;flex-direction:column;gap:12px;margin-top:auto;padding-bottom:16px"},
+    r?.kind === "correct"
+      ? h("button",{class:"cta", onClick:()=>go("/passenger")},"Xem hồ sơ HK", svg(I.arrow,18))
+      : h("button",{class:"cta", onClick:doScan},"QUÉT"),
+    // ĐỀ XUẤT — không có trong source. Sau khi quét đúng, màn hình thật chỉ còn
+    // "Xem hồ sơ HK": không có đường quét khách kế tiếp mà không rời màn.
+    r?.kind === "correct"
+      ? h("button",{class:"cta ghost", onClick:doScan},"Quét khách tiếp theo",
+          h("span",{class:"chip warn", style:"margin-left:6px;font-size:10px"},"đề xuất"))
+      : null,
+    h("p",{style:"text-align:center;font:400 14px Inter;color:var(--n500)"}, `Đã quét: ${S.scan.count}`),
+    h("button",{style:"font:400 14px Inter;color:var(--red-700)"},"⌨︎ Nhập tay PNR/ghế"),
+  ));
+  v.appendChild(body);
+}
+
+function PassengerScreen(v){
+  bar(v,{title:"Hồ sơ hành khách", onBack:()=>back("/scan")});
+  const p = PASSENGER;
+  const body = h("div",{class:"body white", style:"padding-top:18px"});
+  body.appendChild(h("div",{style:"border-radius:var(--r-lg);padding:20px;background:var(--grad-brand);color:#fff;box-shadow:0 10px 26px rgba(240,40,35,.28)"},
+    h("div",{class:"dsp", style:"font-size:24px;line-height:32px"}, p.name),
+    h("div",{style:"font:500 14px/22px Inter;margin-top:4px"}, `Ghế ${p.seat} · PNR ${p.pnr} · ${p.status}`)));
+
+  const sensitive = hasPermission(S.session.roles,"crew_ops.pax.view_sensitive");
+  const rows = [
+    [I.cal,"Ngày sinh", p.dob],
+    [I.wheel,"Dịch vụ đặc biệt (SSR)", sensitive ? p.ssr : "••• bị ẩn"],
+    [I.food,"Suất ăn đặt trước", p.preMeal],
+    [I.cube,"Hàng đã mua", p.merchandise],
+    [I.plane,"Chuyến nối", p.transit],
+  ];
+  const list = h("div",{style:"margin-top:16px"});
+  rows.forEach(([ic,k,val]) => list.appendChild(
+    h("div",{style:"display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--n100)"},
+      h("span",{style:"color:var(--brand);margin-top:2px"}, svg(ic,20)),
+      h("div",{style:"flex:1"},
+        h("div",{style:"font:500 12px/16px Inter;color:var(--n500)"},k),
+        h("div",{style:"font:500 16px/26px Inter"},val)))));
+  body.appendChild(list);
+  if (!sensitive) body.appendChild(h("div",{class:"banner info", style:"margin-top:14px"}, svg(I.lock,18),
+    h("div",{}, h("b",{},"Một số trường bị ẩn"),
+      h("span",{},"Cần quyền crew_ops.pax.view_sensitive. Vai trò mặt đất không có quyền này."))));
+  v.appendChild(body);
+}
+
+/* ── profile ────────────────────────────────────────────────────── */
+function Profile(v){
+  bar(v,{title:"Hồ sơ & Cài đặt"});
+  const body = h("div",{class:"body white pad-tabs", style:"padding-top:22px;display:flex;flex-direction:column;gap:22px"});
+  const primary = resolvePrimaryRole(S.session.roles);
+  body.appendChild(h("div",{},
+    h("div",{style:"font:400 14px Inter;color:var(--n500)"},"Đăng nhập với mã"),
+    h("div",{style:"font:600 18px/26px Inter"}, S.session.employeeCode ?? "—")));
+  body.appendChild(h("div",{},
+    h("div",{style:"font:400 14px Inter;color:var(--n500);margin-bottom:8px"},"Vai trò"),
+    h("div",{style:"display:flex;gap:6px;flex-wrap:wrap"},
+      ...S.session.roles.map(r => h("span",{class:"chip "+(r===primary?"info":"ok")}, r + (r===primary?" · primary":""))))));
+  body.appendChild(h("div",{style:"display:flex;align-items:center;justify-content:space-between"},
+    h("span",{style:"font:500 16px Inter"},"Ngôn ngữ"),
+    h("button",{style:"background:var(--brand);color:#fff;font:600 14px Inter;padding:9px 16px;border-radius:var(--r-sm)"},"VI")));
+  body.appendChild(h("button",{class:"cta ghost", style:"color:var(--danger-text);border-color:var(--danger)", onClick:signOut},"Đăng xuất"));
+  v.appendChild(body);
+  tabbar(v);
+}
+
+/* ── gates ──────────────────────────────────────────────────────── */
+function NoAccess(v){
+  v.appendChild(h("div",{class:"center"},
+    h("span",{style:"color:var(--ink-3)"}, svg(I.lock,40)),
+    h("p",{style:"font:500 16px/26px Inter"},"Bạn không có quyền truy cập module này"),
+    h("p",{style:"font:400 12px/18px ui-monospace,monospace;color:var(--ink-3)"},"RequireModule → canAccessModule() === false"),
+    h("button",{class:"cta", style:"width:auto;padding:0 28px", onClick:()=>back("/home")},"Quay lại")));
+}
+function NoPermission(v){
+  v.appendChild(h("div",{class:"center"},
+    h("span",{style:"color:var(--ink-3)"}, svg(I.lock,40)),
+    h("p",{style:"font:500 16px/26px Inter"},"Bạn không có quyền thực hiện thao tác này."),
+    h("p",{style:"font:400 12px/18px ui-monospace,monospace;color:var(--ink-3)"},"RequirePermission → hasPermission() === false"),
+    h("button",{class:"cta", style:"width:auto;padding:0 28px", onClick:()=>back("/home")},"Quay lại")));
+}
+function NotFound(v){ v.appendChild(h("div",{class:"center"}, h("p",{},"404"))); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   4. INSPECTOR
+   ═══════════════════════════════════════════════════════════════════ */
+function renderInspector(){
+  const roles = S.session.roles;
+  const primary = resolvePrimaryRole(roles);
+
+  document.getElementById("i-stack").innerHTML =
+    S.stack.map(p => `<i>${p}</i>`).join("");
+
+  document.getElementById("i-user").textContent = S.session.employeeCode
+    ? `${S.session.employeeCode} — ${S.session.displayName}`
+    : "— chưa đăng nhập —";
+
+  const rolesEl = document.getElementById("i-roles");
+  rolesEl.innerHTML = roles.length
+    ? ROLE_PRECEDENCE.filter(r => roles.includes(r))
+        .map(r => `<span class="tag ${r===primary?"prim":""}">${r}${r===primary?" ★":""}</span>`).join("")
+    : `<span class="tag no">none</span>`;
+
+  const dash = primary && ROLE_DASHBOARDS[primary];
+  document.getElementById("i-dash").textContent = roles.length
+    ? `resolvePrimaryRole → ${primary} → ${dash ?? "ModuleGridDashboard (fallback)"}`
+    : "";
+
+  const modsEl = document.getElementById("i-mods");
+  const visible = modulesForRoles(roles);
+  modsEl.innerHTML = MODULES.map(m => {
+    const on = visible.includes(m);
+    const cls = !on ? "tag no" : (m.route ? "tag dash" : "tag");
+    return `<span class="${cls}">${m.id}${on && !m.route ? " ·null" : ""}</span>`;
+  }).join("");
+
+  const perms = permsFor(roles);
+  document.getElementById("i-perms").innerHTML = perms.length
+    ? perms.map(p => `<li>${p}</li>`).join("")
+    : `<li style="color:#4b5563">— —</li>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   5. ĐỒNG HỒ MÔ PHỎNG + ĐIỀU KHIỂN
+   ═══════════════════════════════════════════════════════════════════ */
+setInterval(()=>{
+  const wasBefore = S.simNow < ROTATION.reportAt;
+  S.simNow += 1000;
+
+  // Đếm ngược cập nhật tại chỗ — không vẽ lại cả màn mỗi giây.
+  const card = document.querySelector("#views .view:last-child .pass");
+  if (card?._tick) card._tick();
+
+  // Chạm 0 → đổi sang trạng thái "đã tới giờ báo cáo", vẽ lại một lần duy nhất.
+  if (wasBefore && S.simNow >= ROTATION.reportAt && route() === "/home") refresh();
+}, 1000);
+
+/* ── bottom sheet ── */
+const insp = document.getElementById("insp"), scrim = document.getElementById("scrim"), fab = document.getElementById("fab");
+const openSheet  = () => { insp.classList.add("on"); scrim.classList.add("on"); insp.setAttribute("aria-hidden","false"); fab.hidden = true; };
+const closeSheet = () => { insp.classList.remove("on"); scrim.classList.remove("on"); insp.setAttribute("aria-hidden","true"); fab.hidden = false; };
+fab.onclick = openSheet;
+scrim.onclick = closeSheet;
+document.getElementById("c-close").onclick = closeSheet;
+document.getElementById("c-reset").onclick = () => { closeSheet(); if (S.session.employeeCode) signOut(); };
+document.getElementById("c-jump").onclick  = () => { closeSheet(); S.simNow = ROTATION.reportAt + 5*MIN; refresh(); };
+
+/* Vuốt xuống trên tay nắm để đóng — velocity, không phải ngưỡng khoảng cách. */
+(() => {
+  let y0 = 0, t0 = 0, dragging = false;
+  insp.addEventListener("pointerdown", e => {
+    if (insp.scrollTop > 0) return;
+    dragging = true; y0 = e.clientY; t0 = e.timeStamp;
+    insp.style.transition = "none";
+  });
+  insp.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const dy = Math.max(0, e.clientY - y0);
+    insp.style.transform = `translateY(${dy}px)`;
+  });
+  insp.addEventListener("pointerup", e => {
+    if (!dragging) return;
+    dragging = false;
+    insp.style.transition = ""; insp.style.transform = "";
+    const dy = e.clientY - y0, v = dy / Math.max(1, e.timeStamp - t0);
+    if (dy > 90 || v > 0.11) closeSheet();   // ngưỡng vận tốc như Sonner/Vaul
+  });
+})();
+
+/* iOS: chặn double-tap-to-zoom mà không giết được tap. */
+document.addEventListener("gesturestart", e => e.preventDefault());
+
+/* boot */
+document.getElementById("views").appendChild(buildView(route()));
+paintChrome();
+</script>
+</body>
+</html>
