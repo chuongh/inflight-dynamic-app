@@ -293,6 +293,183 @@ body{
 .nt .nttx time{font:500 11px/16px Inter;color:var(--ink-3);margin-top:6px;display:block}
 .nt .ntdot{width:8px;height:8px;border-radius:var(--r-pill);background:var(--info);flex:none;margin-top:6px}
 
+/* ── vertical flight timeline (indigo) ── */
+.vtl{display:flex;flex-direction:column;gap:18px}
+.vgrp-hd{display:flex;align-items:center;gap:10px;margin:0 2px 12px}
+.vgrp-hd .gnum{width:28px;height:28px;border-radius:var(--r-pill);flex:none;display:grid;place-items:center;
+  background:var(--info);color:#fff;font:800 14px "Plus Jakarta Sans";box-shadow:0 4px 12px rgba(79,70,229,.35)}
+.vgrp-hd .grt{font:700 14px/18px Inter;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vgrp-hd .gsub{font:500 12px/16px Inter;color:var(--n500);margin-top:1px}
+.vlegs{position:relative;padding-left:32px}
+.vlegs::before{content:"";position:absolute;left:9px;top:12px;bottom:12px;width:2px;
+  background:linear-gradient(var(--info),var(--info-bg))}
+.vitem{position:relative;margin-bottom:10px}
+.vitem .dot{position:absolute;left:-30px;top:15px;width:16px;height:16px;border-radius:var(--r-pill);
+  background:#fff;border:3px solid var(--info);box-shadow:0 0 0 3px var(--surface-2)}
+.vitem.delayed .dot{border-color:var(--warning)}
+.vitem.gap{margin:-2px 0 10px}
+.vitem.gap .dot{left:-27px;top:3px;width:9px;height:9px;border-width:2px;border-color:var(--n300)}
+.vitem.gap .gt{display:flex;align-items:center;gap:6px;font:600 11px/16px Inter;color:var(--ink-3);padding-left:2px}
+.vitem.gap.tight .gt{color:var(--warning-text)}
+.vcard{display:block;width:100%;text-align:left;background:var(--n0);border:1px solid var(--line);
+  border-radius:var(--r-lg);box-shadow:var(--e1);padding:12px 14px;transition:transform 160ms var(--ease-out)}
+.vcard:active{transform:scale(.99)}
+.vr1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.vno{font:800 15px "Plus Jakarta Sans";color:var(--ink);letter-spacing:.2px}
+.vr2{display:flex;align-items:baseline;gap:10px;margin-top:8px;flex-wrap:wrap}
+.vod{font:700 17px/22px Inter;color:var(--ink)}
+.vtm{font:500 12px/16px Inter;color:var(--n500);font-variant-numeric:tabular-nums}
+.vr3{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.vpax{font:500 12px/16px Inter;color:var(--ink-2)}
+.vr3 .chev{color:var(--ink-3);flex:none}
+
+/* ── primary download CTA (đậm) ── */
+.packcta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;min-height:var(--glove);
+  border-radius:var(--r-lg);padding:15px 18px;color:#fff;
+  background:linear-gradient(135deg,#4338CA 0%,#4F46E5 55%,#6366F1 100%);
+  box-shadow:0 14px 32px rgba(67,56,202,.38);transition:transform 160ms var(--ease-out)}
+.packcta:active{transform:scale(.985)}
+.packcta .ic{width:44px;height:44px;border-radius:12px;flex:none;display:grid;place-items:center;
+  background:rgba(255,255,255,.18)}
+.packcta .t{flex:1;min-width:0}
+.packcta .t b{display:block;font:700 16px/22px Inter}
+.packcta .t span{display:block;font:500 12px/16px Inter;color:rgba(255,255,255,.85);margin-top:1px}
+.packcta .go{margin-left:auto;flex:none;opacity:.9}
+.packcta.done{background:linear-gradient(135deg,#15803D,#16A34A);box-shadow:0 14px 32px rgba(22,163,74,.30)}
+.packcta .reload{margin-left:auto;flex:none;background:rgba(255,255,255,.18);color:#fff;
+  font:600 13px Inter;padding:8px 14px;border-radius:var(--r-pill)}
+.packcta .cprog{height:6px;background:rgba(255,255,255,.25);border-radius:var(--r-pill);margin-top:8px;overflow:hidden}
+.packcta .cprog i{display:block;height:100%;background:#fff;border-radius:var(--r-pill);transition:width .4s ease}
+
+/* ── crew avatar (trong chi tiết chặng) ── */
+.crewav{width:34px;height:34px;border-radius:var(--r-pill);flex:none;display:grid;place-items:center;
+  background:var(--info-bg);color:var(--info-text);font:800 13px "Plus Jakarta Sans"}
+.crewav.lead{background:var(--grad-brand);color:#fff}
+.crewav.pilot{background:var(--n900);color:#fff}
+.crewgrp{font:700 11px Inter;letter-spacing:.6px;text-transform:uppercase;color:var(--n500);margin:6px 0 2px}
+.crewrow{display:flex;align-items:center;gap:12px;padding:9px 0}
+.crewrow.tb{border-top:1px solid var(--n100)}
+
+/* ── pax count + seatmap entry (flight detail) ── */
+.paxbadge{width:44px;height:44px;border-radius:12px;flex:none;display:grid;place-items:center;background:var(--info-bg);color:var(--info-text)}
+.seatentry{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--n0);
+  border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--e1);padding:14px 16px;transition:transform 160ms var(--ease-out)}
+.seatentry:active{transform:scale(.99)}
+.seatentry .si{width:44px;height:44px;border-radius:12px;flex:none;display:grid;place-items:center;background:var(--brand);color:#fff}
+.seatentry b{display:block;font:600 15px Inter;color:var(--ink)}
+.seatentry span{display:block;font:400 12px Inter;color:var(--n500);margin-top:1px}
+.seatentry .chev{margin-left:auto;color:var(--ink-3);flex:none}
+
+/* ── seatmap screen header (kiểu SkySeat) ── */
+.seathd{flex:none;color:#fff;background:linear-gradient(150deg,#7A0000,#E30018 60%,#C10015);
+  padding:calc(max(var(--sa-top),10px) + 12px) calc(var(--sa-r) + 16px) 0 calc(var(--sa-l) + 16px)}
+.seathd-top{display:flex;align-items:center;gap:12px}
+.sback{width:36px;height:36px;border-radius:var(--r-pill);flex:none;display:grid;place-items:center;color:#fff;
+  background:rgba(255,255,255,.16);transition:transform 160ms var(--ease-out)}
+.sback:active{transform:scale(.94)}
+.sh-flt{font:600 12px/16px Inter;color:rgba(255,255,255,.86)}
+.sh-rt{display:flex;align-items:center;gap:12px;margin-top:2px}
+.sh-rt b{font:800 20px "Plus Jakarta Sans";color:#fff}
+.sh-line{flex:1;display:flex;align-items:center;color:#fff;opacity:.85}
+.sh-line::before,.sh-line::after{content:"";flex:1;border-top:1.5px dashed rgba(255,255,255,.45)}
+.sh-line>*{margin:0 6px}
+.sh-pob{text-align:right;flex:none}
+.sh-pob b{font:800 20px "Plus Jakarta Sans";color:#fff;display:block}
+.sh-pob span{font:500 11px Inter;color:rgba(255,255,255,.82)}
+.segtoggle{display:flex;gap:6px;margin-top:14px;padding-bottom:12px}
+.seg{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:38px;border-radius:var(--r-md);
+  font:600 14px Inter;color:rgba(255,255,255,.92);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:transform 160ms var(--ease-out)}
+.seg.on{background:#fff;color:var(--brand);border-color:#fff}
+.seg:active{transform:scale(.98)}
+
+/* ── seat grid ── */
+.smwrap{padding:0 2px}
+.legend{display:flex;flex-wrap:wrap;gap:9px 14px;margin-bottom:12px;padding:0 4px}
+.lg{display:inline-flex;align-items:center;gap:6px;font:500 12px Inter;color:var(--ink-2)}
+.sw{width:16px;height:16px;border-radius:5px;flex:none;position:relative}
+.sw.skyboss{background:var(--brand)} .sw.eco{background:var(--n600)} .sw.ssr{background:#7C3AED}
+.sw.svc{background:var(--n600)} .sw.svc::after{content:"";position:absolute;top:0;right:0;width:0;height:0;
+  border-top:8px solid var(--brand-accent);border-left:8px solid transparent}
+.sw.transit{background:var(--n600)} .sw.transit::before{content:"";position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:#fff}
+.sw.empty{background:var(--n100);border:1px dashed var(--n300)}
+.cabinlab{display:flex;align-items:center;gap:10px;justify-content:center;margin:16px 0 10px;
+  font:700 11px Inter;letter-spacing:.7px;text-transform:uppercase;color:var(--n500)}
+.cabinlab::before,.cabinlab::after{content:"";height:1px;width:44px;background:var(--line)}
+.cabinlab.sb{color:var(--brand)}
+.seatrow{display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:5px}
+.seatrow .rn{width:22px;text-align:center;font:600 11px Inter;color:var(--ink-3);flex:none}
+.seatrow.head{margin-bottom:6px}
+.seatrow.head .cl{width:30px;text-align:center;font:600 11px Inter;color:var(--ink-3);flex:none}
+.aisle{width:16px;flex:none}
+.seat{width:30px;height:30px;border-radius:7px;flex:none;position:relative;border:0;overflow:hidden;
+  color:#fff;font:700 11px Inter;display:grid;place-items:center;transition:transform 120ms var(--ease-out)}
+.seat:active{transform:scale(.9)}
+.seat.skyboss{background:var(--brand)}
+.seat.eco{background:var(--n600)}
+.seat.ssr{background:#7C3AED}
+.seat.empty{background:var(--n100);color:var(--n300);font-size:13px}
+.seat.svc::after{content:"";position:absolute;top:0;right:0;width:0;height:0;
+  border-top:11px solid var(--brand-accent);border-left:11px solid transparent}
+.seat.transit::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+
+/* ── pax list (bảng danh sách khách) ── */
+.paxlist{display:flex;flex-direction:column}
+.plhead{display:flex;align-items:center;gap:10px;padding:0 12px 8px;
+  font:700 10px Inter;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-3)}
+.plrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;
+  background:var(--n0);border:0;border-bottom:1px solid var(--n100);transition:background 160ms ease}
+.plrow:active{background:var(--n50)}
+.c-seat{width:52px;flex:none}
+.c-name{flex:1;min-width:0}
+.c-tag{display:flex;align-items:center;gap:5px;flex:none;flex-wrap:wrap;justify-content:flex-end;max-width:46%}
+.seatpill{display:inline-grid;place-items:center;min-width:42px;padding:5px 4px;border-radius:var(--r-sm);
+  font:800 12px "Plus Jakarta Sans";color:#fff}
+.seatpill.skyboss{background:var(--brand)} .seatpill.eco{background:var(--n600)}
+.c-name b{display:block;font:600 14px/18px Inter;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plsub{display:block;font:500 11px/15px Inter;color:var(--n500);margin-top:1px}
+.plmut{color:var(--ink-3);font:500 12px Inter}
+.c-tag .chev{color:var(--ink-3);flex:none}
+
+/* ── search + filter (danh sách khách) ── */
+.plbar{position:sticky;top:0;z-index:5;background:var(--n0);padding:2px 12px 10px;border-bottom:1px solid var(--n100)}
+.pxsearch{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:11px 14px}
+.pxsearch>span:first-child{color:var(--ink-3);flex:none;display:grid}
+.pxsearch input{font:500 15px Inter;flex:1;min-width:0}
+.pxsearch input::placeholder{color:var(--ink-3)}
+.pxclear{width:24px;height:24px;border-radius:var(--r-pill);flex:none;display:grid;place-items:center;
+  background:var(--n200);color:var(--n600)}
+.fchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fchip{display:inline-flex;align-items:center;gap:7px;font:600 13px Inter;color:var(--ink-2);
+  background:var(--surface-2);border:1px solid var(--line);padding:8px 13px;border-radius:var(--r-pill);
+  transition:background 160ms ease,color 160ms ease,transform 140ms var(--ease-out)}
+.fchip:active{transform:scale(.96)}
+.fchip.on{background:var(--info);color:#fff;border-color:var(--info)}
+.fchip .fcount{font:700 11px Inter;padding:1px 7px;border-radius:var(--r-pill);background:rgba(15,23,42,.08);color:inherit}
+.fchip.on .fcount{background:rgba(255,255,255,.24)}
+.plcount{font:600 12px Inter;color:var(--n500);padding:12px 14px 6px}
+
+/* meal hiển thị ngay trên dòng danh sách */
+.plmeal{display:inline-flex;align-items:center;gap:6px;margin-top:6px;max-width:100%;
+  font:600 12px/16px Inter;color:var(--warning-text);background:var(--warning-bg);
+  padding:3px 9px 3px 7px;border-radius:var(--r-pill)}
+.plmeal svg{flex:none}
+.plmeal>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plempty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:48px 20px;color:var(--ink-3)}
+.plempty p{font:500 14px Inter}
+
+/* ── pax detail ── */
+.clsbadge{font:700 10px Inter;letter-spacing:.4px;text-transform:uppercase;padding:3px 9px;border-radius:var(--r-pill);color:#fff;flex:none}
+.clsbadge.skyboss{background:var(--brand)} .clsbadge.eco{background:var(--n600)}
+.seatbig{min-width:52px;height:52px;padding:0 8px;border-radius:12px;background:var(--n900);color:#fff;
+  display:grid;place-items:center;font:800 18px "Plus Jakarta Sans";flex:none}
+.pdk{font:600 10px Inter;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-3)}
+.pdv{font:600 15px Inter;color:var(--ink);margin-top:3px}
+.svcic{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;background:var(--info-bg);color:var(--info-text)}
+
 /* ── equipment ── */
 .station .h{display:flex;align-items:center;gap:12px;padding:16px;min-height:var(--touch)}
 .glyph{width:var(--touch);height:var(--touch);flex:none;border-radius:var(--r-md);background:var(--info-bg);color:var(--info-text);
@@ -866,7 +1043,18 @@ const LEGS = [
   {id:"VJ874",flightNo:"VJ874",origin:"BMV",destination:"SGN",std:at(10,55),sta:at(12,5),status:"delayed", pob:201,capacity:230,ssrWchr:0,ssrUmnr:1,ssrMeda:1,ssrInf:3},
 ];
 LEGS.forEach(l => l.ssrCount = l.ssrWchr+l.ssrUmnr+l.ssrMeda+l.ssrInf);
-const ROTATION = {aircraftType:"A321neo", registration:"VN-A653", reportAt: LEGS[0].std - REPORT_OFFSET_MINUTES*MIN, dutyEndAt: LEGS[2].sta + 30*MIN};
+// Group 2 trong ngày: SGN-HAN-SGN
+const LEGS2 = [
+  {id:"VJ180",flightNo:"VJ180",origin:"SGN",destination:"HAN",std:at(14,20),sta:at(16,30),status:"upcoming",pob:176,capacity:230,ssrWchr:1,ssrUmnr:0,ssrMeda:0,ssrInf:1},
+  {id:"VJ181",flightNo:"VJ181",origin:"HAN",destination:"SGN",std:at(17,15),sta:at(19,25),status:"upcoming",pob:203,capacity:230,ssrWchr:2,ssrUmnr:1,ssrMeda:0,ssrInf:2},
+];
+LEGS2.forEach(l => l.ssrCount = l.ssrWchr+l.ssrUmnr+l.ssrMeda+l.ssrInf);
+const GROUPS = [
+  {id:"G1", route:"SGN · PQC · BMV · SGN", legs:LEGS},
+  {id:"G2", route:"SGN · HAN · SGN",       legs:LEGS2},
+];
+const ALL_LEGS = [...LEGS, ...LEGS2];
+const ROTATION = {aircraftType:"A321neo", registration:"VN-A653", reportAt: LEGS[0].std - REPORT_OFFSET_MINUTES*MIN, dutyEndAt: LEGS2[1].sta + 30*MIN};
 const CREW = [
   {id:"C1",name:"Amy Nguyễn",position:"Purser",station:"L1"},
   {id:"C2",name:"Trần Thị B",position:"Cabin Crew",station:"R1"},
@@ -874,6 +1062,53 @@ const CREW = [
   {id:"C4",name:"Đỗ Văn E",position:"Cabin Crew",station:"R2"},
   {id:"C5",name:"Vũ Thị F",position:"Cabin Crew",station:"L3"},
 ];
+// Buồng lái (thể hiện riêng với tổ tiếp viên)
+const COCKPIT = [
+  {id:"P1", name:"Trần Quốc Hùng", role:"Cơ trưởng",  rank:"Captain"},
+  {id:"P2", name:"Lê Minh Tuấn",   role:"Cơ phó",     rank:"First Officer"},
+];
+
+// ── Passenger manifest (sinh xác định theo flightNo, cache trên leg) ──
+const SEAT_COLS = ["A","B","C","D","E","F"];
+const SKYBOSS_ROWS = [1,2,3];
+const ECO_ROWS = Array.from({length:35}, (_,i)=>i+6);   // 6..40 → 228 ghế
+const PAX_NAMES = ["Nguyễn Văn Minh","Trần Thị Hà","Lê Hoàng Nam","Phạm Thu Trang","Vũ Đức Anh","Đỗ Thị Lan","Bùi Quang Huy","Hồ Ngọc Mai","Đặng Văn Sơn","Ngô Thị Hương","Dương Anh Khoa","Phan Mỹ Linh","John Smith","Emily Clark","David Kim","Sofia Rossi","Chen Wei","Aiko Tanaka","Raj Patel","Maria Garcia","Oliver Brown","Yuki Sato","Hana Lee","Marco Bianchi"];
+const MEALS = [["SKBZ","SkyBoss Hot Meal"],["CHIC","Cơm gà xối mỡ"],["BEEF","Mì Ý sốt bò"],["VGML","Suất chay"],["SEAF","Cơm hải sản"]];
+const SSR_TYPES = [["WCHR","Xe lăn"],["UMNR","Trẻ đi một mình"],["MEDA","Ca y tế"],["INF","Trẻ sơ sinh"],["BLND","Khiếm thị"],["DEAF","Khiếm thính"]];
+const A36 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function rng(seed){ let x=(seed||1)>>>0; return ()=>{ x^=x<<13; x>>>=0; x^=x>>>17; x^=x<<5; x>>>=0; return x/4294967296; }; }
+function pnrFrom(r){ let s=""; for(let i=0;i<6;i++) s+=A36[Math.floor(r()*36)]; return s; }
+
+function buildManifest(leg){
+  if (leg._manifest) return leg._manifest;
+  const seats = [];
+  SKYBOSS_ROWS.forEach(r => SEAT_COLS.forEach(c => seats.push({id:`${r}${c}`, row:r, col:c, cls:"skyboss"})));
+  ECO_ROWS.forEach(r => SEAT_COLS.forEach(c => seats.push({id:`${r}${c}`, row:r, col:c, cls:"eco"})));
+  const pick = rng(hashStr(leg.flightNo+"seed"));
+  const order = seats.map(s => ({s, k:pick()})).sort((a,b)=>a.k-b.k).map(o=>o.s.id);
+  const occ = new Set(order.slice(0, Math.min(leg.pob, seats.length)));
+  const map = {}; let seq = 0;
+  seats.forEach(s => {
+    if (!occ.has(s.id)){ map[s.id] = null; return; }
+    seq++;
+    const r = rng(hashStr(leg.flightNo+s.id));
+    const name = PAX_NAMES[Math.floor(r()*PAX_NAMES.length)];
+    const pnr = pnrFrom(r);
+    const tr = r();
+    const type = tr < 0.04 ? "Em bé" : tr < 0.10 ? "Trẻ em" : "Người lớn";
+    const age = type==="Em bé" ? 1 : type==="Trẻ em" ? 3+Math.floor(r()*11) : 18+Math.floor(r()*56);
+    const ssr = [];
+    if (r() < 0.07) ssr.push(SSR_TYPES[Math.floor(r()*SSR_TYPES.length)]);
+    const services = [];
+    if (s.cls==="skyboss" || r() < 0.4) services.push([...MEALS[Math.floor(r()*MEALS.length)], 1]);
+    if (r() < 0.16) services.push(["DUTY","Nước hoa (miễn thuế)", 1+Math.floor(r()*2)]);
+    map[s.id] = {seat:s.id, cls:s.cls, name, pnr, seq, type, age, dob:String(2026-age),
+      ssr, services, transit: r()<0.07, delivered: r()<0.4};
+  });
+  leg._manifest = {seats, map, occ, cols:SEAT_COLS};
+  return leg._manifest;
+}
 const groundMinutes = (prevSta,nextStd) => Math.max(0, Math.round((nextStd-prevSta)/MIN));
 const isTightGround = m => m < TIGHT_GROUND_MINUTES;
 const pad = n => String(n).padStart(2,"0");
@@ -902,7 +1137,7 @@ const NOTIFS = [
   {id:"N1", icon:"warn",     tone:"danger", title:"VJ874 chuyển giờ",  body:"BMV → SGN trễ 45′ · dự kiến 12:05 → 12:50", time:"5 phút trước",  unread:true},
   {id:"N2", icon:"cal",      tone:"info",   title:"Phân ca 15/07",     body:"Ca sáng SGN · báo cáo 05:30 tại phòng briefing", time:"1 giờ trước",  unread:true},
   {id:"N3", icon:"bell",     tone:"info",   title:"Thông báo nội bộ",  body:"Quy trình phục vụ khách SSR cập nhật từ 14/07", time:"Hôm qua",     unread:false},
-  {id:"N4", icon:"down",     tone:"info",   title:"Gói bay đã sẵn sàng",body:"3 chặng · 12.4 MB đã tải xong, dùng được offline", time:"Hôm qua",  unread:false},
+  {id:"N4", icon:"down",     tone:"info",   title:"Gói bay đã sẵn sàng",body:"5 chặng · 12.4 MB đã tải xong, dùng được offline", time:"Hôm qua",  unread:false},
 ];
 const unreadNotifs = () => NOTIFS.filter(n => n.unread).length;
 
@@ -920,11 +1155,12 @@ const S = {
   stack: ["/login"],
   tab: "home",
   simNow: ROTATION.reportAt - 45*MIN,   // mô phỏng: 45' trước giờ báo cáo
-  pack: {state:"missing", done:0, total:3, syncedAt:null},
+  pack: {state:"missing", done:0, total:5, syncedAt:null},
   scan: {count:activeFlight.scannedCount, result:null},
   equip: {outcome:null},
   reg: {size:"full", manufacturer:"", partNo:"", serial:"", year:"", loc:"SGN", issued:null},
   login: {code:"", pw:"", show:false},
+  paxView: "map",
 };
 const route = () => S.stack[S.stack.length-1];
 const DARK_BAR = new Set(["/login","/forgot","/unlock"]);
@@ -1005,6 +1241,8 @@ const I = {
   scan:  `<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M3 12h18"/>`,
   car:   `<path d="M5 17h14M6 17v2M18 17v2M4 13l1.5-5A2 2 0 0 1 7.4 6.5h9.2A2 2 0 0 1 18.5 8L20 13M4 13h16v4H4z"/><circle cx="7.5" cy="15" r="0"/>`,
   food:  `<path d="M4 3v8a3 3 0 0 0 6 0V3M7 11v10M17 3c-1.5 0-3 2-3 5s1.5 4 3 4v9"/>`,
+  search:`<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>`,
+  x:     `<path d="M18 6 6 18M6 6l12 12"/>`,
   cube:  `<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5M12 13v8"/>`,
   tag:   `<path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.2"/>`,
   lock:  `<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>`,
@@ -1041,6 +1279,8 @@ function buildView(path){
   // Tra bảng khớp chính xác TRƯỚC, rồi mới tới prefix — nếu không "/crew/flights"
   // sẽ bị "/crew/flight" nuốt mất.
   }[path] ?? (
+    path.includes("/pax/")            ? PaxDetail :
+    path.endsWith("/seats")           ? SeatScreen :
     path.startsWith("/crew/flight/")  ? FlightDetail :
     path.startsWith("/equipment/")    ? DeviceScreen : NotFound
   ))(v, path);
@@ -1140,7 +1380,7 @@ function signIn(code){
 function signOut(){
   S.session = {employeeCode:null, displayName:null, roles:[], baseStation:"SGN"};
   S.login = {code:"", pw:"", show:false};
-  S.pack = {state:"missing", done:0, total:3, syncedAt:null};
+  S.pack = {state:"missing", done:0, total:5, syncedAt:null};
   S.scan = {count:activeFlight.scannedCount, result:null};
   S.equip.outcome = null; S.reg.issued = null;
   ITEMS = SEED.map(e=>({...e}));
@@ -1466,62 +1706,14 @@ function CrewDashboard(v){
   if (!passed) pass._tick = () => { cd.textContent = formatCountdown(Math.max(0, ROTATION.reportAt - S.simNow)); };
   body.appendChild(st(pass));
 
-  /* ── ray ca trực ── */
-  body.appendChild(st(h("section",{class:"card", style:"padding:14px 12px 12px"},
-    h("div",{style:"display:flex;align-items:baseline;justify-content:space-between;margin:0 4px 10px"},
-      h("b",{class:"hdg", style:"font-size:15px"},"Ca trực"),
-      h("span",{style:"font:500 12px Inter;color:var(--n500)"}, `${hhmm(ROTATION.reportAt)} – ${hhmm(ROTATION.dutyEndAt)}`)),
-    dutyRail())));
+  /* ── chuyến bay của tôi hôm nay — timeline dọc, 2 nhóm ── */
+  body.appendChild(st(h("div",{class:"sec", style:"margin:6px 2px 2px"},
+    h("h2",{style:"font-size:18px"},"Chuyến bay của tôi hôm nay"),
+    h("span",{class:"hint"}, `${ALL_LEGS.length} chặng · ${GROUPS.length} nhóm`))));
+  body.appendChild(flightsTimeline(st));
 
-  /* ── ba con số ── */
-  const blockMin = LEGS.reduce((s,l)=>s + Math.round((l.sta-l.std)/MIN), 0);
-  const pax = LEGS.reduce((s,l)=>s+l.pob, 0);
-  const ssrTot = LEGS.reduce((s,l)=>s+l.ssrCount, 0);
-  body.appendChild(st(h("div",{class:"trio"},
-    h("div",{}, h("b",{}, `${Math.floor(blockMin/60)}h${pad(blockMin%60)}`), h("span",{},"Giờ bay")),
-    h("div",{}, h("b",{}, String(pax)), h("span",{},"Khách cả ca")),
-    h("div",{}, h("b",{}, String(ssrTot)), h("span",{},"Suất SSR")),
-  )));
-
-  body.appendChild(st(packStrip()));
-
-  /* ── chuyến bay của tôi — ngay trên màn chính ── */
-  body.appendChild(st(h("div",{style:"display:flex;align-items:baseline;justify-content:space-between;margin:8px 2px -4px"},
-    h("b",{class:"hdg", style:"font-size:15px"},"Chuyến bay của tôi"),
-    h("button",{class:"link", style:"font-size:13px", onClick:()=>go("/crew/flights")},"Xem cả ca ›"))));
-  body.appendChild(st(flightList()));
-
-  /* ── cần chú ý ── */
-  const alerts = deriveAlerts(S.pack.state);
-  if (alerts.length) body.appendChild(st(h("section",{class:"card", style:"padding:4px 14px"},
-    ...alerts.map((a,i) => h("div",{style:`display:flex;align-items:center;gap:10px;padding:11px 0;${i?"border-top:1px solid var(--n100)":""}`},
-      h("span",{style:`color:var(--${a.sev==="bad"?"danger":"warning"})`}, svg(I.warn,18)),
-      h("span",{style:"font:600 14px/22px Inter;flex:1"}, a.text)))
-  )));
-
-  /* ── SSR ── */
-  const ssr = LEGS.reduce((s,l)=>({wchr:s.wchr+l.ssrWchr, umnr:s.umnr+l.ssrUmnr, meda:s.meda+l.ssrMeda, inf:s.inf+l.ssrInf}),{wchr:0,umnr:0,meda:0,inf:0});
-  body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
-    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:10px"},"Dịch vụ đặc biệt"),
-    h("div",{style:"display:flex;gap:6px;flex-wrap:wrap"},
-      h("span",{class:"chip info"}, svg(I.wheel,14), `${ssr.wchr} xe lăn`),
-      h("span",{class:"chip info"}, `${ssr.umnr} trẻ đi một mình`),
-      h("span",{class:"chip info"}, `${ssr.meda} ca y tế`),
-      h("span",{class:"chip info"}, `${ssr.inf} trẻ sơ sinh`),
-    ))));
-
-  /* ── tổ bay: chồng avatar ── */
-  const faces = h("div",{class:"faces"},
-    ...CREW.slice(0,4).map((c,i) => h("span",{class:"f"+(i===0?" lead":"")},
-      c.name.trim().split(/\s+/).slice(-1)[0][0])),
-    CREW.length > 4 ? h("span",{class:"more"}, `+${CREW.length-4}`) : null);
-  body.appendChild(st(h("section",{class:"card", style:"padding:14px;display:flex;align-items:center;gap:12px"},
-    faces,
-    h("div",{style:"flex:1"},
-      h("b",{class:"hdg", style:"font-size:15px;display:block"},"Tổ bay"),
-      h("span",{style:"font:400 12px/16px Inter;color:var(--n500)"},
-        `${CREW.length} người · ${CREW[0].name} (Purser)`)),
-    h("span",{style:"color:var(--ink-3)"}, svg(I.chev,18)))));
+  /* ── tải gói bay — CTA chính, đậm ── */
+  body.appendChild(st(packCTA()));
 
   v.appendChild(body);
 }
@@ -1625,6 +1817,70 @@ const STATUS_CHIP = {
   cancelled: ["bad","Huỷ"],
 };
 
+/* Timeline dọc: 2 nhóm chặng bay hôm nay. Tap 1 chặng → chi tiết. */
+function flightsTimeline(st){
+  const wrap = h("div",{class:"vtl"});
+  GROUPS.forEach((g, gi) => {
+    const first = g.legs[0], last = g.legs[g.legs.length-1];
+    const grp = h("div",{class:"vgrp"});
+    grp.appendChild(h("div",{class:"vgrp-hd"},
+      h("span",{class:"gnum"}, String(gi+1)),
+      h("div",{style:"min-width:0"},
+        h("div",{class:"grt"}, `Nhóm ${gi+1} · ${g.route}`),
+        h("div",{class:"gsub"}, `${hhmm(first.std)} – ${hhmm(last.sta)} · ${g.legs.length} chặng`))));
+    const legs = h("div",{class:"vlegs"});
+    g.legs.forEach((l, i) => {
+      const mins = Math.round((l.sta - l.std)/MIN);
+      const pct = Math.round(l.pob / l.capacity * 100);
+      const chip = STATUS_CHIP[l.status];
+      const item = h("div",{class:"vitem"+(l.status==="delayed"?" delayed":"")},
+        h("span",{class:"dot"}),
+        h("button",{class:"vcard", onClick:()=>go(`/crew/flight/${l.flightNo}`)},
+          h("div",{class:"vr1"},
+            h("span",{class:"vno"}, l.flightNo),
+            h("span",{class:"chip "+chip[0]}, chip[1])),
+          h("div",{class:"vr2"},
+            h("span",{class:"vod"}, `${l.origin} → ${l.destination}`),
+            h("span",{class:"vtm"}, `${hhmm(l.std)}–${hhmm(l.sta)} · ${Math.floor(mins/60)}h${pad(mins%60)}`)),
+          h("div",{class:"vr3"},
+            h("span",{class:"vpax"}, `${l.pob}/${l.capacity} khách · ${pct}%`),
+            h("span",{class:"chev"}, svg(I.chev,18)))));
+      legs.appendChild(st ? st(item) : item);
+      const next = g.legs[i+1];
+      if (next){
+        const gm = groundMinutes(l.sta, next.std);
+        const tight = isTightGround(gm);
+        legs.appendChild(h("div",{class:"vitem gap"+(tight?" tight":"")},
+          h("span",{class:"dot"}),
+          h("span",{class:"gt"}, svg(I.clock,13),
+            tight ? `Quay đầu gấp tại ${l.destination} · ${gm}′` : `Nghỉ sân tại ${l.destination} · ${gm}′`)));
+      }
+    });
+    grp.appendChild(legs);
+    wrap.appendChild(grp);
+  });
+  return wrap;
+}
+
+/* CTA chính: tải gói bay (đậm, indigo). Có 3 trạng thái theo S.pack. */
+function packCTA(){
+  const p = S.pack;
+  if (p.state === "ready")
+    return h("div",{class:"packcta done"},
+      h("span",{class:"ic"}, svg(I.check,24)),
+      h("div",{class:"t"}, h("b",{},"Gói bay đã tải"), h("span",{},`${PACK_SIZE_MB} MB · sẵn sàng dùng offline`)),
+      h("button",{class:"reload", onClick:startDownload},"Tải lại"));
+  if (p.state === "downloading")
+    return h("div",{class:"packcta"},
+      h("span",{class:"ic"}, svg(I.down,24)),
+      h("div",{class:"t"}, h("b",{},`Đang tải… ${p.done}/${p.total} chặng`),
+        h("div",{class:"cprog"}, h("i",{style:`width:${p.done/p.total*100}%`}))));
+  return h("button",{class:"packcta", onClick:startDownload},
+    h("span",{class:"ic"}, svg(I.down,24)),
+    h("div",{class:"t"}, h("b",{},"Tải gói bay"), h("span",{},`${PACK_SIZE_MB} MB · ${ALL_LEGS.length} chặng · dùng offline`)),
+    h("span",{class:"go"}, svg(I.arrow,20)));
+}
+
 function flightList(){
   const list = h("div",{class:"flist"});
   LEGS.forEach((l,i) => {
@@ -1655,13 +1911,13 @@ function flightList(){
 
 /* ── /crew/flight/:no ── */
 function FlightDetail(v, path){
-  if (!canAccessModule(S.session.roles,"crew_ops")) return NoAccess(v);
+  if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
   const no = decodeURIComponent(path.split("/")[3]);
-  const l = LEGS.find(x => x.flightNo === no);
+  const l = ALL_LEGS.find(x => x.flightNo === no);
   bar(v,{title: no, subtitle: l ? `${l.origin} → ${l.destination}` : undefined, onBack:()=>back("/home")});
   if (!l){ v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng này."))); return; }
 
-  const i = LEGS.indexOf(l), done = legDownloaded(i);
+  const i = ALL_LEGS.indexOf(l), done = legDownloaded(i);
   const mins = Math.round((l.sta - l.std)/MIN);
   const pct = Math.round(l.pob / l.capacity * 100);
   const chip = STATUS_CHIP[l.status];
@@ -1695,18 +1951,24 @@ function FlightDetail(v, path){
     done ? null : h("button",{class:"btn", onClick:startDownload},"Tải"),
   )));
 
-  /* hệ số tải */
-  const bar_ = h("i",{class: pct>=85 ? "hot" : ""});
-  requestAnimationFrame(()=>{ bar_.style.width = pct + "%"; });
-  body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
-    h("div",{class:"load"},
-      h("div",{class:"lb"},
-        h("span",{style:"font-weight:600;color:var(--ink)"},"Hệ số tải"),
-        h("span",{style: pct>=85 ? "color:var(--danger-text);font-weight:700" : ""}, `${l.pob}/${l.capacity} · ${pct}%`)),
-      h("div",{class:"tr"}, bar_)),
-    pct>=85 ? h("p",{style:"font:500 12px/18px Inter;color:var(--danger-text);margin-top:8px"},
-      "Chuyến gần đầy — khoang hành lý trên sẽ chật.") : null,
-  )));
+  /* số lượng khách (thay cho hệ số tải) */
+  const emptySeats = Math.max(0, l.capacity - l.pob);
+  body.appendChild(st(h("section",{class:"card", style:"padding:16px;display:flex;align-items:center;gap:12px"},
+    h("span",{class:"paxbadge"}, svg(I.user,22)),
+    h("div",{style:"flex:1;min-width:0"},
+      h("div",{style:"display:flex;align-items:baseline;gap:7px"},
+        h("b",{class:"dsp", style:"font-size:26px;line-height:30px"}, String(l.pob)),
+        h("span",{style:"font:600 14px Inter;color:var(--ink-2)"},"khách")),
+      h("div",{style:"font:500 12px Inter;color:var(--n500);margin-top:1px"}, `Sức chứa ${l.capacity} · còn ${emptySeats} ghế trống`)),
+    pct>=85 ? h("span",{class:"chip warn"},"Gần đầy") : null)));
+
+  /* lối vào sơ đồ + danh sách khách */
+  body.appendChild(st(h("button",{class:"seatentry", onClick:()=>go(`/crew/flight/${l.flightNo}/seats`)},
+    h("span",{class:"si"}, svg(I.grid,22)),
+    h("div",{style:"flex:1;text-align:left;min-width:0"},
+      h("b",{},"Sơ đồ & danh sách khách"),
+      h("span",{},"Xem từng ghế · thông tin khách · SSR & dịch vụ")),
+    h("span",{class:"chev"}, svg(I.chev,20)))));
 
   /* giờ giấc */
   const rows = [
@@ -1740,6 +2002,214 @@ function FlightDetail(v, path){
       : [h("p",{style:"font:400 13px Inter;color:var(--ink-2)"},"Không có dịch vụ đặc biệt")]),
   )));
 
+  /* Tổ bay: buồng lái (riêng) + tổ tiếp viên */
+  body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:4px"},"Tổ bay"),
+
+    h("div",{class:"crewgrp"},"Buồng lái"),
+    ...COCKPIT.map((c,idx) => h("div",{class:"crewrow"+(idx?" tb":"")},
+      h("span",{class:"crewav pilot"}, svg(I.plane,17)),
+      h("div",{style:"flex:1;min-width:0"},
+        h("b",{style:"font:600 14px Inter;display:block"}, c.name),
+        h("span",{style:"font:400 12px Inter;color:var(--n500)"}, c.rank)),
+      h("span",{class:"chip "+(idx===0?"bad":"warn")}, c.role))),
+
+    h("div",{class:"crewgrp", style:"margin-top:14px"},"Tổ tiếp viên"),
+    ...CREW.map((c,idx) => h("div",{class:"crewrow"+(idx?" tb":"")},
+      h("span",{class:"crewav"+(idx===0?" lead":"")}, c.name.trim().split(/\s+/).slice(-1)[0][0]),
+      h("div",{style:"flex:1;min-width:0"},
+        h("b",{style:"font:600 14px Inter;display:block"}, c.name),
+        h("span",{style:"font:400 12px Inter;color:var(--n500)"}, c.position)),
+      h("span",{class:"chip info"}, c.station))),
+  )));
+
+  v.appendChild(body);
+}
+
+/* ── /crew/flight/:no/seats — sơ đồ khách + danh sách (theo SkySeat) ── */
+function SeatScreen(v, path){
+  if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
+  const no = decodeURIComponent(path.split("/")[3]);
+  const l = ALL_LEGS.find(x => x.flightNo === no);
+  if (!l){ bar(v,{title:no, onBack:()=>back(`/crew/flight/${no}`)}); v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng."))); return; }
+  const man = buildManifest(l);
+
+  const body = h("div",{class:"body pad-tabs white", style:"padding-top:14px"});
+  // Đổi view TẠI CHỖ + cache node đã dựng → không transition, không dựng lại
+  // ~228 ô ghế mỗi lần bấm (đó mới là thứ làm chậm, không phải kích thước file).
+  let mapEl = null, listEl = null;
+  const segMap  = h("button",{class:"seg", onClick:()=>swap("map")},  svg(I.grid,16),"Sơ đồ");
+  const segList = h("button",{class:"seg", onClick:()=>swap("list")}, svg(I.user,16),"Danh sách");
+  function swap(view){
+    S.paxView = view;
+    segMap.classList.toggle("on", view !== "list");
+    segList.classList.toggle("on", view === "list");
+    if (view === "list"){ if (!listEl) listEl = paxList(l, man); body.replaceChildren(listEl); }
+    else { if (!mapEl) mapEl = seatMap(l, man); body.replaceChildren(mapEl); }
+  }
+
+  /* header đỏ kiểu SkySeat */
+  v.appendChild(h("header",{class:"seathd"},
+    h("div",{class:"seathd-top"},
+      h("button",{class:"sback","aria-label":"Quay lại", onClick:()=>back(`/crew/flight/${no}`)}, svg(I.back,22)),
+      h("div",{style:"flex:1;min-width:0"},
+        h("div",{class:"sh-flt"}, `${l.flightNo} · ${ROTATION.aircraftType}`),
+        h("div",{class:"sh-rt"}, h("b",{},l.origin), h("span",{class:"sh-line"}, svg(I.plane,15)), h("b",{},l.destination))),
+      h("div",{class:"sh-pob"}, h("b",{}, String(l.pob)), h("span",{}, `/${l.capacity} khách`))),
+    h("div",{class:"segtoggle"}, segMap, segList),
+  ));
+  v.appendChild(body);
+  swap(S.paxView === "list" ? "list" : "map");
+}
+
+/* Legend + lưới ghế (2 khoang: SkyBoss, Phổ thông) */
+function seatMap(l, man){
+  const wrap = h("div",{class:"smwrap"});
+  wrap.appendChild(h("div",{class:"legend"},
+    ...[["skyboss","SkyBoss"],["eco","Phổ thông"],["ssr","SSR"],["svc","Dịch vụ"],["transit","Nối chuyến"],["empty","Trống"]]
+      .map(([k,lab]) => h("span",{class:"lg"}, h("span",{class:"sw "+k}), lab))));
+
+  const colHeader = () => {
+    const row = h("div",{class:"seatrow head"}, h("span",{class:"rn"}));
+    SEAT_COLS.forEach(c => { if(c==="D") row.appendChild(h("span",{class:"aisle"})); row.appendChild(h("span",{class:"cl"}, c)); });
+    return row;
+  };
+  const seatCell = id => {
+    const pax = man.map[id];
+    if (!pax) return h("span",{class:"seat empty"}, "×");
+    const kind = pax.ssr.length ? "ssr" : pax.cls;
+    return h("button",{class:"seat "+kind+(pax.services.length?" svc":"")+(pax.transit?" transit":""),
+      "aria-label":`Ghế ${id} · ${pax.name}`, onClick:()=>go(`/crew/flight/${l.flightNo}/pax/${id}`)});
+  };
+  const section = (label, cls, rows) => {
+    const sec = h("div",{class:"seatsec"});
+    sec.appendChild(h("div",{class:"cabinlab "+cls}, label));
+    sec.appendChild(colHeader());
+    rows.forEach(r => {
+      const row = h("div",{class:"seatrow"}, h("span",{class:"rn"}, String(r)));
+      SEAT_COLS.forEach(c => { if(c==="D") row.appendChild(h("span",{class:"aisle"})); row.appendChild(seatCell(`${r}${c}`)); });
+      sec.appendChild(row);
+    });
+    return sec;
+  };
+  wrap.appendChild(section("SkyBoss","sb", SKYBOSS_ROWS));
+  wrap.appendChild(section("Phổ thông","eco", ECO_ROWS));
+  return wrap;
+}
+
+/* Danh sách khách kiểu bảng */
+const mealsOf = p => p.services.filter(sv => sv[0] !== "DUTY");
+const hasDuty = p => p.services.some(sv => sv[0] === "DUTY");
+
+function paxList(l, man){
+  const occ = man.seats.filter(s => man.map[s.id]);   // ghế có khách, đúng thứ tự
+  let q = "", filter = "all";
+
+  const wrap = h("div",{class:"paxlist"});
+
+  /* thanh tìm kiếm + lọc (dính trên đầu khi cuộn) */
+  const input = h("input",{type:"text", placeholder:"Tìm tên khách, số ghế hoặc PNR…",
+    onInput:e=>{ q = e.target.value.trim().toLowerCase(); clearBtn.style.display = q ? "grid" : "none"; apply(); }});
+  const clearBtn = h("button",{class:"pxclear", "aria-label":"Xoá", style:"display:none",
+    onClick:()=>{ input.value=""; q=""; clearBtn.style.display="none"; apply(); input.focus(); }}, svg(I.x,16));
+  const searchBar = h("div",{class:"pxsearch"}, svg(I.search,18), input, clearBtn);
+
+  const FILTERS = [["all","Tất cả"],["meal","Có suất ăn"],["ssr","Có SSR"]];
+  const chipEls = {};
+  const chips = h("div",{class:"fchips"}, ...FILTERS.map(([key,lab]) => {
+    const cnt = key==="all" ? occ.length
+      : key==="meal" ? occ.filter(s=>mealsOf(man.map[s.id]).length).length
+      : occ.filter(s=>man.map[s.id].ssr.length).length;
+    const b = h("button",{class:"fchip"+(filter===key?" on":""), onClick:()=>{ filter=key; Object.entries(chipEls).forEach(([k,el])=>el.classList.toggle("on",k===key)); apply(); }},
+      lab, h("span",{class:"fcount"}, String(cnt)));
+    chipEls[key] = b; return b;
+  }));
+
+  const count = h("div",{class:"plcount"});
+  const results = h("div",{class:"plresults"});
+
+  function rowFor(s){
+    const p = man.map[s.id];
+    const meals = mealsOf(p);
+    const tags = [];
+    p.ssr.forEach(([code]) => tags.push(h("span",{class:"chip warn"}, code)));
+    if (hasDuty(p)) tags.push(h("span",{class:"chip info"}, "DF"));
+    if (p.transit) tags.push(h("span",{class:"chip ok"}, "Nối"));
+    return h("button",{class:"plrow", onClick:()=>go(`/crew/flight/${l.flightNo}/pax/${s.id}`)},
+      h("span",{class:"c-seat"}, h("span",{class:"seatpill "+p.cls}, s.id)),
+      h("span",{class:"c-name"},
+        h("b",{}, p.name),
+        h("span",{class:"plsub"}, `${p.pnr} · ${p.type}`),
+        meals.length
+          ? h("span",{class:"plmeal"}, svg(I.food,13),
+              h("span",{}, meals.map(m => m[1] + (m[2]>1?` ×${m[2]}`:"")).join(", ")))
+          : null),
+      h("span",{class:"c-tag"}, ...tags, h("span",{class:"chev"}, svg(I.chev,16))));
+  }
+
+  function apply(){
+    const rows = occ.filter(s => {
+      const p = man.map[s.id];
+      if (q && !`${p.name} ${p.seat} ${p.pnr}`.toLowerCase().includes(q)) return false;
+      if (filter==="meal" && mealsOf(p).length===0) return false;
+      if (filter==="ssr"  && p.ssr.length===0) return false;
+      return true;
+    });
+    count.textContent = `${rows.length} khách${(q||filter!=="all") ? ` / ${occ.length}` : ""}`;
+    results.replaceChildren(...(rows.length
+      ? rows.map(rowFor)
+      : [h("div",{class:"plempty"}, svg(I.search,26), h("p",{},"Không tìm thấy khách phù hợp"))]));
+  }
+
+  wrap.appendChild(h("div",{class:"plbar"}, searchBar, chips));
+  wrap.appendChild(count);
+  wrap.appendChild(results);
+  apply();
+  return wrap;
+}
+
+/* ── /crew/flight/:no/pax/:seat — chi tiết khách ── */
+function PaxDetail(v, path){
+  if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
+  const parts = path.split("/");
+  const no = decodeURIComponent(parts[3]), seat = decodeURIComponent(parts[5]);
+  const l = ALL_LEGS.find(x => x.flightNo === no);
+  const pax = l && buildManifest(l).map[seat];
+  bar(v,{title:"Chi tiết khách", subtitle: l ? `${l.flightNo} · ghế ${seat}` : undefined, onBack:()=>back(`/crew/flight/${no}/seats`)});
+  if (!pax){ v.appendChild(h("div",{class:"center"}, h("p",{},"Ghế trống hoặc không tìm thấy."))); return; }
+
+  const body = h("div",{class:"body pad-tabs", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
+  let n=0; const st = el => { el.classList.add("st"); el.style.animationDelay=(n++*55)+"ms"; return el; };
+
+  body.appendChild(st(h("section",{class:"card", style:"padding:16px"},
+    h("div",{style:"display:flex;align-items:flex-start;justify-content:space-between;gap:12px"},
+      h("div",{style:"min-width:0"},
+        h("div",{style:"display:flex;align-items:center;gap:8px;flex-wrap:wrap"},
+          h("b",{class:"dsp", style:"font-size:20px;line-height:26px"}, pax.name),
+          h("span",{class:"clsbadge "+pax.cls}, pax.cls==="skyboss"?"SkyBoss":"Phổ thông")),
+        h("div",{style:"font:500 12px Inter;color:var(--n500);margin-top:4px"}, `PNR ${pax.pnr} · STT ${pax.seq}`)),
+      h("span",{class:"seatbig"}, seat)),
+    h("div",{style:"display:flex;gap:24px;margin-top:14px;padding-top:14px;border-top:1px solid var(--n100)"},
+      h("div",{}, h("div",{class:"pdk"},"Năm sinh · tuổi"), h("div",{class:"pdv"}, `${pax.dob} · ${pax.age}`)),
+      h("div",{}, h("div",{class:"pdk"},"Loại khách"), h("div",{class:"pdv"}, pax.type))))));
+
+  if (pax.ssr.length) body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:8px"},"Dịch vụ đặc biệt (SSR)"),
+    ...pax.ssr.map(([code,label]) => h("div",{style:"display:flex;align-items:center;gap:10px;padding:6px 0"},
+      h("span",{class:"mini "+(code==="MEDA"?"off":"on"), style:code==="MEDA"?"background:var(--warning-bg);color:var(--warning-text)":""}, code),
+      h("span",{style:"font:500 14px Inter"}, label))))));
+
+  body.appendChild(st(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:8px"},"Dịch vụ đặt trước"),
+    ...(pax.services.length
+      ? pax.services.map(([code,label,qty]) => h("div",{style:"display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--n100)"},
+          h("span",{class:"svcic"}, svg(code==="DUTY"?I.tag:I.food,20)),
+          h("div",{style:"flex:1;min-width:0"},
+            h("b",{style:"font:600 14px Inter;display:block"}, label),
+            h("span",{style:"font:400 12px Inter;color:var(--n500)"}, `${code} · SL ${qty}`))))
+      : [h("p",{style:"font:400 13px Inter;color:var(--ink-2)"},"Không đặt trước dịch vụ nào")]),
+  )));
+
   v.appendChild(body);
 }
 
@@ -1752,7 +2222,7 @@ function packStrip(){
 
   if (p.state === "missing"){
     txt.appendChild(h("b",{},"Tải gói bay"));
-    txt.appendChild(h("span",{},`${PACK_SIZE_MB} MB · 3 chặng`));
+    txt.appendChild(h("span",{},`${PACK_SIZE_MB} MB · ${ALL_LEGS.length} chặng`));
     el.appendChild(h("button",{class:"btn", onClick:startDownload},"Tải"));
   } else if (p.state === "downloading"){
     txt.appendChild(h("b",{},`Đang tải… ${p.done}/${p.total} chặng`));
@@ -1768,19 +2238,20 @@ function packStrip(){
 }
 function startDownload(){
   if (!hasPermission(S.session.roles,"crew_ops.pack.download")) return;
-  S.pack = {state:"downloading", done:0, total:3, syncedAt:null};
+  const total = ALL_LEGS.length;
+  S.pack = {state:"downloading", done:0, total, syncedAt:null};
   refresh();
   const step = i => setTimeout(()=>{
     S.pack.done = i;
-    if (i === 3){ S.pack = {state:"ready", done:3, total:3, syncedAt:S.simNow}; refresh(); }
+    if (i === total){ S.pack = {state:"ready", done:total, total, syncedAt:S.simNow}; refresh(); }
     else { refresh(); step(i+1); }
-  }, 600);
+  }, 500);
   step(1);
 }
 
 /* ── crew/flights ───────────────────────────────────────────────── */
 function CrewFlights(v){
-  if (!canAccessModule(S.session.roles,"crew_ops")) return NoAccess(v);
+  if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
   bar(v,{title:"Chuyến bay của tôi", onBack:()=>back("/home")});
   const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
   let n = 0;
