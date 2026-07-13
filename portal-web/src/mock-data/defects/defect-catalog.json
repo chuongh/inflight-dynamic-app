@@ -1,0 +1,58 @@
+[
+  {
+    "id": "def-t-001",
+    "equipmentType": "trolley",
+    "code": "WHEEL_BRAKE",
+    "label": "Wheel/brake failure",
+    "active": true
+  },
+  {
+    "id": "def-t-002",
+    "equipmentType": "trolley",
+    "code": "DOOR_LOCK",
+    "label": "Door lock broken",
+    "active": true
+  },
+  {
+    "id": "def-t-003",
+    "equipmentType": "trolley",
+    "code": "POWER_SOCKET",
+    "label": "Power socket fault",
+    "active": true
+  },
+  {
+    "id": "def-t-004",
+    "equipmentType": "trolley",
+    "code": "FRAME_CRACK",
+    "label": "Frame crack",
+    "active": true
+  },
+  {
+    "id": "def-p-001",
+    "equipmentType": "pos",
+    "code": "CARD_READER",
+    "label": "Card reader fault",
+    "active": true
+  },
+  {
+    "id": "def-p-002",
+    "equipmentType": "pos",
+    "code": "BATTERY",
+    "label": "Battery degradation",
+    "active": true
+  },
+  {
+    "id": "def-i-001",
+    "equipmentType": "ipad",
+    "code": "SCREEN",
+    "label": "Screen damage",
+    "active": true
+  },
+  {
+    "id": "def-i-002",
+    "equipmentType": "ipad",
+    "code": "CHARGING",
+    "label": "Charging port fault",
+    "active": true
+  }
+]

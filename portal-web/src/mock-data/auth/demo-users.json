@@ -1,0 +1,26 @@
+[
+  {
+    "employeeCode": "VJ1808",
+    "password": "vietjet",
+    "name": "Nguyen Van Admin",
+    "department": "Ground Operations",
+    "jobTitle": "Equipment Manager",
+    "roleId": "admin"
+  },
+  {
+    "employeeCode": "VJ2401",
+    "password": "vietjet",
+    "name": "Tran Thi Equipment",
+    "department": "In-Flight Services",
+    "jobTitle": "Equipment Staff",
+    "roleId": "equipment_staff"
+  },
+  {
+    "employeeCode": "VJ2402",
+    "password": "vietjet",
+    "name": "Le Van Viewer",
+    "department": "Ground Operations",
+    "jobTitle": "Analyst",
+    "roleId": "viewer"
+  }
+]

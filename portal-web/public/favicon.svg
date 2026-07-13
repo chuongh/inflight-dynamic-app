@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vietjet">
+  <rect width="64" height="64" rx="14" fill="#F02823"/>
+  <path d="M-2 52 C 18 45, 40 59, 66 47 L66 66 L-2 66 Z" fill="#FFDD32"/>
+  <path d="M42 50 C 52 46, 58 52, 66 48 L66 66 L38 66 Z" fill="#87DC00" opacity="0.9"/>
+</svg>
