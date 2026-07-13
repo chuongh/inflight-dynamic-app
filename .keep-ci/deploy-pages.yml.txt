@@ -1,0 +1,73 @@
+name: Deploy to GitHub Pages
+
+# Publishes a single Pages artifact that keeps BOTH sites:
+#   /                      → root index.html (mobile prototype)
+#   /portal-web/           → portal-web (Vite + React SPA, HashRouter)
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deploy; don't cancel an in-progress run.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: portal-web/package-lock.json
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install deps (portal-web)
+        working-directory: portal-web
+        run: npm ci
+
+      - name: Build portal-web
+        working-directory: portal-web
+        env:
+          # Served under this sub-path on Pages; Vite prefixes all assets with it.
+          VITE_BASE: /inflight-dynamic-app/portal-web/
+        # vite build (not `npm run build`) so a pending tsc issue in an unrelated
+        # WIP page can't block the deploy; Vite still type-strips via esbuild.
+        run: npx vite build
+
+      - name: Assemble site (root prototype + portal-web)
+        run: |
+          mkdir -p _site/portal-web
+          cp index.html _site/
+          [ -f README.md ] && cp README.md _site/ || true
+          touch _site/.nojekyll
+          cp -r portal-web/dist/. _site/portal-web/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

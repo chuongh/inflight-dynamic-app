@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import { AuthProvider } from '@/core/auth/AuthProvider'
 import { QueryProvider } from '@/core/api/QueryProvider'
 import { VietJetThemeProvider } from '@/design-system/VietJetThemeProvider'
@@ -9,9 +9,11 @@ export default function App() {
     <VietJetThemeProvider>
       <QueryProvider>
         <AuthProvider>
-          <BrowserRouter>
+          {/* HashRouter: robust for GitHub Pages under a sub-path (no server-side
+              rewrite / 404.html trick needed — deep links & refresh always work). */}
+          <HashRouter>
             <AppRoutes />
-          </BrowserRouter>
+          </HashRouter>
         </AuthProvider>
       </QueryProvider>
     </VietJetThemeProvider>
