@@ -92,7 +92,8 @@ body{
 /* ── headers ── */
 /* max(): trong Safari thường safe-area-inset-top = 0 (thanh URL đã chiếm chỗ),
    ở chế độ standalone nó là ~59px. max() cho cả hai một khoảng thở tối thiểu. */
-.hero{position:relative;isolation:isolate;overflow:hidden;color:#fff;flex:none;background:var(--hdr-grad);
+.hero{position:relative;isolation:isolate;overflow:hidden;color:#fff;flex:none;
+  background:linear-gradient(150deg,#B70005 0%,#E30018 26%,#9A1668 60%,#4F46E5 100%);
   padding:calc(max(var(--sa-top),10px) + 22px) calc(var(--sa-r) + 20px) 64px calc(var(--sa-l) + 20px)}
 .hero::before{content:"";position:absolute;inset:-30% -25% -55% -25%;z-index:-1;
   background:radial-gradient(46% 42% at 90% 98%,rgba(252,104,89,.55),transparent 66%),
@@ -102,7 +103,8 @@ body{
   animation:aurora 20s var(--ease-in-out) infinite alternate}
 @keyframes aurora{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-16px,-10px,0) scale(1.09)}}
 .hero .edge{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--grad-sunset);opacity:.9}
-.hero .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.hero .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  background:transparent;border:0;border-radius:0;padding:0;min-height:0;box-shadow:none}
 .hero .hello{font:500 14px/22px Inter;color:#fff}
 .hero .name{font-size:24px;line-height:32px;letter-spacing:-.24px;text-transform:uppercase;margin-top:2px}
 .avatar{width:var(--touch);height:var(--touch);border-radius:var(--r-pill);flex:none;display:grid;place-items:center;
@@ -203,6 +205,93 @@ body{
 .tab.on{color:var(--info-text)}
 .tab .pip{width:22px;height:3px;border-radius:var(--r-pill);background:transparent;transition:background 200ms ease}
 .tab.on .pip{background:var(--info)}
+.tab .ti{position:relative;display:grid;place-items:center}
+.tbadge{position:absolute;top:-6px;right:-9px;min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-pill);
+  background:var(--danger);color:#fff;font:700 10px/16px Inter;text-align:center;border:2px solid var(--n0)}
+
+/* ── notification bell in hero header ── */
+.heroact{display:flex;align-items:center;gap:8px}
+.bell{position:relative;width:var(--touch);height:var(--touch);border-radius:var(--r-pill);flex:none;
+  display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.24);transition:transform 160ms var(--ease-out)}
+.bell:active{transform:scale(.94)}
+.bcount{position:absolute;top:5px;right:5px;min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-pill);
+  background:var(--brand-accent);color:var(--red-900);font:700 10px/16px Inter;text-align:center}
+
+/* ── duty ribbon on home ── */
+.ribbon{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+  background:var(--n0);border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--e3);
+  padding:14px 16px;margin:16px 0 4px;transition:transform 160ms var(--ease-out)}
+.ribbon:active{transform:scale(.985)}
+.ribbon .rleft{display:flex;flex-direction:column;gap:2px;flex:none}
+.ribbon .rkick{font:600 11px/14px Inter;letter-spacing:.4px;text-transform:uppercase;color:var(--info-text)}
+.ribbon .rbig{font-size:22px;line-height:26px;color:var(--ink);font-variant-numeric:tabular-nums}
+.ribbon .rmid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;align-items:flex-start;
+  padding-left:14px;border-left:1px solid var(--line)}
+.ribbon .rflt{font:700 15px/20px Inter;color:var(--ink)}
+.ribbon .rroute{font:500 12px/16px Inter;color:var(--n500)}
+.ribbon .rchev{color:var(--ink-3);flex:none}
+
+/* ── Aurora hero header (trang chủ): gradient thương hiệu + card nổi ── */
+.lhero{flex:none;position:relative;isolation:isolate;overflow:hidden;color:#fff;
+  border-radius:0 0 28px 28px;box-shadow:0 14px 32px rgba(122,0,0,.20);
+  padding:calc(max(var(--sa-top),10px) + 18px) calc(var(--sa-r) + 20px) 20px calc(var(--sa-l) + 20px);
+  background:
+    radial-gradient(120% 92% at 8% -18%, rgba(255,221,50,.24), transparent 55%),
+    radial-gradient(112% 84% at 116% -6%, rgba(129,140,248,.60), transparent 60%),
+    linear-gradient(148deg,#B70005 0%,#E30018 30%,#9A1668 60%,#4F46E5 100%)}
+.lhero::before{content:"";position:absolute;z-index:-1;top:-72px;right:-72px;width:224px;height:224px;
+  border-radius:var(--r-pill);background:radial-gradient(circle,#6366F1,transparent 66%);filter:blur(46px);opacity:.5}
+.lhero .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lgreet{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lhero .lg1{font:500 13px/18px Inter;color:rgba(255,255,255,.86)}
+.lhero .lg2{font-size:22px;line-height:28px;color:#fff;letter-spacing:-.2px}
+.lact{display:flex;align-items:center;gap:10px;flex:none}
+.lbell{position:relative;width:var(--touch);height:var(--touch);border-radius:var(--r-pill);display:grid;place-items:center;
+  color:#fff;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);transition:transform 160ms var(--ease-out)}
+.lbell:active{transform:scale(.94)}
+.lbc{position:absolute;top:6px;right:6px;min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-pill);
+  background:var(--brand-accent);color:var(--red-900);font:700 10px/16px Inter;text-align:center}
+.lav{width:var(--touch);height:var(--touch);border-radius:var(--r-pill);display:grid;place-items:center;flex:none;
+  background:#fff;color:var(--brand);font:800 14px "Plus Jakarta Sans",Inter;box-shadow:0 6px 16px rgba(0,0,0,.22);
+  transition:transform 160ms var(--ease-out)}
+.lav:active{transform:scale(.94)}
+.lhero .ribbon{margin:16px 0 0}
+
+/* ── Inner-page header (Ca trực · Thông báo · Hồ sơ) — tiêu đề trang, không lời chào ── */
+.subhd{flex:none;position:relative;isolation:isolate;overflow:hidden;color:#fff;
+  border-radius:0 0 24px 24px;box-shadow:0 12px 30px rgba(122,0,0,.16);
+  background:linear-gradient(148deg,#B70005 0%,#E30018 30%,#9A1668 62%,#4F46E5 100%);
+  padding:calc(max(var(--sa-top),10px) + 16px) calc(var(--sa-r) + 20px) 18px calc(var(--sa-l) + 20px)}
+.subhd::before{content:"";position:absolute;z-index:-1;top:-70px;right:-60px;width:210px;height:210px;
+  border-radius:var(--r-pill);background:radial-gradient(circle,#6366F1,transparent 66%);filter:blur(44px);opacity:.5}
+.subhd.tuck{padding-bottom:54px}   /* chừa chỗ cho card trèo lên (Ca trực) */
+.subhd-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.subhd-ttl{min-width:0}
+.subhd-ttl h1{font-family:"Plus Jakarta Sans";font-weight:800;font-size:24px;line-height:30px;color:#fff;letter-spacing:-.2px}
+.subhd-ttl p{font:500 13px/18px Inter;color:rgba(255,255,255,.82);margin-top:3px}
+
+/* ── prototype disclaimer line ── */
+.protoline{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;
+  font:500 12px/18px Inter;color:var(--ink-3);margin:22px 8px 6px}
+.protoline .protodot{display:grid;color:var(--warning)}
+
+/* ── notification list ── */
+.ntlist{display:flex;flex-direction:column;gap:10px}
+.nt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:14px;
+  background:var(--n0);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--e1);
+  transition:transform 160ms var(--ease-out)}
+.nt:active{transform:scale(.99)}
+.nt.unread{background:var(--info-bg);border-color:rgba(79,70,229,.25)}
+.nt .ntic{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex:none;
+  background:var(--info-bg);color:var(--info-text)}
+.nt.unread .ntic{background:var(--n0)}
+.nt.danger .ntic{background:var(--danger-bg);color:var(--danger-text)}
+.nt .nttx{flex:1;min-width:0}
+.nt .nttx b{font:600 14px/20px Inter;color:var(--ink);display:block}
+.nt .nttx p{font:400 13px/19px Inter;color:var(--ink-2);margin-top:2px}
+.nt .nttx time{font:500 11px/16px Inter;color:var(--ink-3);margin-top:6px;display:block}
+.nt .ntdot{width:8px;height:8px;border-radius:var(--r-pill);background:var(--info);flex:none;margin-top:6px}
 
 /* ── equipment ── */
 .station .h{display:flex;align-items:center;gap:12px;padding:16px;min-height:var(--touch)}
@@ -270,10 +359,10 @@ body{
 .mod .ic{width:var(--touch);height:var(--touch);border-radius:var(--r-md);background:var(--info-bg);color:var(--info-text);
   display:grid;place-items:center}
 .mod b{font:600 15px/22px Inter}
-.mod.off{opacity:.55;cursor:not-allowed}
+.mod.off{cursor:default}
 .mod.off:active{transform:none}
 .mod .soon{position:absolute;top:12px;right:12px;font:600 10px/14px Inter;letter-spacing:.5px;text-transform:uppercase;
-  background:var(--n100);color:var(--n500);padding:3px 7px;border-radius:var(--r-pill)}
+  background:var(--warning-bg);color:var(--warning-text);padding:3px 7px;border-radius:var(--r-pill)}
 
 /* ═══════════════════════════════════════════════════════════════════
    CREW — boarding pass, duty rail, timeline
@@ -285,11 +374,13 @@ body{
 
 /* ── boarding pass ── */
 .pass{position:relative;isolation:isolate;overflow:hidden;border-radius:var(--r-xl);color:#fff;
-  background:linear-gradient(150deg,var(--info-text) 0%,var(--info) 58%,var(--info-text) 100%);
-  box-shadow:0 14px 40px rgba(67,56,202,.32), var(--e2)}
+  background:linear-gradient(148deg,#4F46E5 0%,#7C3AED 52%,#9333EA 100%);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 18px 44px rgba(88,28,180,.38), var(--e2)}
 .pass::before{content:"";position:absolute;inset:-40% -20%;z-index:-1;
-  background:radial-gradient(44% 40% at 86% 6%,rgba(255,255,255,.20),transparent 68%),
-             radial-gradient(40% 36% at 6% 92%,rgba(240,40,35,.28),transparent 72%);
+  background:radial-gradient(46% 42% at 88% 4%,rgba(255,255,255,.28),transparent 66%),
+             radial-gradient(42% 38% at 4% 96%,rgba(255,184,0,.30),transparent 70%),
+             radial-gradient(40% 36% at 60% 100%,rgba(236,72,153,.34),transparent 72%);
   animation:aurora 22s var(--ease-in-out) infinite alternate}
 .pass .top{padding:18px 18px 12px}
 .pass .kick{font:600 11px/16px Inter;letter-spacing:.88px;text-transform:uppercase;opacity:.86}
@@ -342,10 +433,16 @@ body{
   padding:5px 10px;border-radius:var(--r-pill)}
 
 /* ── stat trio ── */
-.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
-  border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
-.trio div{background:var(--n0);padding:13px 10px;text-align:center}
-.trio b{display:block;font-family:"Plus Jakarta Sans";font-weight:800;font-size:19px;line-height:26px;letter-spacing:-.2px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.trio div{border-radius:var(--r-lg);padding:14px 10px 13px;text-align:center;
+  border:1px solid var(--line);box-shadow:var(--e1)}
+.trio div:nth-child(1){background:var(--info-bg)}
+.trio div:nth-child(2){background:#FFE1E3}
+.trio div:nth-child(3){background:var(--warning-bg)}
+.trio div:nth-child(1) b{color:var(--info-text)}
+.trio div:nth-child(2) b{color:var(--brand)}
+.trio div:nth-child(3) b{color:var(--warning-text)}
+.trio b{display:block;font-family:"Plus Jakarta Sans";font-weight:800;font-size:20px;line-height:26px;letter-spacing:-.2px}
 .trio span{display:block;font:500 11px/16px Inter;color:var(--n500);margin-top:1px}
 
 /* ── crew avatar stack ── */
@@ -487,7 +584,7 @@ body{
   background:radial-gradient(circle,#6366F1,transparent 66%);animation:auroraFloat 19s var(--ease-in-out) infinite reverse}
 @keyframes auroraFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(20px,28px,0)}}
 
-.hero{display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff;
+.aurora .hero{display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff;
   padding:calc(var(--sa-top) + 54px) 28px 30px;gap:16px}
 .logo-hero{width:76px;height:76px;border-radius:22px;display:grid;place-items:center;color:#fff;
   font-family:"Plus Jakarta Sans";font-weight:800;font-size:29px;letter-spacing:.5px;
@@ -581,7 +678,7 @@ body{
 .ctlrow button:active{transform:scale(.96)}
 
 /* ── stagger vào màn: 55ms/phần tử, dịch lên 10px. Không chặn tương tác. ── */
-.st{opacity:0;transform:translateY(10px);animation:rise 420ms var(--ease-out) forwards}
+.st{opacity:0;transform:translateY(16px) scale(.985);animation:rise 560ms cubic-bezier(.22,1,.32,1) forwards}
 @keyframes rise{to{opacity:1;transform:none}}
 
 @media (prefers-reduced-motion:reduce){
@@ -657,13 +754,25 @@ const ROLES = ["purser","cabin_crew","gate_supervisor","ground_staff","ramp_driv
 const ROLE_PRECEDENCE = ROLES;
 
 // src/lib/modules/registry.ts
+const ALL_ROLES = ["purser","cabin_crew","gate_supervisor","ground_staff","ramp_driver","catering","engineer","equipment_manager"];
+const CREW_ROLES = ["purser","cabin_crew"];
+// Launcher = danh sách tính năng theo vai trò. Ca trực/chuyến bay KHÔNG nằm ở đây —
+// nó là một tab điều hướng riêng. Ở đây chỉ là "việc tôi làm được trong app".
 const MODULES = [
-  {id:"crew_ops",   title:"Tổ bay",            icon:"plane", roles:["purser","cabin_crew"],              route:"/crew/flights"},
-  {id:"ground_ops", title:"Mặt đất",           icon:"scan",  roles:["ground_staff","gate_supervisor"],   route:"/scan"},
-  {id:"ops_ride",   title:"Xe vận hành",       icon:"car",   roles:["ramp_driver"],                      route:null},
-  {id:"catering",   title:"Suất ăn & Hàng hoá",icon:"food",  roles:["catering"],                         route:null},
-  {id:"devices",    title:"Thiết bị",          icon:"cube",  roles:["engineer"],                         route:null},
-  {id:"equipment",  title:"Quản lý thiết bị",  icon:"tag",   roles:["equipment_manager"],                route:null},
+  // Tổ bay: 3 tính năng đã đặt tên (named:true → hiện tên dù chưa có route thật).
+  {id:"scan_bp",     title:"Scan Boarding Pass",  icon:"scan", roles:CREW_ROLES, route:null, named:true},
+  {id:"call_ride",   title:"Gọi xe",              icon:"car",  roles:CREW_ROLES, route:null, named:true},
+  {id:"airport_map", title:"Xem bản đồ sân bay",   icon:"map",  roles:CREW_ROLES, route:null, named:true},
+  // Tính năng theo vai trò khác (có màn thật).
+  {id:"ground_ops",  title:"Mặt đất · Quét thẻ",  icon:"scan", roles:["ground_staff","gate_supervisor"], route:"/scan"},
+  {id:"ops_ride",    title:"Xe vận hành",         icon:"car",  roles:["ramp_driver"],                    route:null, named:true},
+  {id:"catering_ops",title:"Suất ăn & Hàng hoá",  icon:"food", roles:["catering"],                       route:null, named:true},
+  {id:"devices",     title:"Thiết bị",            icon:"cube", roles:["engineer"],                       route:null, named:true},
+  {id:"equipment",   title:"Quản lý thiết bị",    icon:"tag",  roles:["equipment_manager"],              route:"/equipment/base"},
+  // Ô placeholder chung (hiện dưới dạng "Tính năng N" — chưa đặt tên).
+  {id:"ph_1", title:"", icon:"grid", roles:ALL_ROLES, route:null},
+  {id:"ph_2", title:"", icon:"grid", roles:ALL_ROLES, route:null},
+  {id:"ph_3", title:"", icon:"grid", roles:ALL_ROLES, route:null},
 ];
 const modulesForRoles = roles => roles.length ? MODULES.filter(m => m.roles.some(r => roles.includes(r))) : [];
 const canAccessModule = (roles,id) => { const m = MODULES.find(x=>x.id===id); return m ? m.roles.some(r=>roles.includes(r)) : false; };
@@ -690,7 +799,7 @@ const resolvePrimaryRole = roles => ROLE_PRECEDENCE.find(r => roles.includes(r))
 
 // src/lib/mock/users.ts
 const DEMO_USERS = {
-  purser:     {employeeCode:"purser",     displayName:"Nguyễn Văn A",  roles:["purser","cabin_crew"]},
+  purser:     {employeeCode:"purser",     displayName:"Amy Nguyễn",    roles:["purser","cabin_crew"]},
   cabincrew:  {employeeCode:"cabincrew",  displayName:"Trần Thị B",    roles:["cabin_crew"]},
   groundstaff:{employeeCode:"groundstaff",displayName:"Lê Văn C",      roles:["ground_staff"]},
   gatesup:    {employeeCode:"gatesup",    displayName:"Phạm Thị D",    roles:["gate_supervisor","ground_staff"]},
@@ -759,7 +868,7 @@ const LEGS = [
 LEGS.forEach(l => l.ssrCount = l.ssrWchr+l.ssrUmnr+l.ssrMeda+l.ssrInf);
 const ROTATION = {aircraftType:"A321neo", registration:"VN-A653", reportAt: LEGS[0].std - REPORT_OFFSET_MINUTES*MIN, dutyEndAt: LEGS[2].sta + 30*MIN};
 const CREW = [
-  {id:"C1",name:"Nguyễn Văn A",position:"Purser",station:"L1"},
+  {id:"C1",name:"Amy Nguyễn",position:"Purser",station:"L1"},
   {id:"C2",name:"Trần Thị B",position:"Cabin Crew",station:"R1"},
   {id:"C3",name:"Phạm Thị D",position:"Cabin Crew",station:"L2"},
   {id:"C4",name:"Đỗ Văn E",position:"Cabin Crew",station:"R2"},
@@ -787,6 +896,15 @@ function deriveAlerts(packState){
   if (packState==="stale")   a.push({sev:"warn", text:"Gói bay đã cũ"});
   return a.sort((x,y)=> (x.sev==="bad"?0:1) - (y.sev==="bad"?0:1));
 }
+
+// src/lib/mock — notifications (hộp thư vận hành)
+const NOTIFS = [
+  {id:"N1", icon:"warn",     tone:"danger", title:"VJ874 chuyển giờ",  body:"BMV → SGN trễ 45′ · dự kiến 12:05 → 12:50", time:"5 phút trước",  unread:true},
+  {id:"N2", icon:"cal",      tone:"info",   title:"Phân ca 15/07",     body:"Ca sáng SGN · báo cáo 05:30 tại phòng briefing", time:"1 giờ trước",  unread:true},
+  {id:"N3", icon:"bell",     tone:"info",   title:"Thông báo nội bộ",  body:"Quy trình phục vụ khách SSR cập nhật từ 14/07", time:"Hôm qua",     unread:false},
+  {id:"N4", icon:"down",     tone:"info",   title:"Gói bay đã sẵn sàng",body:"3 chặng · 12.4 MB đã tải xong, dùng được offline", time:"Hôm qua",  unread:false},
+];
+const unreadNotifs = () => NOTIFS.filter(n => n.unread).length;
 
 // src/lib/mock — scan, passenger, flight
 const activeFlight = {code:"VJ872", from:"SGN", to:"HAN", scannedCount:128};
@@ -849,6 +967,10 @@ function transition(kind){
   setTimeout(()=>{ old?.remove(); animating=false; }, 340);
 }
 function paintChrome(){
+  // Reset cuộn của #stack: focus vào input (vd. màn đăng nhập) có thể cuộn cả
+  // app-shell (overflow:hidden vẫn cuộn được khi lộ phần tử focus), đẩy header
+  // màn kế tiếp lên khỏi màn hình. Về 0 mỗi lần điều hướng.
+  document.getElementById("stack").scrollTop = 0;
   // theme-color nhuộm thanh trạng thái iOS: trắng ở màn auth, đỏ thẫm ở màn có header.
   // red-900 chứ không phải brand — nó là màu THẬT ở mép trên của gradient.
   document.getElementById("theme-color")
@@ -888,6 +1010,11 @@ const I = {
   lock:  `<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>`,
   finger:`<path d="M5 8a10 10 0 0 1 0 8M9.5 6a15 15 0 0 1 0 12M14 4.5a20 20 0 0 1 0 15M18.5 3a25 25 0 0 1 0 18"/>`,
   faceid:`<path d="M4 8V6a2 2 0 0 1 2-2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M20 16v2a2 2 0 0 1-2 2h-2"/><path d="M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1.4"/><path d="M15 10v1.4"/><path d="M12 10v3l-1 1"/><path d="M9.4 15.2a3.6 3.6 0 0 0 5.2 0"/>`,
+  bell:  `<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 8 2.5 8H3.5S6 15 6 9Z"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>`,
+  file:  `<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>`,
+  book:  `<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>`,
+  grid:  `<rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/>`,
+  map:   `<path d="M9 4 3 6.5v13.5L9 17.5l6 2.5 6-2.5V6.5L15 9 9 6.5Z"/><path d="M9 4v13.5M15 9v11"/>`,
   warn:  `<path d="M12 3 2 20h20L12 3Z"/><path d="M12 9v5M12 17h.01"/>`,
   down:  `<path d="M12 3v12M7 11l5 5 5-5M4 21h16"/>`,
   check: `<path d="M20 6 9 17l-5-5"/>`,
@@ -906,6 +1033,7 @@ function buildView(path){
   ({
     "/login": Login, "/forgot": Forgot, "/unlock": Unlock,
     "/home": Home, "/profile": Profile,
+    "/crew": CrewWork, "/work": EquipWork, "/notifications": Notifications,
     "/crew/flights": CrewFlights,
     "/scan": ScanScreen, "/passenger": PassengerScreen,
     "/equipment/base": BaseScreen, "/equipment/not-service": NotService,
@@ -1065,24 +1193,32 @@ function Unlock(v){
 }
 
 /* ── TABS SHELL ─────────────────────────────────────────────────── */
+/* Chuyển tab: chỉ điều hướng khi đổi tab (tránh reset thừa cùng tab). */
+function nav(tab, path){ if (S.tab !== tab){ S.tab = tab; go(path,"reset"); } }
+
 function tabbar(v){
-  const mk = (id,label,icon,onClick) =>
-    h("button",{class:"tab"+(S.tab===id?" on":""), onClick}, svg(icon,22), label, h("span",{class:"pip"}));
-  v.appendChild(h("nav",{class:"tabs"},
-    mk("home","Trang chủ",I.home, ()=>{ if(S.tab!=="home"){S.tab="home"; go("/home","reset");} }),
-    mk("profile","Hồ sơ",I.user, ()=>{ if(S.tab!=="profile"){S.tab="profile"; go("/profile","reset");} }),
-  ));
+  const dash = ROLE_DASHBOARDS[resolvePrimaryRole(S.session.roles)];
+  const unread = unreadNotifs();
+  const mk = (id,label,icon,onClick,badge) =>
+    h("button",{class:"tab"+(S.tab===id?" on":""), onClick},
+      h("span",{class:"ti"}, svg(icon,22),
+        badge ? h("span",{class:"tbadge"}, badge>9?"9+":String(badge)) : null),
+      label, h("span",{class:"pip"}));
+
+  const tabs = [ mk("home","Trang chủ",I.home, ()=>nav("home","/home")) ];
+  // Tab "công việc" role-gated: tổ bay → Ca trực; quản lý thiết bị → Công việc.
+  if (dash === "CrewDashboard")      tabs.push(mk("crew","Ca trực",I.plane, ()=>nav("crew","/crew")));
+  else if (dash === "EquipmentDashboard") tabs.push(mk("work","Công việc",I.tag, ()=>nav("work","/work")));
+  tabs.push(mk("notif","Thông báo",I.bell, ()=>nav("notif","/notifications"), unread));
+  tabs.push(mk("profile","Hồ sơ",I.user, ()=>nav("profile","/profile")));
+  v.appendChild(h("nav",{class:"tabs"}, ...tabs));
 }
 
-/* ── HOME = role-resolved dashboard slot ────────────────────────── */
-function Home(v){
-  const primary = resolvePrimaryRole(S.session.roles);
-  const dash = primary && ROLE_DASHBOARDS[primary];
-  if (dash === "CrewDashboard") CrewDashboard(v);
-  else if (dash === "EquipmentDashboard") EquipmentDashboard(v);
-  else ModuleGridDashboard(v);
-  tabbar(v);
-}
+/* ── HOME = launcher tính năng (mọi vai trò cùng một trang chủ) ──── */
+function Home(v){ LauncherHome(v); tabbar(v); }
+/* Dashboard vận hành giờ nằm ở tab riêng, không phải màn chính. */
+function CrewWork(v){ CrewDashboard(v); tabbar(v); }
+function EquipWork(v){ EquipmentDashboard(v); tabbar(v); }
 
 /* Logo Vietjet: chữ trên nền đỏ đã là đỏ, nên logo lộn ngược — chữ trắng,
    ngôi sao vàng brand-accent. Đây là bề mặt accent nhỏ, đúng guideline. */
@@ -1100,39 +1236,147 @@ function vjLogo(){
 }
 
 function heroHeader(v, hello, name){
+  const unread = unreadNotifs();
   v.appendChild(h("header",{class:"hero"},
     h("span",{class:"edge"}),
     h("div",{style:"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px"},
       vjLogo(),
-      h("button",{class:"avatar", "aria-label":"Hồ sơ", onClick:()=>{S.tab="profile"; go("/profile","reset");}},
-        (name??"?").trim().split(/\s+/).slice(-2).map(w=>w[0]).join("").toUpperCase())),
+      h("div",{class:"heroact"},
+        h("button",{class:"bell", "aria-label":`Thông báo${unread?` · ${unread} chưa đọc`:""}`, onClick:()=>nav("notif","/notifications")},
+          svg(I.bell,22),
+          unread ? h("span",{class:"bcount"}, unread>9?"9+":String(unread)) : null),
+        h("button",{class:"avatar", "aria-label":"Hồ sơ", onClick:()=>nav("profile","/profile")},
+          (name??"?").trim().split(/\s+/).slice(-2).map(w=>w[0]).join("").toUpperCase()))),
     h("div",{class:"row"},
       h("div",{}, h("div",{class:"hello"},hello), h("div",{class:"name dsp"}, name ?? "")),
     ),
   ));
 }
 
-/* ── ModuleGridDashboard ────────────────────────────────────────── */
-function ModuleGridDashboard(v){
-  heroHeader(v, "Xin chào", S.session.displayName);
-  const mods = modulesForRoles(S.session.roles);
+/* Header trang trong: tiêu đề trang + chuông/avatar trên gradient Aurora.
+   Dùng chung cho Ca trực · Thông báo · Hồ sơ. `tuck` chừa chỗ cho card trèo lên. */
+function subHeader(v, title, subtitle, tuck){
+  const unread = unreadNotifs();
+  const name = S.session.displayName ?? "";
+  const initials = name.trim().split(/\s+/).slice(-2).map(w=>w[0]).join("").toUpperCase() || "?";
+  v.appendChild(h("header",{class:"subhd"+(tuck?" tuck":"")},
+    h("div",{class:"subhd-row"},
+      h("div",{class:"subhd-ttl"},
+        h("h1",{}, title),
+        subtitle ? h("p",{}, subtitle) : null),
+      h("div",{class:"lact"},
+        h("button",{class:"lbell", "aria-label":`Thông báo${unread?` · ${unread} chưa đọc`:""}`, onClick:()=>nav("notif","/notifications")},
+          svg(I.bell,22),
+          unread ? h("span",{class:"lbc"}, unread>9?"9+":String(unread)) : null),
+        h("button",{class:"lav", "aria-label":"Hồ sơ", onClick:()=>nav("profile","/profile")}, initials))),
+  ));
+}
+
+/* ── LauncherHome = trang chủ super app: lưới tính năng + ribbon ca trực ── */
+function greetingByHour(){
+  const hh = new Date().getHours();
+  return hh < 11 ? "Chào buổi sáng" : hh < 14 ? "Chào buổi trưa" : hh < 18 ? "Chào buổi chiều" : "Chào buổi tối";
+}
+
+/* Ribbon ca trực: giữ giá trị zero-tap (đếm giờ báo cáo + chuyến kế) ngay trên
+   trang chủ, bấm vào deep-link sang tab Ca trực. Chỉ hiện với tổ bay. */
+function dutyRibbon(){
+  const remaining = Math.max(0, ROTATION.reportAt - S.simNow);
+  const passed = remaining === 0;
+  const leg = LEGS[0];
+  return h("button",{class:"ribbon", onClick:()=>nav("crew","/crew")},
+    h("span",{class:"rleft"},
+      h("span",{class:"rkick"}, passed ? "Đến giờ báo cáo" : "Báo cáo sau"),
+      h("span",{class:"rbig dsp"}, passed ? hhmm(ROTATION.reportAt) : formatCountdown(remaining))),
+    h("span",{class:"rmid"},
+      h("span",{class:"rflt"}, leg.flightNo),
+      h("span",{class:"rroute"}, `${leg.origin} → ${leg.destination} · ${hhmm(leg.std)}`)),
+    h("span",{class:"rchev"}, svg(I.chev,20)));
+}
+
+/* Header trang chủ: hero gradient Aurora (đỏ→indigo) + lời chào + chuông/avatar,
+   ribbon ca trực là card trắng NỔI trên gradient. #stack tự reset cuộn (paintChrome)
+   nên header không còn bị đẩy che card. */
+function launcherHero(v, ribbonEl){
+  const name = S.session.displayName ?? "";
+  const unread = unreadNotifs();
+  const initials = name.trim().split(/\s+/).slice(-2).map(w=>w[0]).join("").toUpperCase() || "?";
+  v.appendChild(h("header",{class:"lhero"},
+    h("div",{class:"top"},
+      h("div",{class:"lgreet"},
+        h("span",{class:"lg1"}, greetingByHour() + ","),
+        h("span",{class:"lg2 dsp"}, name)),
+      h("div",{class:"lact"},
+        h("button",{class:"lbell", "aria-label":`Thông báo${unread?` · ${unread} chưa đọc`:""}`, onClick:()=>nav("notif","/notifications")},
+          svg(I.bell,22),
+          unread ? h("span",{class:"lbc"}, unread>9?"9+":String(unread)) : null),
+        h("button",{class:"lav", "aria-label":"Hồ sơ", onClick:()=>nav("profile","/profile")}, initials))),
+    ribbonEl || null,
+  ));
+}
+
+// Tông màu mềm luân phiên cho icon-chip từng tile (Aurora + semantic).
+const TILE_TINTS = [
+  ["#EEF2FF","#4F46E5"], // indigo
+  ["#FFE1E3","#E30018"], // đỏ brand
+  ["#FEF3C7","#B45309"], // sun / amber
+  ["#DCFCE7","#15803D"], // xanh lá
+  ["#F3E8FF","#7C3AED"], // tím
+  ["#E0F2FE","#0369A1"], // cyan
+];
+
+function LauncherHome(v){
+  const roles = S.session.roles;
+  const isCrew = ROLE_DASHBOARDS[resolvePrimaryRole(roles)] === "CrewDashboard";
+  launcherHero(v, isCrew ? dutyRibbon() : null);
+  const mods = modulesForRoles(roles);
   const body = h("div",{class:"body pad-tabs"});
-  body.appendChild(h("div",{class:"sec"}, h("h2",{},"Chức năng"),
-    h("span",{class:"hint"}, `${mods.length} module`)));
+
+  body.appendChild(h("div",{class:"sec"}, h("h2",{},"Tính năng"),
+    h("span",{class:"hint"}, `${mods.length} mục`)));
 
   if (!mods.length){
     body.appendChild(h("div",{class:"card", style:"padding:28px;text-align:center"},
       h("div",{style:"display:grid;place-items:center;color:var(--ink-3);margin-bottom:10px"}, svg(I.lock,32)),
-      h("p",{style:"font:400 14px/22px Inter;color:var(--ink-2)"},"Vai trò của bạn chưa được gán module nào")));
+      h("p",{style:"font:400 14px/22px Inter;color:var(--ink-2)"},"Vai trò của bạn chưa được gán tính năng nào")));
   } else {
-    body.appendChild(h("div",{class:"grid"}, ...mods.map(m =>
-      h("button",{class:"mod"+(m.route?"":" off"), disabled:!m.route, onClick: m.route ? ()=>go(m.route) : null},
-        m.route ? null : h("span",{class:"soon"},"Sắp có"),
-        h("span",{class:"ic"}, svg(I[m.icon] ?? I.cube, 22)),
-        h("b",{}, m.title),
-        h("span",{style:"font:500 11px/16px ui-monospace,monospace;color:var(--ink-3)"}, m.id),
-      ))));
+    // Tính năng chưa có route thật → tên placeholder + icon trung tính (giữ trung
+    // thực). Tính năng đã chạy thật thì giữ tên + icon thật. Icon-chip đổi màu
+    // luân phiên cho sinh động; KHÔNG làm mờ tile chưa có.
+    let ph = 0;
+    body.appendChild(h("div",{class:"grid"}, ...mods.map((m,i) => {
+      const real = !!m.route;
+      const showName = real || m.named;   // named:true hiện tên dù chưa có route
+      const label = showName ? m.title : `Tính năng ${++ph}`;
+      const icon  = showName ? (I[m.icon] ?? I.grid) : I.grid;
+      const [bg,fg] = TILE_TINTS[i % TILE_TINTS.length];
+      return h("button",{class:"mod"+(real?"":" off"), onClick: real ? ()=>go(m.route) : null},
+        real ? null : h("span",{class:"soon"},"Sắp có"),
+        h("span",{class:"ic", style:`background:${bg};color:${fg}`}, svg(icon, 22)),
+        h("b",{}, label));
+    })));
   }
+
+  body.appendChild(h("p",{class:"protoline"},
+    h("span",{class:"protodot"}, svg(I.warn,13)),
+    "Đây là bản prototype, không phải sản phẩm thật"));
+
+  v.appendChild(body);
+}
+
+/* ── Notifications = hộp thư vận hành ────────────────────────────── */
+function Notifications(v){
+  const unread = unreadNotifs();
+  subHeader(v, "Thông báo", unread ? `${unread} thông báo chưa đọc` : "Đã đọc hết");
+  const body = h("div",{class:"body pad-tabs"});
+  if (unread) body.appendChild(h("div",{class:"sec", style:"justify-content:flex-end"},
+    h("button",{class:"link", style:"font-size:13px", onClick:()=>{ NOTIFS.forEach(n=>n.unread=false); go("/notifications","reset"); }},"Đánh dấu đã đọc")));
+  body.appendChild(h("div",{class:"ntlist"}, ...NOTIFS.map(n =>
+    h("button",{class:"nt"+(n.unread?" unread":"")+(n.tone==="danger"?" danger":""),
+        onClick:()=>{ n.unread=false; go("/notifications","reset"); }},
+      h("span",{class:"ntic"}, svg(I[n.icon] ?? I.bell, 20)),
+      h("span",{class:"nttx"}, h("b",{}, n.title), h("p",{}, n.body), h("time",{}, n.time)),
+      n.unread ? h("span",{class:"ntdot"}) : null))));
   v.appendChild(body);
 }
 
@@ -1190,7 +1434,7 @@ function dutyRail(){
 }
 
 function CrewDashboard(v){
-  heroHeader(v, "Chào buổi sáng", S.session.displayName);
+  subHeader(v, "Ca trực", `${hhmm(ROTATION.reportAt)}–${hhmm(ROTATION.dutyEndAt)} · hôm nay`, true);
   const body = h("div",{class:"body pad-tabs overlap", style:"display:flex;flex-direction:column;gap:14px;padding-top:0"});
   let n = 0;
   const st = el => { el.classList.add("st"); el.style.animationDelay = (n++ * 55) + "ms"; return el; };
@@ -1914,7 +2158,7 @@ function PassengerScreen(v){
 
 /* ── profile ────────────────────────────────────────────────────── */
 function Profile(v){
-  bar(v,{title:"Hồ sơ & Cài đặt"});
+  subHeader(v, "Hồ sơ", `${S.session.employeeCode ?? "—"} · nhân viên Vietjet`);
   const body = h("div",{class:"body white pad-tabs", style:"padding-top:22px;display:flex;flex-direction:column;gap:22px"});
   const primary = resolvePrimaryRole(S.session.roles);
   body.appendChild(h("div",{},
