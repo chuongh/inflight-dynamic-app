@@ -3,6 +3,19 @@ export const paths = {
   login: '/login',
   dashboard: '/dashboard',
   designSystem: '/design-system',
+  admin: {
+    users: '/admin/users',
+    roles: '/admin/roles',
+    permissions: '/admin/permissions',
+  },
+  airports: {
+    list: '/airports',
+  },
+  catering: {
+    quota: {
+      list: '/catering/quota',
+    },
+  },
   equipment: {
     trolley: {
       list: '/equipment',

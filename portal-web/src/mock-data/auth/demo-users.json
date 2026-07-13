@@ -22,5 +22,101 @@
     "department": "Ground Operations",
     "jobTitle": "Analyst",
     "roleId": "viewer"
+  },
+  {
+    "employeeCode": "VJ3001",
+    "password": "vietjet",
+    "name": "Pham Thi Hoa",
+    "department": "In-Flight Services",
+    "jobTitle": "IFS Back Office Officer",
+    "roleId": "ifs_backoffice"
+  },
+  {
+    "employeeCode": "VJ3002",
+    "password": "vietjet",
+    "name": "Do Van Cuong",
+    "department": "Catering Operations",
+    "jobTitle": "Catering Planner",
+    "roleId": "catering_ops"
+  },
+  {
+    "employeeCode": "VJ3003",
+    "password": "vietjet",
+    "name": "Nguyen Thi Mai",
+    "department": "Commercial",
+    "jobTitle": "Commercial Executive",
+    "roleId": "commercial"
+  },
+  {
+    "employeeCode": "VJ3004",
+    "password": "vietjet",
+    "name": "Vu Van Long",
+    "department": "Operations Control",
+    "jobTitle": "Operations Officer",
+    "roleId": "operations"
+  },
+  {
+    "employeeCode": "VJ3005",
+    "password": "vietjet",
+    "name": "Bui Thi Lan",
+    "department": "Supply Chain",
+    "jobTitle": "Supply Coordinator",
+    "roleId": "supply"
+  },
+  {
+    "employeeCode": "VJ3006",
+    "password": "vietjet",
+    "name": "Tran Van Nam",
+    "department": "Operations Control",
+    "jobTitle": "Ramp Dispatcher",
+    "roleId": "dispatcher"
+  },
+  {
+    "employeeCode": "VJ4001",
+    "password": "vietjet",
+    "name": "Le Thi Thu",
+    "department": "Airport Services",
+    "jobTitle": "Boarding Agent",
+    "roleId": "boarding_agent"
+  },
+  {
+    "employeeCode": "VJ4002",
+    "password": "vietjet",
+    "name": "Hoang Van Son",
+    "department": "Airport Services",
+    "jobTitle": "Gate Supervisor",
+    "roleId": "gate_supervisor"
+  },
+  {
+    "employeeCode": "VJ5001",
+    "password": "vietjet",
+    "name": "Nguyen Thi Ngoc",
+    "department": "Cabin Crew",
+    "jobTitle": "Flight Attendant",
+    "roleId": "cabin_crew"
+  },
+  {
+    "employeeCode": "VJ5002",
+    "password": "vietjet",
+    "name": "Dang Thi Huong",
+    "department": "Cabin Crew",
+    "jobTitle": "Purser",
+    "roleId": "purser"
+  },
+  {
+    "employeeCode": "VJ6001",
+    "password": "vietjet",
+    "name": "Pham Van Tai",
+    "department": "Ground Transport",
+    "jobTitle": "Airside Driver",
+    "roleId": "driver"
+  },
+  {
+    "employeeCode": "VJ9001",
+    "password": "vietjet",
+    "name": "SkyChef Catering Co.",
+    "department": "External Supplier",
+    "jobTitle": "Supplier Account",
+    "roleId": "supplier"
   }
 ]

@@ -53,7 +53,7 @@ export function LoginPage() {
         <div className="login-page__hero-stripe" aria-hidden />
 
         <div className="login-page__hero-content login-page__enter login-page__enter--1">
-          <VietJetLogo size="lg" />
+          <VietJetLogo size="lg" variant="white" />
           <p className="login-page__product-name">{t('auth.appName')}</p>
         </div>
 
@@ -82,7 +82,7 @@ export function LoginPage() {
 
       <div className="login-page__form-panel">
         <div className="login-page__card login-page__enter login-page__enter--form">
-          <div className="login-page__mobile-brand">
+          <div className="login-page__card-brand">
             <VietJetLogo size="md" />
             <Text variant="bodySm" tone="secondary" className="font-vja-subhead">
               {t('auth.appName')}

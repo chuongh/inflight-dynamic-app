@@ -1,16 +1,22 @@
 import { Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
 import {
+  Building2,
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  KeyRound,
   LayoutDashboard,
   LogOut,
   Palette,
   Search,
+  Shield,
+  ShieldCheck,
   ShoppingCart,
   Tablet,
   User,
+  Users,
+  UtensilsCrossed,
 } from 'lucide-react'
 import { type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -25,9 +31,15 @@ const ICONS: Record<string, ReactNode> = {
   dashboard: <LayoutDashboard size={18} strokeWidth={2} />,
   'design-system': <Palette size={18} strokeWidth={2} />,
   equipment: <ShoppingCart size={18} strokeWidth={2} />,
+  catering: <UtensilsCrossed size={18} strokeWidth={2} />,
+  airports: <Building2 size={18} strokeWidth={2} />,
   'trolley-carts': <ShoppingCart size={16} strokeWidth={2} />,
   pos: <CreditCard size={16} strokeWidth={2} />,
   ipad: <Tablet size={16} strokeWidth={2} />,
+  administration: <Shield size={18} strokeWidth={2} />,
+  'iam-users': <Users size={16} strokeWidth={2} />,
+  'iam-roles': <ShieldCheck size={16} strokeWidth={2} />,
+  'iam-permissions': <KeyRound size={16} strokeWidth={2} />,
 }
 
 interface AppShellProps {
@@ -40,6 +52,11 @@ function resolveSelection(pathname: string) {
   if (pathname.startsWith(paths.equipment.pos.list)) return { selectedKey: 'pos', ...NAV_SECTION_KEYS.pos }
   if (pathname.startsWith(paths.equipment.ipad.list)) return { selectedKey: 'ipad', ...NAV_SECTION_KEYS.ipad }
   if (pathname.startsWith(paths.equipment.trolley.list)) return { selectedKey: 'trolley-carts', ...NAV_SECTION_KEYS['trolley-carts'] }
+  if (pathname.startsWith(paths.catering.quota.list)) return { selectedKey: 'catering', ...NAV_SECTION_KEYS.catering }
+  if (pathname.startsWith(paths.airports.list)) return { selectedKey: 'airports', ...NAV_SECTION_KEYS.airports }
+  if (pathname.startsWith(paths.admin.users)) return { selectedKey: 'iam-users', ...NAV_SECTION_KEYS['iam-users'] }
+  if (pathname.startsWith(paths.admin.roles)) return { selectedKey: 'iam-roles', ...NAV_SECTION_KEYS['iam-roles'] }
+  if (pathname.startsWith(paths.admin.permissions)) return { selectedKey: 'iam-permissions', ...NAV_SECTION_KEYS['iam-permissions'] }
   return { selectedKey: 'dashboard', ...NAV_SECTION_KEYS.dashboard }
 }
 

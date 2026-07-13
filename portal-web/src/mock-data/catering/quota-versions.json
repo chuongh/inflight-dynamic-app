@@ -1,0 +1,94 @@
+{
+  "versions": [
+    {
+      "id": "v5",
+      "version": 5,
+      "status": "active",
+      "effectiveFrom": "01/07/2026",
+      "importedBy": "Ng. T. Mai · Commercial",
+      "importedAt": "28/06/2026",
+      "source": "Report-HOTMEAL-T7.xlsx",
+      "sourceKind": "file",
+      "rows": [
+        { "flightNo": "VJ021", "route": "HAN-VTE", "type": "INT_Regular", "block": "01:10", "std": "03:50", "sta": "05:00", "hotmeal": 0, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ024", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:10", "std": "18:00", "sta": "19:10", "hotmeal": 2, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ026", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:10", "std": "20:00", "sta": "21:10", "hotmeal": 1, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ027", "route": "HKG-SGN", "type": "Multiple_Religion_SIN_HKG", "block": "01:40", "std": "19:00", "sta": "20:40", "hotmeal": 0, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ031", "route": "SGN-CGK", "type": "Muslim", "block": "03:00", "std": "14:00", "sta": "17:00", "hotmeal": 4, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ032", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:35", "std": "17:00", "sta": "18:35", "hotmeal": 4, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ035", "route": "HAN-VTE", "type": "INT_Regular", "block": "00:25", "std": "09:00", "sta": "09:25", "hotmeal": 4, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ036", "route": "CGK-SGN", "type": "Muslim", "block": "03:00", "std": "17:00", "sta": "20:00", "hotmeal": 2, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ042", "route": "SGN-CGK", "type": "Muslim", "block": "03:00", "std": "10:00", "sta": "13:00", "hotmeal": 2, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ047", "route": "SGN-HKG", "type": "Multiple_Religion_SIN_HKG", "block": "03:40", "std": "16:00", "sta": "19:40", "hotmeal": 3, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ061", "route": "CXR-ALA", "type": "INT_Regular", "block": "06:35", "std": "20:20", "sta": "02:55", "hotmeal": 0, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ067", "route": "CXR-NQZ", "type": "INT_Regular", "block": "06:15", "std": "12:40", "sta": "18:55", "hotmeal": 0, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ089", "route": "SGN-ICN", "type": "INT_Regular", "block": "05:20", "std": "00:20", "sta": "07:10", "hotmeal": 2, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ125", "route": "SGN-HAN", "type": "Domestic_South_Other", "block": "02:10", "std": "21:30", "sta": "23:40", "hotmeal": 0, "banhMi": 0, "traSua": 0 }
+      ]
+    },
+    {
+      "id": "v4",
+      "version": 4,
+      "status": "superseded",
+      "effectiveFrom": "15/06/2026",
+      "effectiveTo": "30/06/2026",
+      "importedBy": "Tr. V. Sơn · Commercial",
+      "importedAt": "14/06/2026",
+      "source": "email · 14/06",
+      "sourceKind": "email",
+      "rows": [
+        { "flightNo": "VJ021", "route": "HAN-VTE", "type": "INT_Regular", "block": "01:10", "std": "03:50", "sta": "05:00", "hotmeal": 0, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ024", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:10", "std": "18:00", "sta": "19:10", "hotmeal": 2, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ026", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:10", "std": "20:00", "sta": "21:10", "hotmeal": 1, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ031", "route": "SGN-CGK", "type": "Muslim", "block": "03:00", "std": "14:00", "sta": "17:00", "hotmeal": 3, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ032", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:35", "std": "17:00", "sta": "18:35", "hotmeal": 3, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ035", "route": "HAN-VTE", "type": "INT_Regular", "block": "00:25", "std": "09:00", "sta": "09:25", "hotmeal": 3, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ036", "route": "CGK-SGN", "type": "Muslim", "block": "03:00", "std": "17:00", "sta": "20:00", "hotmeal": 2, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ042", "route": "SGN-CGK", "type": "Muslim", "block": "03:00", "std": "10:00", "sta": "13:00", "hotmeal": 2, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ047", "route": "SGN-HKG", "type": "Multiple_Religion_SIN_HKG", "block": "03:40", "std": "16:00", "sta": "19:40", "hotmeal": 3, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ089", "route": "SGN-ICN", "type": "INT_Regular", "block": "05:20", "std": "00:20", "sta": "07:10", "hotmeal": 2, "banhMi": 1, "traSua": 0 }
+      ]
+    },
+    {
+      "id": "v3",
+      "version": 3,
+      "status": "superseded",
+      "effectiveFrom": "01/06/2026",
+      "effectiveTo": "14/06/2026",
+      "importedBy": "Ng. T. Mai · Commercial",
+      "importedAt": "30/05/2026",
+      "source": "Report-HOTMEAL-T6.xlsx",
+      "sourceKind": "file",
+      "rows": [
+        { "flightNo": "VJ021", "route": "HAN-VTE", "type": "INT_Regular", "block": "01:10", "std": "03:50", "sta": "05:00", "hotmeal": 0, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ024", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:10", "std": "18:00", "sta": "19:10", "hotmeal": 1, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ031", "route": "SGN-CGK", "type": "Muslim", "block": "03:00", "std": "14:00", "sta": "17:00", "hotmeal": 3, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ032", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:35", "std": "17:00", "sta": "18:35", "hotmeal": 3, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ035", "route": "HAN-VTE", "type": "INT_Regular", "block": "00:25", "std": "09:00", "sta": "09:25", "hotmeal": 3, "banhMi": 2, "traSua": 0 },
+        { "flightNo": "VJ042", "route": "SGN-CGK", "type": "Muslim", "block": "03:00", "std": "10:00", "sta": "13:00", "hotmeal": 2, "banhMi": 0, "traSua": 0 },
+        { "flightNo": "VJ047", "route": "SGN-HKG", "type": "Multiple_Religion_SIN_HKG", "block": "03:40", "std": "16:00", "sta": "19:40", "hotmeal": 2, "banhMi": 1, "traSua": 0 },
+        { "flightNo": "VJ089", "route": "SGN-ICN", "type": "INT_Regular", "block": "05:20", "std": "00:20", "sta": "07:10", "hotmeal": 2, "banhMi": 1, "traSua": 0 }
+      ]
+    }
+  ],
+  "pendingImport": {
+    "source": "Report - ĐỊNH MỨC HOTMEAL·BÁNH MÌ.xlsx",
+    "sourceKind": "file",
+    "sourceRows": 1843,
+    "normalizedTypes": 12,
+    "dedupedRows": 224,
+    "suggestedEffectiveFrom": "15/07/2026",
+    "reviewRows": [
+      { "flightNo": "VJ061", "route": "CXR-ALA", "type": "INT_Regular", "block": "06:35", "std": "20:20", "sta": "2:55", "hotmeal": 0, "banhMi": 0, "traSua": 0, "flag": "error", "errorField": "sta", "note": "STA sai định dạng (thiếu số 0)" },
+      { "flightNo": "VJ062", "route": "ALA-CXR", "type": "INT_Regular", "block": "09:15", "std": "1:05", "sta": "10:20", "hotmeal": 0, "banhMi": 0, "traSua": 0, "flag": "error", "errorField": "std", "note": "STD sai định dạng (thiếu số 0)" },
+      { "flightNo": "VJ067", "route": "CXR-NQZ", "type": "INT_Regular", "block": "06:15", "std": "12:40", "sta": "18:5", "hotmeal": 0, "banhMi": 0, "traSua": 0, "flag": "error", "errorField": "sta", "note": "STA sai định dạng" },
+      { "flightNo": "VJ024", "route": "VTE-HAN", "type": "INT_Regular", "block": "01:10", "std": "18:00", "sta": "19:10", "hotmeal": 4, "banhMi": 2, "traSua": 0, "flag": "delta", "prevHotmeal": 2, "note": "+100% hotmeal so với v5" },
+      { "flightNo": "VJ036", "route": "CGK-SGN", "type": "Muslim", "block": "03:00", "std": "17:00", "sta": "20:00", "hotmeal": 1, "banhMi": 0, "traSua": 0, "flag": "delta", "prevHotmeal": 2, "note": "-50% hotmeal so với v5" },
+      { "flightNo": "VJ301", "route": "SGN-BKK", "type": "INT_Regular", "block": "01:35", "std": "08:15", "sta": "09:50", "hotmeal": 3, "banhMi": 1, "traSua": 0, "flag": "new", "note": "Chuyến chưa có ở v5" },
+      { "flightNo": "VJ302", "route": "BKK-SGN", "type": "INT_Regular", "block": "01:35", "std": "10:40", "sta": "12:15", "hotmeal": 3, "banhMi": 1, "traSua": 0, "flag": "new", "note": "Chuyến chưa có ở v5" },
+      { "flightNo": "VJ021", "route": "HAN-VTE", "type": "INT_Regular", "block": "01:10", "std": "03:50", "sta": "05:00", "hotmeal": 0, "banhMi": 0, "traSua": 0, "flag": "ok" },
+      { "flightNo": "VJ031", "route": "SGN-CGK", "type": "Muslim", "block": "03:00", "std": "14:00", "sta": "17:00", "hotmeal": 4, "banhMi": 1, "traSua": 0, "flag": "ok" },
+      { "flightNo": "VJ047", "route": "SGN-HKG", "type": "Multiple_Religion_SIN_HKG", "block": "03:40", "std": "16:00", "sta": "19:40", "hotmeal": 4, "banhMi": 1, "traSua": 0, "flag": "delta", "prevHotmeal": 3, "note": "+1 hotmeal so với v5" }
+    ]
+  }
+}

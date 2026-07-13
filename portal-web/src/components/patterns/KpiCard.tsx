@@ -8,6 +8,8 @@ interface KpiCardProps {
   icon?: LucideIcon
   tone?: 'default' | 'success' | 'warning' | 'danger' | 'brand'
   className?: string
+  /** Optional marker rendered at the far end of the header (e.g. a "Later" tag). */
+  badge?: ReactNode
 }
 
 const toneClass = {
@@ -18,7 +20,7 @@ const toneClass = {
   brand: 'kpi-card--brand',
 }
 
-export function KpiCard({ label, value, hint, icon: Icon, tone = 'default', className = '' }: KpiCardProps) {
+export function KpiCard({ label, value, hint, icon: Icon, tone = 'default', className = '', badge }: KpiCardProps) {
   return (
     <article className={`kpi-card ${toneClass[tone]} ${className}`.trim()} aria-label={label}>
       <span className="kpi-card__stripe" aria-hidden />
@@ -31,6 +33,7 @@ export function KpiCard({ label, value, hint, icon: Icon, tone = 'default', clas
           </span>
         ) : null}
         <p className="kpi-card__label">{label}</p>
+        {badge ? <span className="kpi-card__badge">{badge}</span> : null}
       </div>
 
       <p className="kpi-card__value tnum">{value}</p>

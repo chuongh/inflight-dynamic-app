@@ -57,6 +57,44 @@ export const PORTAL_MODULES: PortalModule[] = [
       },
     ],
   },
+  {
+    id: 'catering',
+    labelKey: 'nav.catering',
+    path: paths.catering.quota.list,
+    permission: 'catering.quota.manage',
+  },
+  {
+    id: 'airports',
+    labelKey: 'nav.airports',
+    path: paths.airports.list,
+    permission: 'airports.read',
+  },
+  {
+    id: 'administration',
+    labelKey: 'nav.administration',
+    path: paths.admin.users,
+    permission: 'admin.users.read',
+    children: [
+      {
+        id: 'iam-users',
+        labelKey: 'nav.users',
+        path: paths.admin.users,
+        permission: 'admin.users.read',
+      },
+      {
+        id: 'iam-roles',
+        labelKey: 'nav.roles',
+        path: paths.admin.roles,
+        permission: 'admin.users.read',
+      },
+      {
+        id: 'iam-permissions',
+        labelKey: 'nav.permissions',
+        path: paths.admin.permissions,
+        permission: 'admin.users.read',
+      },
+    ],
+  },
 ]
 
 export function moduleVisible(module: PortalModule, permissions: PermissionKey[]): boolean {
@@ -82,7 +120,12 @@ export const NAV_SECTION_KEYS: Record<
 > = {
   dashboard: { sectionTitleKey: 'nav.dashboard' },
   'design-system': { sectionTitleKey: 'nav.designSystem' },
+  catering: { sectionTitleKey: 'nav.catering' },
+  airports: { sectionTitleKey: 'nav.airports' },
   pos: { sectionTitleKey: 'nav.pos', moduleLabelKey: 'nav.equipment' },
   ipad: { sectionTitleKey: 'nav.ipad', moduleLabelKey: 'nav.equipment' },
   'trolley-carts': { sectionTitleKey: 'nav.trolleyCarts', moduleLabelKey: 'nav.equipment' },
+  'iam-users': { sectionTitleKey: 'nav.users', moduleLabelKey: 'nav.administration' },
+  'iam-roles': { sectionTitleKey: 'nav.roles', moduleLabelKey: 'nav.administration' },
+  'iam-permissions': { sectionTitleKey: 'nav.permissions', moduleLabelKey: 'nav.administration' },
 }

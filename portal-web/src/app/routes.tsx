@@ -8,6 +8,11 @@ import {
   useSaveTrolleys,
   useTrolleys,
 } from '@/modules/equipment/hooks/useEquipment'
+import { AirportListPage } from '@/pages/airports/AirportListPage'
+import { QuotaPage } from '@/pages/catering/quota/QuotaPage'
+import { PermissionMatrixPage } from '@/pages/admin/PermissionMatrixPage'
+import { RolesPage } from '@/pages/admin/RolesPage'
+import { UsersPage } from '@/pages/admin/UsersPage'
 import { DashboardPage } from '@/pages/dashboard/DashboardPage'
 import { DesignSystemPage } from '@/pages/design-system/DesignSystemPage'
 import { IpadDetailPage } from '@/pages/equipment/ipad/IpadDetailPage'
@@ -97,6 +102,11 @@ export function AppRoutes() {
         <Route path={`${paths.equipment.ipad.list}/:code`} element={<IpadDetailPage />} />
         <Route path={paths.equipment.trolley.list} element={<TrolleyListRoute />} />
         <Route path={`${paths.equipment.trolley.list}/:code`} element={<TrolleyDetailRoute />} />
+        <Route path={paths.airports.list} element={<AirportListPage />} />
+        <Route path={paths.catering.quota.list} element={<QuotaPage />} />
+        <Route path={paths.admin.users} element={<UsersPage />} />
+        <Route path={paths.admin.roles} element={<RolesPage />} />
+        <Route path={paths.admin.permissions} element={<PermissionMatrixPage />} />
       </Route>
       <Route path="/" element={<Navigate to={paths.login} replace />} />
       <Route path="*" element={<Navigate to={paths.login} replace />} />

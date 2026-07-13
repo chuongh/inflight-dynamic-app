@@ -1,0 +1,144 @@
+[
+  {
+    "code": "SGN",
+    "icao": "VVTS",
+    "name": "Tân Sơn Nhất",
+    "city": "TP. Hồ Chí Minh",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "note": "Sân bay pilot MVP.",
+    "map": {
+      "published": true,
+      "version": 3,
+      "points": [
+        { "id": "sgn-p1", "name": "Cổng A1", "type": "gate" },
+        { "id": "sgn-p2", "name": "Sân đỗ 12", "type": "apron" },
+        { "id": "sgn-p3", "name": "Crew Center", "type": "crew_center" },
+        { "id": "sgn-p4", "name": "Cargo Terminal", "type": "cargo" },
+        { "id": "sgn-p5", "name": "Hangar 2", "type": "hangar" }
+      ],
+      "zones": [
+        { "id": "sgn-z1", "name": "Zone Apron Bắc", "allowedVehicles": "Xe thang, xe suất ăn" },
+        { "id": "sgn-z2", "name": "Zone Cổng nội địa", "allowedVehicles": "Xe điện chở khách" },
+        { "id": "sgn-z3", "name": "Zone Kỹ thuật", "allowedVehicles": "Hạn chế an toàn" },
+        { "id": "sgn-z4", "name": "Zone Cargo", "allowedVehicles": "Xe tải hàng" }
+      ]
+    },
+    "updatedAt": 1751328000000
+  },
+  {
+    "code": "HAN",
+    "icao": "VVNB",
+    "name": "Nội Bài",
+    "city": "Hà Nội",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "map": {
+      "published": true,
+      "version": 2,
+      "points": [
+        { "id": "han-p1", "name": "Cổng B4", "type": "gate" },
+        { "id": "han-p2", "name": "Sân đỗ 8", "type": "apron" },
+        { "id": "han-p3", "name": "Crew Center", "type": "crew_center" }
+      ],
+      "zones": [
+        { "id": "han-z1", "name": "Zone Apron", "allowedVehicles": "Xe thang, xe suất ăn" },
+        { "id": "han-z2", "name": "Zone Cổng quốc tế", "allowedVehicles": "Xe điện chở khách" },
+        { "id": "han-z3", "name": "Zone Kỹ thuật", "allowedVehicles": "Hạn chế an toàn" }
+      ]
+    },
+    "updatedAt": 1751241600000
+  },
+  {
+    "code": "DAD",
+    "icao": "VVDN",
+    "name": "Đà Nẵng",
+    "city": "Đà Nẵng",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "updatedAt": 1751155200000
+  },
+  {
+    "code": "CXR",
+    "icao": "VVCR",
+    "name": "Cam Ranh",
+    "city": "Khánh Hòa",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1751068800000
+  },
+  {
+    "code": "PQC",
+    "icao": "VVPQ",
+    "name": "Phú Quốc",
+    "city": "Kiên Giang",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1750982400000
+  },
+  {
+    "code": "VII",
+    "icao": "VVVH",
+    "name": "Vinh",
+    "city": "Nghệ An",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1750896000000
+  },
+  {
+    "code": "HPH",
+    "icao": "VVCI",
+    "name": "Cát Bi",
+    "city": "Hải Phòng",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1750809600000
+  },
+  {
+    "code": "DLI",
+    "icao": "VVDL",
+    "name": "Liên Khương",
+    "city": "Lâm Đồng",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1750723200000
+  },
+  {
+    "code": "ICN",
+    "icao": "RKSI",
+    "name": "Incheon",
+    "city": "Seoul, Hàn Quốc",
+    "country": "Hàn Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1750636800000
+  },
+  {
+    "code": "UIH",
+    "icao": "VVPC",
+    "name": "Phù Cát",
+    "city": "Bình Định",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "draft",
+    "updatedAt": 1750550400000
+  }
+]
