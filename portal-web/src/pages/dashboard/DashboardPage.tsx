@@ -20,7 +20,6 @@ import { summarizeFleet } from '@/modules/equipment/lib/generateTrolleys'
 import { isStale } from '@/modules/equipment/lib/movement'
 import type { RepairRequest } from '@/modules/equipment/types'
 
-const DAY_MS = 86_400_000
 const SLA_INTAKE_DAYS = 2
 
 interface DashboardPageProps {
@@ -192,14 +191,16 @@ export function DashboardPage({ trolleys, repairRequests = [] }: DashboardPagePr
   const alertGroups = useMemo(() => {
     const now = Date.now()
     const slaBreach = trolleys.filter(
-      (unit) => unit.status === 'not-service' && now - unit.lastSeenAt > SLA_INTAKE_DAYS * DAY_MS,
+      (unit) => unit.status === 'not-service' && unit.daysInStatus > SLA_INTAKE_DAYS,
     )
     const rework = trolleys.filter((unit) => computeReworkStats(unit).reworkCount > 0)
     const stale = trolleys.filter((unit) => isStale(unit, now))
     return { slaBreach, rework, stale }
   }, [trolleys])
 
-  const alertsTotal = alertGroups.slaBreach.length + alertGroups.rework.length + alertGroups.stale.length
+  const alertsTotal = new Set(
+    [...alertGroups.slaBreach, ...alertGroups.rework, ...alertGroups.stale].map((unit) => unit.code),
+  ).size
 
   const stationNodes = useMemo((): StationMapNode[] => {
     return STATIONS.map((code) => {

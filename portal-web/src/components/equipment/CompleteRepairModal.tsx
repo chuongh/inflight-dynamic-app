@@ -28,10 +28,15 @@ export function CompleteRepairModal({ open, request, onClose, onSubmit }: Comple
         onClose()
       }}
       onOk={() => {
-        form.validateFields().then((values) => {
-          onSubmit(values)
-          form.resetFields()
-        })
+        form
+          .validateFields()
+          .then((values) => {
+            onSubmit(values)
+            form.resetFields()
+          })
+          .catch(() => {
+            /* validation errors are shown inline by the form */
+          })
       }}
       destroyOnClose
     >
