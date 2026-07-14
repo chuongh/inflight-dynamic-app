@@ -245,7 +245,21 @@
       "exportHistory": "Export history",
       "avgRepairCycle": "Avg repair cycle",
       "daysUnit": "days",
-      "repairsCount": "{{count}} repairs"
+      "repairsCount": "{{count}} repairs",
+      "timeline": "Timeline",
+      "movementHistory": "Movement history",
+      "mtbf": "MTBF",
+      "reworkRate": "Rework rate",
+      "avgTat": "Avg TAT",
+      "by": "By",
+      "leg": "Leg",
+      "event": "Event",
+      "time": "Time",
+      "sentToRepair": "Sent to repair",
+      "repairCompleted": "Repair completed",
+      "checkinDamaged": "Check-in (damaged)",
+      "noMovementHistory": "No movement history yet.",
+      "noTimelineEvents": "No events yet."
     },
     "detail": {
       "serialNumber": "Serial Number",

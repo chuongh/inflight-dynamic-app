@@ -7,12 +7,20 @@ import {
   SendToRepairModal,
   type SendToRepairFormValues,
 } from '@/components/equipment/SendToRepairModal'
+import { TrolleyTimeline } from '@/components/equipment/TrolleyTimeline'
 import {
   VENDORS,
+  type MovementEvent,
   type TrolleyRepairEntry,
   type TrolleyStatus,
   type TrolleyUnit,
 } from '@/modules/equipment/constants'
+import {
+  computeHealthScore,
+  computeMtbfDays,
+  computeReworkStats,
+  isReworkEntry,
+} from '@/modules/equipment/lib/analytics'
 import { useSendTrolleysToRepair } from '@/modules/equipment/hooks/useEquipment'
 import { DetailHero } from '@/components/patterns/DetailHero'
 import { SurfaceCard } from '@/components/patterns/SurfaceCard'
@@ -63,6 +71,15 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
       return matchedSearch && matchedVendor
     })
   }, [historySearch, vendorFilter, trolley])
+
+  const reworkMap = useMemo(() => {
+    const map = new Map<string, boolean>()
+    const history = trolley?.repairHistory ?? []
+    history.forEach((entry, index) => {
+      map.set(entry.id, isReworkEntry(history, index))
+    })
+    return map
+  }, [trolley])
 
   const repairColumns: ColumnsType<TrolleyRepairEntry> = useMemo(
     () => [
@@ -141,8 +158,23 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
         sorter: (left, right) => left.vendor.localeCompare(right.vendor),
         render: (value: string) => <span className="text-xs font-medium text-[var(--color-foreground)]">{value}</span>,
       },
+      {
+        title: t('equipment.repairColumns.quality'),
+        key: 'quality',
+        width: 110,
+        render: (_: unknown, entry: TrolleyRepairEntry) =>
+          reworkMap.get(entry.id) ? (
+            <span className="rounded-md bg-[var(--color-vj-red-50)] px-2 py-0.5 text-[11px] font-bold text-vj-red">
+              {t('equipment.repairColumns.rework')}
+            </span>
+          ) : (
+            <span className="rounded-md bg-[var(--color-vj-green-muted)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-vj-green-dark)]">
+              {t('equipment.repairColumns.pass')}
+            </span>
+          ),
+      },
     ],
-    [filteredHistory.length, formatDateDMY, t],
+    [filteredHistory.length, formatDateDMY, reworkMap, t],
   )
 
   if (!trolley) {
@@ -159,6 +191,24 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
   const avgCycle = trolley.repairs > 0 ? (trolley.daysInStatus / trolley.repairs).toFixed(1) : '—'
   const lastRepair = trolley.repairHistory[0]
   const lastRepairDate = lastRepair?.completedAt ?? lastRepair?.startedAt
+
+  const health = computeHealthScore(trolley, Date.now())
+  const mtbf = computeMtbfDays(trolley)
+  const rework = computeReworkStats(trolley)
+  const completedRepairs = trolley.repairHistory.filter((entry) => entry.completedAt != null)
+  const avgTat = completedRepairs.length
+    ? Math.round(
+        (completedRepairs.reduce(
+          (sum, entry) =>
+            sum + Math.max(1, Math.floor(((entry.completedAt ?? entry.startedAt) - entry.startedAt) / 86_400_000)),
+          0,
+        ) /
+          completedRepairs.length) *
+          10,
+      ) / 10
+    : null
+  const healthTone =
+    health >= 75 ? 'var(--color-vj-green)' : health >= 50 ? 'var(--color-vj-yellow-dark)' : 'var(--color-vj-red)'
 
   const updateUnit = (patch: Partial<TrolleyUnit>) => {
     onTrolleysChange(
@@ -246,7 +296,7 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
           <>
             <Text variant="bodySm" tone="secondary">
               {typeLabel(trolley.type)} · {trolley.manufacturer} · {trolley.serialNumber} ·{' '}
-              {trolley.partNo}
+              {trolley.partNo} · EPC {trolley.rfidEpc}
             </Text>
             <div className="mt-4 flex gap-6 border-t border-[var(--color-border)] pt-4 text-sm">
               <div>
@@ -271,6 +321,22 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
                 ) : (
                   <div className="tnum font-bold text-vj-dark">—</div>
                 )}
+              </div>
+              <div>
+                <Text variant="caption" tone="secondary">{t('equipment.columns.health')}</Text>
+                <div className="tnum font-bold" style={{ color: healthTone }}>
+                  {health}/100
+                </div>
+              </div>
+              <div>
+                <Text variant="caption" tone="secondary">{t('equipment.trolley.mtbf')}</Text>
+                <div className="tnum font-bold text-vj-dark">
+                  {mtbf ?? '—'} {t('equipment.trolley.daysUnit')}
+                </div>
+              </div>
+              <div>
+                <Text variant="caption" tone="secondary">{t('equipment.trolley.reworkRate')}</Text>
+                <div className="tnum font-bold text-vj-dark">{Math.round(rework.rate * 100)}%</div>
               </div>
             </div>
           </>
@@ -300,45 +366,37 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
 
       <SurfaceCard>
         <Tabs
-          defaultActiveKey="info"
+          defaultActiveKey="timeline"
           items={[
             {
-              key: 'info',
-              label: t('common.information'),
-              children: (
-                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {[
-                    [t('equipment.columns.partNo'), trolley.partNo],
-                    [t('equipment.detail.serialNumber'), trolley.serialNumber],
-                    [t('equipment.trolley.manufacturer'), trolley.manufacturer],
-                    [t('equipment.detail.yearOfManufacture'), String(trolley.yearOfManufacture)],
-                    [
-                      t('equipment.detail.yearOfExpiry'),
-                      trolley.yearOfExpiry ? String(trolley.yearOfExpiry) : '—',
-                    ],
-                    [t('equipment.detail.registrationLocation'), trolley.registrationLocation],
-                    [t('equipment.detail.currentStation'), trolley.station],
-                    [t('equipment.detail.repairVendor'), trolley.vendor],
-                    [
-                      t('equipment.columns.lastRepairDate'),
-                      lastRepairDate
-                        ? `${formatDateDMY(lastRepairDate)} · ${formatRelativeAgo(lastRepairDate)}`
-                        : '—',
-                    ],
-                  ].map(([label, value]) => (
-                    <div key={label}>
-                      <dt className="text-xs text-[var(--color-text-secondary)]">{label}</dt>
-                      <dd className="mt-0.5 text-sm font-medium text-vj-dark">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ),
+              key: 'timeline',
+              label: t('equipment.trolley.timeline'),
+              children: <TrolleyTimeline unit={trolley} />,
             },
             {
-              key: 'history',
+              key: 'repair',
               label: t('equipment.trolley.repairHistory'),
               children: (
                 <div className="space-y-3">
+                  <div className="flex flex-wrap gap-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] px-4 py-3">
+                    <div>
+                      <Text variant="caption" tone="secondary">{t('equipment.trolley.reworkRate')}</Text>
+                      <div className="tnum font-bold text-vj-dark">{Math.round(rework.rate * 100)}%</div>
+                    </div>
+                    <div>
+                      <Text variant="caption" tone="secondary">{t('equipment.trolley.mtbf')}</Text>
+                      <div className="tnum font-bold text-vj-dark">
+                        {mtbf ?? '—'} {t('equipment.trolley.daysUnit')}
+                      </div>
+                    </div>
+                    <div>
+                      <Text variant="caption" tone="secondary">{t('equipment.trolley.avgTat')}</Text>
+                      <div className="tnum font-bold text-vj-dark">
+                        {avgTat ?? '—'} {t('equipment.trolley.daysUnit')}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                     <Select
                       value={vendorFilter}
@@ -368,6 +426,137 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
                     }
                   />
                 </div>
+              ),
+            },
+            {
+              key: 'movement',
+              label: t('equipment.trolley.movementHistory'),
+              children: (
+                <Table<MovementEvent>
+                  rowKey="id"
+                  size="small"
+                  dataSource={trolley.movements}
+                  pagination={false}
+                  locale={{ emptyText: t('equipment.trolley.noMovementHistory') }}
+                  scroll={{ x: 'max-content' }}
+                  columns={[
+                    {
+                      title: t('equipment.trolley.time'),
+                      dataIndex: 'timestamp',
+                      defaultSortOrder: 'descend',
+                      sorter: (left, right) => left.timestamp - right.timestamp,
+                      render: (value: number) => (
+                        <span className="tnum text-xs text-[var(--color-text-secondary)]">
+                          {formatDateDMY(value)}
+                        </span>
+                      ),
+                    },
+                    {
+                      title: t('equipment.trolley.event'),
+                      key: 'event',
+                      render: (_, record) => {
+                        const damaged = record.type === 'checkin' && record.condition === 'damaged'
+                        const color = record.type === 'checkout'
+                          ? 'var(--color-text-secondary)'
+                          : damaged
+                            ? 'var(--color-vj-red)'
+                            : 'var(--color-vj-green)'
+                        return (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color }}>
+                            <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
+                            {record.type === 'checkout'
+                              ? t('equipment.checkinout.checkout')
+                              : damaged
+                                ? t('equipment.trolley.checkinDamaged')
+                                : t('equipment.checkinout.checkin')}
+                          </span>
+                        )
+                      },
+                    },
+                    {
+                      title: t('equipment.trolley.leg'),
+                      key: 'leg',
+                      render: (_, record) => (
+                        <span className="tnum text-xs text-[var(--color-text-secondary)]">
+                          {record.type === 'checkout'
+                            ? `${record.fromStation} → ${record.toStation}`
+                            : `→ ${record.station}`}
+                        </span>
+                      ),
+                    },
+                    {
+                      title: t('equipment.checkinout.flight'),
+                      dataIndex: 'flight',
+                      render: (value?: string) => (
+                        <span className="text-xs text-[var(--color-text-secondary)]">{value ?? '—'}</span>
+                      ),
+                    },
+                    {
+                      title: t('equipment.trolley.by'),
+                      dataIndex: 'actor',
+                      render: (value: string) => (
+                        <span className="text-xs font-medium text-[var(--color-foreground)]">{value}</span>
+                      ),
+                    },
+                    {
+                      title: t('equipment.checkinout.condition'),
+                      dataIndex: 'condition',
+                      render: (value: 'ok' | 'damaged') =>
+                        value === 'damaged' ? (
+                          <span className="rounded-md bg-[var(--color-vj-red-50)] px-2 py-0.5 text-[11px] font-bold text-vj-red">
+                            {t('equipment.checkinout.damaged')}
+                          </span>
+                        ) : (
+                          <span className="rounded-md bg-[var(--color-vj-green-muted)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-vj-green-dark)]">
+                            {t('equipment.checkinout.ok')}
+                          </span>
+                        ),
+                    },
+                  ]}
+                />
+              ),
+            },
+            {
+              key: 'info',
+              label: t('common.information'),
+              children: (
+                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {[
+                    [t('equipment.columns.partNo'), trolley.partNo],
+                    [t('equipment.detail.serialNumber'), trolley.serialNumber],
+                    [t('equipment.trolley.manufacturer'), trolley.manufacturer],
+                    [t('equipment.detail.yearOfManufacture'), String(trolley.yearOfManufacture)],
+                    [
+                      t('equipment.detail.yearOfExpiry'),
+                      trolley.yearOfExpiry ? String(trolley.yearOfExpiry) : '—',
+                    ],
+                    [t('equipment.detail.registrationLocation'), trolley.registrationLocation],
+                    [t('equipment.detail.currentStation'), trolley.station],
+                    [t('equipment.detail.repairVendor'), trolley.vendor],
+                    [
+                      t('equipment.columns.lastRepairDate'),
+                      lastRepairDate
+                        ? `${formatDateDMY(lastRepairDate)} · ${formatRelativeAgo(lastRepairDate)}`
+                        : '—',
+                    ],
+                    [t('equipment.columns.rfid'), trolley.rfidEpc],
+                    [
+                      t('equipment.columns.lastSeen'),
+                      `${formatRelativeAgo(trolley.lastSeenAt)} · ${trolley.lastSeenStation}`,
+                    ],
+                    [
+                      t('equipment.columns.custody'),
+                      trolley.custody
+                        ? `${trolley.custody.holder} · ${trolley.custody.flight} · ${trolley.custody.fromStation} → ${trolley.custody.toStation}`
+                        : '—',
+                    ],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <dt className="text-xs text-[var(--color-text-secondary)]">{label}</dt>
+                      <dd className="mt-0.5 text-sm font-medium text-vj-dark">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
               ),
             },
           ]}

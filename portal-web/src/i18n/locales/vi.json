@@ -245,7 +245,21 @@
       "exportHistory": "Xuất lịch sử",
       "avgRepairCycle": "Chu kỳ sửa TB",
       "daysUnit": "ngày",
-      "repairsCount": "{{count}} lần sửa"
+      "repairsCount": "{{count}} lần sửa",
+      "timeline": "Dòng thời gian",
+      "movementHistory": "Lịch sử di chuyển",
+      "mtbf": "MTBF",
+      "reworkRate": "Tỷ lệ tái hỏng",
+      "avgTat": "TAT trung bình",
+      "by": "Người thực hiện",
+      "leg": "Chặng",
+      "event": "Sự kiện",
+      "time": "Thời gian",
+      "sentToRepair": "Gửi đi sửa chữa",
+      "repairCompleted": "Đã sửa xong",
+      "checkinDamaged": "Check-in (hỏng)",
+      "noMovementHistory": "Chưa có lịch sử di chuyển.",
+      "noTimelineEvents": "Chưa có sự kiện nào."
     },
     "detail": {
       "serialNumber": "Số serial",
