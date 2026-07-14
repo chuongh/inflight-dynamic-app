@@ -1,4 +1,4 @@
-import { Alert, App as AntApp, Button, Input, Popover, Select, Space, Spin } from 'antd'
+import { Alert, App as AntApp, Button, Input, Popover, Segmented, Select, Space, Spin } from 'antd'
 import { Info, Pencil, Plus, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +21,9 @@ import { formatDateDMY } from '@/shared/utils/format'
 import { RuleCard } from './RuleCard'
 import { RuleEditorDrawer } from './RuleEditorDrawer'
 import { RulePickerModal } from './RulePickerModal'
+import { CrewMealTab } from './crew/CrewMealTab'
+
+type ConfigTab = 'commercial' | 'crew'
 
 const STATUS_DOT: Record<VersionStatus, string> = {
   active: '#16a34a',
@@ -52,6 +55,7 @@ export function ConfigPage() {
   const { data, isLoading } = useRuleConfigData()
   const saveConfig = useSaveRuleConfigData()
 
+  const [tab, setTab] = useState<ConfigTab>('commercial')
   const [viewingId, setViewingId] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
   const [workingRules, setWorkingRules] = useState<Rule[]>([])
@@ -152,6 +156,22 @@ export function ConfigPage() {
           description={t('catering.config.desc')}
         />
 
+        <div className="mt-1 mb-4">
+          <Segmented<ConfigTab>
+            value={tab}
+            onChange={(v) => setTab(v)}
+            size="large"
+            options={[
+              { value: 'commercial', label: t('catering.config.tab.commercial') },
+              { value: 'crew', label: t('catering.config.tab.crew') },
+            ]}
+          />
+        </div>
+
+        {tab === 'crew' ? (
+          <CrewMealTab />
+        ) : (
+          <>
         <div className="flex flex-col gap-4">
           {/* Version context bar */}
           <div className="border-border bg-surface flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border px-4 py-3">
@@ -267,6 +287,8 @@ export function ConfigPage() {
             </div>
           </div>
         ) : null}
+          </>
+        )}
       </div>
 
       <RuleEditorDrawer

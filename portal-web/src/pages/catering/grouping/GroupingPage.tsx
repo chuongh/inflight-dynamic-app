@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsDownUp,
+  Info,
   MapPin,
   Package,
   RefreshCw,
@@ -13,7 +14,10 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '@/components/patterns/PageHeader'
+import { useAuth } from '@/core/auth/useAuth'
+import { activeCrewMealVersion, profileFor } from '@/modules/catering/crewMeal'
 import {
   autoGroupFlights,
   isReview,
@@ -22,10 +26,14 @@ import {
   sortForReview,
   splitGroupAt,
 } from '@/modules/catering/grouping'
-import type { FlightGroup } from '@/modules/catering/groupingTypes'
+import type { FlightGroup, RawFlight } from '@/modules/catering/groupingTypes'
+import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
 import { useFlightGroups, useSaveFlightGroups } from '@/modules/catering/hooks/useFlightGroups'
+import { useMeals } from '@/modules/catering/hooks/useMeals'
+import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
+import { buildOrderLines, groupOrderFiles, makeCodeOf, orderFileId } from '@/modules/catering/orders'
+import { paths } from '@/routes/paths'
 import { GroupCard } from './GroupCard'
-import { OrderModal } from './OrderModal'
 import { UngroupedView } from './UngroupedView'
 
 type FilterKey = 'all' | 'review' | 'confirmed'
@@ -33,15 +41,20 @@ type FilterKey = 'all' | 'review' | 'confirmed'
 export function GroupingPage() {
   const { t } = useTranslation()
   const { message } = AntApp.useApp()
+  const navigate = useNavigate()
+  const { session } = useAuth()
   const { data, isLoading } = useFlightGroups()
   const saveGroups = useSaveFlightGroups()
+  const { data: ordersData } = useOrders()
+  const saveOrders = useSaveOrders()
+  const { data: catalog } = useMeals()
+  const { data: crewCfg } = useCrewMealConfigData()
 
   const [selectedDate, setSelectedDate] = useState('')
   const [filter, setFilter] = useState<FilterKey>('all')
   const [query, setQuery] = useState('')
   const [opened, setOpened] = useState<Set<string>>(new Set())
   const [editing, setEditing] = useState<Set<string>>(new Set())
-  const [orderOpen, setOrderOpen] = useState(false)
   const [running, setRunning] = useState(false)
 
   const days = useMemo(() => data?.days ?? [], [data])
@@ -82,6 +95,18 @@ export function GroupingPage() {
       d.serviceDate === day.serviceDate ? { ...d, groups: nextGroups } : d,
     )
     saveGroups.mutate({ ...data, days: nextDays }, { onSuccess: () => toast && message.success(toast) })
+  }
+
+  /** Persist an in-place edit to one of the day's ungrouped raw flights. */
+  const handleEditFlight = (index: number, patch: Partial<RawFlight>) => {
+    if (!data || !day) return
+    const nextFlights = (day.ungroupedFlights ?? []).map((f, i) =>
+      i === index ? { ...f, ...patch } : f,
+    )
+    const nextDays = data.days.map((d) =>
+      d.serviceDate === day.serviceDate ? { ...d, ungroupedFlights: nextFlights } : d,
+    )
+    saveGroups.mutate({ ...data, days: nextDays })
   }
 
   const toggle = (set: Set<string>, id: string) => {
@@ -185,6 +210,46 @@ export function GroupingPage() {
     setEditing(new Set())
   }
 
+  /** Build (or reopen) the day's supplier order from the CONFIRMED groups. */
+  const handleCreateOrder = () => {
+    if (!data || !day) return
+    const confirmed = groups.filter((g) => g.confirmed)
+    if (confirmed.length === 0) {
+      message.warning(t('catering.orders.needConfirmed'))
+      return
+    }
+    const fileId = orderFileId(data.station, day.serviceDate)
+    const files = groupOrderFiles(ordersData?.orders ?? [])
+    const existing = files.find((f) => f.fileId === fileId)
+    // A draft already open for this day → just go edit it.
+    if (existing && existing.latest.status === 'draft') {
+      navigate(paths.catering.orders.detail(fileId))
+      return
+    }
+    const crewVersion = activeCrewMealVersion(crewCfg?.versions ?? [])
+    const profile = crewVersion ? profileFor(crewVersion, 'cockpit') : undefined
+    const lines = buildOrderLines(confirmed, profile, makeCodeOf(catalog))
+    const version = (existing?.latest.version ?? 0) + 1
+    saveOrders.mutate(
+      {
+        orders: [
+          ...(ordersData?.orders ?? []),
+          {
+            id: `${fileId}-v${version}`,
+            version,
+            serviceDate: day.serviceDate,
+            station: data.station,
+            createdAt: Date.now(),
+            createdBy: session?.user.name ?? 'Catering Ops',
+            status: 'draft' as const,
+            lines,
+          },
+        ],
+      },
+      { onSuccess: () => navigate(paths.catering.orders.detail(fileId)) },
+    )
+  }
+
   if (isLoading || !data || !day) {
     return (
       <div className="page-loading">
@@ -266,6 +331,17 @@ export function GroupingPage() {
                 <span className="font-extrabold">{pendingCount}</span> {t('catering.grouping.flightsPending')}
               </span>
             )}
+            {data.nextDayCutoff ? (
+              <>
+                <span className="bg-border h-1 w-1 rounded-full" />
+                <Tooltip title={t('catering.grouping.cutoffTip', { time: data.nextDayCutoff })}>
+                  <span className="text-text-secondary inline-flex cursor-help items-center gap-1 font-semibold">
+                    <Info size={14} className="text-text-muted" />
+                    {t('catering.grouping.cutoffChip', { time: data.nextDayCutoff })}
+                  </span>
+                </Tooltip>
+              </>
+            ) : null}
           </div>
 
           {isGrouped ? (
@@ -351,6 +427,7 @@ export function GroupingPage() {
               flights={day.ungroupedFlights ?? []}
               running={running}
               onRun={runGrouping}
+              onEditFlight={handleEditFlight}
             />
           )}
         </div>
@@ -380,24 +457,18 @@ export function GroupingPage() {
                 {t('catering.grouping.confirmAll')}
               </Button>
             </Tooltip>
-            <Button type="primary" size="large" icon={<Package size={17} />} onClick={() => setOrderOpen(true)}>
+            <Button
+              type="primary"
+              size="large"
+              icon={<Package size={17} />}
+              loading={saveOrders.isPending}
+              onClick={handleCreateOrder}
+            >
               {t('catering.grouping.createOrder')}
             </Button>
           </div>
         </div>
       ) : null}
-
-      <OrderModal
-        open={orderOpen}
-        groups={groups}
-        station={data.station}
-        serviceDate={day.serviceDate}
-        onClose={() => setOrderOpen(false)}
-        onSend={() => {
-          setOrderOpen(false)
-          message.success(t('catering.grouping.orderSent'))
-        }}
-      />
     </div>
   )
 }

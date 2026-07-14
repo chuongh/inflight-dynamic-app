@@ -1,0 +1,91 @@
+{
+  "versions": [
+    {
+      "id": "m2",
+      "version": 2,
+      "status": "active",
+      "effectiveFrom": "01/07/2026",
+      "updatedBy": "Trần Minh · IFS",
+      "updatedAt": "28/06/2026",
+      "note": "Tháng 7/2026 — nới buffer sau hạ cánh buồng lái 15→20′; giữ 4 khung chuẩn.",
+      "profiles": [
+        {
+          "group": "cockpit",
+          "enabled": true,
+          "windows": [
+            { "id": "w1", "slot": "morning", "start": "06:00", "end": "08:00" },
+            { "id": "w2", "slot": "noon", "start": "11:00", "end": "13:00" },
+            { "id": "w3", "slot": "evening", "start": "17:00", "end": "19:00" },
+            { "id": "w4", "slot": "night", "start": "22:00", "end": "04:00" }
+          ],
+          "preStdMinutes": 60,
+          "postStaMinutes": 20,
+          "minOverlapMinutes": 10,
+          "countedColumns": ["cockpit", "jumpseat", "positioning"],
+          "dedupeByEmployee": true,
+          "splitByLandingDate": true
+        },
+        {
+          "group": "cabin",
+          "enabled": false,
+          "windows": [
+            { "id": "w1", "slot": "morning", "start": "06:00", "end": "08:00" },
+            { "id": "w2", "slot": "noon", "start": "11:00", "end": "13:00" },
+            { "id": "w3", "slot": "evening", "start": "17:00", "end": "19:00" },
+            { "id": "w4", "slot": "night", "start": "22:00", "end": "04:00" }
+          ],
+          "preStdMinutes": 60,
+          "postStaMinutes": 15,
+          "minOverlapMinutes": 10,
+          "countedColumns": ["cabin"],
+          "dedupeByEmployee": true,
+          "splitByLandingDate": true
+        }
+      ]
+    },
+    {
+      "id": "m1",
+      "version": 1,
+      "status": "superseded",
+      "effectiveFrom": "01/06/2026",
+      "effectiveTo": "01/07/2026",
+      "updatedBy": "Trần Minh · IFS",
+      "updatedAt": "30/05/2026",
+      "note": "Bản gốc — số hoá 4 khung giờ ăn từ quy tắc BRule-04.",
+      "profiles": [
+        {
+          "group": "cockpit",
+          "enabled": true,
+          "windows": [
+            { "id": "w1", "slot": "morning", "start": "06:00", "end": "08:00" },
+            { "id": "w2", "slot": "noon", "start": "11:00", "end": "13:00" },
+            { "id": "w3", "slot": "evening", "start": "17:00", "end": "19:00" },
+            { "id": "w4", "slot": "night", "start": "22:00", "end": "04:00" }
+          ],
+          "preStdMinutes": 60,
+          "postStaMinutes": 15,
+          "minOverlapMinutes": 10,
+          "countedColumns": ["cockpit", "jumpseat", "positioning"],
+          "dedupeByEmployee": true,
+          "splitByLandingDate": true
+        },
+        {
+          "group": "cabin",
+          "enabled": false,
+          "windows": [
+            { "id": "w1", "slot": "morning", "start": "06:00", "end": "08:00" },
+            { "id": "w2", "slot": "noon", "start": "11:00", "end": "13:00" },
+            { "id": "w3", "slot": "evening", "start": "17:00", "end": "19:00" },
+            { "id": "w4", "slot": "night", "start": "22:00", "end": "04:00" }
+          ],
+          "preStdMinutes": 60,
+          "postStaMinutes": 15,
+          "minOverlapMinutes": 10,
+          "countedColumns": ["cabin"],
+          "dedupeByEmployee": true,
+          "splitByLandingDate": true
+        }
+      ]
+    }
+  ]
+}

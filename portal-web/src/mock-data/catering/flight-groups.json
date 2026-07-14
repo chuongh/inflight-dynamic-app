@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-14-3days",
+  "seedVersion": "2026-07-15-ungrouped-detail",
   "station": "SGN",
   "stationName": "Tân Sơn Nhất",
   "days": [
@@ -273,7 +273,22 @@
           "sta": "08:10",
           "purser": "MAI 3 NGUYEN THI HONG",
           "purserCode": "3021",
-          "intl": false
+          "intl": false,
+          "premeal": 7,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "MEZA LEYVA MOISES ABRAHAM",
+              "code": "18997",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "KRISTIAN PAOLO ANG FENIX",
+              "code": "7446",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ121",
@@ -285,7 +300,22 @@
           "sta": "11:10",
           "purser": "MAI 3 NGUYEN THI HONG",
           "purserCode": "3021",
-          "intl": false
+          "intl": false,
+          "premeal": 6,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "MEZA LEYVA MOISES ABRAHAM",
+              "code": "18997",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "KRISTIAN PAOLO ANG FENIX",
+              "code": "7446",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ632",
@@ -297,7 +327,22 @@
           "sta": "13:50",
           "purser": "HANG 8 LE THU",
           "purserCode": "3088",
-          "intl": false
+          "intl": false,
+          "premeal": 16,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "PHAM VAN HAI",
+              "code": "11602",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "HIPOLITO DAVID",
+              "code": "7402",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ633",
@@ -309,7 +354,22 @@
           "sta": "15:50",
           "purser": "HANG 8 LE THU",
           "purserCode": "3088",
-          "intl": false
+          "intl": false,
+          "premeal": 16,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "PHAM VAN HAI",
+              "code": "11602",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "HIPOLITO DAVID",
+              "code": "7402",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ890",
@@ -321,7 +381,22 @@
           "sta": "12:35",
           "purser": "SON 5 TRAN VAN",
           "purserCode": "2915",
-          "intl": true
+          "intl": true,
+          "premeal": 2,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "BENJAMIN STUART SMITH",
+              "code": "14906",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "HUYNH TAN PHAT",
+              "code": "11335",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ891",
@@ -333,7 +408,22 @@
           "sta": "16:20",
           "purser": "SON 5 TRAN VAN",
           "purserCode": "2915",
-          "intl": true
+          "intl": true,
+          "premeal": 2,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "BENJAMIN STUART SMITH",
+              "code": "14906",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "HUYNH TAN PHAT",
+              "code": "11335",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ350",
@@ -345,7 +435,22 @@
           "sta": "17:20",
           "purser": "LAN 12 PHAM NGOC",
           "purserCode": "4610",
-          "intl": false
+          "intl": false,
+          "premeal": 2,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "BENJAMIN STUART SMITH",
+              "code": "14906",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "HUYNH TAN PHAT",
+              "code": "11335",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ351",
@@ -357,7 +462,22 @@
           "sta": "18:55",
           "purser": "LAN 12 PHAM NGOC",
           "purserCode": "4610",
-          "intl": false
+          "intl": false,
+          "premeal": 1,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "BENJAMIN STUART SMITH",
+              "code": "14906",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "HUYNH TAN PHAT",
+              "code": "11335",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ654",
@@ -369,7 +489,22 @@
           "sta": "21:20",
           "purser": "TUAN 7 DO MINH",
           "purserCode": "3344",
-          "intl": false
+          "intl": false,
+          "premeal": 52,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "SAPTARIZA HARRY LASMANA",
+              "code": "8684",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "YIN KOK JING",
+              "code": "9727",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ655",
@@ -381,7 +516,22 @@
           "sta": "23:15",
           "purser": "TUAN 7 DO MINH",
           "purserCode": "3344",
-          "intl": false
+          "intl": false,
+          "premeal": 52,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "SAPTARIZA HARRY LASMANA",
+              "code": "8684",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "YIN KOK JING",
+              "code": "9727",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ852",
@@ -393,7 +543,28 @@
           "sta": "14:30",
           "purser": "DUYEN 3 NGUYEN THI",
           "purserCode": "2139",
-          "intl": true
+          "intl": true,
+          "premeal": 147,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "MARC FRANCIS MEJES",
+              "code": "1733",
+              "riding": false
+            },
+            {
+              "role": "CP",
+              "name": "PANGANIBAN FERNANDEZ AMIEL",
+              "code": "1735",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "JOHN KEVIN BELTRANO",
+              "code": "4436",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ853",
@@ -405,7 +576,28 @@
           "sta": "18:00",
           "purser": "DUYEN 3 NGUYEN THI",
           "purserCode": "2139",
-          "intl": true
+          "intl": true,
+          "premeal": 147,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "MARC FRANCIS MEJES",
+              "code": "1733",
+              "riding": false
+            },
+            {
+              "role": "CP",
+              "name": "PANGANIBAN FERNANDEZ AMIEL",
+              "code": "1735",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "JOHN KEVIN BELTRANO",
+              "code": "4436",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ896",
@@ -417,7 +609,22 @@
           "sta": "06:50",
           "purser": "KHANH 9 TRAN QUOC",
           "purserCode": "2777",
-          "intl": true
+          "intl": true,
+          "premeal": 107,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "SAWANT SANDESH HARISH CHANDRA",
+              "code": "18254",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "NGUYEN THANH BINH",
+              "code": "13049",
+              "riding": false
+            }
+          ]
         },
         {
           "flightNo": "VJ085",
@@ -429,7 +636,22 @@
           "sta": "21:30",
           "purser": "HA 4 VU THANH",
           "purserCode": "2266",
-          "intl": true
+          "intl": true,
+          "premeal": 24,
+          "cockpitCrew": [
+            {
+              "role": "CP",
+              "name": "ALEXANDER RUBIS",
+              "code": "15095",
+              "riding": false
+            },
+            {
+              "role": "FO",
+              "name": "HOANG VIET DUNG",
+              "code": "7416",
+              "riding": false
+            }
+          ]
         }
       ]
     },
@@ -455,7 +677,29 @@
               "arr": "DAD",
               "std": "05:05",
               "sta": "06:20",
-              "intl": false
+              "intl": false,
+              "premeal": 7,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 10,
+                "banhMi": 4,
+                "traSua": 8
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "MEZA LEYVA MOISES ABRAHAM",
+                  "code": "18997",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "KRISTIAN PAOLO ANG FENIX",
+                  "code": "7446",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ641",
@@ -463,12 +707,179 @@
               "arr": "SGN",
               "std": "06:50",
               "sta": "08:10",
-              "intl": false
+              "intl": false,
+              "premeal": 6,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 13,
+                "banhMi": 7,
+                "traSua": 2
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "MEZA LEYVA MOISES ABRAHAM",
+                  "code": "18997",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "KRISTIAN PAOLO ANG FENIX",
+                  "code": "7446",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 13,
+          "meals": [
+            {
+              "name": "Miến xào tôm cua",
+              "count": 3
+            },
+            {
+              "name": "Mì Ý",
+              "count": 2
+            },
+            {
+              "name": "Cơm bò",
+              "count": 2
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 2
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 1
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 1
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 1
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 1
             }
           ]
         },
         {
           "id": "d3g2",
+          "aircraft": "VN-A202",
+          "aircraftType": "A321",
+          "purser": "HUNG 17 TRAN HOANG",
+          "purserCode": "5553",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ807",
+              "dep": "SGN",
+              "arr": "BKK",
+              "std": "13:15",
+              "sta": "14:45",
+              "intl": true,
+              "premeal": 16,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 35,
+                "banhMi": 11,
+                "traSua": 6
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "PHAM VAN HAI",
+                  "code": "11602",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HIPOLITO DAVID",
+                  "code": "7402",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ800",
+              "dep": "BKK",
+              "arr": "SGN",
+              "std": "15:45",
+              "sta": "17:15",
+              "intl": true,
+              "premeal": 16,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 28,
+                "banhMi": 4,
+                "traSua": 8
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "PHAM VAN HAI",
+                  "code": "11602",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HIPOLITO DAVID",
+                  "code": "7402",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 32,
+          "meals": [
+            {
+              "name": "Miến xào tôm cua",
+              "count": 8
+            },
+            {
+              "name": "Cơm bò",
+              "count": 8
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 4
+            },
+            {
+              "name": "Mì Ý",
+              "count": 3
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 2
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 2
+            },
+            {
+              "name": "Xôi mặn",
+              "count": 2
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 2
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "d3g3",
           "aircraft": "VN-A202",
           "aircraftType": "A321",
           "purser": "THY 7 TRAN HUYNH",
@@ -483,7 +894,29 @@
               "arr": "BMV",
               "std": "17:55",
               "sta": "18:55",
-              "intl": false
+              "intl": false,
+              "premeal": 2,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 12,
+                "banhMi": 6,
+                "traSua": 10
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BENJAMIN STUART SMITH",
+                  "code": "14906",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TAN PHAT",
+                  "code": "11335",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ353",
@@ -491,7 +924,29 @@
               "arr": "SGN",
               "std": "19:25",
               "sta": "20:25",
-              "intl": false
+              "intl": false,
+              "premeal": 2,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 13,
+                "banhMi": 7,
+                "traSua": 2
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BENJAMIN STUART SMITH",
+                  "code": "14906",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TAN PHAT",
+                  "code": "11335",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ652",
@@ -499,7 +954,29 @@
               "arr": "DAD",
               "std": "21:10",
               "sta": "22:30",
-              "intl": false
+              "intl": false,
+              "premeal": 2,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 15,
+                "banhMi": 9,
+                "traSua": 4
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BENJAMIN STUART SMITH",
+                  "code": "14906",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TAN PHAT",
+                  "code": "11335",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ631",
@@ -507,34 +984,61 @@
               "arr": "SGN",
               "std": "23:00",
               "sta": "00:20",
-              "intl": false
+              "intl": false,
+              "staNextDay": true,
+              "premeal": 1,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 12,
+                "banhMi": 6,
+                "traSua": 10
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BENJAMIN STUART SMITH",
+                  "code": "14906",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TAN PHAT",
+                  "code": "11335",
+                  "riding": false
+                }
+              ]
             }
-          ]
-        },
-        {
-          "id": "d3g3",
-          "aircraft": "VN-A578",
-          "aircraftType": "A321",
-          "purser": "CHUC 1 NGO TRAN KHANH",
-          "purserCode": "7511",
-          "confidence": "high",
-          "confirmed": false,
-          "legs": [
+          ],
+          "premealTotal": 7,
+          "meals": [
             {
-              "flightNo": "VJ893",
-              "dep": "SGN",
-              "arr": "DPS",
-              "std": "08:45",
-              "sta": "13:35",
-              "intl": true
+              "name": "Mì Ý",
+              "count": 1
             },
             {
-              "flightNo": "VJ894",
-              "dep": "DPS",
-              "arr": "SGN",
-              "std": "14:35",
-              "sta": "17:25",
-              "intl": true
+              "name": "Miến xào tôm cua",
+              "count": 1
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 1
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 1
+            },
+            {
+              "name": "Cơm bò",
+              "count": 1
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 1
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 1
             }
           ]
         },
@@ -553,7 +1057,29 @@
               "arr": "KUL",
               "std": "09:30",
               "sta": "12:35",
-              "intl": true
+              "intl": true,
+              "premeal": 52,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 35,
+                "banhMi": 11,
+                "traSua": 6
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SAPTARIZA HARRY LASMANA",
+                  "code": "8684",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "YIN KOK JING",
+                  "code": "9727",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ826",
@@ -561,39 +1087,73 @@
               "arr": "SGN",
               "std": "13:35",
               "sta": "14:20",
-              "intl": true
+              "intl": true,
+              "premeal": 52,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 36,
+                "banhMi": 12,
+                "traSua": 7
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SAPTARIZA HARRY LASMANA",
+                  "code": "8684",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "YIN KOK JING",
+                  "code": "9727",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 104,
+          "meals": [
+            {
+              "name": "Mì Ý",
+              "count": 83
+            },
+            {
+              "name": "Miến xào tôm cua",
+              "count": 5
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 3
+            },
+            {
+              "name": "Cơm bò",
+              "count": 3
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 3
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 2
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 2
+            },
+            {
+              "name": "Cơm Basmati cà ri chay",
+              "count": 2
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 1
             }
           ]
         },
         {
           "id": "d3g5",
-          "aircraft": "VN-A532",
-          "aircraftType": "A321",
-          "purser": "TRA 4 NGO THI KHANH",
-          "purserCode": "7955",
-          "confidence": "high",
-          "confirmed": false,
-          "legs": [
-            {
-              "flightNo": "VJ858",
-              "dep": "SGN",
-              "arr": "MNL",
-              "std": "22:25",
-              "sta": "02:10",
-              "intl": true
-            },
-            {
-              "flightNo": "VJ859",
-              "dep": "MNL",
-              "arr": "SGN",
-              "std": "03:00",
-              "sta": "04:35",
-              "intl": true
-            }
-          ]
-        },
-        {
-          "id": "d3g6",
           "aircraft": "VN-A535",
           "aircraftType": "A321",
           "purser": "NGAN 16 TRAN THI KIM",
@@ -607,7 +1167,35 @@
               "arr": "BOM",
               "std": "19:10",
               "sta": "22:45",
-              "intl": true
+              "intl": true,
+              "premeal": 147,
+              "cockpit": 3,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 39,
+                "banhMi": 15,
+                "traSua": 10
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "MARC FRANCIS MEJES",
+                  "code": "1733",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "PANGANIBAN FERNANDEZ AMIEL",
+                  "code": "1735",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "JOHN KEVIN BELTRANO",
+                  "code": "4436",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ884",
@@ -615,56 +1203,231 @@
               "arr": "SGN",
               "std": "23:45",
               "sta": "06:45",
-              "intl": true
+              "intl": true,
+              "staNextDay": true,
+              "premeal": 147,
+              "cockpit": 3,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 40,
+                "banhMi": 4,
+                "traSua": 2
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "MARC FRANCIS MEJES",
+                  "code": "1733",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "PANGANIBAN FERNANDEZ AMIEL",
+                  "code": "1735",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "JOHN KEVIN BELTRANO",
+                  "code": "4436",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 294,
+          "meals": [
+            {
+              "name": "Cơm Basmati cà ri chay",
+              "count": 131
+            },
+            {
+              "name": "Khoai viên chay vị Ấn và bánh Paratha",
+              "count": 75
+            },
+            {
+              "name": "Cơm cà ri gà",
+              "count": 62
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 24
+            },
+            {
+              "name": "Cơm cà ri cá",
+              "count": 1
+            },
+            {
+              "name": "Soda Dâu + Macca",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "d3g6",
+          "aircraft": "VN-A578",
+          "aircraftType": "A321",
+          "purser": "QUYNH 4 NGUYEN NHU",
+          "purserCode": "4269",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ868",
+              "dep": "SGN",
+              "arr": "PUS",
+              "std": "00:05",
+              "sta": "06:55",
+              "intl": true,
+              "stdNextDay": true,
+              "staNextDay": true,
+              "premeal": 107,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 42,
+                "banhMi": 6,
+                "traSua": 4
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SAWANT SANDESH HARISH CHANDRA",
+                  "code": "18254",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "NGUYEN THANH BINH",
+                  "code": "13049",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 107,
+          "meals": [
+            {
+              "name": "Cơm Basmati cà ri chay",
+              "count": 35
+            },
+            {
+              "name": "Khoai viên chay vị Ấn và bánh Paratha",
+              "count": 23
+            },
+            {
+              "name": "Cơm cà ri gà",
+              "count": 14
+            },
+            {
+              "name": "Miến xào tôm cua",
+              "count": 7
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 7
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 5
+            },
+            {
+              "name": "Mì Ý",
+              "count": 4
+            },
+            {
+              "name": "Xôi mặn",
+              "count": 4
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 2
+            },
+            {
+              "name": "Cơm bò",
+              "count": 2
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 2
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "id": "d3g13",
+          "aircraft": "VN-A578",
+          "aircraftType": "A321",
+          "purser": "CHUC 1 NGO TRAN KHANH",
+          "purserCode": "7511",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ893",
+              "dep": "SGN",
+              "arr": "DPS",
+              "std": "08:45",
+              "sta": "13:35",
+              "intl": true,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 40,
+                "banhMi": 4,
+                "traSua": 2
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "DIDI ADITYAWARMAN",
+                  "code": "6514",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "LUU DUC NAM",
+                  "code": "9659",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ894",
+              "dep": "DPS",
+              "arr": "SGN",
+              "std": "14:35",
+              "sta": "17:25",
+              "intl": true,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 41,
+                "banhMi": 5,
+                "traSua": 3
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "DIDI ADITYAWARMAN",
+                  "code": "6514",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "LUU DUC NAM",
+                  "code": "9659",
+                  "riding": false
+                }
+              ]
             }
           ]
         },
         {
           "id": "d3g7",
-          "aircraft": "VN-A552",
-          "aircraftType": "A321",
-          "purser": "NGUYEN 17 HUYNH MY",
-          "purserCode": "10379",
-          "confidence": "mid",
-          "confirmed": false,
-          "reviewNote": "Chặng giữa dừng HAN (SGN→DAD→HAN→DAD→SGN) — bất thường cho vòng bay từ SGN. Xác nhận lại toàn bộ có cùng một nhóm không.",
-          "legs": [
-            {
-              "flightNo": "VJ634",
-              "dep": "SGN",
-              "arr": "DAD",
-              "std": "10:50",
-              "sta": "12:15",
-              "intl": false
-            },
-            {
-              "flightNo": "VJ1504",
-              "dep": "DAD",
-              "arr": "HAN",
-              "std": "12:45",
-              "sta": "14:05",
-              "intl": false
-            },
-            {
-              "flightNo": "VJ1505",
-              "dep": "HAN",
-              "arr": "DAD",
-              "std": "14:40",
-              "sta": "16:00",
-              "intl": false
-            },
-            {
-              "flightNo": "VJ637",
-              "dep": "DAD",
-              "arr": "SGN",
-              "std": "16:40",
-              "sta": "18:00",
-              "intl": false
-            }
-          ]
-        },
-        {
-          "id": "d3g8",
           "aircraft": "VN-A649",
           "aircraftType": "A321",
           "purser": "LY 6 NGUYEN HUYNH",
@@ -679,7 +1442,29 @@
               "arr": "DAD",
               "std": "05:20",
               "sta": "06:40",
-              "intl": false
+              "intl": false,
+              "premeal": 24,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 12,
+                "banhMi": 6,
+                "traSua": 10
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "ALEXANDER RUBIS",
+                  "code": "15095",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HOANG VIET DUNG",
+                  "code": "7416",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ625",
@@ -687,7 +1472,29 @@
               "arr": "SGN",
               "std": "07:10",
               "sta": "08:30",
-              "intl": false
+              "intl": false,
+              "premeal": 24,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 15,
+                "banhMi": 9,
+                "traSua": 4
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "ALEXANDER RUBIS",
+                  "code": "15095",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HOANG VIET DUNG",
+                  "code": "7416",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ630",
@@ -695,7 +1502,29 @@
               "arr": "DAD",
               "std": "09:05",
               "sta": "10:30",
-              "intl": false
+              "intl": false,
+              "premeal": 24,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 11,
+                "banhMi": 5,
+                "traSua": 9
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "ALEXANDER RUBIS",
+                  "code": "15095",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HOANG VIET DUNG",
+                  "code": "7416",
+                  "riding": false
+                }
+              ]
             },
             {
               "flightNo": "VJ629",
@@ -703,7 +1532,263 @@
               "arr": "SGN",
               "std": "11:00",
               "sta": "12:25",
-              "intl": false
+              "intl": false,
+              "premeal": 23,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 19,
+                "banhMi": 13,
+                "traSua": 8
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "ALEXANDER RUBIS",
+                  "code": "15095",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HOANG VIET DUNG",
+                  "code": "7416",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 95,
+          "meals": [
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 48
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 12
+            },
+            {
+              "name": "Cơm bò",
+              "count": 6
+            },
+            {
+              "name": "Mì Ý",
+              "count": 4
+            },
+            {
+              "name": "Miến xào tôm cua",
+              "count": 4
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 4
+            },
+            {
+              "name": "Xôi mặn",
+              "count": 4
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 3
+            },
+            {
+              "name": "Xôi khúc chả chiên",
+              "count": 3
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 3
+            },
+            {
+              "name": "Bánh chưng chà bông",
+              "count": 2
+            },
+            {
+              "name": "Bia + Khô gà + snack chả giò",
+              "count": 1
+            },
+            {
+              "name": "Soda Dâu + Macca",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "d3g8",
+          "aircraft": "VN-A641",
+          "aircraftType": "A321",
+          "purser": "DUC 3 NGUYEN PHAN DUY",
+          "purserCode": "1032",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Hành trình 4 chặng qua HAN rồi DAD trên cùng tàu VN-A641. Xác nhận toàn bộ là một nhóm.",
+          "legs": [
+            {
+              "flightNo": "VJ126",
+              "dep": "SGN",
+              "arr": "HAN",
+              "std": "07:30",
+              "sta": "09:40",
+              "intl": false,
+              "premeal": 18,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 11,
+                "banhMi": 5,
+                "traSua": 9
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "LE HOANG MINH",
+                  "code": "14907",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "JENNIFER KIM HUI",
+                  "code": "17393",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ131",
+              "dep": "HAN",
+              "arr": "SGN",
+              "std": "10:15",
+              "sta": "12:25",
+              "intl": false,
+              "premeal": 17,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 7,
+                "banhMi": 13,
+                "traSua": 5
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "LE HOANG MINH",
+                  "code": "14907",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "JENNIFER KIM HUI",
+                  "code": "17393",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ638",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "13:30",
+              "sta": "14:50",
+              "intl": false,
+              "premeal": 17,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 19,
+                "banhMi": 13,
+                "traSua": 8
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "LE HOANG MINH",
+                  "code": "14907",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "JENNIFER KIM HUI",
+                  "code": "17393",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ635",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "15:20",
+              "sta": "16:40",
+              "intl": false,
+              "premeal": 17,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 16,
+                "banhMi": 10,
+                "traSua": 5
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "LE HOANG MINH",
+                  "code": "14907",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "JENNIFER KIM HUI",
+                  "code": "17393",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 69,
+          "meals": [
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 25
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 11
+            },
+            {
+              "name": "Cơm bò",
+              "count": 7
+            },
+            {
+              "name": "Miến xào tôm cua",
+              "count": 6
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 4
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 4
+            },
+            {
+              "name": "Mì Ý",
+              "count": 3
+            },
+            {
+              "name": "Xôi mặn",
+              "count": 3
+            },
+            {
+              "name": "Bánh chưng chà bông",
+              "count": 2
+            },
+            {
+              "name": "Xôi khúc chả chiên",
+              "count": 2
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 2
             }
           ]
         },
@@ -711,27 +1796,713 @@
           "id": "d3g9",
           "aircraft": "VN-A653",
           "aircraftType": "A321",
-          "purser": "VY 61 VU THI PHUONG",
-          "purserCode": "4624",
+          "purser": "THANH 31 LE KE",
+          "purserCode": "10300",
           "confidence": "high",
           "confirmed": false,
           "legs": [
             {
-              "flightNo": "VJ822",
+              "flightNo": "VJ849",
               "dep": "SGN",
-              "arr": "NRT",
-              "std": "23:35",
-              "sta": "07:55",
-              "intl": true
+              "arr": "DPS",
+              "std": "07:55",
+              "sta": "12:55",
+              "intl": true,
+              "premeal": 35,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 41,
+                "banhMi": 5,
+                "traSua": 3
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SUGIANTO",
+                  "code": "16776",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HWANG TING CHUN",
+                  "code": "7421",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ848",
+              "dep": "DPS",
+              "arr": "SGN",
+              "std": "14:00",
+              "sta": "16:50",
+              "intl": true,
+              "premeal": 34,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 40,
+                "banhMi": 4,
+                "traSua": 2
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SUGIANTO",
+                  "code": "16776",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HWANG TING CHUN",
+                  "code": "7421",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 69,
+          "meals": [
+            {
+              "name": "Cơm Basmati cà ri chay",
+              "count": 20
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 11
+            },
+            {
+              "name": "Khoai viên chay vị Ấn và bánh Paratha",
+              "count": 11
+            },
+            {
+              "name": "Cơm cà ri gà",
+              "count": 7
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 5
+            },
+            {
+              "name": "Cơm bò",
+              "count": 4
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 3
+            },
+            {
+              "name": "Mì Ý",
+              "count": 2
+            },
+            {
+              "name": "Miến xào tôm cua",
+              "count": 2
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 2
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 2
             }
           ]
         },
         {
           "id": "d3g10",
+          "aircraft": "VN-A580",
+          "aircraftType": "A321",
+          "purser": "NGA 3 LU THI NGOC",
+          "purserCode": "2573",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ862",
+              "dep": "SGN",
+              "arr": "ICN",
+              "std": "02:35",
+              "sta": "09:40",
+              "intl": true,
+              "stdNextDay": true,
+              "staNextDay": true,
+              "premeal": 69,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 36,
+                "banhMi": 12,
+                "traSua": 7
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "LUU HONG HAI",
+                  "code": "3802",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAN GIA HUY",
+                  "code": "13935",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ863",
+              "dep": "ICN",
+              "arr": "SGN",
+              "std": "11:40",
+              "sta": "14:55",
+              "intl": true,
+              "stdNextDay": true,
+              "staNextDay": true,
+              "premeal": 68,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 37,
+                "banhMi": 13,
+                "traSua": 8
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "PRABOWO MAHENDRA",
+                  "code": "19249",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAN NGOC VU THIEN",
+                  "code": "13953",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 137,
+          "meals": [
+            {
+              "name": "Miến xào tôm cua",
+              "count": 51
+            },
+            {
+              "name": "Mì Ý",
+              "count": 49
+            },
+            {
+              "name": "Xôi mặn",
+              "count": 7
+            },
+            {
+              "name": "Cơm bò",
+              "count": 6
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 6
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 5
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 5
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 3
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 3
+            },
+            {
+              "name": "Cơm Basmati cà ri chay",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "id": "d3g11",
+          "aircraft": "VN-A526",
+          "aircraftType": "A321",
+          "purser": "SON 11 LE HONG",
+          "purserCode": "7007",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ886",
+              "dep": "SGN",
+              "arr": "KHH",
+              "std": "07:30",
+              "sta": "11:40",
+              "intl": true,
+              "premeal": 41,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 42,
+                "banhMi": 6,
+                "traSua": 4
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "JONATHAN ALARCADO BARTOLOME",
+                  "code": "3506",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "NGUYEN NHA UYEN",
+                  "code": "11597",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ885",
+              "dep": "KHH",
+              "arr": "SGN",
+              "std": "12:40",
+              "sta": "14:50",
+              "intl": true,
+              "premeal": 40,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 41,
+                "banhMi": 5,
+                "traSua": 3
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "JONATHAN ALARCADO BARTOLOME",
+                  "code": "3506",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "NGUYEN NHA UYEN",
+                  "code": "11597",
+                  "riding": false
+                }
+              ]
+            }
+          ],
+          "premealTotal": 81,
+          "meals": [
+            {
+              "name": "Miến xào tôm cua",
+              "count": 37
+            },
+            {
+              "name": "Mì Ý",
+              "count": 16
+            },
+            {
+              "name": "Cơm bò",
+              "count": 8
+            },
+            {
+              "name": "Cơm chiên Thái",
+              "count": 5
+            },
+            {
+              "name": "Bún xào Singapore",
+              "count": 4
+            },
+            {
+              "name": "Xôi mặn",
+              "count": 4
+            },
+            {
+              "name": "Bánh mì Viêt Nam",
+              "count": 4
+            },
+            {
+              "name": "Cơm chiên dương châu chay",
+              "count": 2
+            },
+            {
+              "name": "Cơm dừa Malaysia",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "d3g12",
+          "aircraft": "VN-A580",
+          "aircraftType": "A321",
+          "purser": "TRANG 22 TRAN THI HUYEN",
+          "purserCode": "2984",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ278",
+              "dep": "SGN",
+              "arr": "HPH",
+              "std": "13:55",
+              "sta": "15:55",
+              "intl": false,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 19,
+                "banhMi": 13,
+                "traSua": 8
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SHAHDADPURI SATYA",
+                  "code": "18372",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAM HUY THANH",
+                  "code": "9681",
+                  "riding": false
+                }
+              ]
+            },
+            {
+              "flightNo": "VJ279",
+              "dep": "HPH",
+              "arr": "SGN",
+              "std": "16:25",
+              "sta": "18:25",
+              "intl": false,
+              "cockpit": 2,
+              "extra": 0,
+              "salesQuota": {
+                "hotmeal": 20,
+                "banhMi": 14,
+                "traSua": 9
+              },
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SHAHDADPURI SATYA",
+                  "code": "18372",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAM HUY THANH",
+                  "code": "9681",
+                  "riding": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "serviceDate": "15/07/2026",
+      "serviceWeekday": "Thứ Tư",
+      "status": "grouped",
+      "aiGroupedAt": "09:30 · 14/07",
+      "aiAccuracy": 90,
+      "groups": [
+        {
+          "id": "d4g1",
+          "aircraft": "VN-A200",
+          "aircraftType": "A321",
+          "purser": "DAT 3 NGUYEN TUAN",
+          "purserCode": "2122",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ1805",
+              "dep": "SGN",
+              "arr": "AMD",
+              "std": "19:10",
+              "sta": "22:50",
+              "intl": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "AMIT PUSHKAR",
+                  "code": "16445",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "PEDRO RUSSO BENZINHO BAPTISTA",
+                  "code": "17430",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "MARK PUI WEE SHENG",
+                  "code": "6250",
+                  "riding": false
+                }
+              ],
+              "cockpit": 3,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ1806",
+              "dep": "AMD",
+              "arr": "SGN",
+              "std": "23:50",
+              "sta": "06:30",
+              "intl": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "AMIT PUSHKAR",
+                  "code": "16445",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "PEDRO RUSSO BENZINHO BAPTISTA",
+                  "code": "17430",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "MARK PUI WEE SHENG",
+                  "code": "6250",
+                  "riding": false
+                }
+              ],
+              "cockpit": 3,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g2",
+          "aircraft": "VN-A526",
+          "aircraftType": "A321",
+          "purser": "HIEU 25 NGUYEN TRUNG",
+          "purserCode": "10644",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ895",
+              "dep": "SGN",
+              "arr": "DEL",
+              "std": "19:25",
+              "sta": "22:55",
+              "intl": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SHKLYAR OLEG",
+                  "code": "12179",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "YUDHA SAKTI HENDRIAN",
+                  "code": "15240",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "TRAN ANH TU",
+                  "code": "11337",
+                  "riding": false
+                }
+              ],
+              "cockpit": 3,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ896",
+              "dep": "DEL",
+              "arr": "SGN",
+              "std": "00:05",
+              "sta": "06:35",
+              "intl": true,
+              "stdNextDay": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "SHKLYAR OLEG",
+                  "code": "12179",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "YUDHA SAKTI HENDRIAN",
+                  "code": "15240",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "TRAN ANH TU",
+                  "code": "11337",
+                  "riding": false
+                }
+              ],
+              "cockpit": 3,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g3",
+          "aircraft": "VN-A640",
+          "aircraftType": "A321",
+          "purser": "TIN 1 LAI TRUNG",
+          "purserCode": "4763",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ3900",
+              "dep": "SGN",
+              "arr": "PVG",
+              "std": "20:00",
+              "sta": "01:00",
+              "intl": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "DIMAPILIS CHESTER",
+                  "code": "16438",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "NGUYEN HONG CHIEN",
+                  "code": "15410",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TRONG HIEU",
+                  "code": "16113",
+                  "riding": false
+                }
+              ],
+              "cockpit": 3,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ3901",
+              "dep": "PVG",
+              "arr": "SGN",
+              "std": "02:15",
+              "sta": "05:25",
+              "intl": true,
+              "stdNextDay": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "DIMAPILIS CHESTER",
+                  "code": "16438",
+                  "riding": false
+                },
+                {
+                  "role": "CP",
+                  "name": "NGUYEN HONG CHIEN",
+                  "code": "15410",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TRONG HIEU",
+                  "code": "16113",
+                  "riding": false
+                }
+              ],
+              "cockpit": 3,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g4",
+          "aircraft": "VN-A629",
+          "aircraftType": "A321",
+          "purser": "TUYEN 4 TRAN PHUONG",
+          "purserCode": "6692",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ858",
+              "dep": "SGN",
+              "arr": "MNL",
+              "std": "22:25",
+              "sta": "02:10",
+              "intl": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BYUNGSEUNG LEE",
+                  "code": "4369",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TAN PHAT",
+                  "code": "11335",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ859",
+              "dep": "MNL",
+              "arr": "SGN",
+              "std": "03:00",
+              "sta": "04:35",
+              "intl": true,
+              "stdNextDay": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BYUNGSEUNG LEE",
+                  "code": "4369",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HUYNH TAN PHAT",
+                  "code": "11335",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g5",
           "aircraft": "VN-A817",
           "aircraftType": "A330",
-          "purser": "THINH 3 NGUYEN TRAN DUC",
-          "purserCode": "3832",
+          "purser": "HUYEN 1 PHU LY MINH",
+          "purserCode": "58",
           "confidence": "high",
           "confirmed": false,
           "legs": [
@@ -741,30 +2512,446 @@
               "arr": "SYD",
               "std": "19:55",
               "sta": "08:20",
-              "intl": true
+              "intl": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "FEBRIAN PRAWIANTO EDI PRASETYO",
+                  "code": "11604",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "VU TUAN ANH",
+                  "code": "9690",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
             }
           ]
         },
         {
-          "id": "d3g11",
-          "aircraft": "VN-A820",
-          "aircraftType": "A330",
-          "purser": "HIEN 5 PHAM THI THANH",
-          "purserCode": "1438",
+          "id": "d4g6",
+          "aircraft": "VN-A607",
+          "aircraftType": "A321",
+          "purser": "TU 2 DAO PHAN MINH",
+          "purserCode": "414",
           "confidence": "high",
           "confirmed": false,
           "legs": [
             {
-              "flightNo": "VJ081",
+              "flightNo": "VJ822",
               "dep": "SGN",
-              "arr": "MEL",
-              "std": "11:10",
-              "sta": "23:35",
-              "intl": true
+              "arr": "NRT",
+              "std": "23:35",
+              "sta": "07:55",
+              "intl": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "DUONG CHAU PHAT",
+                  "code": "9682",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "TRAN DUC THINH",
+                  "code": "13070",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g7",
+          "aircraft": "VN-A648",
+          "aircraftType": "A321",
+          "purser": "KIEN 4 TRAN TRUNG",
+          "purserCode": "5306",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ168",
+              "dep": "SGN",
+              "arr": "HAN",
+              "std": "23:00",
+              "sta": "01:10",
+              "intl": false,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "ALEKSEEV PETR",
+                  "code": "18565",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "HO MINH QUANG",
+                  "code": "11346",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g8",
+          "aircraft": "VN-A532",
+          "aircraftType": "A321",
+          "purser": "THANH 28 LE TRUNG",
+          "purserCode": "8893",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Hành trình 4 chặng qua 2 vòng (THD rồi DAD), kết thúc sau nửa đêm. Kiểm tra có nên tách nhóm.",
+          "legs": [
+            {
+              "flightNo": "VJ254",
+              "dep": "SGN",
+              "arr": "THD",
+              "std": "16:20",
+              "sta": "18:20",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "KRISTANTO ANGGORO",
+                  "code": "18164",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "LE THANH HAI",
+                  "code": "15949",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ255",
+              "dep": "THD",
+              "arr": "SGN",
+              "std": "18:50",
+              "sta": "20:50",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "KRISTANTO ANGGORO",
+                  "code": "18164",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "LE THANH HAI",
+                  "code": "15949",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ650",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "21:50",
+              "sta": "23:10",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "KRISTANTO ANGGORO",
+                  "code": "18164",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "LE THANH HAI",
+                  "code": "15949",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ653",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "23:40",
+              "sta": "01:00",
+              "intl": false,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "KRISTANTO ANGGORO",
+                  "code": "18164",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "LE THANH HAI",
+                  "code": "15949",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g9",
+          "aircraft": "VN-A687",
+          "aircraftType": "A321",
+          "purser": "KHOA 12 LY NHAT DANG",
+          "purserCode": "7260",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Chặng giữa HAN→DAD→HAN bất thường cho vòng bay từ SGN, về sau nửa đêm. Xác nhận là một nhóm.",
+          "legs": [
+            {
+              "flightNo": "VJ144",
+              "dep": "SGN",
+              "arr": "HAN",
+              "std": "15:55",
+              "sta": "18:05",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "TRAN DUC MANH TUNG",
+                  "code": "7991",
+                  "riding": false
+                },
+                {
+                  "role": "CP-Pax",
+                  "name": "VU NGOC DUONG",
+                  "code": "7363",
+                  "riding": true
+                },
+                {
+                  "role": "FO",
+                  "name": "NGUYEN HOANG LONG",
+                  "code": "3564",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 1
+            },
+            {
+              "flightNo": "VJ519",
+              "dep": "HAN",
+              "arr": "DAD",
+              "std": "19:25",
+              "sta": "20:45",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "TRAN DUC MANH TUNG",
+                  "code": "7991",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "NGUYEN HOANG LONG",
+                  "code": "3564",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ522",
+              "dep": "DAD",
+              "arr": "HAN",
+              "std": "21:15",
+              "sta": "22:35",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "TRAN DUC MANH TUNG",
+                  "code": "7991",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "NGUYEN HOANG LONG",
+                  "code": "3564",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ169",
+              "dep": "HAN",
+              "arr": "SGN",
+              "std": "23:25",
+              "sta": "01:35",
+              "intl": false,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "TRAN DUC MANH TUNG",
+                  "code": "7991",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "NGUYEN HOANG LONG",
+                  "code": "3564",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g10",
+          "aircraft": "VN-A693",
+          "aircraftType": "A321",
+          "purser": "HUNG 17 TRAN HOANG",
+          "purserCode": "5553",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Nối chặng nội địa PQC rồi bay quốc tế ICN qua đêm — kiểm tra có phải một nhóm chuẩn bị suất.",
+          "legs": [
+            {
+              "flightNo": "VJ325",
+              "dep": "SGN",
+              "arr": "PQC",
+              "std": "17:30",
+              "sta": "18:35",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BUI CONG THANH",
+                  "code": "16868",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAN QUANG HAI",
+                  "code": "13046",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ978",
+              "dep": "PQC",
+              "arr": "ICN",
+              "std": "19:35",
+              "sta": "03:00",
+              "intl": true,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "BUI CONG THANH",
+                  "code": "16868",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAN QUANG HAI",
+                  "code": "13046",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            }
+          ]
+        },
+        {
+          "id": "d4g11",
+          "aircraft": "VN-A635",
+          "aircraftType": "A321",
+          "purser": "NGOC 4 VO HOANG NHU",
+          "purserCode": "730",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ652",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "21:10",
+              "sta": "22:30",
+              "intl": false,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "REYMOND CABALLERO TJELTA",
+                  "code": "2086",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAM NGUYEN DANG KHOA",
+                  "code": "17610",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
+            },
+            {
+              "flightNo": "VJ631",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "23:00",
+              "sta": "00:20",
+              "intl": false,
+              "staNextDay": true,
+              "cockpitCrew": [
+                {
+                  "role": "CP",
+                  "name": "REYMOND CABALLERO TJELTA",
+                  "code": "2086",
+                  "riding": false
+                },
+                {
+                  "role": "FO",
+                  "name": "PHAM NGUYEN DANG KHOA",
+                  "code": "17610",
+                  "riding": false
+                }
+              ],
+              "cockpit": 2,
+              "extra": 0
             }
           ]
         }
       ]
     }
-  ]
+  ],
+  "nextDayCutoff": "07:00"
 }

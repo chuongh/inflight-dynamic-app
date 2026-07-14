@@ -1,0 +1,27 @@
+{
+  "meals": [
+    { "name": "Bia + Khô gà + snack chả giò", "description": "Bia + Khô gà + snack chả giò", "pbmlCodes": ["BRCP"] },
+    { "name": "Bánh chưng chà bông", "description": "Bánh chưng (Vietnamese steamed cake)", "pbmlCodes": ["HMBC", "BRSC"] },
+    { "name": "Bánh mì Việt Nam", "description": "Bánh mì (Bread)", "pbmlCodes": ["BRBM", "BCBM"] },
+    { "name": "Bún xào chay Business", "description": "Bún xào chay Business", "pbmlCodes": ["BRDS", "VESB"] },
+    { "name": "Bún xào Singapore", "description": "Bún xào Singapore (Singapore noodle)", "pbmlCodes": ["BRBX", "BCBX"] },
+    { "name": "Combo Miến xào cua và nước suối (free for China)", "description": "Combo Crab and Shrimp Glass Noodles and Water (Free for China)", "pbmlCodes": ["BRCN"] },
+    { "name": "Combo snack", "description": "Snack for prebook meal of short route", "pbmlCodes": ["SNACK"] },
+    { "name": "Cơm Basmati cà ri chay", "description": "Combo Cơm Basmati cà ri chay", "pbmlCodes": ["GDSM01", "BRIB", "BCIB", "EXIB"] },
+    { "name": "Cơm basmati cà ri chay Business", "description": "", "pbmlCodes": ["BRDT"] },
+    { "name": "Cơm bò", "description": "Cơm bò Lotteria (Rice with Beef)", "pbmlCodes": ["HMCB", "BRCB"] },
+    { "name": "Cơm chiên dương châu chay", "description": "Combo Vegetarian Yang Chow Fried Rice + Water + Biscuit", "pbmlCodes": ["GDSM03", "BRCC", "BCCC", "BRDQ", "EXCC"] },
+    { "name": "Cơm chiên Thái", "description": "Cơm chiên Thái (Thai rice)", "pbmlCodes": ["VZCC", "VZCI", "BRTH", "BCTH", "GDSM06", "EXTH"] },
+    { "name": "Cơm cà ri cá", "description": "Combo Cơm cà ri cá", "pbmlCodes": ["BRIC", "GDSM05"] },
+    { "name": "Cơm cà ri gà", "description": "Combo Cơm cà ri gà", "pbmlCodes": ["BRIG", "BCIG", "GDSM04", "EXIG"] },
+    { "name": "Cơm dừa Malaysia", "description": "Cơm dừa Malaysia (Nasi Lemark)", "pbmlCodes": ["BCCD", "BRCD", "EXCD"] },
+    { "name": "Happy meal (Mỳ ý + Bánh que + Coca)", "description": "Mỳ ý + Bánh quy socola + Coca", "pbmlCodes": ["BRHP"] },
+    { "name": "Khoai viên chay vị Ấn và bánh Paratha", "description": "Combo Khoai viên chay vị Ấn và bánh Paratha", "pbmlCodes": ["GDSM02", "BRIM", "BRDR", "EXIM"] },
+    { "name": "Miến xào tôm cua", "description": "Miến (Crab&shrimp stir fried noodle)", "pbmlCodes": ["BRMX", "BCMX"] },
+    { "name": "Mì Ý", "description": "Mì Ý (Beef bolognese)", "pbmlCodes": ["BRMY", "BCMY", "GDSM07", "EXMY"] },
+    { "name": "Soda Dâu + Macca", "description": "Soda Dâu + Macca", "pbmlCodes": ["BRSM"] },
+    { "name": "VCS Vegetarian meal box", "description": "VCS Vegetarian meal box", "pbmlCodes": ["BRVM"] },
+    { "name": "Xôi khúc chả chiên", "description": "Xôi khúc chả chiên (Sticky rice)", "pbmlCodes": ["HMXK", "BRXK"] },
+    { "name": "Xôi mặn", "description": "Xôi mặn (Mixed sticky rice)", "pbmlCodes": ["HMXM", "BRXM"] }
+  ]
+}

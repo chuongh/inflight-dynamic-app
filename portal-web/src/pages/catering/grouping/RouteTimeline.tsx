@@ -118,11 +118,18 @@ export function RouteTimeline({ group, editing, onSplit }: TimelineProps) {
                     ) : null}
                   </span>
                   <span className="text-text-secondary mt-0.5 block text-[10.5px] font-bold">
-                    {leg.std}→{leg.sta}
+                    {leg.std}
+                    {leg.stdNextDay ? <sup className="text-vj-red font-extrabold">+1</sup> : null}→{leg.sta}
+                    {leg.staNextDay ? <sup className="text-vj-red font-extrabold">+1</sup> : null}
                   </span>
                   <span className="text-text-muted block text-[9.5px] font-bold">
                     {formatDuration(legDurationMin(leg))} {t('catering.grouping.flightShort')}
                   </span>
+                  {leg.premeal != null ? (
+                    <span className="text-vj-red-dark bg-vj-red-50 mt-1 block rounded px-1 text-[9.5px] font-extrabold">
+                      {t('catering.grouping.premealN', { count: leg.premeal })}
+                    </span>
+                  ) : null}
                 </div>
               </div>
             ) : null}

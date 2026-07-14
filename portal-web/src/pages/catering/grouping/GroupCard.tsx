@@ -1,4 +1,5 @@
 import { Button, Select, Tooltip } from 'antd'
+import type { ReactNode } from 'react'
 import {
   AlertTriangle,
   ArrowRightLeft,
@@ -7,15 +8,26 @@ import {
   Circle,
   Pencil,
   Plane,
+  ShoppingBag,
+  Users,
   Utensils,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   formatDuration,
+  groupCockpitHeadcount,
+  groupCockpitRoster,
   groupFlightMinutes,
+  groupPremeal,
+  groupSalesQuota,
+  hasCrewData,
+  hasSalesQuota,
   isReview,
 } from '@/modules/catering/grouping'
-import type { FlightGroup } from '@/modules/catering/groupingTypes'
+import { activeCrewMealVersion, absMinutesToLabel, profileFor } from '@/modules/catering/crewMeal'
+import { computeGroupCrewMeals } from '@/modules/catering/groupCrewMeal'
+import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
+import type { CockpitCrewMember, FlightGroup } from '@/modules/catering/groupingTypes'
 import { InlineRoute, RouteTimeline } from './RouteTimeline'
 
 interface Props {
@@ -57,6 +69,14 @@ export function GroupCard({
   const { t } = useTranslation()
   const review = isReview(group)
   const flightMin = groupFlightMinutes(group)
+  const { data: crewCfg } = useCrewMealConfigData()
+  const crewVersion = activeCrewMealVersion(crewCfg?.versions ?? [])
+  const cockpitProfile = crewVersion ? profileFor(crewVersion, 'cockpit') : undefined
+  const crewSim = cockpitProfile && hasCrewData(group) ? computeGroupCrewMeals(group, cockpitProfile) : null
+  const crew = groupCockpitHeadcount(group)
+  const roster = groupCockpitRoster(group)
+  const slotsHit = crewSim ? [...new Set(crewSim.hits.map((h) => h.slot))] : []
+  const quota = groupSalesQuota(group)
   const origin = group.legs[0]?.dep ?? '—'
   const timeRange = group.legs.length
     ? `${group.legs[0].std} – ${group.legs[group.legs.length - 1].sta}`
@@ -170,25 +190,15 @@ export function GroupCard({
       {/* Expanded detail */}
       {open ? (
         <div className="border-border border-t bg-[#FCFDFE] px-[22px] py-[18px]">
-          <div className="bg-vj-red-50 text-vj-red-dark mb-4 inline-flex items-center gap-1.5 rounded-full border border-[#F5C6C4] px-3 py-1.5 text-[12px] font-bold">
-            <Utensils size={15} />
-            {t('catering.grouping.loadNote', {
-              station: origin,
-              legs: group.legs.length,
-              time: formatDuration(flightMin),
-            })}
-          </div>
-
-          <RouteTimeline group={group} editing={editing} onSplit={onSplit} />
-
-          <div className="border-border mt-[18px] flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-dashed pt-4">
-            <DetailField label={t('catering.grouping.loadPoint')} value={origin} />
-            <DetailField label={t('catering.grouping.totalFlightTime')} value={formatDuration(flightMin)} />
-            <DetailField label={t('catering.grouping.timeRange')} value={timeRange} />
-            <DetailField label={t('catering.grouping.aircraft')} value={`${group.aircraft} · ${group.aircraftType}`} />
-            <DetailField label={t('catering.grouping.purser')} value={`${shortPurser(group.purser)} · #${group.purserCode}`} />
-
-            <div className="ml-auto flex items-center gap-2.5">
+          {/* Context + actions — only meta NOT already in the header row (time range
+              + load station). Aircraft / purser / legs / flight time live above. */}
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <span className="text-text-secondary inline-flex items-center gap-2 text-[12px] font-bold">
+              <span className="text-foreground tnum">{timeRange}</span>
+              <span className="text-border">·</span>
+              <span>{t('catering.grouping.loadAt', { station: origin })}</span>
+            </span>
+            <div className="flex items-center gap-2.5">
               <Button icon={<Pencil size={15} />} onClick={onToggleEdit}>
                 {editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}
               </Button>
@@ -207,6 +217,8 @@ export function GroupCard({
             </div>
           </div>
 
+          <RouteTimeline group={group} editing={editing} onSplit={onSplit} />
+
           {review && group.reviewNote ? (
             <div className="bg-vj-yellow-muted border-vj-yellow-border text-vj-yellow-dark mt-4 flex items-start gap-2.5 rounded-lg border px-3.5 py-3 text-[12.5px] font-semibold">
               <AlertTriangle size={16} className="mt-0.5 shrink-0" />
@@ -222,6 +234,87 @@ export function GroupCard({
                   {t('catering.grouping.markCorrect')}
                 </Button>
               </div>
+            </div>
+          ) : null}
+
+          {/* Meal streams — pre-book full-width, then crew | sales-quota in a row. */}
+          {(group.meals?.length ?? 0) > 0 || crewSim || hasSalesQuota(group) ? (
+            <div className="mt-3.5 flex flex-col gap-3">
+              {group.meals && group.meals.length > 0 ? (
+                <section className="border-border rounded-xl border bg-white p-3.5">
+                  <SectionHead
+                    icon={<Utensils size={14} className="text-vj-red" />}
+                    title={t('catering.grouping.premealTitleShort')}
+                    pill={t('catering.grouping.premealN', { count: groupPremeal(group) })}
+                  />
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.meals.map((m) => (
+                      <span
+                        key={m.name}
+                        className="border-border inline-flex items-center gap-1.5 rounded-lg border bg-[#FCFDFE] px-2 py-1 text-[12px] font-semibold"
+                      >
+                        {m.name}
+                        <span className="bg-vj-red-50 text-vj-red-dark rounded px-1.5 text-[11px] font-extrabold tnum">
+                          {m.count}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
+              {crewSim || hasSalesQuota(group) ? (
+                <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.35fr_1fr]">
+                  {crewSim ? (
+                    <section className="border-border rounded-xl border bg-white p-3.5">
+                      <SectionHead
+                        icon={<Users size={14} className="text-vj-red" />}
+                        title={t('catering.grouping.crewTitleShort')}
+                        pill={t('catering.grouping.crewMealsN', { count: crewSim.meals })}
+                        sub={crewVersion ? t('catering.grouping.crewConfigV', { v: crewVersion.version }) : undefined}
+                      />
+                      <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                        <span className="text-[12.5px] font-extrabold tnum">
+                          {absMinutesToLabel(crewSim.dutySpan.start)}–{absMinutesToLabel(crewSim.dutySpan.end)}
+                        </span>
+                        <span className="flex flex-wrap gap-1">
+                          {slotsHit.length ? (
+                            slotsHit.map((s) => (
+                              <span key={s} className="bg-vj-red-50 text-vj-red-dark rounded px-1.5 text-[11.5px] font-bold">
+                                {t(`catering.grouping.crewSlot.${s}`)}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-text-muted text-[12px] font-semibold">{t('catering.grouping.crewNoWindow')}</span>
+                          )}
+                        </span>
+                      </div>
+                      {roster.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-1.5 xl:grid-cols-2">
+                          {roster.map((m) => (
+                            <CrewChip key={m.code} member={m} ridingLabel={t('catering.grouping.crewRiding')} />
+                          ))}
+                        </div>
+                      ) : null}
+                    </section>
+                  ) : null}
+
+                  {hasSalesQuota(group) ? (
+                    <section className="border-border rounded-xl border bg-white p-3.5">
+                      <SectionHead
+                        icon={<ShoppingBag size={14} className="text-vj-red" />}
+                        title={t('catering.grouping.salesQuotaTitleShort')}
+                        sub="UC-10"
+                      />
+                      <div className="grid grid-cols-3 gap-2.5">
+                        <QuotaStat label={t('catering.grouping.quotaHotmeal')} value={quota.hotmeal} />
+                        <QuotaStat label={t('catering.grouping.quotaBanhMi')} value={quota.banhMi} />
+                        <QuotaStat label={t('catering.grouping.quotaTraSua')} value={quota.traSua} />
+                      </div>
+                    </section>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -283,11 +376,62 @@ export function GroupCard({
   )
 }
 
-function DetailField({ label, value }: { label: string; value: string }) {
+/** One named cockpit crew member — role badge + name + employee code, so the
+ *  planner can audit the crew-meal head-count against the real roster. */
+function CrewChip({ member, ridingLabel }: { member: CockpitCrewMember; ridingLabel: string }) {
+  const isCaptain = member.role.startsWith('CP')
+  // Captain filled red, FO light red, positioning/riding muted + dashed.
+  const badgeCls = member.riding
+    ? 'bg-muted text-text-secondary'
+    : isCaptain
+      ? 'bg-vj-red text-white'
+      : 'bg-vj-red-50 text-vj-red-dark'
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-text-secondary text-[11px] font-semibold">{label}</span>
-      <span className="text-[14px] font-extrabold">{value}</span>
+    <div
+      className={`flex items-center gap-2 rounded-md border bg-[#FCFDFE] px-2.5 py-1.5 ${
+        member.riding ? 'border-border border-dashed opacity-90' : 'border-border'
+      }`}
+    >
+      <span
+        className={`inline-flex min-w-[42px] shrink-0 justify-center rounded px-1.5 py-0.5 text-[10.5px] font-extrabold tracking-wide ${badgeCls}`}
+      >
+        {member.role}
+      </span>
+      <span className="flex-1 truncate text-[12.5px] font-extrabold" title={member.name}>
+        {member.name}
+      </span>
+      {member.riding ? (
+        <span className="bg-muted text-text-muted shrink-0 rounded px-1.5 text-[10px] font-bold">{ridingLabel}</span>
+      ) : null}
+      <span className="text-text-muted shrink-0 text-[11px] font-bold tnum">{member.code}</span>
+    </div>
+  )
+}
+
+/** Compact section header: icon + uppercase title, an optional count pill, and
+ *  an optional right-aligned sub-note (config version, source code). */
+function SectionHead({ icon, title, pill, sub }: { icon: ReactNode; title: string; pill?: string; sub?: string }) {
+  return (
+    <div className="mb-2.5 flex items-center gap-2">
+      <span className="text-text-secondary flex items-center gap-1.5 text-[11.5px] font-extrabold uppercase tracking-wide">
+        {icon}
+        {title}
+      </span>
+      {pill ? (
+        <span className="bg-vj-red-50 text-vj-red-dark rounded-full px-2 py-0.5 text-[11px] font-extrabold tnum">
+          {pill}
+        </span>
+      ) : null}
+      {sub ? <span className="text-text-muted ml-auto text-[11px] font-semibold normal-case">{sub}</span> : null}
+    </div>
+  )
+}
+
+function QuotaStat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="border-border rounded-lg border bg-[#FCFDFE] px-3 py-2">
+      <div className="text-vj-red-dark text-[20px] leading-none font-extrabold tnum">{value}</div>
+      <div className="text-text-secondary mt-1.5 text-[11px] font-semibold">{label}</div>
     </div>
   )
 }

@@ -15,11 +15,18 @@ export const paths = {
     grouping: {
       list: '/catering/grouping',
     },
+    orders: {
+      list: '/catering/orders',
+      detail: (fileId: string) => `/catering/orders/${fileId}` as const,
+    },
     quota: {
       list: '/catering/quota',
     },
     config: {
       list: '/catering/config',
+    },
+    meals: {
+      list: '/catering/meals',
     },
   },
   equipment: {

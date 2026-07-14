@@ -21,6 +21,46 @@ export interface FlightLeg {
   sta: string
   /** International leg (shown as a "QT" marker). */
   intl: boolean
+  /** Departure is on the day after the group's service day (source `+`). */
+  stdNextDay?: boolean
+  /** Arrival is on the day after departure / next calendar day (source `+`). */
+  staNextDay?: boolean
+  /**
+   * Pre-ordered meals (premeal) on this leg. The source records a rotation's
+   * premeal on its first leg only, so seed data splits the group total evenly
+   * across legs. Optional — absent when no premeal data exists for the day.
+   */
+  premeal?: number
+  /** Operating cockpit crew count (CP + FO) on this leg — derived from `cockpitCrew`. */
+  cockpit?: number
+  /** Extra / deadhead pilots riding along (CP-Pax, FO-Pax) — derived from `cockpitCrew`. */
+  extra?: number
+  /**
+   * Named cockpit roster for this leg, from the crew-list source. Drives the
+   * crew-meal head-count (deduped by employee code across the rotation) so the
+   * meal quantity is auditable against real names, not an assumed CP+FO=2.
+   */
+  cockpitCrew?: CockpitCrewMember[]
+  /** Commercial upsell quota for this leg (from the inflight meal quota, UC-10). */
+  salesQuota?: { hotmeal: number; banhMi: number; traSua: number }
+}
+
+/** One cockpit crew member on a leg, parsed from the crew-list COCKPIT column. */
+export interface CockpitCrewMember {
+  /** Source role tag: `CP`, `FO`, `CP/T`, `FO/T`, `CP-Pax`, `FO-Pax`. */
+  role: string
+  /** Full name as printed on the crew list. */
+  name: string
+  /** Employee code (dedupe key across the rotation's legs). */
+  code: string
+  /** Positioning / deadhead (`-Pax`) — rides along, not operating this leg. */
+  riding?: boolean
+}
+
+/** A premeal dish and its ordered quantity for a group. */
+export interface MealBreakdownItem {
+  name: string
+  count: number
 }
 
 export type GroupConfidence = 'high' | 'mid'
@@ -38,6 +78,10 @@ export interface FlightGroup {
   /** Why the AI is unsure (only on `mid` confidence). */
   reviewNote?: string
   legs: FlightLeg[]
+  /** Group's premeal count as recorded in the source (before per-leg split). */
+  premealTotal?: number
+  /** Premeal dishes ordered for this rotation (for the supplier order). */
+  meals?: MealBreakdownItem[]
 }
 
 /** A single flight leg before AI grouping (raw crew-list row). */
@@ -52,6 +96,13 @@ export interface RawFlight {
   purser: string
   purserCode: string
   intl: boolean
+  /**
+   * Pre-ordered passenger meals (premeal) on this flight. Known before grouping;
+   * the sales quota and crew meals are only computed once flights are grouped.
+   */
+  premeal?: number
+  /** Named cockpit roster (CP + FO) for this flight, from the crew-list source. */
+  cockpitCrew?: CockpitCrewMember[]
 }
 
 export type DayStatus = 'grouped' | 'ungrouped'
@@ -78,6 +129,12 @@ export interface FlightGroupDataset {
   /** Catering station the staff prepares meals at, e.g. `SGN`. */
   station: string
   stationName: string
+  /**
+   * Config rule: an SGN/HAN/CXR departure before this `HH:MM` cutoff counts as
+   * the PREVIOUS day's order (the meals are prepped the evening before), so an
+   * early-morning `+` flight still belongs to the day the order was created.
+   */
+  nextDayCutoff?: string
   /** One entry per service day (e.g. tomorrow + the day after). */
   days: DayGrouping[]
 }

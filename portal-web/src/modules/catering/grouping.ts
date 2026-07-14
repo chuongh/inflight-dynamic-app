@@ -1,6 +1,6 @@
 /** Pure helpers for UC-11 catering flight-grouping. All functions are
  *  immutable — editing operations return a fresh `groups` array. */
-import type { FlightGroup, FlightLeg, RawFlight } from './groupingTypes'
+import type { CockpitCrewMember, FlightGroup, FlightLeg, RawFlight } from './groupingTypes'
 
 /** Stations that have catering — a rotation loads its meals at one of these. */
 export const CATERING_STATIONS = new Set(['SGN', 'HAN', 'CXR'])
@@ -21,6 +21,13 @@ export function legTimeKey(hhmm: string): number {
   return (h < 4 ? h + 24 : h) * 60 + m
 }
 
+/** Chronological sort key for a leg, honouring the explicit next-day flag. */
+export function legSortKey(leg: FlightLeg): number {
+  const [h, m] = leg.std.split(':').map(Number)
+  const nextDay = leg.stdNextDay ?? h < 4
+  return (nextDay ? 24 : 0) * 60 + h * 60 + m
+}
+
 /** Airborne minutes of one leg, handling overnight arrivals. */
 export function legDurationMin(leg: FlightLeg): number {
   return (toMinutes(leg.sta) - toMinutes(leg.std) + 1440) % 1440
@@ -29,6 +36,99 @@ export function legDurationMin(leg: FlightLeg): number {
 /** Total scheduled flight time of a whole group, in minutes. */
 export function groupFlightMinutes(group: FlightGroup): number {
   return group.legs.reduce((sum, leg) => sum + legDurationMin(leg), 0)
+}
+
+/** Sum of premeal across a group's legs (stays correct after split/merge/move). */
+export function groupPremeal(group: FlightGroup): number {
+  return group.legs.reduce((sum, leg) => sum + (leg.premeal ?? 0), 0)
+}
+
+/** Whether any leg in the group carries premeal data. */
+export function hasPremeal(group: FlightGroup): boolean {
+  return group.legs.some((leg) => leg.premeal != null)
+}
+
+/** A rotation that crosses midnight (any leg departs or arrives next day). */
+export function isOvernight(group: FlightGroup): boolean {
+  return group.legs.some((leg) => leg.stdNextDay || leg.staNextDay)
+}
+
+export type DishKind = 'business' | 'veg' | 'snack' | 'main'
+
+/** Derived menu category from a dish name (reference-only grouping). */
+export function dishKind(name: string): DishKind {
+  const n = name.toLowerCase()
+  if (n.includes('business')) return 'business'
+  if (n.includes('chay') || n.includes('vegetarian') || n.startsWith('vcs')) return 'veg'
+  if (n.includes('snack') || n.includes('happy meal') || n.includes('soda') || n.includes('bia'))
+    return 'snack'
+  return 'main'
+}
+
+/**
+ * Distinct cockpit crew across a rotation, deduped by employee code — a pilot
+ * flying several legs is one person, and a crew change mid-rotation adds
+ * people. Prefers an operating record over a positioning one for the same
+ * pilot. Falls back to the per-leg `cockpit`/`extra` counts when no named
+ * roster exists (older seed days). This deduped list is what the crew-meal
+ * head-count is built from, so the meal quantity matches the real names.
+ */
+export function groupCockpitRoster(group: FlightGroup): CockpitCrewMember[] {
+  const byCode = new Map<string, CockpitCrewMember>()
+  for (const leg of group.legs) {
+    for (const m of leg.cockpitCrew ?? []) {
+      const prev = byCode.get(m.code)
+      // Keep the operating record if the same pilot also appears as positioning.
+      if (!prev || (prev.riding && !m.riding)) byCode.set(m.code, m)
+    }
+  }
+  return [...byCode.values()]
+}
+
+/** Distinct cockpit head-count for a group = operating + riding pilots. */
+export function groupCockpitHeadcount(group: FlightGroup): { operating: number; riding: number } {
+  const roster = groupCockpitRoster(group)
+  if (roster.length > 0) {
+    const operating = roster.filter((m) => !m.riding).length
+    return { operating, riding: roster.length - operating }
+  }
+  // Fallback for days without a named roster: per-leg counts (crew assumed
+  // constant across legs, so take the max leg).
+  const operating = Math.max(0, ...group.legs.map((l) => l.cockpit ?? 0))
+  const riding = Math.max(0, ...group.legs.map((l) => l.extra ?? 0))
+  return { operating, riding }
+}
+
+/** Whether crew composition is known for the group. */
+export function hasCrewData(group: FlightGroup): boolean {
+  return group.legs.some((l) => l.cockpit != null)
+}
+
+/** Sum the commercial upsell quota across a group's legs. */
+export function groupSalesQuota(group: FlightGroup): { hotmeal: number; banhMi: number; traSua: number } {
+  return group.legs.reduce(
+    (a, l) => ({
+      hotmeal: a.hotmeal + (l.salesQuota?.hotmeal ?? 0),
+      banhMi: a.banhMi + (l.salesQuota?.banhMi ?? 0),
+      traSua: a.traSua + (l.salesQuota?.traSua ?? 0),
+    }),
+    { hotmeal: 0, banhMi: 0, traSua: 0 },
+  )
+}
+
+export function hasSalesQuota(group: FlightGroup): boolean {
+  return group.legs.some((l) => l.salesQuota != null)
+}
+
+/** Sum every group's per-dish premeal into a day total, sorted desc by qty. */
+export function aggregateDayMeals(groups: FlightGroup[]): { name: string; count: number }[] {
+  const map = new Map<string, number>()
+  for (const g of groups) {
+    for (const m of g.meals ?? []) map.set(m.name, (map.get(m.name) ?? 0) + m.count)
+  }
+  return [...map.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
 }
 
 /** Minutes → `Hh MM`, e.g. 280 → `4h40`. */
@@ -138,7 +238,7 @@ export function mergeGroups(groups: FlightGroup[], targetId: string, sourceId: s
   const merged: FlightGroup = {
     ...target,
     confirmed: false,
-    legs: [...target.legs, ...source.legs].sort((a, b) => legTimeKey(a.std) - legTimeKey(b.std)),
+    legs: [...target.legs, ...source.legs].sort((a, b) => legSortKey(a) - legSortKey(b)),
   }
   return groups.flatMap((g) => (g.id === sourceId ? [] : g.id === targetId ? [merged] : [g]))
 }
@@ -163,7 +263,7 @@ export function moveLeg(
   const nextDest: FlightGroup = {
     ...dest,
     confirmed: false,
-    legs: [...dest.legs, leg].sort((a, b) => legTimeKey(a.std) - legTimeKey(b.std)),
+    legs: [...dest.legs, leg].sort((a, b) => legSortKey(a) - legSortKey(b)),
   }
   return groups.flatMap((g) => {
     if (g.id === sourceId) return nextSource.legs.length === 0 ? [] : [nextSource]

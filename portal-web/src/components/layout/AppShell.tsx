@@ -6,6 +6,7 @@ import {
   ChevronRight,
   ClipboardList,
   CreditCard,
+  SlidersHorizontal,
   KeyRound,
   LayoutDashboard,
   LogOut,
@@ -34,6 +35,8 @@ const ICONS: Record<string, ReactNode> = {
   'design-system': <Palette size={18} strokeWidth={2} />,
   equipment: <ShoppingCart size={18} strokeWidth={2} />,
   catering: <UtensilsCrossed size={18} strokeWidth={2} />,
+  'catering-quota': <ClipboardList size={16} strokeWidth={2} />,
+  'catering-config': <SlidersHorizontal size={16} strokeWidth={2} />,
   airports: <Building2 size={18} strokeWidth={2} />,
   'trolley-carts': <ShoppingCart size={16} strokeWidth={2} />,
   pos: <CreditCard size={16} strokeWidth={2} />,
@@ -58,7 +61,8 @@ function resolveSelection(pathname: string) {
   if (pathname.startsWith(paths.equipment.workshop.list)) return { selectedKey: 'workshop', ...NAV_SECTION_KEYS.workshop }
   if (pathname.startsWith(paths.equipment.report.list)) return { selectedKey: 'scorecard', ...NAV_SECTION_KEYS.scorecard }
   if (pathname.startsWith(paths.equipment.trolley.list)) return { selectedKey: 'trolley-carts', ...NAV_SECTION_KEYS['trolley-carts'] }
-  if (pathname.startsWith(paths.catering.quota.list)) return { selectedKey: 'catering', ...NAV_SECTION_KEYS.catering }
+  if (pathname.startsWith(paths.catering.config.list)) return { selectedKey: 'catering-config', ...NAV_SECTION_KEYS['catering-config'] }
+  if (pathname.startsWith(paths.catering.quota.list)) return { selectedKey: 'catering-quota', ...NAV_SECTION_KEYS['catering-quota'] }
   if (pathname.startsWith(paths.airports.list)) return { selectedKey: 'airports', ...NAV_SECTION_KEYS.airports }
   if (pathname.startsWith(paths.admin.users)) return { selectedKey: 'iam-users', ...NAV_SECTION_KEYS['iam-users'] }
   if (pathname.startsWith(paths.admin.roles)) return { selectedKey: 'iam-roles', ...NAV_SECTION_KEYS['iam-roles'] }
