@@ -429,8 +429,10 @@ export function summarizeFleet(trolleys: TrolleyUnit[]) {
   const service = trolleys.filter((item) => item.status === 'service').length
   const notService = trolleys.filter((item) => item.status === 'not-service').length
   const repairing = trolleys.filter((item) => item.status === 'repairing').length
+  const inTransit = trolleys.filter((item) => item.status === 'in-transit').length
+  const retired = trolleys.filter((item) => item.status === 'retired').length
 
-  return { total: trolleys.length, full, half, service, notService, repairing }
+  return { total: trolleys.length, full, half, service, notService, repairing, inTransit, retired }
 }
 
 export function exportTrolleysCsv(trolleys: TrolleyUnit[]) {

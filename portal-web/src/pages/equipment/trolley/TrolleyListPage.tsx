@@ -1,6 +1,6 @@
 import { App as AntApp, Button, Input, Modal, Select, Table } from 'antd'
 import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
-import { Download, FileUp, Search, Wrench } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Download, FileUp, Radio, Search, Wrench } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -18,8 +18,11 @@ import {
   type TrolleyUnit,
 } from '@/modules/equipment/constants'
 import { exportTrolleysCsv, summarizeFleet } from '@/modules/equipment/lib/generateTrolleys'
+import { computeHealthScore } from '@/modules/equipment/lib/analytics'
+import { isStale } from '@/modules/equipment/lib/movement'
 import { useRepairRequests, useSendTrolleysToRepair } from '@/modules/equipment/hooks/useEquipment'
 import { summarizeRepairRequests } from '@/modules/equipment/repairRequest'
+import { KpiCard } from '@/components/patterns/KpiCard'
 import { ListPageLayout } from '@/components/patterns/ListPageLayout'
 import { EquipmentBadge } from '@/components/primitives/Badge'
 import { Button as VjButton } from '@/components/primitives/Button'
@@ -162,6 +165,19 @@ export function TrolleyListPage({ trolleys, onTrolleysChange }: TrolleyListPageP
       ),
     },
     {
+      title: t('equipment.columns.rfid'),
+      dataIndex: 'rfidEpc',
+      width: 140,
+      render: (value: string) => (
+        <span
+          className="tnum text-[11.5px] font-semibold text-[var(--color-text-secondary)]"
+          style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}
+        >
+          {value}
+        </span>
+      ),
+    },
+    {
       title: t('equipment.columns.type'),
       dataIndex: 'type',
       sorter: (left, right) => left.type.localeCompare(right.type),
@@ -215,6 +231,62 @@ export function TrolleyListPage({ trolleys, onTrolleysChange }: TrolleyListPageP
       dataIndex: 'status',
       sorter: (left, right) => left.status.localeCompare(right.status),
       render: (value: TrolleyStatus) => <EquipmentBadge status={value} />,
+    },
+    {
+      title: t('equipment.columns.health'),
+      key: 'health',
+      width: 120,
+      sorter: (left, right) => computeHealthScore(left, Date.now()) - computeHealthScore(right, Date.now()),
+      render: (_: unknown, record: TrolleyUnit) => {
+        const score = computeHealthScore(record, Date.now())
+        const tone =
+          score >= 75 ? 'var(--color-vj-green)' : score >= 50 ? 'var(--color-vj-yellow)' : 'var(--color-vj-red)'
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className="h-1.5 overflow-hidden rounded-full bg-[var(--color-border)]"
+              style={{ width: 52 }}
+            >
+              <span className="block h-full rounded-full" style={{ width: `${score}%`, background: tone }} />
+            </div>
+            <span className="tnum text-xs font-bold" style={{ color: tone }}>
+              {score}
+            </span>
+          </div>
+        )
+      },
+    },
+    {
+      title: t('equipment.columns.custody'),
+      key: 'custody',
+      width: 180,
+      render: (_: unknown, record: TrolleyUnit) =>
+        record.custody ? (
+          <Text variant="caption" tone="secondary">
+            {record.custody.holder} · {record.custody.flight}
+          </Text>
+        ) : (
+          <Text variant="caption" tone="muted">
+            —
+          </Text>
+        ),
+    },
+    {
+      title: t('equipment.columns.lastSeen'),
+      key: 'lastSeen',
+      width: 130,
+      sorter: (left, right) => left.lastSeenAt - right.lastSeenAt,
+      render: (_: unknown, record: TrolleyUnit) => {
+        const stale = isStale(record, Date.now())
+        return (
+          <div className="leading-tight">
+            <span className={`tnum text-xs font-semibold ${stale ? 'text-vj-red' : 'text-vj-green'}`}>
+              {formatRelativeAgo(record.lastSeenAt)}
+            </span>
+            <div className="text-[11px] text-[var(--color-text-muted)]">{record.lastSeenStation}</div>
+          </div>
+        )
+      },
     },
     {
       title: t('equipment.columns.station'),
@@ -325,6 +397,8 @@ export function TrolleyListPage({ trolleys, onTrolleysChange }: TrolleyListPageP
               { value: 'service', label: statusLabel('service') },
               { value: 'not-service', label: statusLabel('not-service') },
               { value: 'repairing', label: statusLabel('repairing') },
+              { value: 'in-transit', label: statusLabel('in-transit') },
+              { value: 'retired', label: statusLabel('retired') },
             ]}
           />
           <Select
@@ -442,6 +516,13 @@ export function TrolleyListPage({ trolleys, onTrolleysChange }: TrolleyListPageP
         </>
       }
     >
+      <div className="kpi-grid kpi-grid--4 mb-4">
+        <KpiCard label={statusLabel('service')} value={summary.service} icon={CheckCircle2} tone="success" />
+        <KpiCard label={statusLabel('in-transit')} value={summary.inTransit} icon={Radio} tone="brand" />
+        <KpiCard label={statusLabel('not-service')} value={summary.notService} icon={AlertTriangle} tone="danger" />
+        <KpiCard label={statusLabel('repairing')} value={summary.repairing} icon={Wrench} tone="warning" />
+      </div>
+
       <Table
         rowKey="code"
         size="middle"
