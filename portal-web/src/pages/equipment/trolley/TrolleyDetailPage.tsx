@@ -7,6 +7,7 @@ import {
   SendToRepairModal,
   type SendToRepairFormValues,
 } from '@/components/equipment/SendToRepairModal'
+import { CheckInOutModal } from '@/components/equipment/CheckInOutModal'
 import { TrolleyTimeline } from '@/components/equipment/TrolleyTimeline'
 import {
   VENDORS,
@@ -56,6 +57,7 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
   const [repairOpen, setRepairOpen] = useState(false)
   const [statusOpen, setStatusOpen] = useState(false)
   const [nextStatus, setNextStatus] = useState<TrolleyStatus | null>(null)
+  const [checkMode, setCheckMode] = useState<'checkout' | 'checkin' | null>(null)
   const sendToRepair = useSendTrolleysToRepair()
 
   const filteredHistory = useMemo(() => {
@@ -343,6 +345,16 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
         }
         actions={
           <>
+            {trolley.status === 'service' && (
+              <Button onClick={() => setCheckMode('checkout')}>
+                {t('equipment.checkinout.checkout')}
+              </Button>
+            )}
+            {trolley.status === 'in-transit' && (
+              <Button type="primary" onClick={() => setCheckMode('checkin')}>
+                {t('equipment.checkinout.checkin')}
+              </Button>
+            )}
             <VjButton
               variant="warning"
               disabled={trolley.status !== 'not-service'}
@@ -570,6 +582,10 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
         onCancel={() => setRepairOpen(false)}
         onSubmit={handleSendRepair}
       />
+
+      {checkMode && (
+        <CheckInOutModal open mode={checkMode} unit={trolley} onClose={() => setCheckMode(null)} />
+      )}
 
       <Modal
         open={statusOpen}
