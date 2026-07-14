@@ -2,6 +2,8 @@ import {
   MANUFACTURERS,
   STATIONS,
   VENDORS,
+  type MovementEvent,
+  type TrolleyCustody,
   type TrolleyRepairEntry,
   type TrolleyStatus,
   type TrolleyType,
@@ -9,6 +11,26 @@ import {
 } from '../constants'
 
 const DAY = 86_400_000
+const HOUR = 3_600_000
+
+/** Deterministic pool of Vietnamese cabin-crew names (prefixed) for custody/movements. */
+const CABIN_CREW = [
+  'CC. Nguyễn T. Lan',
+  'CC. Trần V. Minh',
+  'CC. Lê T. Hà',
+  'CC. Phạm Q. Anh',
+  'CC. Hoàng V. Dũng',
+  'CC. Vũ T. Mai',
+] as const
+
+function movementId(code: string, type: string, timestamp: number) {
+  return `${code}-mv-${type}-${timestamp}`
+}
+
+function pickOtherStation(random: () => number, exclude: string): string {
+  const options = STATIONS.filter((station) => station !== exclude)
+  return pick(random, options)
+}
 
 const REPAIR_NARRATIVES = [
   {
@@ -167,6 +189,63 @@ function buildUnit(options: {
   const latestRepair = repairHistory[0]
   const latestCompleted =
     repairHistory.find((entry) => entry.completedAt != null) ?? latestRepair
+  const lastRepairReason = latestCompleted?.issueDescription ?? '—'
+  const updatedAt = options.now - Math.min(options.daysInStatus, 20) * DAY
+
+  // Chain-of-custody + movement ledger — seeded so the JSON is deterministic.
+  let lastSeenAt = options.now - Math.floor(options.random() * 6) * HOUR
+  let lastSeenStation = options.station
+  let custody: TrolleyCustody | undefined
+  let movements: MovementEvent[] = []
+
+  if (options.status === 'in-transit') {
+    const holder = pick(options.random, CABIN_CREW)
+    const fromStation = options.station
+    const toStation = pickOtherStation(options.random, fromStation)
+    const flight = `VJ${100 + Math.floor(options.random() * 899)}`
+    const checkoutAt = options.now - (1 + Math.floor(options.random() * 6)) * HOUR
+
+    lastSeenAt = checkoutAt
+    lastSeenStation = fromStation
+    custody = { holder, flight, fromStation, toStation, since: checkoutAt }
+
+    const checkout: MovementEvent = {
+      id: movementId(options.code, 'out', checkoutAt),
+      type: 'checkout',
+      timestamp: checkoutAt,
+      station: fromStation,
+      fromStation,
+      toStation,
+      flight,
+      actor: holder,
+      condition: 'ok',
+    }
+    // One prior completed leg: returned to this station before the current trip.
+    const priorAt = checkoutAt - (1 + Math.floor(options.random() * 5)) * DAY
+    const priorCheckin: MovementEvent = {
+      id: movementId(options.code, 'in', priorAt),
+      type: 'checkin',
+      timestamp: priorAt,
+      station: fromStation,
+      actor: pick(options.random, CABIN_CREW),
+      condition: 'ok',
+    }
+    movements = [checkout, priorCheckin]
+  } else if (options.status === 'not-service') {
+    // Newest movement is a damaged check-in so the workshop queue shows the fault.
+    const checkin: MovementEvent = {
+      id: movementId(options.code, 'in', updatedAt),
+      type: 'checkin',
+      timestamp: updatedAt,
+      station: options.station,
+      actor: pick(options.random, CABIN_CREW),
+      condition: 'damaged',
+      note: `${lastRepairReason} reported on arrival`,
+    }
+    lastSeenAt = updatedAt
+    lastSeenStation = options.station
+    movements = [checkin]
+  }
 
   return {
     code: options.code,
@@ -174,10 +253,10 @@ function buildUnit(options: {
     status: options.status,
     station: options.station,
     repairs: options.completedRepairs,
-    lastRepairReason: latestCompleted?.issueDescription ?? '—',
+    lastRepairReason,
     vendor: latestRepair?.vendor ?? pick(options.random, VENDORS),
     daysInStatus: options.daysInStatus,
-    updatedAt: options.now - Math.min(options.daysInStatus, 20) * DAY,
+    updatedAt,
     partNo: options.partNo,
     serialNumber: options.serialNumber,
     manufacturer: options.manufacturer,
@@ -187,9 +266,10 @@ function buildUnit(options: {
     registrationLocation: options.registrationLocation ?? options.station,
     repairHistory,
     rfidEpc: createEpc(options.random),
-    lastSeenAt: options.now - Math.floor(options.random() * 6) * 3_600_000,
-    lastSeenStation: options.station,
-    movements: [],
+    lastSeenAt,
+    lastSeenStation,
+    custody,
+    movements,
   }
 }
 
