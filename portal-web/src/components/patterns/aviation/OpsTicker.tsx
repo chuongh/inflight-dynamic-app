@@ -20,6 +20,8 @@ const statusTone: Record<TrolleyStatus, string> = {
   service: 'ops-ticker__status--service',
   repairing: 'ops-ticker__status--repairing',
   'not-service': 'ops-ticker__status--alert',
+  'in-transit': 'ops-ticker__status--in-transit',
+  retired: 'ops-ticker__status--retired',
 }
 
 export function OpsTicker({ items }: OpsTickerProps) {

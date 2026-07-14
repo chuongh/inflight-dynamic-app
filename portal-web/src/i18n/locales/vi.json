@@ -192,7 +192,9 @@
     "status": {
       "service": "Đang phục vụ",
       "not-service": "Ngừng phục vụ",
-      "repairing": "Đang sửa chữa"
+      "repairing": "Đang sửa chữa",
+      "in-transit": "Đang luân chuyển",
+      "retired": "Thanh lý"
     },
     "type": {
       "full": "Full-size",

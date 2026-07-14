@@ -192,7 +192,9 @@
     "status": {
       "service": "In Service",
       "not-service": "Not in service",
-      "repairing": "Repairing"
+      "repairing": "Repairing",
+      "in-transit": "In transit",
+      "retired": "Retired"
     },
     "type": {
       "full": "Full-size",

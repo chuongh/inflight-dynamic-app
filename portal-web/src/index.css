@@ -1524,6 +1524,9 @@ a[href],
 .ops-ticker__status--service { color: var(--color-vj-green); }
 .ops-ticker__status--repairing { color: var(--color-vj-yellow-dark); }
 .ops-ticker__status--alert { color: var(--color-vj-red); }
+/* Same hex as vjTokens.equipmentStatus['in-transit'|'retired'] (design-system/tokens.ts) */
+.ops-ticker__status--in-transit { color: #2563eb; }
+.ops-ticker__status--retired { color: #475569; }
 .ops-ticker__beacon {
   width: 6px;
   height: 6px;

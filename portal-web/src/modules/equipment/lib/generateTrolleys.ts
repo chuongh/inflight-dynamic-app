@@ -76,6 +76,21 @@ function pick<T>(random: () => number, items: readonly T[]): T {
   return items[Math.floor(random() * items.length)]
 }
 
+const EPC_HEX = '0123456789ABCDEF'
+
+/** Deterministic-looking RFID EPC, e.g. "E280 6994 A142 03F1" */
+function createEpc(random: () => number): string {
+  let hex = 'E280'
+  for (let group = 0; group < 3; group += 1) {
+    let chunk = ''
+    for (let i = 0; i < 4; i += 1) {
+      chunk += EPC_HEX[Math.floor(random() * EPC_HEX.length)]
+    }
+    hex += ` ${chunk}`
+  }
+  return hex
+}
+
 function pickWeightedStation(random: () => number): string {
   const value = random()
   let cumulative = 0
@@ -171,6 +186,10 @@ function buildUnit(options: {
       options.random() > 0.35 ? options.yearOfManufacture + 10 + Math.floor(options.random() * 3) : undefined,
     registrationLocation: options.registrationLocation ?? options.station,
     repairHistory,
+    rfidEpc: createEpc(options.random),
+    lastSeenAt: options.now - Math.floor(options.random() * 6) * 3_600_000,
+    lastSeenStation: options.station,
+    movements: [],
   }
 }
 

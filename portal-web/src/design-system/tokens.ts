@@ -157,6 +157,24 @@ export const vjTokens = {
       border: '#F0DC7A',
       label: 'Repairing',
     },
+    'in-transit': {
+      // Same values as vjTokens.color.info* (tokens.ts:64-69) — referenced by literal, not
+      // by `vjTokens.color.info*`, because equipmentStatus is nested inside the same
+      // `vjTokens` object literal and a self-reference to `vjTokens` here throws
+      // "Cannot access 'vjTokens' before initialization" (verified with a Node repro).
+      bg: '#EFF6FF',
+      text: '#1D4ED8',
+      dot: '#2563EB',
+      border: '#BFDBFE',
+      label: 'In transit',
+    },
+    retired: {
+      bg: '#F1F5F9',
+      text: '#475569',
+      dot: '#94A3B8',
+      border: '#E2E8F0',
+      label: 'Retired',
+    },
   } satisfies Record<TrolleyStatus, StatusToken>,
 
   repairRequestStatus: {

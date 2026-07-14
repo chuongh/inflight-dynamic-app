@@ -23,6 +23,7 @@ export function useEquipmentLabels() {
         { value: 'service' as const, label: t('equipment.status.service') },
         { value: 'not-service' as const, label: t('equipment.status.not-service') },
         { value: 'repairing' as const, label: t('equipment.status.repairing') },
+        { value: 'retired' as const, label: t('equipment.status.retired') },
       ],
       repairStatusOptions: (includeAll = true) => [
         ...(includeAll
