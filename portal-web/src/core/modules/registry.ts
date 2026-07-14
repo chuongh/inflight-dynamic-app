@@ -55,6 +55,18 @@ export const PORTAL_MODULES: PortalModule[] = [
         path: paths.equipment.ipad.list,
         permission: 'equipment.read',
       },
+      {
+        id: 'workshop',
+        labelKey: 'nav.repairWorkshop',
+        path: paths.equipment.workshop.list,
+        permission: 'equipment.read',
+      },
+      {
+        id: 'scorecard',
+        labelKey: 'nav.vendorScorecard',
+        path: paths.equipment.report.list,
+        permission: 'equipment.read',
+      },
     ],
   },
   {
@@ -148,6 +160,8 @@ export const NAV_SECTION_KEYS: Record<
   pos: { sectionTitleKey: 'nav.pos', moduleLabelKey: 'nav.equipment' },
   ipad: { sectionTitleKey: 'nav.ipad', moduleLabelKey: 'nav.equipment' },
   'trolley-carts': { sectionTitleKey: 'nav.trolleyCarts', moduleLabelKey: 'nav.equipment' },
+  workshop: { sectionTitleKey: 'nav.repairWorkshop', moduleLabelKey: 'nav.equipment' },
+  scorecard: { sectionTitleKey: 'nav.vendorScorecard', moduleLabelKey: 'nav.equipment' },
   'iam-users': { sectionTitleKey: 'nav.users', moduleLabelKey: 'nav.administration' },
   'iam-roles': { sectionTitleKey: 'nav.roles', moduleLabelKey: 'nav.administration' },
   'iam-permissions': { sectionTitleKey: 'nav.permissions', moduleLabelKey: 'nav.administration' },

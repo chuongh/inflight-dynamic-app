@@ -4,6 +4,7 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
   CreditCard,
   KeyRound,
   LayoutDashboard,
@@ -17,6 +18,7 @@ import {
   User,
   Users,
   UtensilsCrossed,
+  Wrench,
 } from 'lucide-react'
 import { type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -36,6 +38,8 @@ const ICONS: Record<string, ReactNode> = {
   'trolley-carts': <ShoppingCart size={16} strokeWidth={2} />,
   pos: <CreditCard size={16} strokeWidth={2} />,
   ipad: <Tablet size={16} strokeWidth={2} />,
+  workshop: <Wrench size={16} strokeWidth={2} />,
+  scorecard: <ClipboardList size={16} strokeWidth={2} />,
   administration: <Shield size={18} strokeWidth={2} />,
   'iam-users': <Users size={16} strokeWidth={2} />,
   'iam-roles': <ShieldCheck size={16} strokeWidth={2} />,
@@ -51,6 +55,8 @@ function resolveSelection(pathname: string) {
   if (pathname.startsWith(paths.dashboard)) return { selectedKey: 'dashboard', ...NAV_SECTION_KEYS.dashboard }
   if (pathname.startsWith(paths.equipment.pos.list)) return { selectedKey: 'pos', ...NAV_SECTION_KEYS.pos }
   if (pathname.startsWith(paths.equipment.ipad.list)) return { selectedKey: 'ipad', ...NAV_SECTION_KEYS.ipad }
+  if (pathname.startsWith(paths.equipment.workshop.list)) return { selectedKey: 'workshop', ...NAV_SECTION_KEYS.workshop }
+  if (pathname.startsWith(paths.equipment.report.list)) return { selectedKey: 'scorecard', ...NAV_SECTION_KEYS.scorecard }
   if (pathname.startsWith(paths.equipment.trolley.list)) return { selectedKey: 'trolley-carts', ...NAV_SECTION_KEYS['trolley-carts'] }
   if (pathname.startsWith(paths.catering.quota.list)) return { selectedKey: 'catering', ...NAV_SECTION_KEYS.catering }
   if (pathname.startsWith(paths.airports.list)) return { selectedKey: 'airports', ...NAV_SECTION_KEYS.airports }

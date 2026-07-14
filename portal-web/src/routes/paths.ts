@@ -35,5 +35,7 @@ export const paths = {
       list: '/equipment/ipad',
       detail: (code: string) => `/equipment/ipad/${code}` as const,
     },
+    workshop: { list: '/equipment/workshop' },
+    report: { list: '/equipment/report' },
   },
 } as const

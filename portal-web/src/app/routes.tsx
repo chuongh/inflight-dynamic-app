@@ -21,8 +21,10 @@ import { IpadDetailPage } from '@/pages/equipment/ipad/IpadDetailPage'
 import { IpadPage } from '@/pages/equipment/ipad/IpadPage'
 import { PosDetailPage } from '@/pages/equipment/pos/PosDetailPage'
 import { PosPage } from '@/pages/equipment/pos/PosPage'
+import { VendorScorecardPage } from '@/pages/equipment/report/VendorScorecardPage'
 import { TrolleyDetailPage } from '@/pages/equipment/trolley/TrolleyDetailPage'
 import { TrolleyListPage } from '@/pages/equipment/trolley/TrolleyListPage'
+import { RepairWorkshopPage } from '@/pages/equipment/workshop/RepairWorkshopPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { paths } from '@/routes/paths'
 
@@ -102,6 +104,8 @@ export function AppRoutes() {
         <Route path={`${paths.equipment.pos.list}/:code`} element={<PosDetailPage />} />
         <Route path={paths.equipment.ipad.list} element={<IpadPage />} />
         <Route path={`${paths.equipment.ipad.list}/:code`} element={<IpadDetailPage />} />
+        <Route path={paths.equipment.workshop.list} element={<RepairWorkshopPage />} />
+        <Route path={paths.equipment.report.list} element={<VendorScorecardPage />} />
         <Route path={paths.equipment.trolley.list} element={<TrolleyListRoute />} />
         <Route path={`${paths.equipment.trolley.list}/:code`} element={<TrolleyDetailRoute />} />
         <Route path={paths.airports.list} element={<AirportListPage />} />
