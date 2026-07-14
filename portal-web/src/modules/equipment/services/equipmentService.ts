@@ -6,11 +6,14 @@ import type {
   RepairRequest,
   RepairRequestFilters,
 } from '../types'
+import type { CheckinInput, CheckoutInput } from '../lib/movement'
 
 export interface EquipmentService {
   listTrolleys(): Promise<TrolleyUnit[]>
   getTrolley(code: string): Promise<TrolleyUnit | null>
   saveTrolleys(trolleys: TrolleyUnit[]): Promise<void>
+  checkoutTrolley(code: string, input: CheckoutInput): Promise<TrolleyUnit>
+  checkinTrolley(code: string, input: CheckinInput): Promise<TrolleyUnit>
   listPosDevices(): Promise<PortableDevice[]>
   savePosDevices(devices: PortableDevice[]): Promise<void>
   listIpads(): Promise<PortableDevice[]>

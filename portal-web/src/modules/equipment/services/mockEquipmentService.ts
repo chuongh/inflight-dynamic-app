@@ -20,6 +20,7 @@ import type {
   RepairRequest,
   RepairRequestFilters,
 } from '../types'
+import { applyCheckin, applyCheckout, type CheckinInput, type CheckoutInput } from '../lib/movement'
 import type { EquipmentService } from './equipmentService'
 
 let defectCache: DefectCatalogItem[] | null = null
@@ -54,6 +55,34 @@ export const mockEquipmentService: EquipmentService = {
   async saveTrolleys(trolleys: TrolleyUnit[]) {
     const cache = getEquipmentCache()
     saveEquipmentCache({ ...cache, trolleys })
+  },
+
+  async checkoutTrolley(code: string, input: CheckoutInput) {
+    const cache = getEquipmentCache()
+    const now = Date.now()
+    let updated: TrolleyUnit | null = null
+    const trolleys = cache.trolleys.map((unit) => {
+      if (unit.code !== code) return unit
+      updated = applyCheckout(unit, input, now)
+      return updated
+    })
+    if (!updated) throw new Error(`Trolley ${code} not found`)
+    saveEquipmentCache({ ...cache, trolleys })
+    return updated
+  },
+
+  async checkinTrolley(code: string, input: CheckinInput) {
+    const cache = getEquipmentCache()
+    const now = Date.now()
+    let updated: TrolleyUnit | null = null
+    const trolleys = cache.trolleys.map((unit) => {
+      if (unit.code !== code) return unit
+      updated = applyCheckin(unit, input, now)
+      return updated
+    })
+    if (!updated) throw new Error(`Trolley ${code} not found`)
+    saveEquipmentCache({ ...cache, trolleys })
+    return updated
   },
 
   async listPosDevices() {

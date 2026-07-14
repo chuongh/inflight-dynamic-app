@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PortableDevice } from '@/modules/equipment/lib/generatePortableDevices'
 import type { TrolleyUnit } from '@/modules/equipment/constants'
 import type { CompleteRepairRequestInput, RepairRequestFilters } from '../types'
+import type { CheckinInput, CheckoutInput } from '../lib/movement'
 import { equipmentService } from '../services/createEquipmentService'
 
 export const trolleyQueryKey = ['equipment', 'trolleys'] as const
@@ -129,6 +130,28 @@ export function useCancelRepairRequest() {
     mutationFn: (id: string) => equipmentService.cancelRepairRequest(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: repairRequestsQueryKey })
+      queryClient.invalidateQueries({ queryKey: trolleyQueryKey })
+    },
+  })
+}
+
+export function useCheckoutTrolley() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ code, input }: { code: string; input: CheckoutInput }) =>
+      equipmentService.checkoutTrolley(code, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: trolleyQueryKey })
+    },
+  })
+}
+
+export function useCheckinTrolley() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ code, input }: { code: string; input: CheckinInput }) =>
+      equipmentService.checkinTrolley(code, input),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: trolleyQueryKey })
     },
   })
