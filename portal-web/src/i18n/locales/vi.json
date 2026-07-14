@@ -263,7 +263,27 @@
       "repairContent": "Nội dung sửa chữa",
       "rootCause": "Nguyên nhân",
       "inProgress": "Đang xử lý",
-      "ongoingSuffix": " (đang tiếp tục)"
+      "ongoingSuffix": " (đang tiếp tục)",
+      "quality": "Chất lượng",
+      "rework": "Tái hỏng",
+      "pass": "Đạt"
+    },
+    "checkinout": {
+      "checkout": "Check-out",
+      "checkin": "Check-in",
+      "checkoutTitle": "Check-out trolley {{code}}",
+      "checkinTitle": "Check-in trolley {{code}}",
+      "crew": "Tổ bay thực hiện",
+      "flight": "Chuyến bay",
+      "toStation": "Sân bay đến",
+      "atStation": "Sân bay nhận",
+      "condition": "Tình trạng thiết bị",
+      "ok": "Tốt",
+      "damaged": "Có lỗi / hỏng",
+      "note": "Ghi chú",
+      "checkoutOk": "Đã check-out {{code}}",
+      "checkinOk": "Đã check-in {{code}}",
+      "failed": "Thao tác thất bại, thử lại"
     },
     "repairDrawer": {
       "title": "Lịch sử sửa chữa",
@@ -326,7 +346,11 @@
       "imei": "IMEI",
       "holder": "Người giữ",
       "totalRepairs": "Tổng sửa chữa",
-      "lastRepairDate": "Lần sửa gần nhất"
+      "lastRepairDate": "Lần sửa gần nhất",
+      "rfid": "RFID / EPC",
+      "health": "Sức khỏe",
+      "custody": "Đang giữ bởi",
+      "lastSeen": "Quét gần nhất"
     },
     "sendToRepair": {
       "title": "Gửi sửa chữa",

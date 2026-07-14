@@ -263,7 +263,27 @@
       "repairContent": "Repair Content",
       "rootCause": "Root Cause",
       "inProgress": "In progress",
-      "ongoingSuffix": " (ongoing)"
+      "ongoingSuffix": " (ongoing)",
+      "quality": "Quality",
+      "rework": "Rework",
+      "pass": "Pass"
+    },
+    "checkinout": {
+      "checkout": "Check-out",
+      "checkin": "Check-in",
+      "checkoutTitle": "Check-out trolley {{code}}",
+      "checkinTitle": "Check-in trolley {{code}}",
+      "crew": "Cabin crew",
+      "flight": "Flight",
+      "toStation": "Destination station",
+      "atStation": "Receiving station",
+      "condition": "Equipment condition",
+      "ok": "Good",
+      "damaged": "Damaged",
+      "note": "Note",
+      "checkoutOk": "Checked out {{code}}",
+      "checkinOk": "Checked in {{code}}",
+      "failed": "Action failed, try again"
     },
     "repairDrawer": {
       "title": "Repair history",
@@ -326,7 +346,11 @@
       "imei": "IMEI",
       "holder": "Holder",
       "totalRepairs": "Total Repairs",
-      "lastRepairDate": "Last repair date"
+      "lastRepairDate": "Last repair date",
+      "rfid": "RFID / EPC",
+      "health": "Health",
+      "custody": "Held by",
+      "lastSeen": "Last seen"
     },
     "sendToRepair": {
       "title": "Send to repair",
