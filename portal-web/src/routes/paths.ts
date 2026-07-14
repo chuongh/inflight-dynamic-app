@@ -12,8 +12,14 @@ export const paths = {
     list: '/airports',
   },
   catering: {
+    grouping: {
+      list: '/catering/grouping',
+    },
     quota: {
       list: '/catering/quota',
+    },
+    config: {
+      list: '/catering/config',
     },
   },
   equipment: {

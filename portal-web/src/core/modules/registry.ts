@@ -60,8 +60,28 @@ export const PORTAL_MODULES: PortalModule[] = [
   {
     id: 'catering',
     labelKey: 'nav.catering',
-    path: paths.catering.quota.list,
+    path: paths.catering.grouping.list,
     permission: 'catering.quota.manage',
+    children: [
+      {
+        id: 'catering-grouping',
+        labelKey: 'nav.cateringGrouping',
+        path: paths.catering.grouping.list,
+        permission: 'catering.read',
+      },
+      {
+        id: 'catering-quota',
+        labelKey: 'nav.inflightMealQuota',
+        path: paths.catering.quota.list,
+        permission: 'catering.quota.manage',
+      },
+      {
+        id: 'catering-config',
+        labelKey: 'nav.cateringConfig',
+        path: paths.catering.config.list,
+        permission: 'catering.quota.manage',
+      },
+    ],
   },
   {
     id: 'airports',
@@ -121,6 +141,9 @@ export const NAV_SECTION_KEYS: Record<
   dashboard: { sectionTitleKey: 'nav.dashboard' },
   'design-system': { sectionTitleKey: 'nav.designSystem' },
   catering: { sectionTitleKey: 'nav.catering' },
+  'catering-grouping': { sectionTitleKey: 'nav.cateringGrouping', moduleLabelKey: 'nav.catering' },
+  'catering-quota': { sectionTitleKey: 'nav.inflightMealQuota', moduleLabelKey: 'nav.catering' },
+  'catering-config': { sectionTitleKey: 'nav.cateringConfig', moduleLabelKey: 'nav.catering' },
   airports: { sectionTitleKey: 'nav.airports' },
   pos: { sectionTitleKey: 'nav.pos', moduleLabelKey: 'nav.equipment' },
   ipad: { sectionTitleKey: 'nav.ipad', moduleLabelKey: 'nav.equipment' },

@@ -1,0 +1,770 @@
+{
+  "seedVersion": "2026-07-14-3days",
+  "station": "SGN",
+  "stationName": "Tân Sơn Nhất",
+  "days": [
+    {
+      "serviceDate": "08/07/2026",
+      "serviceWeekday": "Thứ Ba",
+      "status": "grouped",
+      "aiGroupedAt": "10:13 · 07/07",
+      "aiAccuracy": 92,
+      "groups": [
+        {
+          "id": "g1",
+          "aircraft": "VN-A202",
+          "aircraftType": "A321",
+          "purser": "TUYET 1 NGUYEN THI CAM",
+          "purserCode": "1797",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ142",
+              "dep": "SGN",
+              "arr": "HAN",
+              "std": "13:20",
+              "sta": "15:30",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ193",
+              "dep": "HAN",
+              "arr": "SGN",
+              "std": "16:30",
+              "sta": "18:40",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ644",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "19:20",
+              "sta": "20:40",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ645",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "21:15",
+              "sta": "22:35",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "g2",
+          "aircraft": "VN-A203",
+          "aircraftType": "A321",
+          "purser": "LINH 10 TRAN NGOC DIEU",
+          "purserCode": "1449",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ893",
+              "dep": "SGN",
+              "arr": "DPS",
+              "std": "08:15",
+              "sta": "13:05",
+              "intl": true
+            },
+            {
+              "flightNo": "VJ894",
+              "dep": "DPS",
+              "arr": "SGN",
+              "std": "14:05",
+              "sta": "16:55",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "g3",
+          "aircraft": "VN-A203",
+          "aircraftType": "A321",
+          "purser": "LINH 30 LUU MY",
+          "purserCode": "5968",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Hành trình 4 chặng qua 2 vòng (BMV rồi DAD) trên cùng tàu VN-A203. Kiểm tra xem có nên tách thành 2 nhóm đặt hàng riêng.",
+          "legs": [
+            {
+              "flightNo": "VJ352",
+              "dep": "SGN",
+              "arr": "BMV",
+              "std": "17:55",
+              "sta": "18:55",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ353",
+              "dep": "BMV",
+              "arr": "SGN",
+              "std": "19:30",
+              "sta": "20:30",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ652",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "21:10",
+              "sta": "22:30",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ631",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "23:05",
+              "sta": "00:25",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "g4",
+          "aircraft": "VN-A521",
+          "aircraftType": "A321",
+          "purser": "DUYEN 4 NGUYEN LE HA",
+          "purserCode": "6601",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ895",
+              "dep": "SGN",
+              "arr": "DEL",
+              "std": "19:25",
+              "sta": "22:55",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "g5",
+          "aircraft": "VN-A523",
+          "aircraftType": "A321",
+          "purser": "VINH 1 NGUYEN PHU",
+          "purserCode": "2364",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ886",
+              "dep": "SGN",
+              "arr": "KHH",
+              "std": "07:30",
+              "sta": "11:40",
+              "intl": true
+            },
+            {
+              "flightNo": "VJ885",
+              "dep": "KHH",
+              "arr": "SGN",
+              "std": "12:40",
+              "sta": "14:50",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "g6",
+          "aircraft": "VN-A523",
+          "aircraftType": "A321",
+          "purser": "LAN 5 NGUYEN TAN",
+          "purserCode": "4609",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ1831",
+              "dep": "SGN",
+              "arr": "VTE",
+              "std": "16:25",
+              "sta": "18:25",
+              "intl": true
+            },
+            {
+              "flightNo": "VJ1832",
+              "dep": "VTE",
+              "arr": "SGN",
+              "std": "19:10",
+              "sta": "21:10",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "g7",
+          "aircraft": "VN-A523",
+          "aircraftType": "A321",
+          "purser": "PHUONG 18 PHAM MINH",
+          "purserCode": "5670",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Purser đổi 3 lần trên cùng tàu VN-A523 trong ngày. Xác nhận chặng khuya SGN→HAN này là nhóm riêng của purser PHUONG 18.",
+          "legs": [
+            {
+              "flightNo": "VJ150",
+              "dep": "SGN",
+              "arr": "HAN",
+              "std": "22:10",
+              "sta": "00:20",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "g8",
+          "aircraft": "VN-A524",
+          "aircraftType": "A321",
+          "purser": "DO 2 TRIEU TRIEU",
+          "purserCode": "5760",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ1604",
+              "dep": "SGN",
+              "arr": "CXR",
+              "std": "11:15",
+              "sta": "12:15",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "g9",
+          "aircraft": "VN-A820",
+          "aircraftType": "A330",
+          "purser": "TU 15 BUI ANH",
+          "purserCode": "2283",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ083",
+              "dep": "SGN",
+              "arr": "BNE",
+              "std": "10:15",
+              "sta": "21:30",
+              "intl": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "serviceDate": "09/07/2026",
+      "serviceWeekday": "Thứ Tư",
+      "status": "ungrouped",
+      "groups": [],
+      "ungroupedFlights": [
+        {
+          "flightNo": "VJ120",
+          "aircraft": "VN-A301",
+          "aircraftType": "A321",
+          "dep": "SGN",
+          "arr": "HAN",
+          "std": "06:00",
+          "sta": "08:10",
+          "purser": "MAI 3 NGUYEN THI HONG",
+          "purserCode": "3021",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ121",
+          "aircraft": "VN-A301",
+          "aircraftType": "A321",
+          "dep": "HAN",
+          "arr": "SGN",
+          "std": "09:00",
+          "sta": "11:10",
+          "purser": "MAI 3 NGUYEN THI HONG",
+          "purserCode": "3021",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ632",
+          "aircraft": "VN-A301",
+          "aircraftType": "A321",
+          "dep": "SGN",
+          "arr": "DAD",
+          "std": "12:30",
+          "sta": "13:50",
+          "purser": "HANG 8 LE THU",
+          "purserCode": "3088",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ633",
+          "aircraft": "VN-A301",
+          "aircraftType": "A321",
+          "dep": "DAD",
+          "arr": "SGN",
+          "std": "14:30",
+          "sta": "15:50",
+          "purser": "HANG 8 LE THU",
+          "purserCode": "3088",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ890",
+          "aircraft": "VN-A302",
+          "aircraftType": "A321",
+          "dep": "SGN",
+          "arr": "DPS",
+          "std": "07:45",
+          "sta": "12:35",
+          "purser": "SON 5 TRAN VAN",
+          "purserCode": "2915",
+          "intl": true
+        },
+        {
+          "flightNo": "VJ891",
+          "aircraft": "VN-A302",
+          "aircraftType": "A321",
+          "dep": "DPS",
+          "arr": "SGN",
+          "std": "13:30",
+          "sta": "16:20",
+          "purser": "SON 5 TRAN VAN",
+          "purserCode": "2915",
+          "intl": true
+        },
+        {
+          "flightNo": "VJ350",
+          "aircraft": "VN-A303",
+          "aircraftType": "A321",
+          "dep": "SGN",
+          "arr": "BMV",
+          "std": "16:20",
+          "sta": "17:20",
+          "purser": "LAN 12 PHAM NGOC",
+          "purserCode": "4610",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ351",
+          "aircraft": "VN-A303",
+          "aircraftType": "A321",
+          "dep": "BMV",
+          "arr": "SGN",
+          "std": "17:55",
+          "sta": "18:55",
+          "purser": "LAN 12 PHAM NGOC",
+          "purserCode": "4610",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ654",
+          "aircraft": "VN-A303",
+          "aircraftType": "A321",
+          "dep": "SGN",
+          "arr": "DAD",
+          "std": "20:00",
+          "sta": "21:20",
+          "purser": "TUAN 7 DO MINH",
+          "purserCode": "3344",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ655",
+          "aircraft": "VN-A303",
+          "aircraftType": "A321",
+          "dep": "DAD",
+          "arr": "SGN",
+          "std": "21:55",
+          "sta": "23:15",
+          "purser": "TUAN 7 DO MINH",
+          "purserCode": "3344",
+          "intl": false
+        },
+        {
+          "flightNo": "VJ852",
+          "aircraft": "VN-A521",
+          "aircraftType": "A321",
+          "dep": "SGN",
+          "arr": "RMQ",
+          "std": "10:10",
+          "sta": "14:30",
+          "purser": "DUYEN 3 NGUYEN THI",
+          "purserCode": "2139",
+          "intl": true
+        },
+        {
+          "flightNo": "VJ853",
+          "aircraft": "VN-A521",
+          "aircraftType": "A321",
+          "dep": "RMQ",
+          "arr": "SGN",
+          "std": "15:30",
+          "sta": "18:00",
+          "purser": "DUYEN 3 NGUYEN THI",
+          "purserCode": "2139",
+          "intl": true
+        },
+        {
+          "flightNo": "VJ896",
+          "aircraft": "VN-A525",
+          "aircraftType": "A321",
+          "dep": "SGN",
+          "arr": "ICN",
+          "std": "23:40",
+          "sta": "06:50",
+          "purser": "KHANH 9 TRAN QUOC",
+          "purserCode": "2777",
+          "intl": true
+        },
+        {
+          "flightNo": "VJ085",
+          "aircraft": "VN-A810",
+          "aircraftType": "A330",
+          "dep": "SGN",
+          "arr": "BNE",
+          "std": "10:15",
+          "sta": "21:30",
+          "purser": "HA 4 VU THANH",
+          "purserCode": "2266",
+          "intl": true
+        }
+      ]
+    },
+    {
+      "serviceDate": "14/07/2026",
+      "serviceWeekday": "Thứ Ba",
+      "status": "grouped",
+      "aiGroupedAt": "09:30 · 13/07",
+      "aiAccuracy": 90,
+      "groups": [
+        {
+          "id": "d3g1",
+          "aircraft": "VN-A202",
+          "aircraftType": "A321",
+          "purser": "KHOA 1 LE DINH",
+          "purserCode": "1911",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ620",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "05:05",
+              "sta": "06:20",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ641",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "06:50",
+              "sta": "08:10",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "d3g2",
+          "aircraft": "VN-A202",
+          "aircraftType": "A321",
+          "purser": "THY 7 TRAN HUYNH",
+          "purserCode": "8010",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Hành trình 4 chặng qua 2 vòng (BMV rồi DAD) trên cùng tàu VN-A202. Kiểm tra có nên tách thành 2 nhóm đặt hàng riêng.",
+          "legs": [
+            {
+              "flightNo": "VJ352",
+              "dep": "SGN",
+              "arr": "BMV",
+              "std": "17:55",
+              "sta": "18:55",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ353",
+              "dep": "BMV",
+              "arr": "SGN",
+              "std": "19:25",
+              "sta": "20:25",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ652",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "21:10",
+              "sta": "22:30",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ631",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "23:00",
+              "sta": "00:20",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "d3g3",
+          "aircraft": "VN-A578",
+          "aircraftType": "A321",
+          "purser": "CHUC 1 NGO TRAN KHANH",
+          "purserCode": "7511",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ893",
+              "dep": "SGN",
+              "arr": "DPS",
+              "std": "08:45",
+              "sta": "13:35",
+              "intl": true
+            },
+            {
+              "flightNo": "VJ894",
+              "dep": "DPS",
+              "arr": "SGN",
+              "std": "14:35",
+              "sta": "17:25",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "d3g4",
+          "aircraft": "VN-A528",
+          "aircraftType": "A321",
+          "purser": "TUC 1 DIEU",
+          "purserCode": "9933",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ825",
+              "dep": "SGN",
+              "arr": "KUL",
+              "std": "09:30",
+              "sta": "12:35",
+              "intl": true
+            },
+            {
+              "flightNo": "VJ826",
+              "dep": "KUL",
+              "arr": "SGN",
+              "std": "13:35",
+              "sta": "14:20",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "d3g5",
+          "aircraft": "VN-A532",
+          "aircraftType": "A321",
+          "purser": "TRA 4 NGO THI KHANH",
+          "purserCode": "7955",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ858",
+              "dep": "SGN",
+              "arr": "MNL",
+              "std": "22:25",
+              "sta": "02:10",
+              "intl": true
+            },
+            {
+              "flightNo": "VJ859",
+              "dep": "MNL",
+              "arr": "SGN",
+              "std": "03:00",
+              "sta": "04:35",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "d3g6",
+          "aircraft": "VN-A535",
+          "aircraftType": "A321",
+          "purser": "NGAN 16 TRAN THI KIM",
+          "purserCode": "8160",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ883",
+              "dep": "SGN",
+              "arr": "BOM",
+              "std": "19:10",
+              "sta": "22:45",
+              "intl": true
+            },
+            {
+              "flightNo": "VJ884",
+              "dep": "BOM",
+              "arr": "SGN",
+              "std": "23:45",
+              "sta": "06:45",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "d3g7",
+          "aircraft": "VN-A552",
+          "aircraftType": "A321",
+          "purser": "NGUYEN 17 HUYNH MY",
+          "purserCode": "10379",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Chặng giữa dừng HAN (SGN→DAD→HAN→DAD→SGN) — bất thường cho vòng bay từ SGN. Xác nhận lại toàn bộ có cùng một nhóm không.",
+          "legs": [
+            {
+              "flightNo": "VJ634",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "10:50",
+              "sta": "12:15",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ1504",
+              "dep": "DAD",
+              "arr": "HAN",
+              "std": "12:45",
+              "sta": "14:05",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ1505",
+              "dep": "HAN",
+              "arr": "DAD",
+              "std": "14:40",
+              "sta": "16:00",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ637",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "16:40",
+              "sta": "18:00",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "d3g8",
+          "aircraft": "VN-A649",
+          "aircraftType": "A321",
+          "purser": "LY 6 NGUYEN HUYNH",
+          "purserCode": "2379",
+          "confidence": "mid",
+          "confirmed": false,
+          "reviewNote": "Hai vòng SGN→DAD→SGN liên tiếp cùng tàu/purser. Kiểm tra có phải một nhóm hay hai chuyến tách biệt.",
+          "legs": [
+            {
+              "flightNo": "VJ622",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "05:20",
+              "sta": "06:40",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ625",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "07:10",
+              "sta": "08:30",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ630",
+              "dep": "SGN",
+              "arr": "DAD",
+              "std": "09:05",
+              "sta": "10:30",
+              "intl": false
+            },
+            {
+              "flightNo": "VJ629",
+              "dep": "DAD",
+              "arr": "SGN",
+              "std": "11:00",
+              "sta": "12:25",
+              "intl": false
+            }
+          ]
+        },
+        {
+          "id": "d3g9",
+          "aircraft": "VN-A653",
+          "aircraftType": "A321",
+          "purser": "VY 61 VU THI PHUONG",
+          "purserCode": "4624",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ822",
+              "dep": "SGN",
+              "arr": "NRT",
+              "std": "23:35",
+              "sta": "07:55",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "d3g10",
+          "aircraft": "VN-A817",
+          "aircraftType": "A330",
+          "purser": "THINH 3 NGUYEN TRAN DUC",
+          "purserCode": "3832",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ085",
+              "dep": "SGN",
+              "arr": "SYD",
+              "std": "19:55",
+              "sta": "08:20",
+              "intl": true
+            }
+          ]
+        },
+        {
+          "id": "d3g11",
+          "aircraft": "VN-A820",
+          "aircraftType": "A330",
+          "purser": "HIEN 5 PHAM THI THANH",
+          "purserCode": "1438",
+          "confidence": "high",
+          "confirmed": false,
+          "legs": [
+            {
+              "flightNo": "VJ081",
+              "dep": "SGN",
+              "arr": "MEL",
+              "std": "11:10",
+              "sta": "23:35",
+              "intl": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

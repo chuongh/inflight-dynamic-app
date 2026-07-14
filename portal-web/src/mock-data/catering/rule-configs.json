@@ -1,0 +1,112 @@
+{
+  "versions": [
+    {
+      "id": "c3",
+      "version": 3,
+      "status": "active",
+      "effectiveFrom": "01/07/2026",
+      "updatedBy": "Trần Minh · Commercial",
+      "updatedAt": "28/06/2026",
+      "note": "July 2026 — align with quota v5. Added diverted flights to exclusion.",
+      "rules": [
+        {
+          "id": "r-scope",
+          "kind": "scope_note",
+          "enabled": true,
+          "text": "Commercial hotmeal only — excludes crew meal, pre-book, SkyBoss, CIP…"
+        },
+        {
+          "id": "r-prebook",
+          "kind": "threshold_reduction",
+          "enabled": true,
+          "metric": "prebook",
+          "threshold": 50,
+          "reducePct": 50
+        },
+        {
+          "id": "r-latedom",
+          "kind": "time_exclusion",
+          "enabled": true,
+          "scope": "DOM",
+          "fromTime": "21:00"
+        },
+        {
+          "id": "r-status",
+          "kind": "status_exclusion",
+          "enabled": true,
+          "statuses": ["cancelled", "ferry"]
+        },
+        {
+          "id": "r-purser",
+          "kind": "group_by_purser",
+          "enabled": true
+        },
+        {
+          "id": "r-flighthour",
+          "kind": "group_by_flight_hour",
+          "enabled": false,
+          "maxHours": 8
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "version": 2,
+      "status": "superseded",
+      "effectiveFrom": "15/06/2026",
+      "effectiveTo": "30/06/2026",
+      "updatedBy": "Trần Minh · Commercial",
+      "updatedAt": "13/06/2026",
+      "note": "Tighten pre-book threshold to 50.",
+      "rules": [
+        {
+          "id": "r-scope",
+          "kind": "scope_note",
+          "enabled": true,
+          "text": "Commercial hotmeal only — excludes crew meal, pre-book, SkyBoss, CIP…"
+        },
+        {
+          "id": "r-prebook",
+          "kind": "threshold_reduction",
+          "enabled": true,
+          "metric": "prebook",
+          "threshold": 50,
+          "reducePct": 50
+        },
+        {
+          "id": "r-latedom",
+          "kind": "time_exclusion",
+          "enabled": true,
+          "scope": "DOM",
+          "fromTime": "21:00"
+        }
+      ]
+    },
+    {
+      "id": "c1",
+      "version": 1,
+      "status": "superseded",
+      "effectiveFrom": "01/06/2026",
+      "effectiveTo": "14/06/2026",
+      "updatedBy": "Trần Minh · Commercial",
+      "updatedAt": "30/05/2026",
+      "note": "Initial rule set.",
+      "rules": [
+        {
+          "id": "r-scope",
+          "kind": "scope_note",
+          "enabled": true,
+          "text": "Commercial hotmeal only — excludes crew meal, pre-book, SkyBoss, CIP…"
+        },
+        {
+          "id": "r-prebook",
+          "kind": "threshold_reduction",
+          "enabled": true,
+          "metric": "prebook",
+          "threshold": 60,
+          "reducePct": 50
+        }
+      ]
+    }
+  ]
+}

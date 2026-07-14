@@ -10,6 +10,8 @@ import {
 } from '@/modules/equipment/hooks/useEquipment'
 import { AirportListPage } from '@/pages/airports/AirportListPage'
 import { QuotaPage } from '@/pages/catering/quota/QuotaPage'
+import { ConfigPage } from '@/pages/catering/config/ConfigPage'
+import { GroupingPage } from '@/pages/catering/grouping/GroupingPage'
 import { PermissionMatrixPage } from '@/pages/admin/PermissionMatrixPage'
 import { RolesPage } from '@/pages/admin/RolesPage'
 import { UsersPage } from '@/pages/admin/UsersPage'
@@ -103,7 +105,9 @@ export function AppRoutes() {
         <Route path={paths.equipment.trolley.list} element={<TrolleyListRoute />} />
         <Route path={`${paths.equipment.trolley.list}/:code`} element={<TrolleyDetailRoute />} />
         <Route path={paths.airports.list} element={<AirportListPage />} />
+        <Route path={paths.catering.grouping.list} element={<GroupingPage />} />
         <Route path={paths.catering.quota.list} element={<QuotaPage />} />
+        <Route path={paths.catering.config.list} element={<ConfigPage />} />
         <Route path={paths.admin.users} element={<UsersPage />} />
         <Route path={paths.admin.roles} element={<RolesPage />} />
         <Route path={paths.admin.permissions} element={<PermissionMatrixPage />} />
