@@ -1,4 +1,5 @@
-import { AlertTriangle, CheckCircle2, Radio, ShoppingCart, Wrench } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, PlaneTakeoff, Radio, Search, ShoppingCart, Wrench } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KpiCard } from '@/components/patterns/KpiCard'
@@ -14,8 +15,13 @@ import {
 import { STATIONS, type TrolleyUnit } from '@/modules/equipment/constants'
 import { vjFleetChartColors } from '@/design-system'
 import { useEquipmentLabels } from '@/i18n/hooks/useEquipmentLabels'
+import { computeHealthScore, computeReworkStats } from '@/modules/equipment/lib/analytics'
 import { summarizeFleet } from '@/modules/equipment/lib/generateTrolleys'
+import { isStale } from '@/modules/equipment/lib/movement'
 import type { RepairRequest } from '@/modules/equipment/types'
+
+const DAY_MS = 86_400_000
+const SLA_INTAKE_DAYS = 2
 
 interface DashboardPageProps {
   trolleys: TrolleyUnit[]
@@ -88,6 +94,72 @@ function buildOpsFeed(trolleys: TrolleyUnit[], repairRequests: RepairRequest[]):
     .slice(0, 8)
 }
 
+function codesPreview(units: TrolleyUnit[], limit = 4): string {
+  if (units.length === 0) return '—'
+  return units.slice(0, limit).map((unit) => unit.code).join(', ')
+}
+
+function HealthBarRow({
+  label,
+  count,
+  total,
+  color,
+}: {
+  label: string
+  count: number
+  total: number
+  color: string
+}) {
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-24 shrink-0 text-xs font-bold" style={{ color }}>
+        {label}
+      </span>
+      <span className="h-2.5 flex-1 overflow-hidden rounded-full border border-[var(--color-border)] bg-[var(--color-background)]">
+        <span className="block h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+      </span>
+      <span className="tnum w-10 shrink-0 text-right text-xs font-bold" style={{ color }}>
+        {count}
+      </span>
+    </div>
+  )
+}
+
+function AlertRow({
+  tone,
+  icon: Icon,
+  title,
+  detail,
+}: {
+  tone: 'danger' | 'warning' | 'neutral'
+  icon: LucideIcon
+  title: string
+  detail: string
+}) {
+  const toneColor =
+    tone === 'danger'
+      ? 'var(--color-vj-red)'
+      : tone === 'warning'
+        ? 'var(--color-vj-yellow-dark)'
+        : 'var(--color-text-secondary)'
+
+  return (
+    <div
+      className="flex items-start gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
+      style={{ borderLeftWidth: 3, borderLeftColor: toneColor }}
+    >
+      <Icon size={18} strokeWidth={2.25} style={{ color: toneColor }} className="mt-0.5 shrink-0" aria-hidden />
+      <div className="min-w-0">
+        <p className="text-[13px] font-extrabold text-[var(--color-foreground)]">{title}</p>
+        <p className="mt-0.5 truncate text-xs font-semibold leading-relaxed text-[var(--color-text-secondary)]" title={detail}>
+          {detail}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function DashboardPage({ trolleys, repairRequests = [] }: DashboardPageProps) {
   const { t } = useTranslation()
   const { statusLabel } = useEquipmentLabels()
@@ -102,7 +174,32 @@ export function DashboardPage({ trolleys, repairRequests = [] }: DashboardPagePr
   const serviceCount = useCountUp(summary.service, 520)
   const repairingCount = useCountUp(summary.repairing, 540)
   const notServiceCount = useCountUp(summary.notService, 560)
+  const inTransitCount = useCountUp(summary.inTransit, 580)
   const readyDisplay = useCountUp(Math.round(fleetReadyPct), 580)
+
+  const healthBuckets = useMemo(() => {
+    const now = Date.now()
+    const buckets = { good: 0, mid: 0, bad: 0 }
+    for (const unit of trolleys) {
+      const score = computeHealthScore(unit, now)
+      if (score >= 75) buckets.good += 1
+      else if (score >= 50) buckets.mid += 1
+      else buckets.bad += 1
+    }
+    return buckets
+  }, [trolleys])
+
+  const alertGroups = useMemo(() => {
+    const now = Date.now()
+    const slaBreach = trolleys.filter(
+      (unit) => unit.status === 'not-service' && now - unit.lastSeenAt > SLA_INTAKE_DAYS * DAY_MS,
+    )
+    const rework = trolleys.filter((unit) => computeReworkStats(unit).reworkCount > 0)
+    const stale = trolleys.filter((unit) => isStale(unit, now))
+    return { slaBreach, rework, stale }
+  }, [trolleys])
+
+  const alertsTotal = alertGroups.slaBreach.length + alertGroups.rework.length + alertGroups.stale.length
 
   const stationNodes = useMemo((): StationMapNode[] => {
     return STATIONS.map((code) => {
@@ -156,7 +253,7 @@ export function DashboardPage({ trolleys, repairRequests = [] }: DashboardPagePr
   return (
     <div className="page-shell page-shell--command">
       <div className="thin-scroll page-shell__body page-shell__body--flush">
-        {/* <CommandHero
+        <CommandHero
           badge={t('dashboard.badge')}
           title={t('dashboard.title')}
           subtitle={t('dashboard.subtitle')}
@@ -171,10 +268,10 @@ export function DashboardPage({ trolleys, repairRequests = [] }: DashboardPagePr
             />
           }
           ticker={<OpsTicker items={opsFeed} />}
-        /> */}
+        />
 
         <div className="command-body">
-          <div className="kpi-grid kpi-grid--4">
+          <div className="kpi-grid kpi-grid--5">
             <div className="dash-enter dash-enter-delay-1">
               <KpiCard
                 label={t('dashboard.kpiTotal')}
@@ -212,9 +309,18 @@ export function DashboardPage({ trolleys, repairRequests = [] }: DashboardPagePr
                 tone="danger"
               />
             </div>
+            <div className="dash-enter dash-enter-delay-5">
+              <KpiCard
+                label={t('dashboard.kpiInTransit')}
+                value={inTransitCount}
+                hint={t('dashboard.hintInTransit', { count: summary.inTransit })}
+                icon={PlaneTakeoff}
+                tone="brand"
+              />
+            </div>
           </div>
 
-          <div className="dash-enter dash-enter-delay-5">
+          <div className="dash-enter dash-enter-delay-6">
             <SurfaceCard
               title={t('dashboard.throughputTitle')}
               description={t('dashboard.throughputDesc')}
@@ -245,6 +351,60 @@ export function DashboardPage({ trolleys, repairRequests = [] }: DashboardPagePr
                     </div>
                   </div>
                 ))}
+              </div>
+            </SurfaceCard>
+          </div>
+
+          <div className="dash-enter dash-enter-delay-7 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <SurfaceCard
+              title={t('dashboard.healthDistTitle')}
+              description={t('dashboard.healthDistDesc')}
+            >
+              <div className="flex flex-col gap-3">
+                <HealthBarRow
+                  label={t('dashboard.healthGood')}
+                  count={healthBuckets.good}
+                  total={summary.total}
+                  color="var(--color-vj-green-dark)"
+                />
+                <HealthBarRow
+                  label={t('dashboard.healthMid')}
+                  count={healthBuckets.mid}
+                  total={summary.total}
+                  color="var(--color-vj-yellow-dark)"
+                />
+                <HealthBarRow
+                  label={t('dashboard.healthBad')}
+                  count={healthBuckets.bad}
+                  total={summary.total}
+                  color="var(--color-vj-red)"
+                />
+              </div>
+            </SurfaceCard>
+
+            <SurfaceCard
+              title={t('dashboard.alertsTitle')}
+              description={t('dashboard.alertsDesc', { count: alertsTotal })}
+            >
+              <div className="flex flex-col gap-2.5">
+                <AlertRow
+                  tone="danger"
+                  icon={AlertTriangle}
+                  title={t('dashboard.alertSlaBreach', { count: alertGroups.slaBreach.length })}
+                  detail={codesPreview(alertGroups.slaBreach)}
+                />
+                <AlertRow
+                  tone="warning"
+                  icon={Wrench}
+                  title={t('dashboard.alertRework', { count: alertGroups.rework.length })}
+                  detail={codesPreview(alertGroups.rework)}
+                />
+                <AlertRow
+                  tone="neutral"
+                  icon={Search}
+                  title={t('dashboard.alertStale', { count: alertGroups.stale.length })}
+                  detail={codesPreview(alertGroups.stale)}
+                />
               </div>
             </SurfaceCard>
           </div>

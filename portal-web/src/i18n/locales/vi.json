@@ -174,10 +174,12 @@
     "kpiInService": "Đang phục vụ",
     "kpiRepairing": "Đang sửa chữa",
     "kpiNotInService": "Ngừng phục vụ",
+    "kpiInTransit": "Đang luân chuyển",
     "hintFullHalf": "{{full}} Full · {{half}} Half",
     "hintFleetReady": "{{pct}}% đội sẵn sàng",
     "hintUnderMaintenance": "{{count}} thiết bị đang bảo trì",
     "hintAwaitingAction": "{{count}} chờ xử lý",
+    "hintInTransit": "{{count}} trên chuyến bay",
     "throughputTitle": "Thông lượng theo trạm",
     "throughputDesc": "Số lượng đội thiết bị theo mã ICAO",
     "unitsCount": "{{count}} thiết bị",
@@ -191,7 +193,17 @@
     "opsFeed": "Luồng vận hành",
     "eventsCount": "{{count}} sự kiện",
     "noEvents": "Không có sự kiện thiết bị gần đây.",
-    "mapAria": "Bản đồ mạng lưới trạm Việt Nam"
+    "mapAria": "Bản đồ mạng lưới trạm Việt Nam",
+    "healthDistTitle": "Phân bố sức khỏe đội tàu",
+    "healthDistDesc": "Điểm sức khỏe tính từ số lần sửa, tuổi thiết bị và tái hỏng",
+    "healthGood": "Tốt ≥75",
+    "healthMid": "Khá 50–74",
+    "healthBad": "Kém <50",
+    "alertsTitle": "Cảnh báo cần xử lý",
+    "alertsDesc": "{{count}} mục ưu tiên xử lý ngay",
+    "alertSlaBreach": "{{count}} xe quá SLA tiếp nhận sửa",
+    "alertRework": "{{count}} xe tái hỏng trong 30 ngày",
+    "alertStale": "{{count}} xe mất dấu RFID >7 ngày"
   },
   "equipment": {
     "status": {

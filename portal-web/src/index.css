@@ -971,6 +971,7 @@ a[href],
 }
 @media (min-width: 1280px) {
   .kpi-grid--4 { grid-template-columns: repeat(4, 1fr); }
+  .kpi-grid--5 { grid-template-columns: repeat(5, 1fr); }
 }
 
 /* ── Login ── */
@@ -1629,6 +1630,7 @@ a[href],
 .dash-enter-delay-4 { animation-delay: 160ms; }
 .dash-enter-delay-5 { animation-delay: 200ms; }
 .dash-enter-delay-6 { animation-delay: 240ms; }
+.dash-enter-delay-7 { animation-delay: 280ms; }
 .dash-bar-fill {
   transform-origin: left center;
   animation: dash-bar-grow 450ms var(--motion-ease) both;

@@ -174,10 +174,12 @@
     "kpiInService": "In service",
     "kpiRepairing": "Repairing",
     "kpiNotInService": "Not in service",
+    "kpiInTransit": "In transit",
     "hintFullHalf": "{{full}} Full · {{half}} Half",
     "hintFleetReady": "{{pct}}% fleet ready",
     "hintUnderMaintenance": "{{count}} units under maintenance",
     "hintAwaitingAction": "{{count}} awaiting action",
+    "hintInTransit": "{{count}} on flight",
     "throughputTitle": "Station throughput",
     "throughputDesc": "Fleet count by ICAO station code",
     "unitsCount": "{{count}} units",
@@ -191,7 +193,17 @@
     "opsFeed": "Ops feed",
     "eventsCount": "{{count}} events",
     "noEvents": "No recent equipment events.",
-    "mapAria": "Vietnam station network map"
+    "mapAria": "Vietnam station network map",
+    "healthDistTitle": "Fleet health distribution",
+    "healthDistDesc": "Health score derived from repair count, unit age, and rework",
+    "healthGood": "Good ≥75",
+    "healthMid": "Fair 50–74",
+    "healthBad": "Poor <50",
+    "alertsTitle": "Alerts needing action",
+    "alertsDesc": "{{count}} items need immediate attention",
+    "alertSlaBreach": "{{count}} units past intake SLA",
+    "alertRework": "{{count}} units reworked within 30 days",
+    "alertStale": "{{count}} units lost RFID signal >7 days"
   },
   "equipment": {
     "status": {
