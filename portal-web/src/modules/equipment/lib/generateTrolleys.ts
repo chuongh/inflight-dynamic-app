@@ -207,7 +207,8 @@ export function generateTrolleys(now = Date.now()): TrolleyUnit[] {
   // Target mix ≈ dashboard mock: ~86% service · ~9% repairing · ~5% not-service
   const notServiceCount = 18
   const repairingCount = 34
-  const serviceCount = total - notServiceCount - repairingCount
+  const inTransitCount = 21
+  const serviceCount = total - notServiceCount - repairingCount - inTransitCount
 
   const showcase: TrolleyUnit[] = [
     buildUnit({
@@ -280,12 +281,15 @@ export function generateTrolleys(now = Date.now()): TrolleyUnit[] {
     'not-service':
       notServiceCount - showcase.filter((item) => item.status === 'not-service').length,
     repairing: repairingCount - showcase.filter((item) => item.status === 'repairing').length,
+    'in-transit':
+      inTransitCount - showcase.filter((item) => item.status === 'in-transit').length,
   }
 
   const statusQueue: TrolleyStatus[] = [
     ...Array.from({ length: Math.max(0, remaining.service) }, () => 'service' as const),
     ...Array.from({ length: Math.max(0, remaining['not-service']) }, () => 'not-service' as const),
     ...Array.from({ length: Math.max(0, remaining.repairing) }, () => 'repairing' as const),
+    ...Array.from({ length: Math.max(0, remaining['in-transit']) }, () => 'in-transit' as const),
   ]
 
   for (let index = statusQueue.length - 1; index > 0; index -= 1) {
@@ -304,7 +308,7 @@ export function generateTrolleys(now = Date.now()): TrolleyUnit[] {
     statusIndex += 1
 
     const completedRepairs =
-      status === 'service'
+      status === 'service' || status === 'in-transit'
         ? Math.floor(random() * 4)
         : status === 'not-service'
           ? 1 + Math.floor(random() * 5)
@@ -357,9 +361,11 @@ export function exportTrolleysCsv(trolleys: TrolleyUnit[]) {
 
   const headers = [
     'Code',
+    'RFID/EPC',
     'Type',
     'Status',
     'Station',
+    'Last seen station',
     'Repairs',
     'Last repair',
     'Vendor',
@@ -372,9 +378,11 @@ export function exportTrolleysCsv(trolleys: TrolleyUnit[]) {
 
   const rows = trolleys.map((item) => [
     item.code,
+    item.rfidEpc,
     item.type === 'full' ? 'Full-size' : 'Half-size',
     item.status,
     item.station,
+    item.lastSeenStation,
     item.repairs,
     item.lastRepairReason,
     item.vendor,

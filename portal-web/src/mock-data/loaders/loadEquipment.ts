@@ -4,6 +4,7 @@ import {
   type PortableDevice,
 } from '@/modules/equipment/lib/generatePortableDevices'
 import { generateTrolleys } from '@/modules/equipment/lib/generateTrolleys'
+import { normalizeTrolley } from '@/modules/equipment/lib/normalizeTrolley'
 import type { TrolleyUnit } from '@/modules/equipment/constants'
 import { backfillRepairRequestsFromTrolleys, normalizeRepairRequest } from '../../modules/equipment/repairRequest'
 import type { RepairRequest } from '../../modules/equipment/types'
@@ -66,9 +67,15 @@ function ensureRepairRequests(cache: EquipmentCache): EquipmentCache {
 }
 
 export function getEquipmentCache(): EquipmentCache {
+  const now = Date.now()
+  const normalize = (cache: EquipmentCache): EquipmentCache => ({
+    ...cache,
+    trolleys: cache.trolleys.map((unit) => normalizeTrolley(unit, now)),
+  })
+
   const cached = readCache()
-  if (cached) return ensureRepairRequests(cached)
-  const seeded = seedFromJson()
+  if (cached) return ensureRepairRequests(normalize(cached))
+  const seeded = normalize(seedFromJson())
   const withRequests = ensureRepairRequests(seeded)
   writeCache(withRequests)
   return withRequests
