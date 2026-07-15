@@ -533,6 +533,7 @@
       "groupsToPrep": "groups to prep",
       "sectionGroups": "Groups to prep",
       "sectionPending": "Flights pending grouping",
+      "stationLabel": "Catering station",
       "reviewAlert": "groups the AI is unsure about — review before creating the order.",
       "onlyReview": "Show review only",
       "filterAll": "All",

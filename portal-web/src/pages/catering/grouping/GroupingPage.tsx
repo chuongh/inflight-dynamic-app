@@ -1,4 +1,4 @@
-import { App as AntApp, Button, Input, Segmented, Spin, Tooltip } from 'antd'
+import { App as AntApp, Button, Input, Segmented, Select, Spin, Tooltip } from 'antd'
 import {
   AlertTriangle,
   CheckCircle2,
@@ -24,6 +24,7 @@ import type { GroupByFlightHourRule } from '@/modules/catering/configTypes'
 import { activeCrewMealVersion, profileFor } from '@/modules/catering/crewMeal'
 import {
   autoGroupFlights,
+  groupOrigin,
   isReview,
   mergeGroups,
   moveLeg,
@@ -45,6 +46,13 @@ import { GroupCard } from './GroupCard'
 import { UngroupedView } from './UngroupedView'
 
 type FilterKey = 'all' | 'review' | 'confirmed'
+
+/** Catering stations a planner can be assigned to (demo station switcher). */
+const STATION_OPTIONS = [
+  { value: 'SGN', label: 'SGN · Tân Sơn Nhất' },
+  { value: 'HAN', label: 'HAN · Nội Bài' },
+  { value: 'CXR', label: 'CXR · Cam Ranh' },
+]
 
 export function GroupingPage() {
   const { t } = useTranslation()
@@ -68,6 +76,7 @@ export function GroupingPage() {
   const [running, setRunning] = useState(false)
   const [groupsOpen, setGroupsOpen] = useState(true)
   const [pendingOpen, setPendingOpen] = useState(true)
+  const [stationOverride, setStationOverride] = useState<string | null>(null)
 
   const days = useMemo(() => data?.days ?? [], [data])
   const day = useMemo(
@@ -75,19 +84,33 @@ export function GroupingPage() {
     [days, selectedDate],
   )
   const dayIndex = day ? days.findIndex((d) => d.serviceDate === day.serviceDate) : -1
-  const groups = day?.groups ?? []
+
+  // The planner's station (demo dropdown overrides the seed's default). Grouping is
+  // computed globally; this station selects which groups are THIS planner's order.
+  const station = stationOverride ?? data?.station ?? 'SGN'
+  const groups = useMemo(() => day?.groups ?? [], [day])
+  const stationGroups = useMemo(() => groups.filter((g) => groupOrigin(g) === station), [groups, station])
+
+  // After grouping, every flight sits in some group. The flights NOT uplifted at
+  // this station (another station's order, or an overnight-positioned rotation for
+  // review) are the pending list — derived from the kept raw flights.
+  const pendingFlights = useMemo(() => {
+    if (day?.status !== 'grouped') return []
+    const mine = new Set(stationGroups.flatMap((g) => g.legs.map((l) => l.flightNo)))
+    return (day?.ungroupedFlights ?? []).filter((f) => !mine.has(f.flightNo))
+  }, [day, stationGroups])
 
   const numberOf = useMemo(() => {
-    const map = new Map(groups.map((g, i) => [g.id, i + 1]))
+    const map = new Map(stationGroups.map((g, i) => [g.id, i + 1]))
     return (id: string) => map.get(id) ?? 0
-  }, [groups])
+  }, [stationGroups])
 
-  const reviewCount = groups.filter(isReview).length
-  const confirmedCount = groups.filter((g) => g.confirmed).length
+  const reviewCount = stationGroups.filter(isReview).length
+  const confirmedCount = stationGroups.filter((g) => g.confirmed).length
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const filtered = groups.filter((g) => {
+    const filtered = stationGroups.filter((g) => {
       if (filter === 'review' && !isReview(g)) return false
       if (filter === 'confirmed' && !g.confirmed) return false
       if (q) {
@@ -99,7 +122,7 @@ export function GroupingPage() {
       return true
     })
     return sortForReview(filtered)
-  }, [groups, filter, query])
+  }, [stationGroups, filter, query])
 
   const commit = (nextGroups: FlightGroup[], toast?: string) => {
     if (!data || !day) return
@@ -126,6 +149,14 @@ export function GroupingPage() {
     setEditing(new Set())
   }
 
+  const changeStation = (s: string) => {
+    setStationOverride(s)
+    setFilter('all')
+    setQuery('')
+    setOpened(new Set())
+    setEditing(new Set())
+  }
+
   const runGrouping = () => {
     if (!data || !day) return
     setRunning(true)
@@ -141,23 +172,21 @@ export function GroupingPage() {
       const quotaByFlightNo = new Map(
         quotaRows.map((r) => [r.flightNo, { hotmeal: r.hotmeal, banhMi: r.banhMi, traSua: r.traSua }]),
       )
+      // Group globally across all 3 stations at once; the view filters to the
+      // selected planner's station. Raw flights are kept so each station's pending
+      // list (flights it doesn't uplift) can be derived on the fly.
       const grouped = autoGroupFlights(day.ungroupedFlights ?? [], {
-        station: data.station,
         groupByPurser,
         maxHours: hourRule?.maxHours,
         quotaByFlightNo,
       })
-      // Keep the flights the rule didn't group (non-SGN-origin legs) visible
-      // below, so the planner can review them and catch a mis-grouping.
-      const groupedFlightNos = new Set(grouped.flatMap((g) => g.legs.map((l) => l.flightNo)))
-      const pending = (day.ungroupedFlights ?? []).filter((f) => !groupedFlightNos.has(f.flightNo))
       const nextDays = data.days.map((d) =>
         d.serviceDate === day.serviceDate
           ? {
               ...d,
               status: 'grouped' as const,
               groups: grouped,
-              ungroupedFlights: pending,
+              ungroupedFlights: day.ungroupedFlights,
               aiGroupedAt: t('catering.grouping.justNow'),
               aiAccuracy: 90,
             }
@@ -218,8 +247,9 @@ export function GroupingPage() {
   }
 
   const confirmAll = () => {
+    // Confirm only THIS station's groups (leave other stations' groups untouched).
     commit(
-      groups.map((g) => ({ ...g, confirmed: true })),
+      groups.map((g) => (groupOrigin(g) === station ? { ...g, confirmed: true } : g)),
       t('catering.grouping.confirmedAll'),
     )
     setEditing(new Set())
@@ -250,12 +280,12 @@ export function GroupingPage() {
   /** Build (or reopen) the day's supplier order from the CONFIRMED groups. */
   const handleCreateOrder = () => {
     if (!data || !day) return
-    const confirmed = groups.filter((g) => g.confirmed)
+    const confirmed = stationGroups.filter((g) => g.confirmed)
     if (confirmed.length === 0) {
       message.warning(t('catering.orders.needConfirmed'))
       return
     }
-    const fileId = orderFileId(data.station, day.serviceDate)
+    const fileId = orderFileId(station, day.serviceDate)
     const files = groupOrderFiles(ordersData?.orders ?? [])
     const existing = files.find((f) => f.fileId === fileId)
     // A draft already open for this day → just go edit it.
@@ -275,7 +305,7 @@ export function GroupingPage() {
             id: `${fileId}-v${version}`,
             version,
             serviceDate: day.serviceDate,
-            station: data.station,
+            station,
             createdAt: Date.now(),
             createdBy: session?.user.name ?? 'Catering Ops',
             status: 'draft' as const,
@@ -330,10 +360,18 @@ export function GroupingPage() {
         <div className="flex flex-col gap-4">
           {/* Context bar with day switcher */}
           <div className="border-border bg-surface flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-4 py-3 text-[13px] font-semibold">
-            <span className="text-vj-red inline-flex items-center gap-1.5">
+            <span className="text-vj-red inline-flex items-center gap-1">
               <MapPin size={16} />
-              <span className="text-foreground font-extrabold">{data.station}</span>
-              <span className="text-text-secondary">· {data.stationName}</span>
+              <Select
+                size="small"
+                variant="borderless"
+                value={station}
+                onChange={changeStation}
+                options={STATION_OPTIONS}
+                popupMatchSelectWidth={false}
+                aria-label={t('catering.grouping.stationLabel')}
+                className="fg-station-select font-extrabold"
+              />
             </span>
             <span className="bg-border h-1 w-1 rounded-full" />
             <span className="inline-flex items-center gap-1">
@@ -363,7 +401,7 @@ export function GroupingPage() {
               <>
                 <span className="bg-border h-1 w-1 rounded-full" />
                 <span>
-                  <span className="text-foreground font-extrabold">{groups.length}</span>{' '}
+                  <span className="text-foreground font-extrabold">{stationGroups.length}</span>{' '}
                   {t('catering.grouping.groupsToPrep')}
                 </span>
               </>
@@ -394,7 +432,7 @@ export function GroupingPage() {
               <SectionToggle
                 icon={<Utensils size={14} />}
                 label={t('catering.grouping.sectionGroups')}
-                count={groups.length}
+                count={stationGroups.length}
                 open={groupsOpen}
                 onToggle={() => setGroupsOpen((v) => !v)}
               />
@@ -406,7 +444,7 @@ export function GroupingPage() {
                       value={filter}
                       onChange={setFilter}
                       options={[
-                        { value: 'all', label: `${t('catering.grouping.filterAll')} (${groups.length})` },
+                        { value: 'all', label: `${t('catering.grouping.filterAll')} (${stationGroups.length})` },
                         { value: 'review', label: `${t('catering.grouping.filterReview')} (${reviewCount})` },
                         { value: 'confirmed', label: `${t('catering.grouping.filterConfirmed')} (${confirmedCount})` },
                       ]}
@@ -436,7 +474,7 @@ export function GroupingPage() {
                           number={numberOf(g.id)}
                           open={opened.has(g.id)}
                           editing={editing.has(g.id)}
-                          allGroups={groups}
+                          allGroups={stationGroups}
                           numberOf={numberOf}
                           onToggleOpen={() => setOpened((prev) => toggle(prev, g.id))}
                           onToggleEdit={() => {
@@ -459,19 +497,19 @@ export function GroupingPage() {
                 </>
               ) : null}
 
-              {/* Pending section — collapsible; flights the rule didn't group (non-SGN-origin) */}
-              {(day.ungroupedFlights?.length ?? 0) > 0 ? (
+              {/* Pending section — collapsible; flights not uplifting at this station */}
+              {pendingFlights.length > 0 ? (
                 <div className="border-border mt-1 border-t border-dashed pt-3">
                   <SectionToggle
                     icon={<Plane size={14} />}
                     label={t('catering.grouping.sectionPending')}
-                    count={day.ungroupedFlights?.length ?? 0}
+                    count={pendingFlights.length}
                     open={pendingOpen}
                     onToggle={() => setPendingOpen((v) => !v)}
                   />
                   {pendingOpen ? (
                     <div className="mt-2">
-                      <UngroupedView flights={day.ungroupedFlights ?? []} running={false} hideHeader />
+                      <UngroupedView flights={pendingFlights} running={false} hideHeader />
                     </div>
                   ) : null}
                 </div>
@@ -490,15 +528,16 @@ export function GroupingPage() {
             <div className="bg-muted h-[7px] w-[120px] overflow-hidden rounded-full">
               <span
                 className="bg-vj-green block h-full rounded-full transition-[width] duration-300"
-                style={{ width: `${groups.length ? (confirmedCount / groups.length) * 100 : 0}%` }}
+                style={{ width: `${stationGroups.length ? (confirmedCount / stationGroups.length) * 100 : 0}%` }}
               />
             </div>
             <span className="text-text-secondary text-[12.5px] font-bold">
-              <span className="text-foreground">{confirmedCount}</span>/{groups.length}{' '}
+              <span className="text-foreground">{confirmedCount}</span>/{stationGroups.length}{' '}
               {t('catering.grouping.confirmedProgress')}
             </span>
             <span className="text-[13px] font-bold">
-              · <span className="text-[16px]">{groups.length}</span> {t('catering.grouping.groupsToPrep')}
+              · <span className="text-[16px]">{stationGroups.length}</span>{' '}
+              {t('catering.grouping.groupsToPrep')}
             </span>
           </div>
           <div className="flex items-center gap-2.5">

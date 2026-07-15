@@ -164,14 +164,13 @@ function newGroupId(base: string): string {
   return `${base}-s${splitSeq}`
 }
 
+/** A group's uplift/origin station — where its meals are loaded (its first leg's departure). */
+export function groupOrigin(group: FlightGroup): string {
+  return group.legs[0]?.dep ?? ''
+}
+
 /** Inputs the AI-grouping rule needs beyond the raw flights themselves. */
 export interface AutoGroupOptions {
-  /**
-   * The planner's catering station (SGN/HAN/CXR). Grouping runs globally, then
-   * only the groups whose meals are uplifted HERE — i.e. the rotation departs
-   * this station — are returned: that is this planner's supplier order.
-   */
-  station: string
   /** Break a group when the purser changes (config rule `group_by_purser`). */
   groupByPurser: boolean
   /**
@@ -198,19 +197,18 @@ export interface AutoGroupOptions {
  * purser changes) or `group_by_flight_hour` (cumulative flight time exceeds
  * `maxHours`, split at the next catering station).
  *
- * Grouping is computed globally across all stations; each group's uplift station
- * is its first leg's departure. Only the groups uplifting at `opts.station` are
- * returned — the current planner's order. Groups uplifting at another catering
- * station belong to that station's planner; groups whose origin is a NON-catering
- * station (a purser starting mid-network, usually positioned overnight) belong to
- * an earlier day's order and match no station here — so they fall to the pending
- * list for review.
+ * Grouping is computed **globally across all stations** and every group is
+ * returned; each group's uplift station is its first leg's departure
+ * (`groupOrigin`). The caller filters by station: a planner at SGN/HAN/CXR sees
+ * the groups uplifting at their station (their supplier order). Groups whose
+ * origin is a NON-catering station (a purser starting mid-network, usually
+ * positioned overnight) belong to an earlier day and match no station's list.
  *
  * Each leg carries its premeal + cockpit roster + upsell quota, and the group's
  * per-dish breakdown + premeal total are rolled up.
  */
 export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): FlightGroup[] {
-  const { station, groupByPurser, maxHours, quotaByFlightNo } = opts
+  const { groupByPurser, maxHours, quotaByFlightNo } = opts
   const capMin = maxHours && maxHours > 0 ? maxHours * 60 : Number.POSITIVE_INFINITY
   const legMinutes = (f: { std: string; sta: string }) =>
     (toMinutes(f.sta) - toMinutes(f.std) + 1440) % 1440
@@ -286,8 +284,7 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
     finalize()
   }
 
-  // Return only the groups uplifted at this planner's station (its supplier order).
-  return groups.filter((g) => g.legs[0]?.dep === station)
+  return groups
 }
 
 /** Split a group into two at leg index `at` (1..legs.length-1). */
