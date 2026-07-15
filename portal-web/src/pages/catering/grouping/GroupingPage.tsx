@@ -142,13 +142,17 @@ export function GroupingPage() {
         maxHours: hourRule?.maxHours,
         quotaByFlightNo,
       })
+      // Keep the flights the rule didn't group (non-SGN-origin legs) visible
+      // below, so the planner can review them and catch a mis-grouping.
+      const groupedFlightNos = new Set(grouped.flatMap((g) => g.legs.map((l) => l.flightNo)))
+      const pending = (day.ungroupedFlights ?? []).filter((f) => !groupedFlightNos.has(f.flightNo))
       const nextDays = data.days.map((d) =>
         d.serviceDate === day.serviceDate
           ? {
               ...d,
               status: 'grouped' as const,
               groups: grouped,
-              ungroupedFlights: undefined,
+              ungroupedFlights: pending,
               aiGroupedAt: t('catering.grouping.justNow'),
               aiAccuracy: 90,
             }
@@ -437,6 +441,13 @@ export function GroupingPage() {
                   </div>
                 )}
               </div>
+
+              {/* Flights the rule didn't group (non-SGN-origin) — kept visible for review */}
+              {(day.ungroupedFlights?.length ?? 0) > 0 ? (
+                <div className="border-border mt-2 border-t border-dashed pt-4">
+                  <UngroupedView flights={day.ungroupedFlights ?? []} running={false} />
+                </div>
+              ) : null}
             </>
           ) : (
             <UngroupedView flights={day.ungroupedFlights ?? []} running={running} />
