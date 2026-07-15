@@ -189,10 +189,10 @@ export function GroupCard({
 
       {/* Expanded detail */}
       {open ? (
-        <div className="border-border border-t bg-[#FCFDFE] px-[22px] py-[18px]">
+        <div className="border-border border-t bg-[#FCFDFE] px-4 py-3.5">
           {/* Context + actions — only meta NOT already in the header row (time range
               + load station). Aircraft / purser / legs / flight time live above. */}
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="mb-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <span className="text-text-secondary inline-flex items-center gap-2 text-[12px] font-bold">
               <span className="text-foreground tnum">{timeRange}</span>
               <span className="text-border">·</span>
@@ -239,9 +239,9 @@ export function GroupCard({
 
           {/* Meal streams — pre-book full-width, then crew | sales-quota in a row. */}
           {(group.meals?.length ?? 0) > 0 || crewSim || hasSalesQuota(group) ? (
-            <div className="mt-3.5 flex flex-col gap-3">
+            <div className="mt-3 flex flex-col gap-2.5">
               {group.meals && group.meals.length > 0 ? (
-                <section className="border-border rounded-xl border bg-white p-3.5">
+                <section className="border-border rounded-xl border bg-white p-3">
                   <SectionHead
                     icon={<Utensils size={14} className="text-vj-red" />}
                     title={t('catering.grouping.premealTitleShort')}
@@ -264,16 +264,16 @@ export function GroupCard({
               ) : null}
 
               {crewSim || hasSalesQuota(group) ? (
-                <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.35fr_1fr]">
+                <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-[1.35fr_1fr]">
                   {crewSim ? (
-                    <section className="border-border rounded-xl border bg-white p-3.5">
+                    <section className="border-border rounded-xl border bg-white p-3">
                       <SectionHead
                         icon={<Users size={14} className="text-vj-red" />}
                         title={t('catering.grouping.crewTitleShort')}
                         pill={t('catering.grouping.crewMealsN', { count: crewSim.meals })}
                         sub={crewVersion ? t('catering.grouping.crewConfigV', { v: crewVersion.version }) : undefined}
                       />
-                      <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                      <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
                         <span className="text-[12.5px] font-extrabold tnum">
                           {absMinutesToLabel(crewSim.dutySpan.start)}–{absMinutesToLabel(crewSim.dutySpan.end)}
                         </span>
@@ -300,13 +300,13 @@ export function GroupCard({
                   ) : null}
 
                   {hasSalesQuota(group) ? (
-                    <section className="border-border rounded-xl border bg-white p-3.5">
+                    <section className="border-border rounded-xl border bg-white p-3">
                       <SectionHead
                         icon={<ShoppingBag size={14} className="text-vj-red" />}
                         title={t('catering.grouping.salesQuotaTitleShort')}
                         sub="UC-10"
                       />
-                      <div className="grid grid-cols-3 gap-2.5">
+                      <div className="grid grid-cols-3 gap-2">
                         <QuotaStat label={t('catering.grouping.quotaHotmeal')} value={quota.hotmeal} />
                         <QuotaStat label={t('catering.grouping.quotaBanhMi')} value={quota.banhMi} />
                         <QuotaStat label={t('catering.grouping.quotaTraSua')} value={quota.traSua} />
@@ -319,7 +319,7 @@ export function GroupCard({
           ) : null}
 
           {editing ? (
-            <div className="mt-4 rounded-lg border border-dashed border-[#D6DCE5] bg-white p-3.5">
+            <div className="mt-3 rounded-lg border border-dashed border-[#D6DCE5] bg-white p-3">
               <h4 className="text-text-secondary mb-2.5 flex items-center gap-1.5 text-[12px] font-extrabold uppercase tracking-wide">
                 <ArrowRightLeft size={14} className="text-vj-red" />
                 {t('catering.grouping.moveLegsTitle')}
@@ -388,7 +388,7 @@ function CrewChip({ member, ridingLabel }: { member: CockpitCrewMember; ridingLa
       : 'bg-vj-red-50 text-vj-red-dark'
   return (
     <div
-      className={`flex items-center gap-2 rounded-md border bg-[#FCFDFE] px-2.5 py-1.5 ${
+      className={`flex items-center gap-2 rounded-md border bg-[#FCFDFE] px-2 py-1 ${
         member.riding ? 'border-border border-dashed opacity-90' : 'border-border'
       }`}
     >
@@ -412,7 +412,7 @@ function CrewChip({ member, ridingLabel }: { member: CockpitCrewMember; ridingLa
  *  an optional right-aligned sub-note (config version, source code). */
 function SectionHead({ icon, title, pill, sub }: { icon: ReactNode; title: string; pill?: string; sub?: string }) {
   return (
-    <div className="mb-2.5 flex items-center gap-2">
+    <div className="mb-2 flex items-center gap-2">
       <span className="text-text-secondary flex items-center gap-1.5 text-[11.5px] font-extrabold uppercase tracking-wide">
         {icon}
         {title}
@@ -429,9 +429,9 @@ function SectionHead({ icon, title, pill, sub }: { icon: ReactNode; title: strin
 
 function QuotaStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="border-border rounded-lg border bg-[#FCFDFE] px-3 py-2">
-      <div className="text-vj-red-dark text-[20px] leading-none font-extrabold tnum">{value}</div>
-      <div className="text-text-secondary mt-1.5 text-[11px] font-semibold">{label}</div>
+    <div className="border-border rounded-lg border bg-[#FCFDFE] px-2.5 py-1.5">
+      <div className="text-vj-red-dark text-[18px] leading-none font-extrabold tnum">{value}</div>
+      <div className="text-text-secondary mt-1 text-[10.5px] font-semibold">{label}</div>
     </div>
   )
 }

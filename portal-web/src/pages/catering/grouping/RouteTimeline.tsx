@@ -45,7 +45,7 @@ export function RouteTimeline({ group, editing, onSplit }: TimelineProps) {
   const stations = stationsOf(group)
 
   return (
-    <div className="fg-timeline flex items-start overflow-x-auto pb-1.5">
+    <div className="fg-timeline flex items-start overflow-x-auto pb-1">
       {stations.map((code, i) => {
         const cat = isCateringStation(code)
         const isOrigin = i === 0
@@ -53,28 +53,28 @@ export function RouteTimeline({ group, editing, onSplit }: TimelineProps) {
         return (
           <div key={`${code}-${i}`} className="flex items-start">
             {/* Station node */}
-            <div className="flex w-[70px] shrink-0 flex-col items-center gap-1.5">
+            <div className="flex w-[56px] shrink-0 flex-col items-center gap-1">
               <span
                 className="grid place-items-center rounded-full"
                 style={
                   isOrigin
                     ? {
-                        width: 26,
-                        height: 26,
+                        width: 22,
+                        height: 22,
                         border: '3px solid var(--color-vj-red)',
                         background: 'var(--color-vj-red-50)',
                       }
                     : {
-                        width: 13,
-                        height: 13,
+                        width: 12,
+                        height: 12,
                         border: `3px solid ${cat ? 'var(--color-vj-red)' : 'var(--color-text-muted)'}`,
                         background: cat ? 'var(--color-vj-red)' : 'var(--color-surface)',
                       }
                 }
               >
-                {isOrigin ? <Utensils size={14} className="text-vj-red" /> : null}
+                {isOrigin ? <Utensils size={12} className="text-vj-red" /> : null}
               </span>
-              <span className="text-[14px] font-extrabold">{code}</span>
+              <span className="text-[13px] font-extrabold">{code}</span>
               {isOrigin ? (
                 <span className="text-vj-red text-[9px] font-extrabold uppercase tracking-wide">
                   {t('catering.grouping.load')}
@@ -92,7 +92,7 @@ export function RouteTimeline({ group, editing, onSplit }: TimelineProps) {
 
             {/* Connector + leg chip */}
             {leg ? (
-              <div className="relative flex min-w-[96px] flex-1 flex-col items-center pt-0.5">
+              <div className="relative flex min-w-[80px] flex-1 flex-col items-center pt-0.5">
                 {editing && i > 0 ? (
                   <button
                     type="button"
@@ -104,8 +104,8 @@ export function RouteTimeline({ group, editing, onSplit }: TimelineProps) {
                     <Scissors size={12} />
                   </button>
                 ) : null}
-                <div className="fg-conn-line bg-border relative mb-2 h-[3px] w-full rounded-full" />
-                <div className="border-border rounded-lg border bg-white px-2 py-1 text-center">
+                <div className="fg-conn-line bg-border relative mb-1.5 h-[3px] w-full rounded-full" />
+                <div className="border-border rounded-lg border bg-white px-1.5 py-0.5 text-center">
                   <span className="flex items-center justify-center gap-1 text-[12px] font-extrabold">
                     {leg.flightNo}
                     {leg.intl ? (
