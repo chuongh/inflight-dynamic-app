@@ -15,7 +15,6 @@ import {
 import { useTranslation } from 'react-i18next'
 import {
   formatDuration,
-  groupCockpitHeadcount,
   groupCockpitRoster,
   groupFlightMinutes,
   groupPremeal,
@@ -73,7 +72,6 @@ export function GroupCard({
   const crewVersion = activeCrewMealVersion(crewCfg?.versions ?? [])
   const cockpitProfile = crewVersion ? profileFor(crewVersion, 'cockpit') : undefined
   const crewSim = cockpitProfile && hasCrewData(group) ? computeGroupCrewMeals(group, cockpitProfile) : null
-  const crew = groupCockpitHeadcount(group)
   const roster = groupCockpitRoster(group)
   const slotsHit = crewSim ? [...new Set(crewSim.hits.map((h) => h.slot))] : []
   const quota = groupSalesQuota(group)
@@ -162,6 +160,20 @@ export function GroupCard({
         </div>
 
         <div className="flex items-center gap-2 justify-self-end" onClick={(e) => e.stopPropagation()}>
+          <Tooltip title={editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}>
+            <button
+              type="button"
+              onClick={onToggleEdit}
+              aria-label={editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}
+              className={`grid h-9 w-9 cursor-pointer place-items-center rounded-lg border transition-colors ${
+                editing
+                  ? 'bg-vj-red border-vj-red text-white'
+                  : 'border-border text-text-muted hover:border-vj-red hover:text-vj-red hover:bg-vj-red-50'
+              }`}
+            >
+              <Pencil size={16} />
+            </button>
+          </Tooltip>
           <Tooltip title={group.confirmed ? t('catering.grouping.unconfirm') : t('catering.grouping.confirm')}>
             <button
               type="button"
@@ -190,31 +202,12 @@ export function GroupCard({
       {/* Expanded detail */}
       {open ? (
         <div className="border-border border-t bg-[#FCFDFE] px-4 py-3.5">
-          {/* Context + actions — only meta NOT already in the header row (time range
-              + load station). Aircraft / purser / legs / flight time live above. */}
-          <div className="mb-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <span className="text-text-secondary inline-flex items-center gap-2 text-[12px] font-bold">
-              <span className="text-foreground tnum">{timeRange}</span>
-              <span className="text-border">·</span>
-              <span>{t('catering.grouping.loadAt', { station: origin })}</span>
-            </span>
-            <div className="flex items-center gap-2.5">
-              <Button icon={<Pencil size={15} />} onClick={onToggleEdit}>
-                {editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}
-              </Button>
-              <Button
-                type={group.confirmed ? 'default' : 'primary'}
-                icon={group.confirmed ? <Circle size={15} /> : <Check size={15} strokeWidth={3} />}
-                onClick={onConfirm}
-                style={
-                  group.confirmed
-                    ? undefined
-                    : { background: 'var(--color-vj-green-dark)', borderColor: 'var(--color-vj-green-dark)' }
-                }
-              >
-                {group.confirmed ? t('catering.grouping.unconfirm') : t('catering.grouping.confirmGroup')}
-              </Button>
-            </div>
+          {/* Context — time range + load station. Aircraft / purser / legs /
+              flight time and the edit/confirm actions live in the header row. */}
+          <div className="text-text-secondary mb-2.5 inline-flex items-center gap-2 text-[12px] font-bold">
+            <span className="text-foreground tnum">{timeRange}</span>
+            <span className="text-border">·</span>
+            <span>{t('catering.grouping.loadAt', { station: origin })}</span>
           </div>
 
           <RouteTimeline group={group} editing={editing} onSplit={onSplit} />
