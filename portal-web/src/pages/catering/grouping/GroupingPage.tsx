@@ -5,10 +5,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsDownUp,
-  Info,
   MapPin,
   Package,
-  RefreshCw,
+  RotateCcw,
   Search,
   Sparkles,
 } from 'lucide-react'
@@ -17,6 +16,8 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '@/components/patterns/PageHeader'
 import { useAuth } from '@/core/auth/useAuth'
+import { activeConfigVersion } from '@/modules/catering/config'
+import type { GroupByFlightHourRule } from '@/modules/catering/configTypes'
 import { activeCrewMealVersion, profileFor } from '@/modules/catering/crewMeal'
 import {
   autoGroupFlights,
@@ -26,12 +27,16 @@ import {
   sortForReview,
   splitGroupAt,
 } from '@/modules/catering/grouping'
-import type { FlightGroup, RawFlight } from '@/modules/catering/groupingTypes'
+import type { FlightGroup } from '@/modules/catering/groupingTypes'
 import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
 import { useFlightGroups, useSaveFlightGroups } from '@/modules/catering/hooks/useFlightGroups'
 import { useMeals } from '@/modules/catering/hooks/useMeals'
 import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
+import { useQuotaData } from '@/modules/catering/hooks/useQuota'
+import { useRuleConfigData } from '@/modules/catering/hooks/useRuleConfig'
 import { buildOrderLines, groupOrderFiles, makeCodeOf, orderFileId } from '@/modules/catering/orders'
+import { activeVersion as activeQuotaVersion } from '@/modules/catering/quota'
+import { getSeedDataset } from '@/mock-data/loaders/loadFlightGroups'
 import { paths } from '@/routes/paths'
 import { GroupCard } from './GroupCard'
 import { UngroupedView } from './UngroupedView'
@@ -49,6 +54,8 @@ export function GroupingPage() {
   const saveOrders = useSaveOrders()
   const { data: catalog } = useMeals()
   const { data: crewCfg } = useCrewMealConfigData()
+  const { data: ruleCfg } = useRuleConfigData()
+  const { data: quotaData } = useQuotaData()
 
   const [selectedDate, setSelectedDate] = useState('')
   const [filter, setFilter] = useState<FilterKey>('all')
@@ -97,18 +104,6 @@ export function GroupingPage() {
     saveGroups.mutate({ ...data, days: nextDays }, { onSuccess: () => toast && message.success(toast) })
   }
 
-  /** Persist an in-place edit to one of the day's ungrouped raw flights. */
-  const handleEditFlight = (index: number, patch: Partial<RawFlight>) => {
-    if (!data || !day) return
-    const nextFlights = (day.ungroupedFlights ?? []).map((f, i) =>
-      i === index ? { ...f, ...patch } : f,
-    )
-    const nextDays = data.days.map((d) =>
-      d.serviceDate === day.serviceDate ? { ...d, ungroupedFlights: nextFlights } : d,
-    )
-    saveGroups.mutate({ ...data, days: nextDays })
-  }
-
   const toggle = (set: Set<string>, id: string) => {
     const next = new Set(set)
     if (next.has(id)) next.delete(id)
@@ -130,7 +125,23 @@ export function GroupingPage() {
     if (!data || !day) return
     setRunning(true)
     window.setTimeout(() => {
-      const grouped = autoGroupFlights(day.ungroupedFlights ?? [])
+      // Drive the split behaviour from the active Commercial rule config.
+      const rules = activeConfigVersion(ruleCfg?.versions ?? [])?.rules ?? []
+      const groupByPurser = rules.some((r) => r.kind === 'group_by_purser' && r.enabled)
+      const hourRule = rules.find((r) => r.kind === 'group_by_flight_hour' && r.enabled) as
+        | GroupByFlightHourRule
+        | undefined
+      // Per-flight onboard-sales quota from the active inflight-quota version.
+      const quotaRows = activeQuotaVersion(quotaData?.versions ?? [])?.rows ?? []
+      const quotaByFlightNo = new Map(
+        quotaRows.map((r) => [r.flightNo, { hotmeal: r.hotmeal, banhMi: r.banhMi, traSua: r.traSua }]),
+      )
+      const grouped = autoGroupFlights(day.ungroupedFlights ?? [], {
+        station: data.station,
+        groupByPurser,
+        maxHours: hourRule?.maxHours,
+        quotaByFlightNo,
+      })
       const nextDays = data.days.map((d) =>
         d.serviceDate === day.serviceDate
           ? {
@@ -210,6 +221,23 @@ export function GroupingPage() {
     setEditing(new Set())
   }
 
+  /** Revert the current day to its original seed (ungrouped) state — for re-testing AI grouping. */
+  const handleResetDay = () => {
+    if (!data || !day) return
+    const seedDay = getSeedDataset().days.find((d) => d.serviceDate === day.serviceDate)
+    if (!seedDay) return
+    const restored = JSON.parse(JSON.stringify(seedDay)) as typeof seedDay
+    const nextDays = data.days.map((d) => (d.serviceDate === day.serviceDate ? restored : d))
+    saveGroups.mutate(
+      { ...data, days: nextDays },
+      { onSuccess: () => message.success(t('catering.grouping.resetDone')) },
+    )
+    setOpened(new Set())
+    setEditing(new Set())
+    setFilter('all')
+    setQuery('')
+  }
+
   /** Build (or reopen) the day's supplier order from the CONFIRMED groups. */
   const handleCreateOrder = () => {
     if (!data || !day) return
@@ -259,15 +287,12 @@ export function GroupingPage() {
   }
 
   const isGrouped = day.status === 'grouped'
-  const pendingCount = day.ungroupedFlights?.length ?? 0
 
   return (
     <div className="page-shell page-shell--list">
       <div className="thin-scroll page-shell__body">
         <PageHeader
-          badge={t('catering.grouping.badge')}
           title={t('catering.grouping.title')}
-          description={t('catering.grouping.desc', { station: data.station })}
           actions={
             isGrouped ? (
               <div className="flex items-center gap-2.5">
@@ -275,15 +300,20 @@ export function GroupingPage() {
                   <Sparkles size={15} className="text-vj-red" />
                   {t('catering.grouping.aiMeta', { at: day.aiGroupedAt, acc: day.aiAccuracy })}
                 </span>
-                <Button icon={<RefreshCw size={15} />} onClick={() => message.info(t('catering.grouping.regroupToast'))}>
-                  {t('catering.grouping.regroup')}
+                <Button icon={<RotateCcw size={15} />} onClick={handleResetDay}>
+                  {t('catering.grouping.reset')}
                 </Button>
               </div>
             ) : (
-              <span className="bg-vj-yellow-muted text-vj-yellow-dark border-vj-yellow-border inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-extrabold">
-                <Sparkles size={14} />
-                {t('catering.grouping.notGroupedTag')}
-              </span>
+              <Button
+                type="primary"
+                size="large"
+                loading={running}
+                icon={running ? undefined : <Sparkles size={17} />}
+                onClick={runGrouping}
+              >
+                {running ? t('catering.grouping.grouping') : t('catering.grouping.runGrouping')}
+              </Button>
             )
           }
         />
@@ -320,26 +350,13 @@ export function GroupingPage() {
                 <ChevronRight size={16} />
               </button>
             </span>
-            <span className="bg-border h-1 w-1 rounded-full" />
             {isGrouped ? (
-              <span>
-                <span className="text-foreground font-extrabold">{groups.length}</span>{' '}
-                {t('catering.grouping.groupsToPrep')}
-              </span>
-            ) : (
-              <span className="text-vj-yellow-dark">
-                <span className="font-extrabold">{pendingCount}</span> {t('catering.grouping.flightsPending')}
-              </span>
-            )}
-            {data.nextDayCutoff ? (
               <>
                 <span className="bg-border h-1 w-1 rounded-full" />
-                <Tooltip title={t('catering.grouping.cutoffTip', { time: data.nextDayCutoff })}>
-                  <span className="text-text-secondary inline-flex cursor-help items-center gap-1 font-semibold">
-                    <Info size={14} className="text-text-muted" />
-                    {t('catering.grouping.cutoffChip', { time: data.nextDayCutoff })}
-                  </span>
-                </Tooltip>
+                <span>
+                  <span className="text-foreground font-extrabold">{groups.length}</span>{' '}
+                  {t('catering.grouping.groupsToPrep')}
+                </span>
               </>
             ) : null}
           </div>
@@ -422,13 +439,7 @@ export function GroupingPage() {
               </div>
             </>
           ) : (
-            <UngroupedView
-              station={data.station}
-              flights={day.ungroupedFlights ?? []}
-              running={running}
-              onRun={runGrouping}
-              onEditFlight={handleEditFlight}
-            />
+            <UngroupedView flights={day.ungroupedFlights ?? []} running={running} />
           )}
         </div>
       </div>

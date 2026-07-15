@@ -34,3 +34,8 @@ export function saveFlightGroupCache(dataset: FlightGroupDataset) {
 export function resetFlightGroupCache() {
   localStorage.removeItem(DEMO_STORAGE_KEY)
 }
+
+/** The original seed (pre-grouping) — used to reset a day back to ungrouped. */
+export function getSeedDataset(): FlightGroupDataset {
+  return flightGroupsJson as FlightGroupDataset
+}

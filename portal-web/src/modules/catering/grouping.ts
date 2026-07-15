@@ -99,9 +99,9 @@ export function groupCockpitHeadcount(group: FlightGroup): { operating: number; 
   return { operating, riding }
 }
 
-/** Whether crew composition is known for the group. */
+/** Whether crew composition is known for the group (named roster or per-leg count). */
 export function hasCrewData(group: FlightGroup): boolean {
-  return group.legs.some((l) => l.cockpit != null)
+  return group.legs.some((l) => l.cockpit != null || (l.cockpitCrew?.length ?? 0) > 0)
 }
 
 /** Sum the commercial upsell quota across a group's legs. */
@@ -169,38 +169,141 @@ function newGroupId(base: string): string {
  * then break into a new group whenever the purser changes. This mirrors the
  * manual Excel rule (group by A/C, then by purser rotation).
  */
-export function autoGroupFlights(flights: RawFlight[]): FlightGroup[] {
-  const sorted = [...flights].sort(
-    (a, b) => a.aircraft.localeCompare(b.aircraft) || legTimeKey(a.std) - legTimeKey(b.std),
-  )
+/** Everything the AI-grouping rule needs beyond the raw flights themselves. */
+export interface AutoGroupOptions {
+  /** Catering station the planner preps at — a rotation must DEPART here. */
+  station: string
+  /** Break a group when the purser changes (config rule `group_by_purser`). */
+  groupByPurser: boolean
+  /**
+   * Cap a group's cumulative flight time, in hours (config `group_by_flight_hour`).
+   * Omit / 0 = no cap.
+   */
+  maxHours?: number
+  /**
+   * Per-flight onboard-sales quota keyed by flightNo, from the active inflight
+   * meal-quota version. Attached to each leg so the grouped view can total it.
+   */
+  quotaByFlightNo?: Map<string, { hotmeal: number; banhMi: number; traSua: number }>
+}
+
+/**
+ * Group raw flights into catering prep rotations under the configured rules:
+ *  1. **Start at the station** — a group can only open on a leg departing the
+ *     planner's station (SGN). The meal load covers the rotation until the A/C
+ *     reaches a catering station (SGN/HAN/CXR) where it can be re-catered, so
+ *     the group closes there. Legs before the first station departure, and
+ *     aircraft that never depart it, are dropped (another station's job).
+ *  2. **`group_by_purser`** (if enabled) starts a new group when a rotation's
+ *     (outbound) purser differs from the current group's. A rotation is never
+ *     split internally — its return leg stays under the outbound purser — so
+ *     every group still starts at the station.
+ *  3. **`group_by_flight_hour`** (if enabled) caps a group's cumulative flight
+ *     time at `maxHours`, splitting between whole rotations.
+ * Each leg carries its premeal + cockpit roster + upsell quota forward, and the
+ * group's per-dish meal breakdown + premeal total are rolled up — so the grouped
+ * view has everything it needs to compute crew meals, quota and the supplier order.
+ */
+export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): FlightGroup[] {
+  const { station, groupByPurser, maxHours, quotaByFlightNo } = opts
+  const capMin = maxHours && maxHours > 0 ? maxHours * 60 : Number.POSITIVE_INFINITY
+
+  const byAircraft = new Map<string, RawFlight[]>()
+  for (const f of flights) {
+    const list = byAircraft.get(f.aircraft)
+    if (list) list.push(f)
+    else byAircraft.set(f.aircraft, [f])
+  }
+
+  const legMinutes = (f: { std: string; sta: string }) =>
+    (toMinutes(f.sta) - toMinutes(f.std) + 1440) % 1440
+
   const groups: FlightGroup[] = []
-  let current: FlightGroup | null = null
   let seq = 0
-  for (const f of sorted) {
-    const sameRun =
-      current !== null && current.aircraft === f.aircraft && current.purserCode === f.purserCode
-    if (!sameRun) {
-      seq += 1
-      current = {
-        id: `ag${seq}`,
-        aircraft: f.aircraft,
-        aircraftType: f.aircraftType,
-        purser: f.purser,
-        purserCode: f.purserCode,
-        confidence: 'high',
-        confirmed: false,
-        legs: [],
+
+  for (const aircraft of [...byAircraft.keys()].sort()) {
+    const legs = byAircraft
+      .get(aircraft)!
+      .slice()
+      .sort((a, b) => legTimeKey(a.std) - legTimeKey(b.std))
+
+    // Pass 1 (Rule 1) — carve the A/C day into rotations. A rotation opens on a
+    // `station` departure and closes when the A/C reaches a catering station
+    // (SGN/HAN/CXR), where it can be re-catered. Legs before the first station
+    // departure — and aircraft that never depart it — are dropped.
+    const rotations: { purser: string; purserCode: string; legs: RawFlight[] }[] = []
+    let rot: { purser: string; purserCode: string; legs: RawFlight[] } | null = null
+    for (const f of legs) {
+      if (rot === null) {
+        if (f.dep !== station) continue
+        rot = { purser: f.purser, purserCode: f.purserCode, legs: [f] }
+      } else {
+        rot.legs.push(f)
       }
-      groups.push(current)
+      if (isCateringStation(f.arr)) {
+        rotations.push(rot)
+        rot = null
+      }
     }
-    current!.legs.push({
-      flightNo: f.flightNo,
-      dep: f.dep,
-      arr: f.arr,
-      std: f.std,
-      sta: f.sta,
-      intl: f.intl,
-    })
+    if (rot) rotations.push(rot) // one-way that never returns to a catering station
+
+    // Pass 2 (Rules 2 & 3) — merge whole rotations into groups: break on a change
+    // of the rotation's outbound purser, or when cumulative flight time exceeds
+    // the cap. Rotations are never split, so every group starts at the station.
+    let current: FlightGroup | null = null
+    let dishes = new Map<string, number>()
+    let cumMin = 0
+
+    const finalize = () => {
+      if (!current) return
+      if (dishes.size > 0) {
+        current.meals = [...dishes.entries()]
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count)
+      }
+      const total = current.legs.reduce((sum, l) => sum + (l.premeal ?? 0), 0)
+      if (total > 0) current.premealTotal = total
+      current = null
+    }
+
+    for (const r of rotations) {
+      const rotMin = r.legs.reduce((sum, f) => sum + legMinutes(f), 0)
+      const purserBreak = groupByPurser && current !== null && current.purserCode !== r.purserCode
+      const hourBreak = current !== null && cumMin + rotMin > capMin
+      if (current === null || purserBreak || hourBreak) {
+        finalize()
+        seq += 1
+        current = {
+          id: `ag${seq}`,
+          aircraft,
+          aircraftType: r.legs[0].aircraftType,
+          purser: r.purser,
+          purserCode: r.purserCode,
+          confidence: 'high',
+          confirmed: false,
+          legs: [],
+        }
+        dishes = new Map()
+        cumMin = 0
+        groups.push(current)
+      }
+      for (const f of r.legs) {
+        current!.legs.push({
+          flightNo: f.flightNo,
+          dep: f.dep,
+          arr: f.arr,
+          std: f.std,
+          sta: f.sta,
+          intl: f.intl,
+          premeal: f.premeal,
+          cockpitCrew: f.cockpitCrew,
+          salesQuota: quotaByFlightNo?.get(f.flightNo),
+        })
+        for (const m of f.meals ?? []) dishes.set(m.name, (dishes.get(m.name) ?? 0) + m.count)
+      }
+      cumMin += rotMin
+    }
+    finalize()
   }
   return groups
 }

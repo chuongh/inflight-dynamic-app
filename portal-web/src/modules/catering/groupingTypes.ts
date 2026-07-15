@@ -26,9 +26,11 @@ export interface FlightLeg {
   /** Arrival is on the day after departure / next calendar day (source `+`). */
   staNextDay?: boolean
   /**
-   * Pre-ordered meals (premeal) on this leg. The source records a rotation's
-   * premeal on its first leg only, so seed data splits the group total evenly
-   * across legs. Optional — absent when no premeal data exists for the day.
+   * Pre-ordered meals (premeal) on this leg. When the source is a full crew
+   * list (e.g. 15/07), this is the real per-flight count from that flight's
+   * dish columns. When the source records a rotation's premeal on its first
+   * leg only (e.g. 14/07), seed data splits the group total evenly across
+   * legs. Optional — absent when no premeal data exists for the day.
    */
   premeal?: number
   /** Operating cockpit crew count (CP + FO) on this leg — derived from `cockpitCrew`. */
@@ -101,6 +103,12 @@ export interface RawFlight {
    * the sales quota and crew meals are only computed once flights are grouped.
    */
   premeal?: number
+  /**
+   * Per-dish premeal breakdown (non-zero dishes only), from the crew-list meal
+   * columns. Lets the planner review exactly which dishes to prep per flight
+   * before grouping. Optional — absent on days seeded with only a premeal total.
+   */
+  meals?: MealBreakdownItem[]
   /** Named cockpit roster (CP + FO) for this flight, from the crew-list source. */
   cockpitCrew?: CockpitCrewMember[]
 }
