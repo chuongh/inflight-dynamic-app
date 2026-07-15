@@ -81,14 +81,19 @@ function FlightCard({ flight: f, open, onToggleOpen }: CardProps) {
           <b className={`text-[14px] font-extrabold tnum ${open ? 'text-vj-red-dark' : ''}`}>{f.std}</b>
           <small className="text-text-muted mt-0.5 text-[8.5px] font-extrabold uppercase tracking-wide">STD</small>
         </div>
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2 text-[15px] font-extrabold">
             {f.flightNo}
             {f.intl ? <QtBadge /> : null}
           </div>
-          <div className="text-text-secondary text-[12px] font-semibold">
+          <div className="text-text-secondary truncate text-[12px] font-semibold">
             {f.aircraft} · {f.aircraftType}
           </div>
+          {f.purser ? (
+            <div className="text-text-secondary mt-0.5 truncate text-[11.5px] font-semibold" title={f.purser}>
+              {t('catering.grouping.purser')} · <span className="text-foreground">{f.purser}</span>
+            </div>
+          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-2 text-[14px] font-extrabold">
           <span className="text-vj-red-dark inline-flex items-center gap-1">

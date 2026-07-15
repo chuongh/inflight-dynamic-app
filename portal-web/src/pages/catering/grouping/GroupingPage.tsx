@@ -25,6 +25,7 @@ import { activeCrewMealVersion, profileFor } from '@/modules/catering/crewMeal'
 import {
   autoGroupFlights,
   groupOrigin,
+  isCateringStation,
   isReview,
   mergeGroups,
   moveLeg,
@@ -91,14 +92,20 @@ export function GroupingPage() {
   const groups = useMemo(() => day?.groups ?? [], [day])
   const stationGroups = useMemo(() => groups.filter((g) => groupOrigin(g) === station), [groups, station])
 
-  // After grouping, every flight sits in some group. The flights NOT uplifted at
-  // this station (another station's order, or an overnight-positioned rotation for
-  // review) are the pending list — derived from the kept raw flights.
+  // Pending = flights that landed in NO catering-station group across all three
+  // stations (their rotation originates at a non-catering airport, e.g. an
+  // overnight-positioned tail or an inbound-only international arrival). It is the
+  // SAME set whichever planner station is selected — SGN/HAN/CXR flights are all
+  // grouped under their own station, so they never appear here.
   const pendingFlights = useMemo(() => {
     if (day?.status !== 'grouped') return []
-    const mine = new Set(stationGroups.flatMap((g) => g.legs.map((l) => l.flightNo)))
-    return (day?.ungroupedFlights ?? []).filter((f) => !mine.has(f.flightNo))
-  }, [day, stationGroups])
+    const stationed = new Set(
+      groups
+        .filter((g) => isCateringStation(groupOrigin(g)))
+        .flatMap((g) => g.legs.map((l) => l.flightNo)),
+    )
+    return (day?.ungroupedFlights ?? []).filter((f) => !stationed.has(f.flightNo))
+  }, [day, groups])
 
   const numberOf = useMemo(() => {
     const map = new Map(stationGroups.map((g, i) => [g.id, i + 1]))
