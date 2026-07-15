@@ -531,6 +531,8 @@
       "reset": "Đặt lại",
       "resetDone": "Đã trả về chưa nhóm — chạy AI grouping lại để test tiếp.",
       "groupsToPrep": "nhóm cần chuẩn bị",
+      "sectionGroups": "Nhóm cần chuẩn bị",
+      "sectionPending": "Chuyến chưa nhóm",
       "reviewAlert": "nhóm AI chưa chắc chắn — nên kiểm tra trước khi tạo yêu cầu đặt hàng.",
       "onlyReview": "Chỉ xem nhóm cần review",
       "filterAll": "Tất cả",

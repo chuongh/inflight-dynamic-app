@@ -8,9 +8,11 @@ interface Props {
   flights: RawFlight[]
   /** Dims the list while AI grouping runs — the trigger lives in the page header. */
   running: boolean
+  /** Hide the built-in "N flights pending grouping" header when a parent supplies one. */
+  hideHeader?: boolean
 }
 
-export function UngroupedView({ flights, running }: Props) {
+export function UngroupedView({ flights, running, hideHeader = false }: Props) {
   const { t } = useTranslation()
   const [open, setOpen] = useState<Set<number>>(new Set())
 
@@ -26,10 +28,12 @@ export function UngroupedView({ flights, running }: Props) {
     <div className="flex flex-col gap-4">
       {/* Pending raw flights — each expands to journey · premeal · cockpit */}
       <div>
-        <div className="text-text-secondary mb-2 flex items-center gap-2 text-[12px] font-extrabold uppercase tracking-wide">
-          <Plane size={14} className="text-vj-red" />
-          {t('catering.grouping.pendingFlights', { count: flights.length })}
-        </div>
+        {hideHeader ? null : (
+          <div className="text-text-secondary mb-2 flex items-center gap-2 text-[12px] font-extrabold uppercase tracking-wide">
+            <Plane size={14} className="text-vj-red" />
+            {t('catering.grouping.pendingFlights', { count: flights.length })}
+          </div>
+        )}
         <div className={`flex flex-col gap-2 ${running ? 'pointer-events-none opacity-50' : ''}`}>
           {flights.map((f, i) => (
             <FlightCard key={i} flight={f} open={open.has(i)} onToggleOpen={() => toggle(i)} />

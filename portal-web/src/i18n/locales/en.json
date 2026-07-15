@@ -531,6 +531,8 @@
       "reset": "Reset",
       "resetDone": "Reverted to ungrouped — run AI grouping again to re-test.",
       "groupsToPrep": "groups to prep",
+      "sectionGroups": "Groups to prep",
+      "sectionPending": "Flights pending grouping",
       "reviewAlert": "groups the AI is unsure about — review before creating the order.",
       "onlyReview": "Show review only",
       "filterAll": "All",

@@ -2,16 +2,19 @@ import { App as AntApp, Button, Input, Segmented, Spin, Tooltip } from 'antd'
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronsDownUp,
   MapPin,
   Package,
+  Plane,
   RotateCcw,
   Search,
   Sparkles,
+  Utensils,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '@/components/patterns/PageHeader'
@@ -63,6 +66,8 @@ export function GroupingPage() {
   const [opened, setOpened] = useState<Set<string>>(new Set())
   const [editing, setEditing] = useState<Set<string>>(new Set())
   const [running, setRunning] = useState(false)
+  const [groupsOpen, setGroupsOpen] = useState(true)
+  const [pendingOpen, setPendingOpen] = useState(true)
 
   const days = useMemo(() => data?.days ?? [], [data])
   const day = useMemo(
@@ -385,67 +390,90 @@ export function GroupingPage() {
                 </div>
               ) : null}
 
-              {/* Toolbar */}
-              <div className="flex flex-wrap items-center gap-3">
-                <Segmented<FilterKey>
-                  value={filter}
-                  onChange={setFilter}
-                  options={[
-                    { value: 'all', label: `${t('catering.grouping.filterAll')} (${groups.length})` },
-                    { value: 'review', label: `${t('catering.grouping.filterReview')} (${reviewCount})` },
-                    { value: 'confirmed', label: `${t('catering.grouping.filterConfirmed')} (${confirmedCount})` },
-                  ]}
-                />
-                <Input
-                  allowClear
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t('catering.grouping.searchPlaceholder')}
-                  prefix={<Search className="text-text-muted h-4 w-4" />}
-                  style={{ width: 260 }}
-                />
-                <div className="ml-auto">
-                  <Button type="text" icon={<ChevronsDownUp size={15} />} onClick={collapseAll}>
-                    {t('catering.grouping.collapseAll')}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Group list */}
-              <div className="flex flex-col gap-2">
-                {visible.length ? (
-                  visible.map((g) => (
-                    <GroupCard
-                      key={g.id}
-                      group={g}
-                      number={numberOf(g.id)}
-                      open={opened.has(g.id)}
-                      editing={editing.has(g.id)}
-                      allGroups={groups}
-                      numberOf={numberOf}
-                      onToggleOpen={() => setOpened((prev) => toggle(prev, g.id))}
-                      onToggleEdit={() => {
-                        setEditing((prev) => toggle(prev, g.id))
-                        setOpened((prev) => new Set(prev).add(g.id))
-                      }}
-                      onConfirm={() => handleConfirm(g.id)}
-                      onMarkCorrect={() => handleMarkCorrect(g.id)}
-                      onSplit={(at) => handleSplit(g.id, at)}
-                      onMergeInto={(targetId) => handleMerge(g.id, targetId)}
-                      onMoveLeg={(legIndex, destId) => handleMoveLeg(g.id, legIndex, destId)}
+              {/* Groups section — collapsible */}
+              <SectionToggle
+                icon={<Utensils size={14} />}
+                label={t('catering.grouping.sectionGroups')}
+                count={groups.length}
+                open={groupsOpen}
+                onToggle={() => setGroupsOpen((v) => !v)}
+              />
+              {groupsOpen ? (
+                <>
+                  {/* Toolbar */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Segmented<FilterKey>
+                      value={filter}
+                      onChange={setFilter}
+                      options={[
+                        { value: 'all', label: `${t('catering.grouping.filterAll')} (${groups.length})` },
+                        { value: 'review', label: `${t('catering.grouping.filterReview')} (${reviewCount})` },
+                        { value: 'confirmed', label: `${t('catering.grouping.filterConfirmed')} (${confirmedCount})` },
+                      ]}
                     />
-                  ))
-                ) : (
-                  <div className="text-text-secondary py-14 text-center">
-                    {t('catering.grouping.emptyFiltered')}
+                    <Input
+                      allowClear
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={t('catering.grouping.searchPlaceholder')}
+                      prefix={<Search className="text-text-muted h-4 w-4" />}
+                      style={{ width: 260 }}
+                    />
+                    <div className="ml-auto">
+                      <Button type="text" icon={<ChevronsDownUp size={15} />} onClick={collapseAll}>
+                        {t('catering.grouping.collapseAll')}
+                      </Button>
+                    </div>
                   </div>
-                )}
-              </div>
 
-              {/* Flights the rule didn't group (non-SGN-origin) — kept visible for review */}
+                  {/* Group list */}
+                  <div className="flex flex-col gap-2">
+                    {visible.length ? (
+                      visible.map((g) => (
+                        <GroupCard
+                          key={g.id}
+                          group={g}
+                          number={numberOf(g.id)}
+                          open={opened.has(g.id)}
+                          editing={editing.has(g.id)}
+                          allGroups={groups}
+                          numberOf={numberOf}
+                          onToggleOpen={() => setOpened((prev) => toggle(prev, g.id))}
+                          onToggleEdit={() => {
+                            setEditing((prev) => toggle(prev, g.id))
+                            setOpened((prev) => new Set(prev).add(g.id))
+                          }}
+                          onConfirm={() => handleConfirm(g.id)}
+                          onMarkCorrect={() => handleMarkCorrect(g.id)}
+                          onSplit={(at) => handleSplit(g.id, at)}
+                          onMergeInto={(targetId) => handleMerge(g.id, targetId)}
+                          onMoveLeg={(legIndex, destId) => handleMoveLeg(g.id, legIndex, destId)}
+                        />
+                      ))
+                    ) : (
+                      <div className="text-text-secondary py-14 text-center">
+                        {t('catering.grouping.emptyFiltered')}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : null}
+
+              {/* Pending section — collapsible; flights the rule didn't group (non-SGN-origin) */}
               {(day.ungroupedFlights?.length ?? 0) > 0 ? (
-                <div className="border-border mt-2 border-t border-dashed pt-4">
-                  <UngroupedView flights={day.ungroupedFlights ?? []} running={false} />
+                <div className="border-border mt-1 border-t border-dashed pt-3">
+                  <SectionToggle
+                    icon={<Plane size={14} />}
+                    label={t('catering.grouping.sectionPending')}
+                    count={day.ungroupedFlights?.length ?? 0}
+                    open={pendingOpen}
+                    onToggle={() => setPendingOpen((v) => !v)}
+                  />
+                  {pendingOpen ? (
+                    <div className="mt-2">
+                      <UngroupedView flights={day.ungroupedFlights ?? []} running={false} hideHeader />
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </>
@@ -492,5 +520,36 @@ export function GroupingPage() {
         </div>
       ) : null}
     </div>
+  )
+}
+
+/** Collapsible section header — icon · label · count badge · rotating chevron. */
+function SectionToggle({
+  icon,
+  label,
+  count,
+  open,
+  onToggle,
+}: {
+  icon: ReactNode
+  label: string
+  count: number
+  open: boolean
+  onToggle: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="text-text-secondary hover:text-foreground flex w-full cursor-pointer items-center gap-2 py-1 text-[12px] font-extrabold uppercase tracking-wide transition-colors"
+    >
+      <span className="text-vj-red">{icon}</span>
+      <span>{label}</span>
+      <span className="bg-muted text-text-secondary tnum rounded-full px-2 py-0.5 text-[11px] font-extrabold normal-case">
+        {count}
+      </span>
+      <ChevronDown size={16} className={`ml-auto transition-transform ${open ? 'rotate-180' : ''}`} />
+    </button>
   )
 }
