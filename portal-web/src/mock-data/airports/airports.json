@@ -71,7 +71,7 @@
     "city": "Khánh Hòa",
     "country": "Việt Nam",
     "kind": "international",
-    "hasCatering": false,
+    "hasCatering": true,
     "status": "active",
     "updatedAt": 1751068800000
   },
@@ -82,9 +82,20 @@
     "city": "Kiên Giang",
     "country": "Việt Nam",
     "kind": "international",
-    "hasCatering": false,
+    "hasCatering": true,
     "status": "active",
     "updatedAt": 1750982400000
+  },
+  {
+    "code": "VCA",
+    "icao": "VVCT",
+    "name": "Cần Thơ",
+    "city": "Cần Thơ",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "updatedAt": 1784112581000
   },
   {
     "code": "VII",
@@ -93,7 +104,7 @@
     "city": "Nghệ An",
     "country": "Việt Nam",
     "kind": "domestic",
-    "hasCatering": false,
+    "hasCatering": true,
     "status": "active",
     "updatedAt": 1750896000000
   },
@@ -104,7 +115,7 @@
     "city": "Hải Phòng",
     "country": "Việt Nam",
     "kind": "domestic",
-    "hasCatering": false,
+    "hasCatering": true,
     "status": "active",
     "updatedAt": 1750809600000
   },
@@ -115,7 +126,7 @@
     "city": "Lâm Đồng",
     "country": "Việt Nam",
     "kind": "domestic",
-    "hasCatering": false,
+    "hasCatering": true,
     "status": "active",
     "updatedAt": 1750723200000
   },
