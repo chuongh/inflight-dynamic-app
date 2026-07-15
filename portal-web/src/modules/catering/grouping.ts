@@ -15,14 +15,12 @@ function toMinutes(hhmm: string): number {
   return h * 60 + m
 }
 
-/** Sort key that treats after-midnight times (< 04:00) as next-day. */
-export function legTimeKey(hhmm: string): number {
-  const [h, m] = hhmm.split(':').map(Number)
-  return (h < 4 ? h + 24 : h) * 60 + m
-}
-
-/** Chronological sort key for a leg, honouring the explicit next-day flag. */
-export function legSortKey(leg: FlightLeg): number {
+/**
+ * Chronological sort key for a leg/flight, honouring the explicit next-day flag
+ * and falling back to the "before 04:00 = next day" heuristic. Accepts a raw
+ * flight or a grouped leg (both carry `std` + optional `stdNextDay`).
+ */
+export function legSortKey(leg: { std: string; stdNextDay?: boolean }): number {
   const [h, m] = leg.std.split(':').map(Number)
   const nextDay = leg.stdNextDay ?? h < 4
   return (nextDay ? 24 : 0) * 60 + h * 60 + m
@@ -230,7 +228,7 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
     const legs = byAircraft
       .get(aircraft)!
       .slice()
-      .sort((a, b) => legTimeKey(a.std) - legTimeKey(b.std))
+      .sort((a, b) => legSortKey(a) - legSortKey(b))
 
     let current: FlightGroup | null = null
     let dishes = new Map<string, number>()
@@ -285,6 +283,8 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
         std: f.std,
         sta: f.sta,
         intl: f.intl,
+        stdNextDay: f.stdNextDay,
+        staNextDay: f.staNextDay,
         premeal: f.premeal,
         cockpitCrew: f.cockpitCrew,
         salesQuota: quotaByFlightNo?.get(f.flightNo),

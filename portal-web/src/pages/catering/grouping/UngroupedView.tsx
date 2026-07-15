@@ -103,7 +103,9 @@ function FlightCard({ flight: f, open, onToggleOpen }: CardProps) {
           <span className="text-text-muted font-normal">→</span>
           <span className={cat ? '' : 'text-text-muted'}>{f.arr}</span>
           <span className="text-text-secondary text-[11px] font-bold tnum">
-            {f.std}–{f.sta}
+            {f.std}
+            <Nd on={f.stdNextDay} />–{f.sta}
+            <Nd on={f.staNextDay} />
           </span>
           <span className="text-text-muted text-[11px] font-bold">· {dur}</span>
         </div>
@@ -132,7 +134,10 @@ function FlightCard({ flight: f, open, onToggleOpen }: CardProps) {
           <div className="border-border flex items-center gap-2 overflow-x-auto rounded-lg border bg-white px-4 py-2">
             <div className="flex shrink-0 flex-col items-center">
               <span className="text-[16px] font-extrabold leading-none tracking-tight">{f.dep}</span>
-              <span className="text-text-secondary mt-1 text-[11px] font-bold tnum">{f.std}</span>
+              <span className="text-text-secondary mt-1 text-[11px] font-bold tnum">
+                {f.std}
+                <Nd on={f.stdNextDay} />
+              </span>
             </div>
             <div className="flex min-w-[96px] flex-1 flex-col items-center gap-1 px-2">
               <span className="flex items-center gap-1.5 text-[11px] font-extrabold">
@@ -146,7 +151,10 @@ function FlightCard({ flight: f, open, onToggleOpen }: CardProps) {
             </div>
             <div className="flex shrink-0 flex-col items-center">
               <span className="text-[16px] font-extrabold leading-none tracking-tight">{f.arr}</span>
-              <span className="text-text-secondary mt-1 text-[11px] font-bold tnum">{f.sta}</span>
+              <span className="text-text-secondary mt-1 text-[11px] font-bold tnum">
+                {f.sta}
+                <Nd on={f.staNextDay} />
+              </span>
             </div>
           </div>
 
@@ -212,6 +220,11 @@ function QtBadge() {
       QT
     </span>
   )
+}
+
+/** Next-day (+1) superscript for an overnight departure/arrival time. */
+function Nd({ on }: { on?: boolean }) {
+  return on ? <sup className="text-vj-red font-extrabold">+1</sup> : null
 }
 
 /** One named cockpit crew member — role badge + name + employee code. */

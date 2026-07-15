@@ -98,6 +98,10 @@ export interface RawFlight {
   purser: string
   purserCode: string
   intl: boolean
+  /** Departure is on the day after the service day (source `+` on STD). */
+  stdNextDay?: boolean
+  /** Arrival is on the next calendar day (source `+` on STA). */
+  staNextDay?: boolean
   /**
    * Pre-ordered passenger meals (premeal) on this flight. Known before grouping;
    * the sales quota and crew meals are only computed once flights are grouped.

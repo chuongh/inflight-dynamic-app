@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-16-fullday-rules",
+  "seedVersion": "2026-07-16-nextday",
   "station": "SGN",
   "stationName": "Tân Sơn Nhất",
   "days": [
@@ -4052,6 +4052,8 @@
           "purser": "YEN 17 DO HAI",
           "purserCode": "6508",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 11,
           "meals": [
             {
@@ -4284,6 +4286,8 @@
           "purser": "DIEM 4 HO THI (10349) DIEP 5 DINH NGOC (7483) YEN 6 NGUYEN BAO",
           "purserCode": "2224",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 231,
           "meals": [
             {
@@ -4841,6 +4845,7 @@
           "purser": "TRUNG 24 TRAN BAO",
           "purserCode": "7090",
           "intl": false,
+          "staNextDay": true,
           "premeal": 6,
           "meals": [
             {
@@ -4886,6 +4891,8 @@
           "purser": "SON 4 TRAN THI MAI",
           "purserCode": "5770",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -5173,6 +5180,8 @@
           "purser": "VY 20 BUI NGOC TUONG",
           "purserCode": "6488",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 14,
           "meals": [
             {
@@ -5442,6 +5451,7 @@
           "purser": "TIEN 4 HUYNH HUU",
           "purserCode": "2574",
           "intl": true,
+          "staNextDay": true,
           "premeal": 19,
           "meals": [
             {
@@ -5822,6 +5832,7 @@
           "purser": "LINH 35 NGO HAI",
           "purserCode": "6368",
           "intl": false,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -6030,6 +6041,7 @@
           "purser": "KIEU 1 TRAN THI",
           "purserCode": "4396",
           "intl": true,
+          "staNextDay": true,
           "premeal": 6,
           "meals": [
             {
@@ -6284,6 +6296,7 @@
           "purser": "BAO 16 VAN DUC (14940) XUAN 2 TRUONG THI THANH",
           "purserCode": "8097",
           "intl": true,
+          "staNextDay": true,
           "premeal": 92,
           "meals": [
             {
@@ -6558,6 +6571,8 @@
           "purser": "ANH 94 LE DUY (7480) LAM 4 NGUYEN THANH",
           "purserCode": "6037",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -7701,6 +7716,7 @@
           "purser": "NGHIA 8 CAP NGOC",
           "purserCode": "9587",
           "intl": false,
+          "staNextDay": true,
           "premeal": 8,
           "meals": [
             {
@@ -8017,6 +8033,7 @@
           "purser": "LOAN 1 NGUYEN THANH (614) VU 12 HOANG THANH",
           "purserCode": "7360",
           "intl": true,
+          "staNextDay": true,
           "premeal": 84,
           "meals": [
             {
@@ -8068,6 +8085,8 @@
           "purser": "MAI 7 NGUYEN DIEU THANH",
           "purserCode": "1949",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 61,
           "meals": [
             {
@@ -8588,6 +8607,7 @@
           "purser": "DIU 1 NGUYEN THI",
           "purserCode": "6328",
           "intl": false,
+          "staNextDay": true,
           "premeal": 4,
           "meals": [
             {
@@ -8629,6 +8649,8 @@
           "purser": "LINH 27 NGUYEN DIEU",
           "purserCode": "5457",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 5,
           "meals": [
             {
@@ -8907,6 +8929,8 @@
           "purser": "KHOA 1 LE DINH",
           "purserCode": "1911",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 5,
           "meals": [
             {
@@ -9111,6 +9135,8 @@
           "purser": "THINH 11 PHAN LAC (9621) TUAN 22 DO HOANG",
           "purserCode": "5919",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 8,
           "meals": [
             {
@@ -9382,6 +9408,7 @@
           "purser": "THINH 11 PHAN LAC (9621) TUAN 22 DO HOANG",
           "purserCode": "5919",
           "intl": true,
+          "staNextDay": true,
           "premeal": 65,
           "meals": [
             {
@@ -9769,6 +9796,8 @@
           "purser": "HUONG 10 NGUYEN THU (5871) TRANG VU MINH",
           "purserCode": "5125",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 8,
           "meals": [
             {
@@ -10948,6 +10977,8 @@
           "purser": "SANG 5 TONG HOANG",
           "purserCode": "10201",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 28,
           "meals": [
             {
@@ -11321,6 +11352,8 @@
           "purser": "LAN 3 NGUYEN THI",
           "purserCode": "1790",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 27,
           "meals": [
             {
@@ -11706,6 +11739,8 @@
           "purser": "JO YONG KOOK",
           "purserCode": "4498",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 11,
           "meals": [
             {
@@ -11999,6 +12034,7 @@
           "purser": "ANH 4 DANG THI LAN",
           "purserCode": "611",
           "intl": true,
+          "staNextDay": true,
           "premeal": 3,
           "meals": [
             {
@@ -12183,6 +12219,7 @@
           "purser": "NGHIA 2 VU TAN",
           "purserCode": "6041",
           "intl": true,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -12566,6 +12603,7 @@
           "purser": "YEN 1 NGUYEN THI BAO",
           "purserCode": "236",
           "intl": true,
+          "staNextDay": true,
           "premeal": 5,
           "meals": [
             {
@@ -13727,6 +13765,7 @@
           "purser": "THY 19 NGUYEN NHAT",
           "purserCode": "15000",
           "intl": false,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -14506,6 +14545,7 @@
           "purser": "HANH 9 PHAM HONG",
           "purserCode": "5762",
           "intl": false,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -15391,6 +15431,7 @@
           "purser": "LUAN 1 NGUYEN DINH",
           "purserCode": "6040",
           "intl": false,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -16062,6 +16103,8 @@
           "purser": "VIET 7 PHUNG TRAN",
           "purserCode": "6613",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 5,
           "meals": [
             {
@@ -16303,6 +16346,8 @@
           "purser": "DUNG 23 LE THUY",
           "purserCode": "6599",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 6,
           "meals": [
             {
@@ -16800,6 +16845,7 @@
           "purser": "DUNG 23 LE THUY",
           "purserCode": "6599",
           "intl": true,
+          "staNextDay": true,
           "premeal": 4,
           "meals": [
             {
@@ -16845,6 +16891,8 @@
           "purser": "THONG 2 NGUYEN CANH",
           "purserCode": "2117",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -17032,6 +17080,8 @@
           "purser": "KHOA 6 NGUYEN VU DANG",
           "purserCode": "5666",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -17344,6 +17394,7 @@
           "purser": "KHOA 6 NGUYEN VU DANG",
           "purserCode": "5666",
           "intl": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -17377,6 +17428,8 @@
           "purser": "HAO 3 NGUYEN MINH",
           "purserCode": "8881",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 9,
           "meals": [
             {
@@ -17986,6 +18039,7 @@
           "purser": "KHANH 2 NGUYEN XUAN",
           "purserCode": "419",
           "intl": false,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -18808,6 +18862,7 @@
           "purser": "NGOC 3 LUONG HONG",
           "purserCode": "402",
           "intl": true,
+          "staNextDay": true,
           "premeal": 10,
           "meals": [
             {
@@ -19343,6 +19398,7 @@
           "purser": "TRUNG 5 TRINH TUAN",
           "purserCode": "2002",
           "intl": false,
+          "staNextDay": true,
           "premeal": 4,
           "meals": [
             {
@@ -19417,6 +19473,8 @@
           "purser": "THANH 37 NGUYEN BA",
           "purserCode": "12748",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -19655,6 +19713,7 @@
           "purser": "THANH 37 NGUYEN BA",
           "purserCode": "12748",
           "intl": true,
+          "staNextDay": true,
           "premeal": 3,
           "meals": [
             {
@@ -19696,6 +19755,8 @@
           "purser": "TINH 1 NGUYEN HUU",
           "purserCode": "10385",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -20521,6 +20582,8 @@
           "purser": "TAN 4 LE DUC THIEN",
           "purserCode": "6640",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -20746,6 +20809,7 @@
           "purser": "TAN 4 LE DUC THIEN",
           "purserCode": "6640",
           "intl": true,
+          "staNextDay": true,
           "premeal": 3,
           "meals": [
             {
@@ -20787,6 +20851,8 @@
           "purser": "HA 9 NGUYEN NGOC",
           "purserCode": "5030",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 4,
           "meals": [
             {
@@ -21040,6 +21106,7 @@
           "purser": "HA 9 NGUYEN NGOC",
           "purserCode": "5030",
           "intl": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -21580,6 +21647,8 @@
           "purser": "LINH 16 TRAN THI HA",
           "purserCode": "3579",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -21715,6 +21784,7 @@
           "purser": "LINH 16 TRAN THI HA",
           "purserCode": "3579",
           "intl": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -22667,6 +22737,7 @@
           "purser": "MAI 12 NGUYEN THI DIEU",
           "purserCode": "7350",
           "intl": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -22806,6 +22877,8 @@
           "purser": "PHAT 14 LAM PHUC",
           "purserCode": "11799",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -23073,6 +23146,7 @@
           "purser": "TOAN 7 TRAN XUAN",
           "purserCode": "11715",
           "intl": true,
+          "staNextDay": true,
           "premeal": 8,
           "meals": [
             {
@@ -23603,6 +23677,7 @@
           "purser": "DUY 20 HO QUANG",
           "purserCode": "8607",
           "intl": true,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -23937,6 +24012,7 @@
           "purser": "OANH 7 NGUYEN THI MINH",
           "purserCode": "7744",
           "intl": false,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -24613,6 +24689,7 @@
           "purser": "THAI 3 NHAN NGOC VUONG (4497) THUY 52 NGUYEN THI THANH",
           "purserCode": "14998",
           "intl": false,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -24662,6 +24739,8 @@
           "purser": "HUNG 17 TRAN HOANG",
           "purserCode": "5553",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 2,
           "meals": [
             {
@@ -24773,6 +24852,7 @@
           "purser": "TRUNG 19 TRAN",
           "purserCode": "6663",
           "intl": true,
+          "staNextDay": true,
           "premeal": 7,
           "meals": [
             {
@@ -24826,6 +24906,8 @@
           "purser": "TRANG 39 NGUYEN LE (6324) TRANG 43 NGUYEN THU",
           "purserCode": "6963",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -25320,6 +25402,7 @@
           "purser": "DAO 2 LE HOANG",
           "purserCode": "6210",
           "intl": false,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -25659,6 +25742,7 @@
           "purser": "GIANG 6 DO HOANG",
           "purserCode": "5663",
           "intl": true,
+          "staNextDay": true,
           "premeal": 368,
           "meals": [
             {
@@ -25960,6 +26044,7 @@
           "purser": "THUY 8 PHAN THANH",
           "purserCode": "2353",
           "intl": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -25993,6 +26078,8 @@
           "purser": "DO 2 TRIEU TRIEU",
           "purserCode": "5760",
           "intl": true,
+          "stdNextDay": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {
@@ -26310,6 +26397,7 @@
           "purser": "TUNG 17 LE HUU",
           "purserCode": "9120",
           "intl": true,
+          "staNextDay": true,
           "premeal": 398,
           "meals": [
             {
@@ -26476,6 +26564,7 @@
           "purser": "LINH 9 HO MAI",
           "purserCode": "1442",
           "intl": true,
+          "staNextDay": true,
           "premeal": 4,
           "meals": [
             {
@@ -26566,6 +26655,7 @@
           "purser": "LUCKE ANDREANY",
           "purserCode": "6343",
           "intl": true,
+          "staNextDay": true,
           "premeal": 1,
           "meals": [
             {

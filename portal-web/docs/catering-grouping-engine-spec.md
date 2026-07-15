@@ -46,6 +46,8 @@ RawFlight {
   purser:        string          // tên purser (cabin lead) — dùng cho rule đổi purser
   purserCode:    string          // mã NV của purser — KHOÁ so sánh đổi purser
   intl:          boolean         // chuyến quốc tế
+  stdNextDay?:   boolean         // STD sang ngày kế (dấu '+' trên STD nguồn)
+  staNextDay?:   boolean         // STA sang ngày kế (dấu '+' trên STA nguồn)
   premeal?:      number          // tổng suất pre-order của chuyến này
   meals?:        MealBreakdownItem[]   // breakdown theo món (chỉ món > 0)
   cockpitCrew?:  CockpitCrewMember[]   // roster buồng lái có tên
@@ -62,8 +64,11 @@ CockpitCrewMember {
 ```
 
 **Lưu ý xử lý giờ qua đêm:** nguồn crew-list đánh dấu `+` trên STD/STA cho ngày kế. Khi
-extract, ta **bỏ dấu `+`, lưu HH:MM sạch**. Việc sắp xếp qua đêm do `legTimeKey` xử lý
-(giờ < 04:00 coi như +24h). Xem §2.
+extract, ta **bỏ dấu `+` khỏi chuỗi giờ (lưu HH:MM sạch) NHƯNG giữ lại thành 2 cờ boolean
+`stdNextDay`/`staNextDay`**. Hai cờ này là **bắt buộc** cho: (a) hiển thị `+1`, (b) sắp xếp
+chặng đúng thứ tự (§3, `legSortKey`), (c) tính duty span suất tổ lái qua đêm (§8, `depDay`/
+`arrDay`). Thiếu chúng ⇒ chặng đến sau nửa đêm bị coi là cùng ngày và duty span tính SAI.
+`legDurationMin = (sta − std + 1440) mod 1440` vẫn đúng độc lập với cờ.
 
 ### 1.2 Options — cấu hình chạy engine
 
@@ -118,11 +123,12 @@ isCateringStation(code) = code ∈ CATERING_STATIONS
 
 toMinutes("HH:MM") = HH*60 + MM
 
-// Khoá sắp xếp chặng: giờ 00:00–03:59 coi như thuộc "cuối ngày" (+24h),
-// để chuyến đêm/rạng sáng xếp SAU chuyến tối cùng ngày.
-legTimeKey("HH:MM"):
-    (h, m) = parse
-    return (h < 4 ? h + 24 : h) * 60 + m
+// Khoá sắp xếp chặng: ưu tiên cờ stdNextDay; fallback heuristic 00:00–03:59 = ngày kế.
+// Cần cho chuyến cất cánh rạng sáng ngày kế (vd 05:00+) mà heuristic h<4 không bắt được.
+legSortKey(f):                     // f có { std:"HH:MM", stdNextDay?:bool }
+    (h, m) = parse(f.std)
+    nextDay = (f.stdNextDay != null) ? f.stdNextDay : (h < 4)
+    return (nextDay ? 24 : 0) * 60 + h*60 + m
 
 // Thời lượng bay 1 chặng (phút), xử lý qua đêm bằng modulo 1440.
 legDurationMin(leg) = (toMinutes(leg.sta) - toMinutes(leg.std) + 1440) mod 1440
@@ -147,8 +153,8 @@ seq = 0
 // (2) Duyệt từng tàu bay theo THỨ TỰ TÊN TĂNG DẦN (để kết quả deterministic).
 for aircraft in sortAsc(keys(byAircraft)):
 
-    // (3) Sắp các chặng của tàu bay theo thời gian trong ngày.
-    legs = byAircraft[aircraft] sortedBy(f => legTimeKey(f.std)) ascending
+    // (3) Sắp các chặng của tàu bay theo thời gian trong ngày (honour cờ next-day).
+    legs = byAircraft[aircraft] sortedBy(f => legSortKey(f)) ascending
 
     current = null          // group đang mở
     dishes  = {}            // name -> count (breakdown món của group hiện tại)
@@ -185,6 +191,7 @@ for aircraft in sortAsc(keys(byAircraft)):
         current.legs.push(FlightLeg {
             flightNo: f.flightNo, dep: f.dep, arr: f.arr,
             std: f.std, sta: f.sta, intl: f.intl,
+            stdNextDay: f.stdNextDay, staNextDay: f.staNextDay,   // giữ cờ next-day
             premeal: f.premeal,
             cockpitCrew: f.cockpitCrew,
             salesQuota: opts.quotaByFlightNo?.get(f.flightNo)
