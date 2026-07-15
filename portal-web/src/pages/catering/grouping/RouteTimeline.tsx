@@ -7,14 +7,18 @@ import {
   stationsOf,
 } from '@/modules/catering/grouping'
 import type { FlightGroup } from '@/modules/catering/groupingTypes'
+import { useCateringStations } from '@/modules/catering/hooks/useCateringStations'
+import { cateringStationSet } from '@/modules/catering/stations'
 
 /** Compact one-line route for the collapsed row: SGN → BMV → SGN → … */
 export function InlineRoute({ group }: { group: FlightGroup }) {
+  const { data: stationCfg } = useCateringStations()
+  const cateringSet = cateringStationSet(stationCfg?.stations ?? [])
   const stations = stationsOf(group)
   return (
     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13.5px] font-extrabold">
       {stations.map((code, i) => {
-        const cat = isCateringStation(code)
+        const cat = isCateringStation(code, cateringSet)
         return (
           <span key={`${code}-${i}`} className="flex items-center gap-1.5">
             {i === 0 ? (
@@ -42,12 +46,14 @@ interface TimelineProps {
 /** Full rotation timeline shown in the expanded detail. */
 export function RouteTimeline({ group, editing, onSplit }: TimelineProps) {
   const { t } = useTranslation()
+  const { data: stationCfg } = useCateringStations()
+  const cateringSet = cateringStationSet(stationCfg?.stations ?? [])
   const stations = stationsOf(group)
 
   return (
     <div className="fg-timeline flex items-start overflow-x-auto pb-1">
       {stations.map((code, i) => {
-        const cat = isCateringStation(code)
+        const cat = isCateringStation(code, cateringSet)
         const isOrigin = i === 0
         const leg = i < group.legs.length ? group.legs[i] : null
         return (

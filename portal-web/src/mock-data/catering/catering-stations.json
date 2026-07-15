@@ -1,0 +1,9 @@
+{
+  "stations": [
+    { "code": "SGN", "name": "Tân Sơn Nhất", "enabled": true },
+    { "code": "HAN", "name": "Nội Bài", "enabled": true },
+    { "code": "CXR", "name": "Cam Ranh", "enabled": true },
+    { "code": "DAD", "name": "Đà Nẵng", "enabled": false },
+    { "code": "PQC", "name": "Phú Quốc", "enabled": false }
+  ]
+}

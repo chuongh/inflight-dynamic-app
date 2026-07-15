@@ -2,11 +2,14 @@
  *  immutable — editing operations return a fresh `groups` array. */
 import type { CockpitCrewMember, FlightGroup, FlightLeg, RawFlight } from './groupingTypes'
 
-/** Stations that have catering — a rotation loads its meals at one of these. */
-export const CATERING_STATIONS = new Set(['SGN', 'HAN', 'CXR'])
-
-export function isCateringStation(code: string): boolean {
-  return CATERING_STATIONS.has(code)
+/**
+ * Whether meals can be uplifted at `code` — membership in the ENABLED
+ * catering-station set. Config-driven, NOT a hardcoded list: callers pass the
+ * set from `cateringStationSet(useCateringStations())` so toggling a station in
+ * config changes both the engine and the planner filter.
+ */
+export function isCateringStation(code: string, stations: Set<string>): boolean {
+  return stations.has(code)
 }
 
 /** `HH:MM` → minutes since midnight. */
@@ -169,6 +172,12 @@ export function groupOrigin(group: FlightGroup): string {
 
 /** Inputs the AI-grouping rule needs beyond the raw flights themselves. */
 export interface AutoGroupOptions {
+  /**
+   * Enabled catering-station codes (config-driven). A rotation may only take on a
+   * fresh uplift — and therefore only split — where the aircraft departs one of
+   * these. NOT hardcoded: comes from `cateringStationSet(useCateringStations())`.
+   */
+  cateringStations: Set<string>
   /** Break a group when the purser changes (config rule `group_by_purser`). */
   groupByPurser: boolean
   /**
@@ -189,8 +198,8 @@ export interface AutoGroupOptions {
  *
  * Meals are uplifted **once, at the rotation's origin** — the station where the
  * purser's continuous duty starts — and cover every leg. The aircraft is NOT
- * re-catered when it merely passes through another catering station (SGN/HAN/CXR),
- * to keep check-in/out simple. A rotation is only **split** (a fresh uplift +
+ * re-catered when it merely passes through another (config-enabled) catering
+ * station, to keep check-in/out simple. A rotation is only **split** (a fresh uplift +
  * separate station order) when a config rule is violated AND the split point is a
  * catering station — the only place a new uplift is physically possible:
  * `group_by_purser` (the purser changes at a catering-station departure) or
@@ -200,8 +209,8 @@ export interface AutoGroupOptions {
  *
  * Grouping is computed **globally across all stations** and every group is
  * returned; each group's uplift station is its first leg's departure
- * (`groupOrigin`). The caller filters by station: a planner at SGN/HAN/CXR sees
- * the groups uplifting at their station (their supplier order). Groups whose
+ * (`groupOrigin`). The caller filters by station: a planner at an enabled
+ * catering station sees the groups uplifting there (their supplier order). Groups whose
  * origin is a NON-catering station (a purser starting mid-network, usually
  * positioned overnight) belong to an earlier day and match no station's list.
  *
@@ -209,7 +218,7 @@ export interface AutoGroupOptions {
  * per-dish breakdown + premeal total are rolled up.
  */
 export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): FlightGroup[] {
-  const { groupByPurser, maxHours, quotaByFlightNo } = opts
+  const { cateringStations, groupByPurser, maxHours, quotaByFlightNo } = opts
   const capMin = maxHours && maxHours > 0 ? maxHours * 60 : Number.POSITIVE_INFINITY
   const legMinutes = (f: { std: string; sta: string }) =>
     (toMinutes(f.sta) - toMinutes(f.std) + 1440) % 1440
@@ -256,9 +265,10 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
         groupByPurser &&
         current !== null &&
         current.purserCode !== f.purserCode &&
-        isCateringStation(f.dep)
+        isCateringStation(f.dep, cateringStations)
       // Flight-hour cap: likewise only split at a catering station.
-      const hourBreak = current !== null && cumMin + legMin > capMin && isCateringStation(f.dep)
+      const hourBreak =
+        current !== null && cumMin + legMin > capMin && isCateringStation(f.dep, cateringStations)
       if (current === null || purserBreak || hourBreak) {
         finalize()
         seq += 1

@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration, isCateringStation, legDurationMin } from '@/modules/catering/grouping'
 import type { CockpitCrewMember, RawFlight } from '@/modules/catering/groupingTypes'
+import { useCateringStations } from '@/modules/catering/hooks/useCateringStations'
+import { cateringStationSet } from '@/modules/catering/stations'
 
 interface Props {
   flights: RawFlight[]
@@ -14,6 +16,8 @@ interface Props {
 
 export function UngroupedView({ flights, running, hideHeader = false }: Props) {
   const { t } = useTranslation()
+  const { data: stationCfg } = useCateringStations()
+  const cateringSet = cateringStationSet(stationCfg?.stations ?? [])
   const [open, setOpen] = useState<Set<number>>(new Set())
 
   const toggle = (i: number) =>
@@ -36,7 +40,13 @@ export function UngroupedView({ flights, running, hideHeader = false }: Props) {
         )}
         <div className={`flex flex-col gap-2 ${running ? 'pointer-events-none opacity-50' : ''}`}>
           {flights.map((f, i) => (
-            <FlightCard key={i} flight={f} open={open.has(i)} onToggleOpen={() => toggle(i)} />
+            <FlightCard
+              key={i}
+              flight={f}
+              cateringSet={cateringSet}
+              open={open.has(i)}
+              onToggleOpen={() => toggle(i)}
+            />
           ))}
         </div>
       </div>
@@ -46,13 +56,14 @@ export function UngroupedView({ flights, running, hideHeader = false }: Props) {
 
 interface CardProps {
   flight: RawFlight
+  cateringSet: Set<string>
   open: boolean
   onToggleOpen: () => void
 }
 
-function FlightCard({ flight: f, open, onToggleOpen }: CardProps) {
+function FlightCard({ flight: f, cateringSet, open, onToggleOpen }: CardProps) {
   const { t } = useTranslation()
-  const cat = isCateringStation(f.arr)
+  const cat = isCateringStation(f.arr, cateringSet)
   const dur = formatDuration(legDurationMin(f))
   const premeal = f.premeal ?? 0
   const meals = f.meals ?? []

@@ -74,6 +74,7 @@ chặng đúng thứ tự (§3, `legSortKey`), (c) tính duty span suất tổ l
 
 ```
 AutoGroupOptions {
+  cateringStations: Set<string>   // mã trạm có catering ĐANG enable (config) — bắt buộc
   groupByPurser:    boolean       // rule group_by_purser đang bật?
   maxHours?:        number        // từ rule group_by_flight_hour (nếu bật); absent = không cap
   quotaByFlightNo?: Map<string, { hotmeal:number; banhMi:number; traSua:number }>
@@ -81,6 +82,7 @@ AutoGroupOptions {
 ```
 
 Nguồn của options (xem §7):
+- `cateringStations` = tập mã các trạm `enabled=true` trong **catering-station config** (KHÔNG hardcode).
 - `groupByPurser` = có rule `group_by_purser` với `enabled=true` trong version cấu hình đang active.
 - `maxHours` = `maxHours` của rule `group_by_flight_hour` nếu `enabled=true`, ngược lại `undefined`.
 - `quotaByFlightNo` = map `flightNo → quota` từ version inflight-quota (UC-10) đang active.
@@ -118,8 +120,10 @@ FlightLeg {
 ## 2. Helper functions (bắt buộc chính xác)
 
 ```
-CATERING_STATIONS = { "SGN", "HAN", "CXR" }
-isCateringStation(code) = code ∈ CATERING_STATIONS
+// Tập trạm catering KHÔNG hardcode — lấy từ config (danh sách {code,name,enabled}),
+// chỉ các trạm enabled. Truyền set này vào engine (opts.cateringStations) và view.
+cateringStationSet(config) = { s.code | s ∈ config.stations, s.enabled }
+isCateringStation(code, set) = code ∈ set
 
 toMinutes("HH:MM") = HH*60 + MM
 
@@ -168,11 +172,11 @@ for aircraft in sortAsc(keys(byAircraft)):
         purserBreak = opts.groupByPurser
                       AND current != null
                       AND current.purserCode != f.purserCode
-                      AND isCateringStation(f.dep)
+                      AND isCateringStation(f.dep, cateringStations)
 
         hourBreak   = current != null
                       AND (cumMin + legMin) > capMin
-                      AND isCateringStation(f.dep)
+                      AND isCateringStation(f.dep, cateringStations)
 
         // (5) Mở group mới nếu chưa có group, hoặc gặp điều kiện tách.
         if current == null OR purserBreak OR hourBreak:
@@ -218,10 +222,10 @@ return groups
 
 | Rule | Bật khi | Điều kiện tách một chặng `f` (mở group mới bắt đầu từ `f`) |
 |------|---------|-----------------------------------------------------------|
-| **group_by_purser** | có rule `group_by_purser` `enabled` | `current.purserCode != f.purserCode` **VÀ** `isCateringStation(f.dep)` |
-| **group_by_flight_hour** | có rule `group_by_flight_hour` `enabled` (có `maxHours`) | `cumMin + legMin > maxHours*60` **VÀ** `isCateringStation(f.dep)` |
+| **group_by_purser** | có rule `group_by_purser` `enabled` | `current.purserCode != f.purserCode` **VÀ** `isCateringStation(f.dep, cateringStations)` |
+| **group_by_flight_hour** | có rule `group_by_flight_hour` `enabled` (có `maxHours`) | `cumMin + legMin > maxHours*60` **VÀ** `isCateringStation(f.dep, cateringStations)` |
 
-Cả hai rule đều **bắt buộc** điều kiện `isCateringStation(f.dep)` — vì tách = nạp mới, chỉ
+Cả hai rule đều **bắt buộc** điều kiện `isCateringStation(f.dep, cateringStations)` — vì tách = nạp mới, chỉ
 khả thi tại trạm có catering. Đây là điểm mấu chốt:
 
 > Đổi purser (hoặc vượt giờ bay) tại một điểm **không** có catering **KHÔNG** tạo group mới.
@@ -268,7 +272,7 @@ groupsOfStation(S) = [ g in groups where groupOrigin(g) == S ]     // đơn hàn
 // (origin là sân bay không catering → không thuộc trạm nào trong 3 trạm).
 // ĐỘC LẬP với trạm đang chọn — giống nhau cho SGN/HAN/CXR.
 stationedFlightNos = { leg.flightNo
-                       for g in groups if isCateringStation(groupOrigin(g))
+                       for g in groups if isCateringStation(groupOrigin(g), cateringStations)
                        for leg in g.legs }
 pendingFlights = [ f in allRawFlights where f.flightNo ∉ stationedFlightNos ]
 ```
@@ -287,11 +291,18 @@ hourRule      = first r in rules: r.kind=="group_by_flight_hour" AND r.enabled  
 quotaRows = activeQuotaVersion(quotaData.versions).rows            // UC-10 inflight quota
 quotaByFlightNo = map( r => [r.flightNo, {r.hotmeal, r.banhMi, r.traSua}] )
 
-result = autoGroupFlights(rawFlights, { groupByPurser, maxHours: hourRule?.maxHours, quotaByFlightNo })
+cateringStations = cateringStationSet(stationConfig)              // trạm enabled trong config
+result = autoGroupFlights(rawFlights,
+           { cateringStations, groupByPurser, maxHours: hourRule?.maxHours, quotaByFlightNo })
 ```
 
-Cấu hình đang dùng (version c3): `group_by_purser` **bật**, `group_by_flight_hour` **tắt**
-(`maxHours=8` nhưng disabled).
+Cấu hình đang dùng: catering-station config = SGN·HAN·CXR `enabled`, DAD·PQC `disabled`
+(bật DAD ⇒ dropdown hiện DAD **và** engine sinh group origin DAD, không cần đổi code); rule
+version c3: `group_by_purser` **bật**, `group_by_flight_hour` **tắt** (`maxHours=8` nhưng disabled).
+
+Danh sách trạm catering là **config** (`{code, name, enabled}[]`), KHÔNG hardcode: cùng một
+nguồn nuôi cả (a) filter chọn trạm của planner (chỉ hiện `enabled`) và (b) `opts.cateringStations`
+của engine. Có thể versioned như rule/quota nếu cần lịch sử thay đổi.
 
 ### 7.1 Rule day-attribution (`nextDayCutoff`) — tiền xử lý dữ liệu
 
@@ -458,7 +469,7 @@ pending = 68 (độc lập với trạm chọn)
 
 | Tham số | Nguồn | Mặc định hiện tại |
 |---------|-------|-------------------|
-| `CATERING_STATIONS` | hằng | `{SGN, HAN, CXR}` |
+| catering stations (`{code,name,enabled}[]`) | catering-station config | SGN·HAN·CXR enabled; DAD·PQC disabled |
 | `group_by_purser.enabled` | rule config version active | bật |
 | `group_by_flight_hour.enabled` / `maxHours` | rule config version active | tắt / 8h |
 | `nextDayCutoff` | dataset | `07:00` |

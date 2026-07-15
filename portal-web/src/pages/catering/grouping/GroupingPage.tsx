@@ -33,6 +33,7 @@ import {
   splitGroupAt,
 } from '@/modules/catering/grouping'
 import type { FlightGroup } from '@/modules/catering/groupingTypes'
+import { useCateringStations } from '@/modules/catering/hooks/useCateringStations'
 import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
 import { useFlightGroups, useSaveFlightGroups } from '@/modules/catering/hooks/useFlightGroups'
 import { useMeals } from '@/modules/catering/hooks/useMeals'
@@ -41,6 +42,7 @@ import { useQuotaData } from '@/modules/catering/hooks/useQuota'
 import { useRuleConfigData } from '@/modules/catering/hooks/useRuleConfig'
 import { buildOrderLines, groupOrderFiles, makeCodeOf, orderFileId } from '@/modules/catering/orders'
 import { activeVersion as activeQuotaVersion } from '@/modules/catering/quota'
+import { cateringStationSet, enabledStations } from '@/modules/catering/stations'
 import { getSeedDataset } from '@/mock-data/loaders/loadFlightGroups'
 import { paths } from '@/routes/paths'
 import { GroupCard } from './GroupCard'
@@ -49,12 +51,6 @@ import { UngroupedView } from './UngroupedView'
 type FilterKey = 'all' | 'review' | 'confirmed'
 
 /** Catering stations a planner can be assigned to (demo station switcher). */
-const STATION_OPTIONS = [
-  { value: 'SGN', label: 'SGN · Tân Sơn Nhất' },
-  { value: 'HAN', label: 'HAN · Nội Bài' },
-  { value: 'CXR', label: 'CXR · Cam Ranh' },
-]
-
 export function GroupingPage() {
   const { t } = useTranslation()
   const { message } = AntApp.useApp()
@@ -68,6 +64,7 @@ export function GroupingPage() {
   const { data: crewCfg } = useCrewMealConfigData()
   const { data: ruleCfg } = useRuleConfigData()
   const { data: quotaData } = useQuotaData()
+  const { data: stationCfg } = useCateringStations()
 
   const [selectedDate, setSelectedDate] = useState('')
   const [filter, setFilter] = useState<FilterKey>('all')
@@ -86,26 +83,35 @@ export function GroupingPage() {
   )
   const dayIndex = day ? days.findIndex((d) => d.serviceDate === day.serviceDate) : -1
 
+  // Catering stations come from config (not hardcoded): the dropdown lists the
+  // enabled ones, and the engine only uplifts/splits at these.
+  const stations = useMemo(() => stationCfg?.stations ?? [], [stationCfg])
+  const cateringSet = useMemo(() => cateringStationSet(stations), [stations])
+  const stationOptions = useMemo(
+    () => enabledStations(stations).map((s) => ({ value: s.code, label: `${s.code} · ${s.name}` })),
+    [stations],
+  )
+
   // The planner's station (demo dropdown overrides the seed's default). Grouping is
   // computed globally; this station selects which groups are THIS planner's order.
-  const station = stationOverride ?? data?.station ?? 'SGN'
+  const station = stationOverride ?? data?.station ?? enabledStations(stations)[0]?.code ?? 'SGN'
   const groups = useMemo(() => day?.groups ?? [], [day])
   const stationGroups = useMemo(() => groups.filter((g) => groupOrigin(g) === station), [groups, station])
 
-  // Pending = flights that landed in NO catering-station group across all three
-  // stations (their rotation originates at a non-catering airport, e.g. an
+  // Pending = flights that landed in NO catering-station group across every
+  // enabled station (their rotation originates at a non-catering airport, e.g. an
   // overnight-positioned tail or an inbound-only international arrival). It is the
-  // SAME set whichever planner station is selected — SGN/HAN/CXR flights are all
-  // grouped under their own station, so they never appear here.
+  // SAME set whichever planner station is selected — an enabled station's flights
+  // are all grouped under their own station, so they never appear here.
   const pendingFlights = useMemo(() => {
     if (day?.status !== 'grouped') return []
     const stationed = new Set(
       groups
-        .filter((g) => isCateringStation(groupOrigin(g)))
+        .filter((g) => isCateringStation(groupOrigin(g), cateringSet))
         .flatMap((g) => g.legs.map((l) => l.flightNo)),
     )
     return (day?.ungroupedFlights ?? []).filter((f) => !stationed.has(f.flightNo))
-  }, [day, groups])
+  }, [day, groups, cateringSet])
 
   const numberOf = useMemo(() => {
     const map = new Map(stationGroups.map((g, i) => [g.id, i + 1]))
@@ -183,6 +189,7 @@ export function GroupingPage() {
       // selected planner's station. Raw flights are kept so each station's pending
       // list (flights it doesn't uplift) can be derived on the fly.
       const grouped = autoGroupFlights(day.ungroupedFlights ?? [], {
+        cateringStations: cateringSet,
         groupByPurser,
         maxHours: hourRule?.maxHours,
         quotaByFlightNo,
@@ -374,7 +381,7 @@ export function GroupingPage() {
                 variant="borderless"
                 value={station}
                 onChange={changeStation}
-                options={STATION_OPTIONS}
+                options={stationOptions}
                 popupMatchSelectWidth={false}
                 aria-label={t('catering.grouping.stationLabel')}
                 className="fg-station-select font-extrabold"
