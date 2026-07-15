@@ -6,14 +6,14 @@ import {
   legDurationMin,
   stationsOf,
 } from '@/modules/catering/grouping'
+import { useAirports } from '@/modules/airports/hooks/useAirports'
 import type { FlightGroup } from '@/modules/catering/groupingTypes'
-import { useCateringStations } from '@/modules/catering/hooks/useCateringStations'
 import { cateringStationSet } from '@/modules/catering/stations'
 
 /** Compact one-line route for the collapsed row: SGN → BMV → SGN → … */
 export function InlineRoute({ group }: { group: FlightGroup }) {
-  const { data: stationCfg } = useCateringStations()
-  const cateringSet = cateringStationSet(stationCfg?.stations ?? [])
+  const { data: airports } = useAirports()
+  const cateringSet = cateringStationSet(airports ?? [])
   const stations = stationsOf(group)
   return (
     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13.5px] font-extrabold">
@@ -46,8 +46,8 @@ interface TimelineProps {
 /** Full rotation timeline shown in the expanded detail. */
 export function RouteTimeline({ group, editing, onSplit }: TimelineProps) {
   const { t } = useTranslation()
-  const { data: stationCfg } = useCateringStations()
-  const cateringSet = cateringStationSet(stationCfg?.stations ?? [])
+  const { data: airports } = useAirports()
+  const cateringSet = cateringStationSet(airports ?? [])
   const stations = stationsOf(group)
 
   return (

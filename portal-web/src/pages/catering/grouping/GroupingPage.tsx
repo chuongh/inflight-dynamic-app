@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '@/components/patterns/PageHeader'
 import { useAuth } from '@/core/auth/useAuth'
+import { useAirports } from '@/modules/airports/hooks/useAirports'
 import { activeConfigVersion } from '@/modules/catering/config'
 import type { GroupByFlightHourRule } from '@/modules/catering/configTypes'
 import { activeCrewMealVersion, profileFor } from '@/modules/catering/crewMeal'
@@ -33,7 +34,6 @@ import {
   splitGroupAt,
 } from '@/modules/catering/grouping'
 import type { FlightGroup } from '@/modules/catering/groupingTypes'
-import { useCateringStations } from '@/modules/catering/hooks/useCateringStations'
 import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
 import { useFlightGroups, useSaveFlightGroups } from '@/modules/catering/hooks/useFlightGroups'
 import { useMeals } from '@/modules/catering/hooks/useMeals'
@@ -42,7 +42,7 @@ import { useQuotaData } from '@/modules/catering/hooks/useQuota'
 import { useRuleConfigData } from '@/modules/catering/hooks/useRuleConfig'
 import { buildOrderLines, groupOrderFiles, makeCodeOf, orderFileId } from '@/modules/catering/orders'
 import { activeVersion as activeQuotaVersion } from '@/modules/catering/quota'
-import { cateringStationSet, enabledStations } from '@/modules/catering/stations'
+import { cateringAirports, cateringStationSet } from '@/modules/catering/stations'
 import { getSeedDataset } from '@/mock-data/loaders/loadFlightGroups'
 import { paths } from '@/routes/paths'
 import { GroupCard } from './GroupCard'
@@ -64,7 +64,7 @@ export function GroupingPage() {
   const { data: crewCfg } = useCrewMealConfigData()
   const { data: ruleCfg } = useRuleConfigData()
   const { data: quotaData } = useQuotaData()
-  const { data: stationCfg } = useCateringStations()
+  const { data: airportsData } = useAirports()
 
   const [selectedDate, setSelectedDate] = useState('')
   const [filter, setFilter] = useState<FilterKey>('all')
@@ -83,18 +83,20 @@ export function GroupingPage() {
   )
   const dayIndex = day ? days.findIndex((d) => d.serviceDate === day.serviceDate) : -1
 
-  // Catering stations come from config (not hardcoded): the dropdown lists the
-  // enabled ones, and the engine only uplifts/splits at these.
-  const stations = useMemo(() => stationCfg?.stations ?? [], [stationCfg])
-  const cateringSet = useMemo(() => cateringStationSet(stations), [stations])
+  // Catering stations come from the airport master-data (`hasCatering` flag), not
+  // a hardcoded list: the dropdown lists the catering airports, and the engine
+  // only uplifts/splits at these. Toggling catering in the Airports admin flows
+  // through here automatically.
+  const airports = useMemo(() => airportsData ?? [], [airportsData])
+  const cateringSet = useMemo(() => cateringStationSet(airports), [airports])
   const stationOptions = useMemo(
-    () => enabledStations(stations).map((s) => ({ value: s.code, label: `${s.code} · ${s.name}` })),
-    [stations],
+    () => cateringAirports(airports).map((a) => ({ value: a.code, label: `${a.code} · ${a.name}` })),
+    [airports],
   )
 
   // The planner's station (demo dropdown overrides the seed's default). Grouping is
   // computed globally; this station selects which groups are THIS planner's order.
-  const station = stationOverride ?? data?.station ?? enabledStations(stations)[0]?.code ?? 'SGN'
+  const station = stationOverride ?? data?.station ?? cateringAirports(airports)[0]?.code ?? 'SGN'
   const groups = useMemo(() => day?.groups ?? [], [day])
   const stationGroups = useMemo(() => groups.filter((g) => groupOrigin(g) === station), [groups, station])
 

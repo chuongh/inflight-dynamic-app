@@ -10,8 +10,9 @@
 
 ## 0. TL;DR (business context)
 
-Một nhân viên catering tại một **trạm có catering** (chỉ **SGN, HAN, CXR**) cần chuẩn bị
-đơn hàng suất ăn cho các **hành trình (rotation)** của tàu bay khởi hành tại trạm của họ.
+Một nhân viên catering tại một **trạm có catering** (danh sách do config `hasCatering` quyết
+định, xem §7) cần chuẩn bị đơn hàng suất ăn cho các **hành trình (rotation)** của tàu bay
+khởi hành tại trạm của họ.
 
 Chính sách uplift của VietJet:
 1. Suất ăn được **nạp (uplift) MỘT lần tại điểm khởi hành (origin)** của rotation và cover
@@ -24,9 +25,9 @@ Chính sách uplift của VietJet:
    - `group_by_flight_hour`: tổng giờ bay tích luỹ vượt ngưỡng, **tách tại trạm catering kế tiếp**.
    - Đổi purser tại điểm quay đầu **không có catering** ⇒ **KHÔNG tách** (uplift gốc phải cover).
 
-Gom nhóm chạy **global cho cả 3 trạm một lần**. Mỗi group có `origin = chặng đầu tiên .dep`.
-Planner tại trạm S xem các group có `origin == S`. Các chuyến không rơi vào group nào của
-3 trạm (origin là sân bay không catering) là **pending** (chờ review).
+Gom nhóm chạy **global cho tất cả trạm catering một lần**. Mỗi group có `origin = chặng đầu
+tiên .dep`. Planner tại trạm S xem các group có `origin == S`. Các chuyến không rơi vào group
+nào của bất kỳ trạm catering nào (origin là sân bay không catering) là **pending** (chờ review).
 
 ---
 
@@ -82,7 +83,7 @@ AutoGroupOptions {
 ```
 
 Nguồn của options (xem §7):
-- `cateringStations` = tập mã các trạm `enabled=true` trong **catering-station config** (KHÔNG hardcode).
+- `cateringStations` = tập mã **airport có `hasCatering` và `status=="active"`** từ airport master-data (WP-B) — KHÔNG hardcode.
 - `groupByPurser` = có rule `group_by_purser` với `enabled=true` trong version cấu hình đang active.
 - `maxHours` = `maxHours` của rule `group_by_flight_hour` nếu `enabled=true`, ngược lại `undefined`.
 - `quotaByFlightNo` = map `flightNo → quota` từ version inflight-quota (UC-10) đang active.
@@ -120,9 +121,9 @@ FlightLeg {
 ## 2. Helper functions (bắt buộc chính xác)
 
 ```
-// Tập trạm catering KHÔNG hardcode — lấy từ config (danh sách {code,name,enabled}),
-// chỉ các trạm enabled. Truyền set này vào engine (opts.cateringStations) và view.
-cateringStationSet(config) = { s.code | s ∈ config.stations, s.enabled }
+// Tập trạm catering KHÔNG hardcode — DERIVED từ airport master-data (WP-B):
+// airport có hasCatering=true VÀ status=='active'. Truyền set vào engine + view.
+cateringStationSet(airports) = { a.code | a ∈ airports, a.hasCatering, a.status=='active' }
 isCateringStation(code, set) = code ∈ set
 
 toMinutes("HH:MM") = HH*60 + MM
@@ -291,18 +292,20 @@ hourRule      = first r in rules: r.kind=="group_by_flight_hour" AND r.enabled  
 quotaRows = activeQuotaVersion(quotaData.versions).rows            // UC-10 inflight quota
 quotaByFlightNo = map( r => [r.flightNo, {r.hotmeal, r.banhMi, r.traSua}] )
 
-cateringStations = cateringStationSet(stationConfig)              // trạm enabled trong config
+cateringStations = cateringStationSet(airports)                   // airport hasCatering+active
 result = autoGroupFlights(rawFlights,
            { cateringStations, groupByPurser, maxHours: hourRule?.maxHours, quotaByFlightNo })
 ```
 
-Cấu hình đang dùng: catering-station config = SGN·HAN·CXR `enabled`, DAD·PQC `disabled`
-(bật DAD ⇒ dropdown hiện DAD **và** engine sinh group origin DAD, không cần đổi code); rule
-version c3: `group_by_purser` **bật**, `group_by_flight_hour` **tắt** (`maxHours=8` nhưng disabled).
+Cấu hình đang dùng: airport master-data có **9** airport `hasCatering`+active (SGN·HAN·DAD·
+CXR·PQC·VCA·VII·HPH·DLI); ICN·UIH = không catering (bật/tắt `hasCatering` một airport ⇒ dropdown
++ engine đổi theo, không cần sửa code). Rule version c3: `group_by_purser` **bật**,
+`group_by_flight_hour` **tắt** (`maxHours=8` nhưng disabled).
 
-Danh sách trạm catering là **config** (`{code, name, enabled}[]`), KHÔNG hardcode: cùng một
-nguồn nuôi cả (a) filter chọn trạm của planner (chỉ hiện `enabled`) và (b) `opts.cateringStations`
-của engine. Có thể versioned như rule/quota nếu cần lịch sử thay đổi.
+Trạm catering là **cờ `hasCatering` trên airport master-data** (WP-B, quản lý ở màn Airports),
+KHÔNG hardcode: cùng một nguồn nuôi cả (a) filter chọn trạm của planner (chỉ hiện airport
+`hasCatering`+active) và (b) `opts.cateringStations` của engine. Nhân viên bật/tắt catering cho
+một sân bay ở màn Airports là cả hai chỗ đổi theo.
 
 ### 7.1 Rule day-attribution (`nextDayCutoff`) — tiền xử lý dữ liệu
 
@@ -469,7 +472,7 @@ pending = 68 (độc lập với trạm chọn)
 
 | Tham số | Nguồn | Mặc định hiện tại |
 |---------|-------|-------------------|
-| catering stations (`{code,name,enabled}[]`) | catering-station config | SGN·HAN·CXR enabled; DAD·PQC disabled |
+| catering stations | airport master-data `hasCatering` flag (WP-B) | 9 active: SGN·HAN·DAD·CXR·PQC·VCA·VII·HPH·DLI |
 | `group_by_purser.enabled` | rule config version active | bật |
 | `group_by_flight_hour.enabled` / `maxHours` | rule config version active | tắt / 8h |
 | `nextDayCutoff` | dataset | `07:00` |

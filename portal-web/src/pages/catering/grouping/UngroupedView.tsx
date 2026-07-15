@@ -1,9 +1,9 @@
 import { ChevronDown, Plane, Users, Utensils } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAirports } from '@/modules/airports/hooks/useAirports'
 import { formatDuration, isCateringStation, legDurationMin } from '@/modules/catering/grouping'
 import type { CockpitCrewMember, RawFlight } from '@/modules/catering/groupingTypes'
-import { useCateringStations } from '@/modules/catering/hooks/useCateringStations'
 import { cateringStationSet } from '@/modules/catering/stations'
 
 interface Props {
@@ -16,8 +16,8 @@ interface Props {
 
 export function UngroupedView({ flights, running, hideHeader = false }: Props) {
   const { t } = useTranslation()
-  const { data: stationCfg } = useCateringStations()
-  const cateringSet = cateringStationSet(stationCfg?.stations ?? [])
+  const { data: airports } = useAirports()
+  const cateringSet = cateringStationSet(airports ?? [])
   const [open, setOpen] = useState<Set<number>>(new Set())
 
   const toggle = (i: number) =>
