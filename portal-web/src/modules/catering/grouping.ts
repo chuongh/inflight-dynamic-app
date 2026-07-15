@@ -193,9 +193,12 @@ export interface AutoGroupOptions {
  * purser's continuous duty starts — and cover every leg. The aircraft is NOT
  * re-catered when it merely passes through another catering station (SGN/HAN/CXR),
  * to keep check-in/out simple. A rotation is only **split** (a fresh uplift +
- * separate station order) when a config rule is violated: `group_by_purser` (the
- * purser changes) or `group_by_flight_hour` (cumulative flight time exceeds
- * `maxHours`, split at the next catering station).
+ * separate station order) when a config rule is violated AND the split point is a
+ * catering station — the only place a new uplift is physically possible:
+ * `group_by_purser` (the purser changes at a catering-station departure) or
+ * `group_by_flight_hour` (cumulative flight time exceeds `maxHours`, split at the
+ * next catering station). A purser change at a non-catering turnaround does NOT
+ * split — the origin uplift still covers the same-tail return leg.
  *
  * Grouping is computed **globally across all stations** and every group is
  * returned; each group's uplift station is its first leg's departure
@@ -247,8 +250,16 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
 
     for (const f of legs) {
       const legMin = legMinutes(f)
-      const purserBreak = groupByPurser && current !== null && current.purserCode !== f.purserCode
-      // Flight-hour cap: only split at a catering station, where a fresh uplift is possible.
+      // A split means a fresh uplift, which is only physically possible where the
+      // aircraft can be re-catered — i.e. the new leg DEPARTS a catering station.
+      // If the purser changes at a non-catering turnaround (e.g. an ICN→SGN return
+      // on the same tail), the origin uplift must still cover that leg, so no split.
+      const purserBreak =
+        groupByPurser &&
+        current !== null &&
+        current.purserCode !== f.purserCode &&
+        isCateringStation(f.dep)
+      // Flight-hour cap: likewise only split at a catering station.
       const hourBreak = current !== null && cumMin + legMin > capMin && isCateringStation(f.dep)
       if (current === null || purserBreak || hourBreak) {
         finalize()
