@@ -19,13 +19,16 @@ function toMinutes(hhmm: string): number {
 }
 
 /**
- * Chronological sort key for a leg/flight, honouring the explicit next-day flag
- * and falling back to the "before 04:00 = next day" heuristic. Accepts a raw
- * flight or a grouped leg (both carry `std` + optional `stdNextDay`).
+ * Chronological sort key for a leg/flight, honouring the explicit next-day flag.
+ * Every genuinely next-day departure in the seed carries `stdNextDay` (a red-eye
+ * return kept on its outbound's day), so we trust that flag rather than guessing
+ * from the clock: an early-morning leg that departs ON the service day (e.g. a
+ * moved 01:40 outbound) has no flag and must sort FIRST, not be bumped to the end
+ * by a naive "before 04:00 = next day" rule. Accepts a raw flight or a grouped leg.
  */
 export function legSortKey(leg: { std: string; stdNextDay?: boolean }): number {
   const [h, m] = leg.std.split(':').map(Number)
-  const nextDay = leg.stdNextDay ?? h < 4
+  const nextDay = leg.stdNextDay === true
   return (nextDay ? 24 : 0) * 60 + h * 60 + m
 }
 

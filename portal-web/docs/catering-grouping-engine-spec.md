@@ -29,6 +29,10 @@ Gom nhóm chạy **global cho tất cả trạm catering một lần**. Mỗi gr
 tiên .dep`. Planner tại trạm S xem các group có `origin == S`. Các chuyến không rơi vào group
 nào của bất kỳ trạm catering nào (origin là sân bay không catering) là **pending** (chờ review).
 
+**Tiền đề (bắt buộc):** trước khi gom nhóm phải **gán chuyến vào đúng ngày dịch vụ theo ngày
+nạp suất** (§7.1) — một vòng bay qua đêm bị crew-list cắt ngang nửa đêm phải được gộp về một
+ngày, nếu không chặng "về" sáng hôm sau sẽ mồ côi khi engine chạy theo từng ngày.
+
 ---
 
 ## 1. I/O Contract
@@ -67,9 +71,12 @@ CockpitCrewMember {
 **Lưu ý xử lý giờ qua đêm:** nguồn crew-list đánh dấu `+` trên STD/STA cho ngày kế. Khi
 extract, ta **bỏ dấu `+` khỏi chuỗi giờ (lưu HH:MM sạch) NHƯNG giữ lại thành 2 cờ boolean
 `stdNextDay`/`staNextDay`**. Hai cờ này là **bắt buộc** cho: (a) hiển thị `+1`, (b) sắp xếp
-chặng đúng thứ tự (§3, `legSortKey`), (c) tính duty span suất tổ lái qua đêm (§8, `depDay`/
-`arrDay`). Thiếu chúng ⇒ chặng đến sau nửa đêm bị coi là cùng ngày và duty span tính SAI.
-`legDurationMin = (sta − std + 1440) mod 1440` vẫn đúng độc lập với cờ.
+chặng đúng thứ tự (§3, `legSortKey` — TIN cờ, KHÔNG đoán theo giờ), (c) tính duty span suất tổ
+lái qua đêm (§8, `depDay`/`arrDay`). **Mọi chặng sang ngày kế PHẢI mang cờ**: `legSortKey`
+không còn heuristic "trước 04:00 = ngày kế", nên một chặng ngày-kế thiếu cờ sẽ bị sắp SAI (coi
+là đầu ngày thay vì cuối) và duty span qua đêm cũng tính SAI. Ngược lại, một chặng cất cánh rạng
+sáng **trong chính** ngày dịch vụ (đã được day-attribution gán đúng, §7.1) đúng là **không** có
+cờ và sắp đầu ngày. `legDurationMin = (sta − std + 1440) mod 1440` vẫn đúng độc lập với cờ.
 
 ### 1.2 Options — cấu hình chạy engine
 
@@ -128,11 +135,14 @@ isCateringStation(code, set) = code ∈ set
 
 toMinutes("HH:MM") = HH*60 + MM
 
-// Khoá sắp xếp chặng: ưu tiên cờ stdNextDay; fallback heuristic 00:00–03:59 = ngày kế.
-// Cần cho chuyến cất cánh rạng sáng ngày kế (vd 05:00+) mà heuristic h<4 không bắt được.
+// Khoá sắp xếp chặng: TIN cờ stdNextDay tường minh — KHÔNG đoán theo giờ.
+// Mọi chặng thật sự sang ngày kế trong seed đều mang cờ stdNextDay (vd chặng về red-eye giữ
+// ở ngày của chặng đi, §7.1). Một chặng cất cánh rạng sáng NGAY TRONG ngày dịch vụ (vd outbound
+// 01:40 đã gán đúng ngày bay) KHÔNG có cờ → phải sắp ĐẦU tiên. Heuristic "h<4 = ngày kế" cũ
+// đẩy nhầm chặng này xuống cuối rotation ⇒ tách nhầm group (chặng đi mồ côi, chặng về rớt pending).
 legSortKey(f):                     // f có { std:"HH:MM", stdNextDay?:bool }
     (h, m) = parse(f.std)
-    nextDay = (f.stdNextDay != null) ? f.stdNextDay : (h < 4)
+    nextDay = (f.stdNextDay == true)
     return (nextDay ? 24 : 0) * 60 + h*60 + m
 
 // Thời lượng bay 1 chặng (phút), xử lý qua đêm bằng modulo 1440.
@@ -307,12 +317,52 @@ KHÔNG hardcode: cùng một nguồn nuôi cả (a) filter chọn trạm của p
 `hasCatering`+active) và (b) `opts.cateringStations` của engine. Nhân viên bật/tắt catering cho
 một sân bay ở màn Airports là cả hai chỗ đổi theo.
 
-### 7.1 Rule day-attribution (`nextDayCutoff`) — tiền xử lý dữ liệu
+### 7.1 Day-attribution — gán chuyến vào ngày dịch vụ (tiền xử lý, KHÔNG thuộc `autoGroupFlights`)
 
-Không thuộc `autoGroupFlights` mà là bước **gán chuyến vào ngày dịch vụ**: một chuyến cất
-cánh từ trạm catering **trước `nextDayCutoff` (mặc định `07:00`)** được tính vào đơn hàng
-của **ngày HÔM TRƯỚC** (suất chuẩn bị từ tối hôm trước). Backend cần áp rule này khi phân
-chuyến theo ngày trước khi gom nhóm.
+Vì gom nhóm chạy **theo từng ngày**, mọi chặng của một rotation phải nằm **chung một ngày dịch
+vụ** thì engine mới ghép được. Ngày dịch vụ của một chặng = **ngày lịch mà rotation của nó NẠP
+SUẤT (uplift) tại trạm catering gốc**. Nguồn crew-list chia theo **ngày trực của tổ bay**, làm
+một vòng bay qua đêm bị **cắt ngang nửa đêm** (chặng đi ở ngày N, chặng về ở ngày N+1) — phải
+gộp lại. Thuật toán (segment theo tàu bay):
+
+```
+attributeServiceDays(allLegs):                 // gộp mọi roster, mỗi leg có physDate (ngày lịch STD thực)
+    for aircraft in groupBy(allLegs, .aircraft):
+        legs = sortedBy(physicalDepartureTimestamp)          // đa ngày, honour cờ +
+        segDay = null
+        for leg in legs:
+            if isCateringStation(leg.dep, cateringStations):
+                segDay = physicalCalendarDay(leg.dep departure)   // MỞ segment mới tại điểm nạp suất
+            leg.serviceDay = segDay                                // chặng không-catering KẾ THỪA segment
+            // gán lại cờ tương đối với serviceDay:
+            leg.stdNextDay = (physCalendarDay(STD) >  serviceDay)
+            leg.staNextDay = (physCalendarDay(STA) >  serviceDay)
+```
+
+> Một chặng **cất cánh từ trạm catering** MỞ một segment mới → ngày dịch vụ = **ngày lịch cất
+> cánh THỰC** của chính nó. Các chặng sau **cất cánh từ sân bay KHÔNG catering** (chặng về, quay
+> đầu) **kế thừa** ngày của segment đang mở. Cờ `stdNextDay`/`staNextDay` được tính lại tương đối
+> với ngày dịch vụ đã gán.
+
+Hệ quả (khớp seed hiện tại):
+- **Chuyến đi rạng sáng** (VN-catering, dấu `+` trên STD): segment gốc là chính nó, cất cánh
+  rạng sáng **ngày kế** ⇒ thuộc **ngày kế**, **xoá cờ** (nó cất cánh trong ngày dịch vụ). Vd
+  VJ920 HAN→NGO `01:40⁺¹` (roster 15/7) → **ngày 16/7** hiển thị `01:40`, ghép với chặng về
+  VJ921 NGO→HAN cùng ngày 16/7.
+- **Chặng về từ sân bay ngoài** (không catering, quay đầu qua đêm): kế thừa ngày của chặng đi
+  ⇒ thuộc **ngày HÔM TRƯỚC** (ngày đã nạp suất ở VN), **gắn cờ `+1`**. Vd VJ969 PUS→PQC `07:45`
+  (roster 16/7) → **ngày 15/7** hiển thị `07:45⁺¹`, ghép chung rotation HAN→PQC→PUS→PQC — nếu
+  để nguyên ở 16/7 thì mồ côi ở PUS (§11.6).
+- **Biên dữ liệu:** chặng về mà segment gốc (chặng đi) nằm ở ngày CHƯA nạp (ngoài cửa sổ dữ
+  liệu, vd đường bay hàng ngày có chặng về đêm hôm trước) ⇒ không có nơi kéo về, trở thành
+  pending "thuộc ngày trước". Với đường bay HÀNG NGÀY, cùng số hiệu có thể xuất hiện 2 lần trong
+  một ngày dịch vụ (1 chặng-về-đêm-trước mồ côi + 1 rotation trong ngày) — đây là hiệu ứng biên,
+  không phải trùng lặp thật.
+
+`nextDayCutoff` (mặc định `07:00`, còn trong dataset) là quy ước "suất chuẩn bị từ tối hôm
+trước" — mang tính **thời điểm ĐẶT/CHUẨN BỊ đơn hàng**, KHÁC với bucket dữ liệu ở trên (theo
+**ngày VẬN HÀNH/nạp suất**). Seed hiện tại bucket theo segment/uplift-day, nên một chuyến đi
+01:40 nằm ở đúng ngày nó bay; backend có thể chọn hiển thị "chuẩn bị hôm trước" theo cutoff nếu cần.
 
 ---
 
@@ -460,11 +510,35 @@ SGN→HAN (purser A), HAN→DAD (purser B):  tại HAN đổi purser & HAN cater
 NGO→HAN (origin NGO không catering) ⇒ group origin NGO ⇒ không thuộc trạm nào ⇒ pending
 ```
 
-### 11.5 Số liệu tổng (470 chuyến ngày 16/07, group_by_purser bật, flight_hour tắt)
+### 11.5 Số liệu tổng (seed 3 ngày sau day-attribution §7.1; group_by_purser bật, flight_hour tắt)
 ```
-SGN: 93 groups   HAN: 72 groups   CXR: 13 groups
-pending = 68 (độc lập với trạm chọn)
+15/07: 465 chuyến → 207 groups   (SGN 89·HAN 64·DAD 17·CXR 10·HPH 5·PQC 5)   group origin-không-catering 17
+16/07: 462 chuyến → 219 groups   (SGN 92·HAN 74·DAD 25·CXR 13·HPH 8·PQC 6)   group origin-không-catering  1
+17/07:  13 chuyến →  13 groups   (HAN 7·SGN 4·CXR 1·DAD 1)                    group origin-không-catering  0
 ```
+"group origin-không-catering" = số group có origin là sân bay ngoài → các chặng đó rơi vào
+`pendingFlights` (§6). Con số này **giảm mạnh** so với bản 1-ngày cũ (16/7 từ ~68 xuống **1**)
+nhờ day-attribution §7.1 kéo chặng-về-qua-đêm về đúng ngày rotation của nó.
+
+### 11.6 Rotation qua đêm ở sân bay ngoài — day-attribution kéo chặng về (§7.1)
+
+Tàu VN-A521, nguồn (2 roster):
+```
+VJ455  HAN→PQC  20:05→22:10            (roster 15/7)
+VJ968  PQC→PUS  23:10→06:40⁺¹          (roster 15/7)
+VJ969  PUS→PQC  07:45→11:10            (roster 16/7)   ← chặng về, quay đầu qua đêm ở PUS
+```
+- PUS **không catering** ⇒ VJ969 không thể nạp lại ở PUS; suất đã nạp ở PQC (15/7).
+- **Day-attribution:** VJ969 kế thừa segment của VJ968 (dep PQC, 15/7) ⇒ gán **ngày 15/7**, cờ
+  `07:45⁺¹`. (Nếu để nguyên ở 16/7: VJ969 là chặng đầu của tàu ngày 16/7, origin PUS ⇒ mồ côi.)
+- **Gom nhóm ngày 15/7:** VJ455 (HAN) mở group; VJ968 (PQC, cùng purser) join; VJ969 (dep PUS
+  không catering, purser đổi) `purserBreak=false` ⇒ join.
+
+Output — **một group** origin HAN:
+```
+[HAN→PQC 20:05, PQC→PUS 23:10, PUS→PQC 07:45⁺¹] · 3 legs · purser (chặng đầu, VU 6 LE ANH)
+```
+✅ Chặng về không mồ côi; cả vòng HAN→PQC→PUS→PQC do lần uplift tại HAN/PQC (15/7) cover.
 
 ---
 
@@ -475,6 +549,11 @@ pending = 68 (độc lập với trạm chọn)
 | catering stations | airport master-data `hasCatering` flag (WP-B) | 9 active: SGN·HAN·DAD·CXR·PQC·VCA·VII·HPH·DLI |
 | `group_by_purser.enabled` | rule config version active | bật |
 | `group_by_flight_hour.enabled` / `maxHours` | rule config version active | tắt / 8h |
-| `nextDayCutoff` | dataset | `07:00` |
+| `nextDayCutoff` | dataset | `07:00` (quy ước prep hôm trước; KHÁC bucket theo uplift-day §7.1) |
 | crew-meal profile (`preStd`,`postSta`,`minOverlap`,`windows`,`countedColumns`,`dedupeByEmployee`,`splitByLandingDate`) | crew-meal config version active (m2) | xem §8.2 |
 | `quotaByFlightNo` | inflight-quota version active (UC-10) | v6 |
+
+> **Day-attribution (§7.1)** là bước tiền xử lý dữ liệu (không nhận param cấu hình runtime): gán
+> mỗi chặng vào ngày dịch vụ theo **segment nạp-suất của tàu bay** (chặng đi rạng sáng `+` → ngày
+> kế, xoá cờ; chặng về từ sân bay ngoài → kế thừa ngày chặng đi, gắn `+1`). Bắt buộc chạy trước
+> `autoGroupFlights` để vòng bay qua đêm không bị mồ côi.
