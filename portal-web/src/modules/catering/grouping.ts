@@ -1,6 +1,6 @@
 /** Pure helpers for UC-11 catering flight-grouping. All functions are
  *  immutable — editing operations return a fresh `groups` array. */
-import type { CockpitCrewMember, FlightGroup, FlightLeg, RawFlight } from './groupingTypes'
+import type { CockpitCrewMember, FlightGroup, FlightLeg, MealBreakdownItem, RawFlight } from './groupingTypes'
 
 /**
  * Whether meals can be uplifted at `code` — membership in the ENABLED
@@ -124,6 +124,15 @@ export function hasSalesQuota(group: FlightGroup): boolean {
   return group.legs.some((l) => l.salesQuota != null)
 }
 
+/** Roll up per-leg dish counts into a group-level breakdown, desc by count. */
+export function rollupLegMeals(legs: FlightLeg[]): MealBreakdownItem[] {
+  const map = new Map<string, number>()
+  for (const leg of legs) for (const m of leg.meals ?? []) map.set(m.name, (map.get(m.name) ?? 0) + m.count)
+  return [...map.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+}
+
 /** Sum every group's per-dish premeal into a day total, sorted desc by qty. */
 export function aggregateDayMeals(groups: FlightGroup[]): { name: string; count: number }[] {
   const map = new Map<string, number>()
@@ -243,16 +252,12 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
       .sort((a, b) => legSortKey(a) - legSortKey(b))
 
     let current: FlightGroup | null = null
-    let dishes = new Map<string, number>()
     let cumMin = 0
 
     const finalize = () => {
       if (!current) return
-      if (dishes.size > 0) {
-        current.meals = [...dishes.entries()]
-          .map(([name, count]) => ({ name, count }))
-          .sort((a, b) => b.count - a.count)
-      }
+      const meals = rollupLegMeals(current.legs)
+      if (meals.length > 0) current.meals = meals
       const total = current.legs.reduce((sum, l) => sum + (l.premeal ?? 0), 0)
       if (total > 0) current.premealTotal = total
       current = null
@@ -285,7 +290,6 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
           confirmed: false,
           legs: [],
         }
-        dishes = new Map()
         cumMin = 0
         groups.push(current)
       }
@@ -299,10 +303,10 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
         stdNextDay: f.stdNextDay,
         staNextDay: f.staNextDay,
         premeal: f.premeal,
+        meals: f.meals,
         cockpitCrew: f.cockpitCrew,
         salesQuota: quotaByFlightNo?.get(f.flightNo),
       })
-      for (const m of f.meals ?? []) dishes.set(m.name, (dishes.get(m.name) ?? 0) + m.count)
       cumMin += legMin
     }
     finalize()
