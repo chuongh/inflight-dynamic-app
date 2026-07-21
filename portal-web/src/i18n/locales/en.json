@@ -727,6 +727,19 @@
         "exportCsv": "Export reconciliation",
         "close": "Close"
       },
+      "editByFlight": {
+        "open": "Update by flight",
+        "title": "Update meals by flight",
+        "desc": "Adjust passenger meal counts per flight. Saving creates a new version.",
+        "search": "Search flight (e.g. VJ156)",
+        "hint": "Search a flight to adjust its meals.",
+        "noMatch": "No flight matches.",
+        "more": "+{{n}} more flights — refine your search",
+        "netDelta": "Net Δ",
+        "portionsN": "{{n}} portions",
+        "create": "Create new version",
+        "created": "New version v{{v}} created"
+      },
       "savedV": "Draft v{{v}} saved",
       "sentV": "Sent to supplier · v{{v}}",
       "revisionCreated": "New version v{{v}} created for editing",

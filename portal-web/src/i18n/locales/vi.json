@@ -727,6 +727,19 @@
         "exportCsv": "Xuất bảng đối soát",
         "close": "Đóng"
       },
+      "editByFlight": {
+        "open": "Cập nhật theo chuyến",
+        "title": "Cập nhật suất theo chuyến",
+        "desc": "Điều chỉnh số suất khách theo từng chuyến. Lưu sẽ tạo phiên bản mới.",
+        "search": "Tìm chuyến (VD VJ156)",
+        "hint": "Tìm một chuyến để chỉnh số suất.",
+        "noMatch": "Không có chuyến khớp.",
+        "more": "+{{n}} chuyến nữa — thu hẹp tìm kiếm",
+        "netDelta": "Δ ròng",
+        "portionsN": "{{n}} suất",
+        "create": "Tạo phiên bản mới",
+        "created": "Đã tạo phiên bản v{{v}}"
+      },
       "savedV": "Đã lưu nháp v{{v}}",
       "sentV": "Đã gửi nhà cung cấp · v{{v}}",
       "revisionCreated": "Đã tạo version mới v{{v}} để chỉnh sửa",

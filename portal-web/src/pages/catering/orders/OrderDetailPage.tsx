@@ -4,6 +4,7 @@ import {
   ChevronLeft,
   Info,
   Minus,
+  PlaneTakeoff,
   Plus,
   Printer,
   RotateCcw,
@@ -18,10 +19,12 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '@/core/auth/useAuth'
 import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
-import type { CateringOrder, CateringOrderLine, OrderCategory } from '@/modules/catering/orderTypes'
+import type { CateringOrder, CateringOrderLine, OrderCategory, OrderSourceCell } from '@/modules/catering/orderTypes'
 import { categoryTotal, groupOrderFiles, lineTotal, suggestedTotal } from '@/modules/catering/orders'
+import { deriveLines } from '@/modules/catering/orderSnapshot'
 import { paths } from '@/routes/paths'
 import { CAT_COLOR, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
+import { FlightMealEditorDrawer } from './FlightMealEditorDrawer'
 import { ReconcileDrawer } from './ReconcileDrawer'
 
 const CATS: { key: OrderCategory; icon: React.ReactNode }[] = [
@@ -45,6 +48,7 @@ export function OrderDetailPage() {
 
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null)
   const [reconcileOpen, setReconcileOpen] = useState(false)
+  const [flightEditOpen, setFlightEditOpen] = useState(false)
   const current: CateringOrder | undefined = file
     ? (file.versions.find((v) => v.version === (selectedVersion ?? latest!.version)) ?? latest)
     : undefined
@@ -110,6 +114,25 @@ export function OrderDetailPage() {
     saveOrders.mutate({ orders: [...(data?.orders ?? []), rec] })
     setSelectedVersion(v)
     message.success(t('catering.orders.revisionCreated', { v }))
+  }
+  const createVersionFromBreakdown = (nextBreakdown: OrderSourceCell[]) => {
+    const v = latest!.version + 1
+    const codeOf = (name: string) =>
+      current!.lines.find((l) => l.category === 'prebook' && l.name === name)?.pbmlCodes ?? []
+    const rec: CateringOrder = {
+      ...latest!,
+      id: `${file.fileId}-v${v}`,
+      version: v,
+      status: 'draft',
+      createdAt: Date.now(),
+      createdBy: userName(),
+      breakdown: nextBreakdown,
+      lines: deriveLines(nextBreakdown, codeOf),
+    }
+    saveOrders.mutate({ orders: [...(data?.orders ?? []), rec] })
+    setSelectedVersion(v)
+    setFlightEditOpen(false)
+    message.success(t('catering.orders.editByFlight.created', { v }))
   }
   function userName() {
     return session?.user.name ?? 'Catering Ops'
@@ -251,6 +274,11 @@ export function OrderDetailPage() {
 
           {/* actions */}
           <div className="border-border mt-[18px] flex items-center gap-2.5 border-t pt-4">
+            {isLatest ? (
+              <Button icon={<PlaneTakeoff size={15} />} onClick={() => setFlightEditOpen(true)}>
+                {t('catering.orders.editByFlight.open')}
+              </Button>
+            ) : null}
             {editable ? (
               <>
                 <Button icon={<RotateCcw size={15} />} onClick={resetSuggested}>
@@ -346,6 +374,13 @@ export function OrderDetailPage() {
         onClose={() => setReconcileOpen(false)}
         current={current}
         base={reconcileBase}
+      />
+      <FlightMealEditorDrawer
+        open={flightEditOpen}
+        onClose={() => setFlightEditOpen(false)}
+        current={current}
+        onCreateVersion={createVersionFromBreakdown}
+        pending={saveOrders.isPending}
       />
     </div>
   )
