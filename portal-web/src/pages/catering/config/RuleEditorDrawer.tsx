@@ -149,17 +149,6 @@ export function RuleEditorDrawer({ open, rule, onClose, onSave }: Props) {
           </Field>
         ) : null}
 
-        {draft.kind === 'scope_note' ? (
-          <Field label={t('catering.config.form.noteText')}>
-            <Input.TextArea
-              value={draft.text}
-              onChange={(e) => patch({ text: e.target.value })}
-              placeholder={t('catering.config.form.notePlaceholder')}
-              autoSize={{ minRows: 3, maxRows: 6 }}
-            />
-          </Field>
-        ) : null}
-
         {draft.kind === 'group_by_purser' ? (
           <div className="border-border bg-background text-text-muted rounded-xl border px-3.5 py-3 text-[12.5px] leading-relaxed">
             {t('catering.config.form.purserNote')}
