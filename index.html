@@ -2140,6 +2140,8 @@ const I = {
   wheel: `<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>`,
   spin:  `<path d="M21 12a9 9 0 1 1-6.2-8.55" opacity=".95"/>`,
   keyboard:`<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M10 14h4M16 14h.01M18 14h.01"/>`,
+  cash:  `<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 6v.01M18 18v-.01"/>`,
+  card:  `<rect x="2" y="5" width="20" height="14" rx="2.4"/><path d="M2 10h20M6 15h4"/>`,
 };
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -2168,21 +2170,26 @@ function buildView(path){
     path.endsWith("/scan")            ? CrewScanLeg :
     path.endsWith("/seats")           ? SeatScreen :
     path.endsWith("/cabin")           ? CabinServing :
+    path.endsWith("/revenue")         ? RevenueSummary :
     path.startsWith("/crew/flight/")  ? FlightDetail :
     path.startsWith("/equipment/")    ? DeviceScreen : NotFound
   ))(v, path);
   return v;
 }
 
-/* ── ScreenHeader — cùng visual với pageChrome / mchrome ── */
-function bar(v, {title, subtitle, onBack, action, onAction, extra}){
+/* ── ScreenHeader — cùng visual với pageChrome / mchrome ──
+   Luôn kèm nút "Về trang chủ" cạnh back — màn hình chi tiết có thể lồng rất
+   sâu (Ca trực → Chặng → Sơ đồ → Khách → Bán hàng…), nút back chỉ lùi 1 bước
+   nên cần 1 lối thoát nhanh về /home mà không phải bấm back nhiều lần. */
+function bar(v, {title, subtitle, onBack, action, onAction, extra, hideExit}){
   v.appendChild(h("header",{class:"bar"},
     h("div",{class:"bar-inner"},
       onBack ? h("button",{class:"back", "aria-label":"Quay lại", onClick:onBack}, svg(I.back,22)) : null,
       h("div",{class:"ttl"},
         h("b",{}, title),
         subtitle ? h("span",{}, subtitle) : null),
-      action ? h("button",{class:"act", onClick:onAction}, action) : null),
+      action ? h("button",{class:"act", onClick:onAction}, action) : null,
+      hideExit ? null : h("button",{class:"back", "aria-label":"Về trang chủ", onClick:()=>go("/home","reset")}, svg(I.home,20))),
     extra ? h("div",{class:"bar-extra"}, extra) : null,
     h("div",{class:"edge", "aria-hidden":"true"})));
 }
@@ -2200,7 +2207,8 @@ function seatChrome(v, {flightNo, ac, origin, destination, pob, capacity, onBack
           h("b",{}, destination))),
       pob != null
         ? h("div",{class:"sh-pob"}, h("b",{}, String(pob)), h("span",{}, `/${capacity} khách`))
-        : null),
+        : null,
+      h("button",{class:"sback","aria-label":"Về trang chủ", onClick:()=>go("/home","reset")}, svg(I.home,20))),
     extra || null,
     h("div",{class:"mchrome-stripe", "aria-hidden":"true"})));
 }
@@ -2616,7 +2624,17 @@ function homeShortcutsSection(){
     }));
   } else if (after.length){
     afterCards.push(shortcutRow({tone:"ok", icon:I.check, title: after.length+" chặng đã hạ cánh", sub:"Đã bàn giao đầy đủ", onClick:()=>go("/crew/handover")}));
-  } else {
+  }
+  if (purser && after.length){
+    const lastLanded = after[after.length-1];
+    afterCards.push(shortcutRow({
+      tone:"info", icon:I.cash,
+      title:"Tổng hợp doanh thu · "+lastLanded.flightNo,
+      sub: legSaleVnd(lastLanded.flightNo).toLocaleString("vi-VN")+"₫ · "+legSaleUnits(lastLanded.flightNo)+" món",
+      onClick: ()=>go(`/crew/flight/${lastLanded.flightNo}/revenue`),
+    }));
+  }
+  if (!after.length){
     afterCards.push(emptyRow("Chưa có chặng nào hạ cánh"));
     afterCards.push(shortcutRow({
       tone:"info", icon:I.cube,
@@ -2866,6 +2884,13 @@ const groupOfLeg = leg => GROUPS.find(g => g.legs.includes(leg));
 const packOf = flightNo => S.packByLeg[flightNo] || (S.packByLeg[flightNo] = {state:"missing", syncedAt:null});
 const packMbOf = () => (PACK_SIZE_MB / ALL_LEGS.length).toFixed(1);
 const legDownloaded = leg => packOf(leg.flightNo).state === "ready";
+/* DEMO: tắt khoá "chưa tải gói offline" khi mở seatmap/danh sách khách/scan —
+   để cabin crew (và mọi role) xem được ngay mà không phải chờ Purser tải gói
+   trước, cho dễ demo. Trạng thái tải (legDownloaded/groupPackSummary) và luồng
+   tải gói của Purser vẫn giữ nguyên, chỉ tắt phần CHẶN thao tác xem dữ liệu.
+   Đổi về false để bật lại rule gốc (UC-03 · BRule-06). */
+const DEMO_SKIP_PACK_GATE = true;
+const legViewable = leg => DEMO_SKIP_PACK_GATE || legDownloaded(leg);
 const groupPackSummary = g => {
   const legs = g.legs.map(l => packOf(l.flightNo));
   const ready = legs.filter(p => p.state === "ready").length;
@@ -3202,7 +3227,7 @@ function FlightDetail(v, path){
     pct>=85 ? h("span",{class:"chip warn"},"Gần đầy") : null)));
 
   /* lối vào sơ đồ + danh sách khách */
-  const seatHint = done ? "Xem từng ghế · SSR & dịch vụ" : "Cần tải gói bay trước · UC-03";
+  const seatHint = legViewable(l) ? "Xem từng ghế · SSR & dịch vụ" : "Cần tải gói bay trước · UC-03";
   body.appendChild(st(h("button",{type:"button", class:"seatentry", onClick:()=>go("/crew/flight/"+l.flightNo+"/seats")},
     h("span",{class:"si"}, svg(I.grid,22)),
     h("div",{style:"flex:1;text-align:left;min-width:0"},
@@ -3211,7 +3236,7 @@ function FlightDetail(v, path){
     ),
     h("span",{class:"chev"}, svg(I.chev,20))
   )));
-  const sellHint = !done
+  const sellHint = !legViewable(l)
     ? "Cần tải gói bay trước"
     : legSaleUnits(l.flightNo)
       ? `${legSaleUnits(l.flightNo)} món đã bán · chọn ghế thu tiền`
@@ -3224,6 +3249,19 @@ function FlightDetail(v, path){
     ),
     h("span",{class:"chev"}, svg(I.chev,20))
   )));
+
+  /* tổng hợp doanh thu — chỉ Purser */
+  if (isPurser(S.session.roles)){
+    const units = legSaleUnits(l.flightNo);
+    body.appendChild(st(h("button",{type:"button", class:"seatentry", onClick:()=>go("/crew/flight/"+l.flightNo+"/revenue")},
+      h("span",{class:"si", style:"background:var(--success-bg);color:var(--success-text)"}, svg(I.cash,22)),
+      h("div",{style:"flex:1;text-align:left;min-width:0"},
+        h("b",{},"Tổng hợp doanh thu"),
+        h("span",{}, units ? legSaleVnd(l.flightNo).toLocaleString("vi-VN")+"₫ · "+units+" món" : "Chưa có giao dịch nào")
+      ),
+      h("span",{class:"chev"}, svg(I.chev,20))
+    )));
+  }
 
   /* giờ giấc */
   const rows = [
@@ -3288,7 +3326,7 @@ function SeatScreen(v, path){
   const l = ALL_LEGS.find(x => x.flightNo === no);
   if (!l){ bar(v,{title:no, onBack:()=>back(`/crew/flight/${no}`)}); v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng."))); return; }
   const g = groupOfLeg(l);
-  const packReady = legDownloaded(l);
+  const packReady = legViewable(l);
   const purser = isPurser(S.session.roles);
   const myStation = S.session.station || "L1";
 
@@ -3388,7 +3426,7 @@ function CabinServing(v, path){
     onBack:()=>back(l ? `/crew/flight/${no}` : "/crew")});
   if (!l){ v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng."))); return; }
 
-  if (!legDownloaded(l)){
+  if (!legViewable(l)){
     v.appendChild(h("div",{class:"blockpack"},
       h("span",{style:"color:var(--brand)"}, svg(I.down,36)),
       h("b",{},"Chưa có dữ liệu offline"),
@@ -3915,7 +3953,7 @@ function PaxDetail(v, path){
   const parts = path.split("/");
   const no = decodeURIComponent(parts[3]), seat = decodeURIComponent(parts[5]);
   const l = ALL_LEGS.find(x => x.flightNo === no);
-  if (l && !legDownloaded(l)){
+  if (l && !legViewable(l)){
     bar(v,{title:"Chi tiết khách", onBack:()=>back("/crew/flight/"+no+"/seats")});
     v.appendChild(h("div",{class:"blockpack"},
       h("b",{},"Chưa có dữ liệu offline"),
@@ -4065,7 +4103,7 @@ function MealSellFlow(v, path){
   /* Bước chọn ghế */
   if (!seat){
     bar(v,{title:l.flightNo, subtitle:"Chọn số ghế · "+l.origin+"→"+l.destination, onBack:()=>back()});
-    if (!legDownloaded(l)){
+    if (!legViewable(l)){
       const canDownload = hasPermission(S.session.roles,"crew_ops.pack.download");
       const blk = h("div",{class:"blockpack"},
         h("b",{},"Chưa có pack offline"),
@@ -4119,6 +4157,7 @@ function MealSellFlow(v, path){
   let catFilter = "Tất cả";
   let menuQuery = "";
   const qtyByCode = Object.fromEntries(SALE_MENU.map(m => [m.code, 0]));
+  let payMethod = "cash";   // "cash" (tiền mặt, FX) | "card" (quẹt/chạm thẻ qua máy POS — luôn VND)
   let fx = "VND";
   let chgFx = "VND";
   let tenderStr = "";
@@ -4179,7 +4218,7 @@ function MealSellFlow(v, path){
     payOpen = true;
     paySheet.classList.add("on"); payScrim.classList.add("on");
     paySheet.setAttribute("aria-hidden","false");
-    setTimeout(()=>{ try{ tenderIn.focus(); }catch(e){} }, 260);
+    if (payMethod === "cash") setTimeout(()=>{ try{ tenderIn.focus(); }catch(e){} }, 260);
   };
   const closePaySheet = () => {
     payOpen = false;
@@ -4275,6 +4314,19 @@ function MealSellFlow(v, path){
     } else {
       dueSub.textContent = units+" món · quy đổi từ "+total.toLocaleString("vi-VN")+"₫";
     }
+    if (payMethod === "card"){
+      /* Thẻ: quẹt/chạm qua máy POS — luôn thu đúng VND, không cần tính tiền thối. */
+      if (!lines.length){
+        changeEl.className = "cashchg muted";
+        changeEl.textContent = "Chọn ít nhất 1 món";
+        confirmBtn.disabled = true;
+        return;
+      }
+      changeEl.className = "cashchg muted";
+      changeEl.textContent = "Quẹt/chạm thẻ qua máy POS";
+      confirmBtn.disabled = false;
+      return;
+    }
     const due = fxAmount(total, fx).amount;
     const got = parseTender(tenderStr);
     if (!lines.length){
@@ -4309,19 +4361,21 @@ function MealSellFlow(v, path){
     const lines = cartLines();
     if (!lines.length) return;
     const totalVnd = cartVnd();
-    const paid = fxAmount(totalVnd, fx);
-    const got = parseTender(tenderStr);
-    const excessPay = Math.round((got - paid.amount) * 100) / 100;
-    const changeAmt = fxConvert(excessPay, fx, chgFx);
+    const isCard = payMethod === "card";
+    const paid = isCard ? {amount:totalVnd} : fxAmount(totalVnd, fx);
+    const got = isCard ? totalVnd : parseTender(tenderStr);
+    const excessPay = isCard ? 0 : Math.round((got - paid.amount) * 100) / 100;
+    const changeAmt = isCard ? 0 : fxConvert(excessPay, fx, chgFx);
     const txId = "MS"+Date.now().toString(36);
     lines.forEach((bought, i) => {
       const lineVnd = bought.vnd * bought.qty;
       S.mealPurchases.push({
         id: txId + (i ? "-"+i : ""),
         flightNo:l.flightNo, seat, code:bought.code, name:bought.name, cat:bought.cat, qty:bought.qty,
-        vnd:lineVnd, unitVnd:bought.vnd, fx, fxAmt:fxAmount(lineVnd, fx).amount,
+        vnd:lineVnd, unitVnd:bought.vnd, method:payMethod,
+        fx: isCard ? "VND" : fx, fxAmt: isCard ? lineVnd : fxAmount(lineVnd, fx).amount,
         received: i === 0 ? got : 0,
-        change: i === 0 ? changeAmt : 0, changeFx:chgFx, changeInPayFx: i === 0 ? excessPay : 0,
+        change: i === 0 ? changeAmt : 0, changeFx: isCard ? "VND" : chgFx, changeInPayFx: i === 0 ? excessPay : 0,
         at:S.simNow,
       });
       pax.services.push([bought.code, bought.name+" (mua trên chuyến ×"+bought.qty+")", bought.qty]);
@@ -4362,38 +4416,57 @@ function MealSellFlow(v, path){
       );
     }));
   };
+  const methodToggle = () => h("div",{class:"zonechips"},
+    h("button",{type:"button", class:"zchip"+(payMethod==="cash"?" on":""),
+      onClick:()=>{ if (payMethod==="cash") return; payMethod="cash"; syncCash(); paint(); }},
+      svg(I.cash,14), "Tiền mặt"),
+    h("button",{type:"button", class:"zchip"+(payMethod==="card"?" on":""),
+      onClick:()=>{ if (payMethod==="card") return; payMethod="card"; fx="VND"; chgFx="VND"; tenderStr=""; tenderIn.value=""; syncCash(); paint(); }},
+      svg(I.card,14), "Thẻ"));
   const paint = () => {
     paintMenu();
+    const isCard = payMethod === "card";
     payBox.replaceChildren(
       h("div",{class:"paybox"},
-        h("div",{class:"plab"},"Số tiền phải thu"),
+        methodToggle(),
+        h("div",{class:"plab", style:"margin-top:12px"},"Số tiền phải thu"),
         dueEl, dueSub,
-        h("div",{class:"plab", style:"margin-top:12px"},"Khách đưa bằng"),
-        h("div",{class:"fxrow"},
-          ...FX_CODES.map(c => h("button",{type:"button", class:"fxbtn"+(fx===c?" on":""), onClick:()=>{
-            fx=c;
-            if (c !== "VND" && chgFx === c) chgFx = "VND";
-            if (c === "VND") chgFx = "VND";
-            syncCash(); paint();
-          }}, c))),
-        h("div",{class:"cashgrid"},
-          h("div",{class:"cashfield"},
-            h("label",{},"Nhận từ khách ("+fx+")"), tenderIn),
-          h("div",{class:"cashfield"},
-            h("label",{},"Trả lại ("+chgFx+")"), changeEl),
-          h("div",{class:"cashfield full"},
-            h("label",{},"Trả lại bằng (khi không đủ cùng loại tiền)"),
-            h("div",{class:"fxrow", style:"margin-top:0"},
-              ...FX_CODES.map(c => h("button",{type:"button", class:"fxbtn"+(chgFx===c?" on":""), onClick:()=>{ chgFx=c; syncCash(); paint(); }}, c))),
-            h("p",{class:"fxhint"},
-              fx === chgFx
-                ? "Trả lại cùng loại tiền khách đưa."
-                : "Khách đưa "+fx+" · crew trả lại bằng "+chgFx+" (quy đổi tỷ giá demo).")))),
+        isCard
+          ? h("div",{class:"cashgrid"},
+              h("div",{class:"cashfield full"},
+                h("label",{},"Thanh toán"),
+                changeEl,
+                h("p",{class:"fxhint"},"Quẹt / chạm / nhập thẻ qua máy POS · luôn thu đúng VND (không tính tiền thối).")))
+          : [
+              h("div",{class:"plab", style:"margin-top:12px"},"Khách đưa bằng"),
+              h("div",{class:"fxrow"},
+                ...FX_CODES.map(c => h("button",{type:"button", class:"fxbtn"+(fx===c?" on":""), onClick:()=>{
+                  fx=c;
+                  if (c !== "VND" && chgFx === c) chgFx = "VND";
+                  if (c === "VND") chgFx = "VND";
+                  syncCash(); paint();
+                }}, c))),
+              h("div",{class:"cashgrid"},
+                h("div",{class:"cashfield"},
+                  h("label",{},"Nhận từ khách ("+fx+")"), tenderIn),
+                h("div",{class:"cashfield"},
+                  h("label",{},"Trả lại ("+chgFx+")"), changeEl),
+                h("div",{class:"cashfield full"},
+                  h("label",{},"Trả lại bằng (khi không đủ cùng loại tiền)"),
+                  h("div",{class:"fxrow", style:"margin-top:0"},
+                    ...FX_CODES.map(c => h("button",{type:"button", class:"fxbtn"+(chgFx===c?" on":""), onClick:()=>{ chgFx=c; syncCash(); paint(); }}, c))),
+                  h("p",{class:"fxhint"},
+                    fx === chgFx
+                      ? "Trả lại cùng loại tiền khách đưa."
+                      : "Khách đưa "+fx+" · crew trả lại bằng "+chgFx+" (quy đổi tỷ giá demo).")))
+            ]),
       confirmBtn,
       h("p",{style:"font:400 12px Plus Jakarta Sans;color:var(--ink-3);margin-top:8px;text-align:center"},
-        fx === chgFx
-          ? "Nhập đủ số tiền nhận để xác nhận"
-          : "VD: khách đưa USD → chọn trả lại VND nếu không có USD lẻ")
+        isCard
+          ? "Xác nhận sau khi máy POS báo giao dịch thành công"
+          : fx === chgFx
+            ? "Nhập đủ số tiền nhận để xác nhận"
+            : "VD: khách đưa USD → chọn trả lại VND nếu không có USD lẻ")
     );
     syncCash();
   };
@@ -4410,6 +4483,75 @@ function MealSellFlow(v, path){
   v.appendChild(sellBar);
   v.appendChild(payScrim);
   v.appendChild(paySheet);
+}
+
+/* ── /crew/flight/:no/revenue — Tổng hợp doanh thu sau chuyến (chỉ Purser) ──
+   Tổng hợp lại từ S.mealPurchases (giao dịch bán tại ghế thật, không có bước
+   khai báo tay) — theo phương thức thanh toán, theo danh mục, và danh sách. */
+function RevenueSummary(v, path){
+  if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
+  const no = decodeURIComponent(path.split("/")[3]);
+  const l = ALL_LEGS.find(x => x.flightNo === no);
+  bar(v,{title:"Tổng hợp doanh thu", subtitle: l ? (l.flightNo+" · "+l.origin+" → "+l.destination) : undefined,
+    onBack:()=>back("/crew/flight/"+no)});
+  if (!l){ v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng."))); return; }
+  if (!isPurser(S.session.roles)) return NoPermission(v);
+
+  const tx = S.mealPurchases.filter(p => p.flightNo === no);
+  const totalVnd = tx.reduce((s,p)=>s+(p.vnd||0),0);
+  const totalUnits = tx.reduce((s,p)=>s+(p.qty||1),0);
+
+  const body = h("div",{class:"body pad-tabs", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
+
+  if (legPhase(l).phase !== "after"){
+    body.appendChild(h("div",{class:"banner info"}, svg(I.clock,18),
+      h("div",{}, h("b",{},"Chặng chưa hạ cánh"),
+        h("span",{}," Số liệu cập nhật liên tục theo giao dịch đã bán trên chuyến."))));
+  }
+
+  body.appendChild(h("section",{class:"mealtotal"},
+    h("div",{class:"mt-top"},
+      h("div",{style:"min-width:0"},
+        h("div",{class:"mt-lab"},"Tổng doanh thu"),
+        h("div",{class:"mt-sub"}, `${tx.length} giao dịch · ${totalUnits} món`)),
+      h("div",{class:"mt-num"}, h("b",{}, totalVnd.toLocaleString("vi-VN")), h("span",{},"₫")))));
+
+  const byMethod = {cash:{vnd:0,n:0}, card:{vnd:0,n:0}};
+  tx.forEach(p => { const m = p.method === "card" ? "card" : "cash"; byMethod[m].vnd += p.vnd||0; byMethod[m].n++; });
+  body.appendChild(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:8px"},"Theo phương thức thanh toán"),
+    h("div",{class:"pp-prog"},
+      h("div",{class:"pp-cell"}, h("b",{}, byMethod.cash.vnd.toLocaleString("vi-VN")), h("span",{},"Tiền mặt · "+byMethod.cash.n+" GD")),
+      h("div",{class:"pp-cell"}, h("b",{}, byMethod.card.vnd.toLocaleString("vi-VN")), h("span",{},"Thẻ · "+byMethod.card.n+" GD")))));
+
+  const byCat = Object.fromEntries(SALE_CATS.filter(c => c !== "Tất cả").map(c => [c, {vnd:0, units:0}]));
+  tx.forEach(p => {
+    if (!byCat[p.cat]) byCat[p.cat] = {vnd:0, units:0};
+    byCat[p.cat].vnd += p.vnd||0;
+    byCat[p.cat].units += p.qty||1;
+  });
+  body.appendChild(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:4px"},"Theo danh mục"),
+    ...Object.entries(byCat).map(([cat, stat]) => h("div",{class:"steprow"},
+      h("span",{class:"svcic"}, svg(saleIcon(cat),18)),
+      h("div",{style:"flex:1;min-width:0"},
+        h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, cat),
+        h("span",{style:"font:400 12px Plus Jakarta Sans;color:var(--n500)"}, stat.units+" món")),
+      h("b",{style:"font:700 14px Plus Jakarta Sans"}, stat.vnd.toLocaleString("vi-VN")+"₫")))));
+
+  body.appendChild(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:4px"},"Giao dịch"),
+    ...(tx.length
+      ? tx.slice().sort((a,b)=>b.at-a.at).map(p => h("div",{class:"steprow"},
+          h("span",{class:"mini on"}, p.seat),
+          h("div",{style:"flex:1;min-width:0"},
+            h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, p.name+(p.qty>1?" ×"+p.qty:"")),
+            h("span",{style:"font:400 12px Plus Jakarta Sans;color:var(--n500)"},
+              hhmm(p.at)+" · "+(p.method==="card" ? "Thẻ" : "Tiền mặt"+(p.fx && p.fx!=="VND" ? " ("+p.fx+")" : "")))),
+          h("b",{style:"font:700 14px Plus Jakarta Sans"}, (p.vnd||0).toLocaleString("vi-VN")+"₫")))
+      : [h("p",{style:"font:400 13px Plus Jakarta Sans;color:var(--ink-2)"},"Chưa có giao dịch nào trên chặng này.")])));
+
+  v.appendChild(body);
 }
 
 /* ── Bàn giao: thiết bị · hàng hoá trả về sau chặng ────────────── */
@@ -4640,7 +4782,7 @@ function CrewScanPick(v){
   body.appendChild(h("p",{style:"font:400 13px/20px Plus Jakarta Sans;color:var(--ink-2);margin:0 2px 4px"},
     "Scan BP cho tổ bay (khác quét mặt đất). Cần đã tải gói chặng."));
   ALL_LEGS.forEach(l => {
-    const ready = legDownloaded(l);
+    const ready = legViewable(l);
     body.appendChild(h("button",{class:"seatentry", onClick:()=> ready ? go(`/crew/flight/${l.flightNo}/scan`) : go(`/crew/flight/${l.flightNo}`)},
       h("span",{class:"si"}, svg(I.scan,20)),
       h("div",{style:"flex:1;text-align:left;min-width:0"},
@@ -4660,7 +4802,7 @@ function CrewScanLeg(v, path){
   bar(v,{title:"Scan BP · "+no, subtitle: l ? (l.origin+" → "+l.destination) : undefined,
     onBack:()=>back(l ? `/crew/flight/${no}/seats` : "/crew/scan-pick")});
   if (!l){ v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng."))); return; }
-  if (!legDownloaded(l)){
+  if (!legViewable(l)){
     v.appendChild(h("div",{class:"blockpack"},
       h("b",{},"Chưa có pack offline"),
       h("p",{},"Tải gói bay trước khi scan boarding pass."),
