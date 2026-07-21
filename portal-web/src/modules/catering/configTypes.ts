@@ -3,7 +3,7 @@
  *
  * The Commercial business rules that used to live as a static note on the quota
  * screen are here modelled as configurable, versioned data. Each rule is a typed
- * instance from a small catalog (reduction · exclusion · scope note); users add,
+ * instance from a small catalog (reduction · exclusion · grouping); users add,
  * remove, toggle and tune them. A rule set is published as an immutable VERSION
  * with an effective-from date — same lifecycle as the quota versions (BRule-10).
  */
@@ -17,8 +17,6 @@ export type RuleKind =
   | 'time_exclusion'
   /** Zero the quota for flights in one of the listed operational states. */
   | 'status_exclusion'
-  /** Descriptive scope definition — documents intent, no computation. */
-  | 'scope_note'
   /** Break the uplift leg-group whenever the assigned purser changes. */
   | 'group_by_purser'
   /** Cap each leg-group by total flight time, splitting from a catering airport. */
@@ -62,11 +60,6 @@ export interface StatusExclusionRule extends RuleBase {
   statuses: FlightStatus[]
 }
 
-export interface ScopeNoteRule extends RuleBase {
-  kind: 'scope_note'
-  text: string
-}
-
 /** Split the leg-group each time the purser changes (no extra params). */
 export interface GroupByPurserRule extends RuleBase {
   kind: 'group_by_purser'
@@ -82,7 +75,6 @@ export type Rule =
   | ThresholdReductionRule
   | TimeExclusionRule
   | StatusExclusionRule
-  | ScopeNoteRule
   | GroupByPurserRule
   | GroupByFlightHourRule
 

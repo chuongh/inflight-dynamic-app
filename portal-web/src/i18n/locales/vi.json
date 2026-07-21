@@ -872,7 +872,8 @@
       "title": "Cấu hình định mức",
       "desc": "Các quy tắc nghiệp vụ của Commercial chi phối định mức suất ăn — quản lý theo version, có ngày hiệu lực.",
       "tab": {
-        "commercial": "Định mức bán thêm",
+        "commercial": "Định mức hotmeal",
+        "grouping": "Phân nhóm chuyến bay",
         "crew": "Suất ăn tổ bay"
       },
       "crew": {
@@ -951,7 +952,6 @@
       "cat": {
         "reduction": "Giảm định mức",
         "exclusion": "Loại trừ",
-        "note": "Ghi chú phạm vi",
         "grouping": "Chia nhóm"
       },
       "kind": {
@@ -967,10 +967,6 @@
           "name": "Loại trừ theo trạng thái",
           "desc": "Đưa định mức về 0 cho chuyến ở trạng thái khai thác được chọn."
         },
-        "scope_note": {
-          "name": "Ghi chú phạm vi",
-          "desc": "Định nghĩa mô tả — ghi lại ý định, không tham gia tính toán."
-        },
         "group_by_purser": {
           "name": "Chia nhóm theo purser",
           "desc": "Chia nhỏ nhóm chặng bay mỗi khi purser phụ trách thay đổi, để mỗi nhóm chỉ một purser."
@@ -984,7 +980,6 @@
         "threshold_reduction": "{{metric}} ≥ {{threshold}} → hotmeal cắt còn {{pct}}%",
         "time_exclusion": "{{scope}} khởi hành ≥ {{time}} → không suất",
         "status_exclusion": "{{statuses}} → định mức = 0",
-        "scope_note_empty": "Ghi chú phạm vi (trống)",
         "group_by_purser": "Tách nhóm mới mỗi khi đổi purser",
         "group_by_flight_hour": "Tối đa {{hours}} giờ bay mỗi nhóm"
       },
@@ -1010,8 +1005,6 @@
         "fromTime": "Từ giờ khởi hành",
         "timeHint": "Giờ 24h HH:MM — chuyến khởi hành từ mốc này trở đi sẽ về 0.",
         "statuses": "Trạng thái loại trừ",
-        "noteText": "Ghi chú phạm vi",
-        "notePlaceholder": "vd. Chỉ hotmeal thương mại — trừ suất tổ bay, pre-book…",
         "maxHours": "Giờ bay tối đa mỗi nhóm",
         "maxHoursHint": "Chuỗi chặng dài sẽ được chia thành các nhóm trong giới hạn giờ bay này.",
         "hoursUnit": "giờ",
