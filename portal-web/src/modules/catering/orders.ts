@@ -5,8 +5,7 @@
  * streams — pre-book dishes, cockpit crew meals, and onboard sales quota — from
  * the day's CONFIRMED groups into a single flat line list.
  */
-import { computeGroupCrewMeals } from './groupCrewMeal'
-import { aggregateDayMeals, groupSalesQuota } from './grouping'
+import { buildOrderSnapshot } from './orderSnapshot'
 import type { FlightGroup } from './groupingTypes'
 import type { CrewMealProfile } from './crewMealTypes'
 import type { MealCatalog } from './mealsTypes'
@@ -65,45 +64,7 @@ export function buildOrderLines(
   profile: CrewMealProfile | undefined,
   codeOf: (name: string) => string[],
 ): CateringOrderLine[] {
-  const lines: CateringOrderLine[] = []
-
-  // 1 · Pre-book — one line per dish.
-  for (const dish of aggregateDayMeals(groups)) {
-    lines.push({
-      name: dish.name,
-      category: 'prebook',
-      pbmlCodes: codeOf(dish.name),
-      suggested: dish.count,
-      qty: dish.count,
-    })
-  }
-
-  // 2 · Crew — one aggregate cockpit line.
-  if (profile) {
-    const crew = groups.reduce((s, g) => s + computeGroupCrewMeals(g, profile).meals, 0)
-    if (crew > 0) {
-      lines.push({ name: 'crewCockpit', category: 'crew', pbmlCodes: ['CRWM'], suggested: crew, qty: crew })
-    }
-  }
-
-  // 3 · Sales — onboard buy-on-board quota (UC-10).
-  const q = groups.reduce(
-    (a, g) => {
-      const s = groupSalesQuota(g)
-      return { hotmeal: a.hotmeal + s.hotmeal, banhMi: a.banhMi + s.banhMi, traSua: a.traSua + s.traSua }
-    },
-    { hotmeal: 0, banhMi: 0, traSua: 0 },
-  )
-  const salesDefs: Array<[string, string, number]> = [
-    ['hotmeal', 'HOT', q.hotmeal],
-    ['banhMi', 'BMI', q.banhMi],
-    ['traSua', 'TSA', q.traSua],
-  ]
-  for (const [name, code, n] of salesDefs) {
-    if (n > 0) lines.push({ name, category: 'sales', pbmlCodes: [code], suggested: n, qty: n })
-  }
-
-  return lines
+  return buildOrderSnapshot(groups, profile, codeOf).lines
 }
 
 /** One logical order file: all versions for a (station, date), newest last. */
