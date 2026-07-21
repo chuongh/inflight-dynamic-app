@@ -1,26 +1,28 @@
 import { App as AntApp, Button, Empty } from 'antd'
 import {
+  ArrowRightLeft,
   ChevronLeft,
   Info,
-  Minus,
-  Plus,
+  PlaneTakeoff,
   Printer,
   RotateCcw,
-  Save,
   Send,
   ShoppingBag,
   UtensilsCrossed,
   Users,
 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '@/core/auth/useAuth'
 import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
-import type { CateringOrder, CateringOrderLine, OrderCategory } from '@/modules/catering/orderTypes'
+import type { CateringOrder, CateringOrderLine, OrderCategory, OrderSourceCell } from '@/modules/catering/orderTypes'
 import { categoryTotal, groupOrderFiles, lineTotal, suggestedTotal } from '@/modules/catering/orders'
+import { deriveLines } from '@/modules/catering/orderSnapshot'
 import { paths } from '@/routes/paths'
 import { CAT_COLOR, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
+import { FlightMealEditorDrawer } from './FlightMealEditorDrawer'
+import { ReconcileDrawer } from './ReconcileDrawer'
 
 const CATS: { key: OrderCategory; icon: React.ReactNode }[] = [
   { key: 'prebook', icon: <UtensilsCrossed size={15} className="text-vj-red" /> },
@@ -42,19 +44,13 @@ export function OrderDetailPage() {
   const latest = file?.latest
 
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null)
+  const [reconcileOpen, setReconcileOpen] = useState(false)
+  const [flightEditOpen, setFlightEditOpen] = useState(false)
   const current: CateringOrder | undefined = file
     ? (file.versions.find((v) => v.version === (selectedVersion ?? latest!.version)) ?? latest)
     : undefined
   const isLatest = !!current && !!latest && current.version === latest.version
   const editable = !!current && isLatest && current.status === 'draft'
-
-  // Local editable copy of the lines, reseeded when the shown version changes.
-  const [lines, setLines] = useState<CateringOrderLine[]>([])
-  const seedKey = current ? `${fileId}|${current.version}|${current.status}` : ''
-  useEffect(() => {
-    if (current) setLines(current.lines.map((l) => ({ ...l })))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedKey])
 
   if (!file || !current) {
     return (
@@ -67,9 +63,11 @@ export function OrderDetailPage() {
     )
   }
 
-  const setQty = (i: number, qty: number) =>
-    setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, qty: Math.max(0, Math.round(qty)) } : l)))
-  const resetSuggested = () => setLines((prev) => prev.map((l) => ({ ...l, qty: l.suggested })))
+  // Lines are derived (read-only) — all edits go through the flight editor.
+  const lines = current.lines
+
+  const shownIdx = file.versions.findIndex((v) => v.version === current.version)
+  const reconcileBase = shownIdx > 0 ? file.versions[shownIdx - 1] : null
 
   const total = lineTotal(lines)
   const delta = total - suggestedTotal(lines)
@@ -82,16 +80,14 @@ export function OrderDetailPage() {
     saveOrders.mutate({ orders: [...others, record, ...extra] })
   }
 
-  const saveDraft = () => {
-    persist({ ...current, lines: lines.map((l) => ({ ...l })), createdAt: Date.now(), createdBy: userName() })
-    message.success(t('catering.orders.savedV', { v: current.version }))
-  }
   const send = () => {
-    persist({ ...current, status: 'sent', lines: lines.map((l) => ({ ...l })), createdAt: Date.now(), createdBy: userName() })
+    persist({ ...current, status: 'sent', createdAt: Date.now(), createdBy: userName() })
     message.success(t('catering.orders.sentV', { v: current.version }))
   }
-  const newRevision = () => {
+  const createVersionFromBreakdown = (nextBreakdown: OrderSourceCell[]) => {
     const v = latest!.version + 1
+    const codeOf = (name: string) =>
+      current!.lines.find((l) => l.category === 'prebook' && l.name === name)?.pbmlCodes ?? []
     const rec: CateringOrder = {
       ...latest!,
       id: `${file.fileId}-v${v}`,
@@ -99,11 +95,13 @@ export function OrderDetailPage() {
       status: 'draft',
       createdAt: Date.now(),
       createdBy: userName(),
-      lines: latest!.lines.map((l) => ({ ...l })),
+      breakdown: nextBreakdown,
+      lines: deriveLines(nextBreakdown, codeOf),
     }
     saveOrders.mutate({ orders: [...(data?.orders ?? []), rec] })
     setSelectedVersion(v)
-    message.success(t('catering.orders.revisionCreated', { v }))
+    setFlightEditOpen(false)
+    message.success(t('catering.orders.editByFlight.created', { v }))
   }
   function userName() {
     return session?.user.name ?? 'Catering Ops'
@@ -113,7 +111,7 @@ export function OrderDetailPage() {
     l.category === 'prebook' ? l.name : t(`catering.orders.line.${l.name}`)
 
   return (
-    <div>
+    <div className="thin-scroll h-full overflow-auto p-5">
       {/* header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -188,7 +186,7 @@ export function OrderDetailPage() {
 
           {/* category sections */}
           {CATS.map(({ key, icon }) => {
-            const rows = lines.map((l, i) => ({ l, i })).filter((x) => x.l.category === key)
+            const rows = lines.filter((l) => l.category === key)
             if (rows.length === 0) return null
             return (
               <section key={key} className="border-border mt-3.5 overflow-hidden rounded-2xl border">
@@ -204,7 +202,7 @@ export function OrderDetailPage() {
                     {t('catering.orders.portionsN', { n: catTotal(key).toLocaleString() })}
                   </span>
                 </div>
-                {rows.map(({ l, i }, idx) => (
+                {rows.map((l, idx) => (
                   <div key={`${l.category}-${l.name}`} className="border-border flex items-center gap-3 border-b px-3.5 py-2 last:border-b-0">
                     <span className="text-text-muted w-5 text-right text-[11px] font-extrabold tnum">{idx + 1}</span>
                     <div className="min-w-0 flex-1">
@@ -232,11 +230,7 @@ export function OrderDetailPage() {
                     <span className="text-text-muted shrink-0 text-[11px] font-semibold">
                       {t('catering.orders.suggestedShort', { n: l.suggested.toLocaleString() })}
                     </span>
-                    {editable ? (
-                      <QtyStepper value={l.qty} onChange={(v) => setQty(i, v)} />
-                    ) : (
-                      <span className="w-[92px] text-right text-[15px] font-extrabold tnum">{l.qty.toLocaleString()}</span>
-                    )}
+                    <span className="w-[92px] text-right text-[15px] font-extrabold tnum">{l.qty.toLocaleString()}</span>
                   </div>
                 ))}
               </section>
@@ -245,32 +239,22 @@ export function OrderDetailPage() {
 
           {/* actions */}
           <div className="border-border mt-[18px] flex items-center gap-2.5 border-t pt-4">
+            {isLatest && current.breakdown ? (
+              <Button icon={<PlaneTakeoff size={15} />} onClick={() => setFlightEditOpen(true)}>
+                {t('catering.orders.editByFlight.open')}
+              </Button>
+            ) : null}
             {editable ? (
-              <>
-                <Button icon={<RotateCcw size={15} />} onClick={resetSuggested}>
-                  {t('catering.orders.resetSuggested')}
-                </Button>
-                <div className="ml-auto flex items-center gap-2.5">
-                  <Button icon={<Save size={16} />} loading={saveOrders.isPending} onClick={saveDraft}>
-                    {t('catering.orders.saveV', { v: current.version })}
-                  </Button>
-                  <Button
-                    type="primary"
-                    icon={<Send size={16} />}
-                    loading={saveOrders.isPending}
-                    onClick={send}
-                    style={{ background: 'var(--color-vj-green-dark)', borderColor: 'var(--color-vj-green-dark)' }}
-                  >
-                    {t('catering.orders.sendSupplier')}
-                  </Button>
-                </div>
-              </>
-            ) : isLatest && current.status === 'sent' ? (
-              <div className="ml-auto">
-                <Button type="primary" icon={<Plus size={16} />} loading={saveOrders.isPending} onClick={newRevision}>
-                  {t('catering.orders.newRevision')}
-                </Button>
-              </div>
+              <Button
+                type="primary"
+                className="ml-auto"
+                icon={<Send size={16} />}
+                loading={saveOrders.isPending}
+                onClick={send}
+                style={{ background: 'var(--color-vj-green-dark)', borderColor: 'var(--color-vj-green-dark)' }}
+              >
+                {t('catering.orders.sendSupplier')}
+              </Button>
             ) : null}
           </div>
         </div>
@@ -278,9 +262,18 @@ export function OrderDetailPage() {
         {/* right rail */}
         <div>
           <div className="border-border rounded-2xl border p-3.5">
-            <div className="text-text-secondary mb-3 flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide uppercase">
-              <RotateCcw size={13} className="text-vj-red" />
-              {t('catering.orders.versionHistory')}
+            <div className="mb-3 flex items-center gap-1.5">
+              <span className="text-text-secondary flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide uppercase">
+                <RotateCcw size={13} className="text-vj-red" />
+                {t('catering.orders.versionHistory')}
+              </span>
+              <button
+                type="button"
+                onClick={() => setReconcileOpen(true)}
+                className="text-vj-red hover:text-vj-red-hover ml-auto flex cursor-pointer items-center gap-1 text-[11px] font-bold"
+              >
+                <ArrowRightLeft size={12} /> {t('catering.orders.reconcile.open')}
+              </button>
             </div>
             <div className="relative pl-5">
               <span className="bg-border absolute top-1 bottom-1 left-[6px] w-0.5" />
@@ -326,36 +319,20 @@ export function OrderDetailPage() {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function QtyStepper({ value, onChange }: { value: number; onChange: (v: number) => void }) {
-  return (
-    <span className="border-border inline-flex h-8 items-center overflow-hidden rounded-lg border bg-white">
-      <button
-        type="button"
-        onClick={() => onChange(value - 1)}
-        className="text-text-secondary hover:bg-muted grid h-full w-7 cursor-pointer place-items-center"
-        aria-label="minus"
-      >
-        <Minus size={14} />
-      </button>
-      <input
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value.replace(/\D/g, '')) || 0)}
-        className="w-12 border-x-0 text-center text-[13px] font-extrabold tnum outline-none"
-        inputMode="numeric"
+      <ReconcileDrawer
+        open={reconcileOpen}
+        onClose={() => setReconcileOpen(false)}
+        current={current}
+        base={reconcileBase}
       />
-      <button
-        type="button"
-        onClick={() => onChange(value + 1)}
-        className="text-text-secondary hover:bg-muted grid h-full w-7 cursor-pointer place-items-center"
-        aria-label="plus"
-      >
-        <Plus size={14} />
-      </button>
-    </span>
+      <FlightMealEditorDrawer
+        open={flightEditOpen}
+        onClose={() => setFlightEditOpen(false)}
+        current={current}
+        onCreateVersion={createVersionFromBreakdown}
+        pending={saveOrders.isPending}
+      />
+    </div>
   )
 }
 

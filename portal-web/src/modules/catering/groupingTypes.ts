@@ -33,6 +33,9 @@ export interface FlightLeg {
    * legs. Optional — absent when no premeal data exists for the day.
    */
   premeal?: number
+  /** Per-dish premeal breakdown for THIS leg (from the crew-list meal columns).
+   *  Kept at leg level so a group's rollup stays correct after split/merge/move. */
+  meals?: MealBreakdownItem[]
   /** Operating cockpit crew count (CP + FO) on this leg — derived from `cockpitCrew`. */
   cockpit?: number
   /** Extra / deadhead pilots riding along (CP-Pax, FO-Pax) — derived from `cockpitCrew`. */
