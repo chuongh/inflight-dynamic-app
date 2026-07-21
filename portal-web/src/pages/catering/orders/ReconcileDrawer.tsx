@@ -2,7 +2,7 @@ import { Button, Drawer, Empty } from 'antd'
 import { ArrowRightLeft, ChevronDown, ChevronRight, Download } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { changedLines } from '@/modules/catering/orderSnapshot'
+import { changedLines, changedLinesFromLines } from '@/modules/catering/orderSnapshot'
 import type { CateringOrder, OrderCategory } from '@/modules/catering/orderTypes'
 
 interface ReconcileDrawerProps {
@@ -20,10 +20,14 @@ export function ReconcileDrawer({ open, onClose, current, base }: ReconcileDrawe
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
-  const changed = useMemo(
-    () => (base ? changedLines(base.breakdown ?? [], current.breakdown ?? []) : []),
-    [base, current],
-  )
+  // Prefer per-flight deltas from the breakdown snapshot; fall back to a
+  // line-level diff for legacy versions that have no (or unchanged) breakdown.
+  const changed = useMemo(() => {
+    if (!base) return []
+    const byBreakdown =
+      base.breakdown && current.breakdown ? changedLines(base.breakdown, current.breakdown) : []
+    return byBreakdown.length > 0 ? byBreakdown : changedLinesFromLines(base.lines, current.lines)
+  }, [base, current])
   const net = changed.reduce((s, c) => s + c.delta, 0)
 
   const label = (category: OrderCategory, name: string) =>
@@ -116,32 +120,46 @@ export function ReconcileDrawer({ open, onClose, current, base }: ReconcileDrawe
 
           {changed.map((line) => {
             const key = `${line.category} ${line.name}`
-            const isOpen = expanded.has(key)
+            const hasFlights = line.flights.length > 0
+            const isOpen = hasFlights && expanded.has(key)
             const up = line.delta > 0
             const chip = up ? 'bg-vj-green-muted text-vj-green-dark' : 'bg-vj-red-50 text-vj-red-dark'
             const edge = up ? 'border-vj-green' : 'border-vj-red'
-            return (
-              <div key={key} className={`border-border border-b border-l-2 ${edge}`}>
-                <button
-                  type="button"
-                  onClick={() => toggle(key)}
-                  className="hover:bg-muted/40 flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 text-left"
-                >
-                  {isOpen ? (
+            const rowInner = (
+              <>
+                {hasFlights ? (
+                  isOpen ? (
                     <ChevronDown size={15} className="text-text-muted shrink-0" />
                   ) : (
                     <ChevronRight size={15} className="text-text-muted shrink-0" />
-                  )}
-                  <span className="text-[13px] font-bold text-foreground">{label(line.category, line.name)}</span>
-                  <span className="ml-auto flex items-center gap-2.5">
-                    <span className="text-text-secondary tnum text-[11.5px] font-semibold">
-                      {line.from} → <b className="text-foreground">{line.to}</b>
-                    </span>
-                    <span className={`tnum rounded-full px-2 py-0.5 text-[11.5px] font-extrabold ${chip}`}>
-                      {up ? '+' : ''}{line.delta}
-                    </span>
+                  )
+                ) : (
+                  <span className="shrink-0" style={{ width: 15 }} />
+                )}
+                <span className="text-[13px] font-bold text-foreground">{label(line.category, line.name)}</span>
+                <span className="ml-auto flex items-center gap-2.5">
+                  <span className="text-text-secondary tnum text-[11.5px] font-semibold">
+                    {line.from} → <b className="text-foreground">{line.to}</b>
                   </span>
-                </button>
+                  <span className={`tnum rounded-full px-2 py-0.5 text-[11.5px] font-extrabold ${chip}`}>
+                    {up ? '+' : ''}{line.delta}
+                  </span>
+                </span>
+              </>
+            )
+            return (
+              <div key={key} className={`border-border border-b border-l-2 ${edge}`}>
+                {hasFlights ? (
+                  <button
+                    type="button"
+                    onClick={() => toggle(key)}
+                    className="hover:bg-muted/40 flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 text-left"
+                  >
+                    {rowInner}
+                  </button>
+                ) : (
+                  <div className="flex w-full items-center gap-2 px-3.5 py-2.5">{rowInner}</div>
+                )}
                 {isOpen ? (
                   <div className="bg-[#fafcfe] px-3.5 pb-2.5 pl-9">
                     {line.flights.map((f) => {

@@ -1,6 +1,24 @@
 import { describe, expect, it } from 'vitest'
-import { changedLines } from './orderSnapshot'
-import type { OrderSourceCell } from './orderTypes'
+import { changedLines, changedLinesFromLines } from './orderSnapshot'
+import type { CateringOrderLine, OrderSourceCell } from './orderTypes'
+
+const line = (p: Partial<CateringOrderLine> & { name: string; qty: number }): CateringOrderLine => ({
+  category: 'prebook', pbmlCodes: [], suggested: p.qty, ...p,
+})
+
+describe('changedLinesFromLines (fallback when no breakdown)', () => {
+  it('lists changed lines by dish, with no per-flight detail', () => {
+    const base = [line({ name: 'Cơm', qty: 100 }), line({ name: 'Mì', qty: 50 })]
+    const next = [line({ name: 'Cơm', qty: 108 }), line({ name: 'Mì', qty: 50 })]
+    const changed = changedLinesFromLines(base, next)
+    expect(changed).toEqual([{ category: 'prebook', name: 'Cơm', from: 100, to: 108, delta: 8, flights: [] }])
+  })
+
+  it('handles a dish that only exists in one version', () => {
+    const changed = changedLinesFromLines([line({ name: 'Cơm', qty: 100 })], [line({ name: 'Cơm', qty: 100 }), line({ name: 'Phở', qty: 6 })])
+    expect(changed).toEqual([{ category: 'prebook', name: 'Phở', from: 0, to: 6, delta: 6, flights: [] }])
+  })
+})
 
 const cell = (p: Partial<OrderSourceCell> & { name: string; qty: number }): OrderSourceCell => ({
   category: 'prebook', groupId: 'g1', ...p,
