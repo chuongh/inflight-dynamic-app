@@ -69,7 +69,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 button:focus-visible,.tab:focus-visible,.seat:focus-visible,.row:focus-visible,
 .link:focus-visible,.mod:focus-visible,.fchip:focus-visible,.seg:focus-visible,
 .cta:focus-visible,.back:focus-visible,.sback:focus-visible,.fab:focus-visible,
-.gact:focus-visible,.packcta:focus-visible,.seatentry:focus-visible,.vcard:focus-visible{
+.packcta:focus-visible,.seatentry:focus-visible,.vcard:focus-visible{
   outline:2px solid var(--brand);outline-offset:2px}
 input{font:inherit;color:inherit;background:none;border:0;outline:0;width:100%;border-radius:0;-webkit-appearance:none}
 
@@ -172,9 +172,11 @@ body{
    .body sẽ cắt cụt nó. Kéo cả .body lên, để nền trong suốt cho đỏ lộ ra hai bên. */
 .body.overlap{margin-top:-42px}
 .pull{position:relative;z-index:10}
-.sec{display:flex;align-items:baseline;justify-content:space-between;margin:24px 2px 12px}
-.sec h2{font-family:"JambonoVN Medium","Jambono Medium",Nunito,sans-serif;font-weight:700;font-size:18px;line-height:26px}
-.sec .hint{font:500 12px/16px "Plus Jakarta Sans";color:var(--n500)}
+/* flex-wrap: ở màn hình 375px, tiêu đề + hint (vd "8 chặng · 2 nhóm") không đủ
+   chỗ chung 1 dòng — cho hint rớt xuống dòng riêng thay vì để tiêu đề tự vỡ chữ. */
+.sec{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;margin:24px 2px 12px;row-gap:2px}
+.sec h2{flex:1 1 auto;min-width:0;font-family:"JambonoVN Medium","Jambono Medium",Nunito,sans-serif;font-weight:700;font-size:18px;line-height:26px}
+.sec .hint{flex:none;font:500 12px/16px "Plus Jakarta Sans";color:var(--n500)}
 
 /* ── card primitives ── */
 .card{background:var(--n0);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--e1)}
@@ -276,7 +278,7 @@ body{
 .mchrome-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .mchrome-greet{display:flex;flex-direction:column;gap:1px;min-width:0}
 .mchrome-eyebrow{font:600 11px/14px "Plus Jakarta Sans",Inter,sans-serif;color:rgba(255,255,255,.95);letter-spacing:.02em}
-.mchrome-logo{height:28px;width:auto;flex:none;object-fit:contain;display:block}
+.mchrome-logo{height:14px;width:auto;flex:none;object-fit:contain;display:block}
 .mchrome-title{font-family:"JambonoVN Medium","Jambono Medium",Nunito,sans-serif;font-weight:700;font-size:17px;line-height:1.2;color:#fff;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mchrome-title.xl{font-family:"JambonoVN Black","Jambono Black",Nunito,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.2px;color:#fff}
@@ -372,31 +374,6 @@ body{
 .packcta.sm .ic{width:38px;height:38px;border-radius:10px}
 .packcta.sm .t b{font-size:14px;line-height:20px}
 /* Action strip — ngay dưới header nhóm (Approach A) */
-.gops{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 2px 14px}
-.gact{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;
-  min-height:var(--glove);padding:12px 14px;border-radius:var(--r-lg);text-align:left;
-  transition:transform var(--dur-fast) var(--ease-out),box-shadow var(--dur) ease}
-.gact:active{transform:scale(.98)}
-.gact .gact-k{display:flex;align-items:center;gap:8px;width:100%}
-.gact .gact-ic{width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center}
-.gact .gact-t{font:700 13px/18px "Plus Jakarta Sans";flex:1;min-width:0}
-.gact .gact-s{font:500 11px/14px "Plus Jakarta Sans";opacity:.88;padding-left:36px}
-.gact .gact-prog{height:4px;width:100%;margin-top:6px;background:var(--n100);border-radius:var(--r-pill);overflow:hidden}
-.gact .gact-prog i{display:block;height:100%;background:var(--brand);border-radius:var(--r-pill);transition:width .4s ease}
-.gact.pack{background:var(--n0);border:1px solid var(--line);color:var(--ink);box-shadow:var(--e1)}
-.gact.pack .gact-ic{background:var(--info-bg);color:var(--info-text)}
-.gact.pack .gact-s{color:var(--n500);opacity:1}
-.gact.pack .gact-prog{background:var(--n100)}
-.gact.pack .gact-prog i{background:var(--brand)}
-.gact.pack.done{background:var(--success-bg);border-color:rgba(74,122,0,.35)}
-.gact.pack.done .gact-ic{background:rgba(74,122,0,.12);color:var(--success-text)}
-.gact.meal{background:var(--n0);border:1px solid var(--line);color:var(--ink);box-shadow:var(--e1)}
-.gact.meal .gact-ic{background:var(--warning-bg);color:var(--warning-text)}
-.gact.meal .gact-s{color:var(--n500);opacity:1}
-.gact.sale{background:var(--n0);border:1px solid var(--line);color:var(--ink);box-shadow:var(--e1)}
-.gact.sale .gact-ic{background:var(--success-bg);color:var(--success-text)}
-.gact.sale .gact-s{color:var(--n500);opacity:1}
-.gops.triple{grid-template-columns:1fr 1fr 1fr}
 .rolepill{display:inline-flex;align-items:center;gap:6px;font:700 11px/14px "Plus Jakarta Sans";
   padding:5px 10px;border-radius:var(--r-pill);background:var(--info-bg);color:var(--info-text)}
 .rolepill.cabin{background:var(--success-bg);color:var(--success-text)}
@@ -662,7 +639,8 @@ body{
   font:800 12px "Plus Jakarta Sans";color:#fff}
 .seatpill.sbbiz{background:#7A0A0D} .seatpill.skyboss{background:var(--brand)} .seatpill.deluxe{background:#C9A000;color:var(--ink)} .seatpill.eco{background:var(--n600)} .seatpill.served{outline:2px solid var(--success-text);outline-offset:1px}
 .c-name b{display:block;font:600 14px/18px "Plus Jakarta Sans";color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.plsub{display:block;font:500 11px/15px "Plus Jakarta Sans";color:var(--n500);margin-top:1px}
+.plsub{display:block;font:500 11px/15px "Plus Jakarta Sans";color:var(--n500);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plmut{color:var(--ink-3);font:500 12px "Plus Jakarta Sans"}
 .c-tag .chev{color:var(--ink-3);flex:none}
 
@@ -796,6 +774,14 @@ body{
 .mh-tx b{display:block;font:700 15px "Plus Jakarta Sans";color:var(--ink)}
 .mh-tx span{display:block;font:500 12px "Plus Jakarta Sans";color:var(--n500)}
 .mh-total{font-family:"JambonoVN Black","Jambono Black",Nunito,sans-serif;font-weight:800;font-size:22px;color:var(--ink);flex:none}
+/* Danh sách hàng hoá dài (~34 dòng, phẳng) — thu gọn mặc định + có ô tìm kiếm
+   khi mở, để không phải lướt hết mới thấy mục cần (Nhận trolley cart · Bàn giao). */
+.amenity-toggle{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;
+  padding:12px 0 4px;cursor:pointer;text-align:left}
+.amenity-toggle .chev{transition:transform 200ms ease;color:var(--ink-3);flex:none}
+.amenity-toggle .chev.open{transform:rotate(90deg)}
+.amenity-toggle .mh-tx b{display:flex;align-items:center;gap:8px}
+.amenity-count{font:600 11px/16px "Plus Jakarta Sans";color:var(--ink-3);flex:none}
 .legmeal{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--n100)}
 .lm-l b{font:700 14px "Plus Jakarta Sans";color:var(--ink)}
 .lm-l span{font:500 12px "Plus Jakarta Sans";color:var(--n500);margin-left:8px}
@@ -1065,6 +1051,8 @@ body{
 .rot .grd{stroke:rgba(35,31,32,.28);stroke-width:2;stroke-linecap:round;fill:none;stroke-dasharray:1 5}
 .rot .grd.tight{stroke:var(--warning-text);stroke-dasharray:none}
 .rot .stop{fill:var(--brand);stroke:#fff;stroke-width:2.5}
+.rot .stop.swap{fill:var(--warning-text);stroke-width:3}
+.rot .swaplab{font:800 9px "Plus Jakarta Sans";fill:var(--warning-text);letter-spacing:.2px}
 .rot .iata{font:800 13px "Plus Jakarta Sans","Plus Jakarta Sans";fill:var(--ink);letter-spacing:.3px}
 .rot .hhmm{font:500 9.5px "Plus Jakarta Sans";fill:var(--n500);font-variant-numeric:tabular-nums}
 .rot .flt{font:700 10px "Plus Jakarta Sans";fill:var(--brand-dark);letter-spacing:.3px}
@@ -1488,8 +1476,20 @@ const at = (h,m) => DAY0 + h*HOUR + m*MIN;
 const LEGS = [
   {id:"VJ127",flightNo:"VJ127",origin:"HAN",destination:"SGN",std:at(8,10),sta:at(10,20),status:"upcoming",pob:168,capacity:230,ssrWchr:1,ssrUmnr:0,ssrMeda:0,ssrInf:1,sbPax:1},
   {id:"VJ142",flightNo:"VJ142",origin:"SGN",destination:"HAN",std:at(13,20),sta:at(15,30),status:"upcoming",pob:182,capacity:230,ssrWchr:2,ssrUmnr:1,ssrMeda:0,ssrInf:2,sbPax:2},
-  {id:"VJ193",flightNo:"VJ193",origin:"HAN",destination:"SGN",std:at(16,30),sta:at(18,40),status:"upcoming",pob:195,capacity:230,ssrWchr:1,ssrUmnr:0,ssrMeda:1,ssrInf:1,sbPax:1},
-  {id:"VJ644",flightNo:"VJ644",origin:"SGN",destination:"DAD",std:at(19,20),sta:at(20,40),status:"upcoming",pob:141,capacity:230,ssrWchr:0,ssrUmnr:1,ssrMeda:0,ssrInf:2,sbPax:1},
+  /* Trễ 35′ — chậm slot cất cánh ATC tại HAN. std/sta là giờ MỚI (dùng cho mọi tính
+     toán: dutyRail, groundMinutes, legPhase…); origStd/origSta giữ giờ kế hoạch gốc
+     chỉ để hiển thị "cũ → mới". Xem thêm mục "Trường hợp delay" trong tài liệu spec. */
+  {id:"VJ193",flightNo:"VJ193",origin:"HAN",destination:"SGN",
+    std:at(16,30)+35*MIN, sta:at(18,40)+35*MIN,
+    origStd:at(16,30), origSta:at(18,40),
+    delayMin:35, delayReason:"Chậm slot cất cánh (ATC) tại HAN", delayAt:at(15,45),
+    status:"delayed",pob:195,capacity:230,ssrWchr:1,ssrUmnr:0,ssrMeda:1,ssrInf:1,sbPax:1},
+  /* Đổi tàu tại SGN — quay đầu sau VJ193 chỉ còn 5′ (do trễ dây chuyền), không đủ
+     an toàn để quay đầu VN-A202 nên điều tàu khác (VN-A688, cùng loại A321, cùng
+     cấu hình ghế) tiếp nhận từ chặng này. Tổ bay & lịch trực không đổi. */
+  {id:"VJ644",flightNo:"VJ644",origin:"SGN",destination:"DAD",std:at(19,20),sta:at(20,40),
+    tailSwap:{registration:"VN-A688", reason:"Đổi tàu tại SGN — quay đầu VN-A202 sau VJ193 không đủ thời gian an toàn", at:at(17,30)},
+    status:"upcoming",pob:141,capacity:230,ssrWchr:0,ssrUmnr:1,ssrMeda:0,ssrInf:2,sbPax:1},
   {id:"VJ645",flightNo:"VJ645",origin:"DAD",destination:"SGN",std:at(21,15),sta:at(22,35),status:"upcoming",pob:176,capacity:230,ssrWchr:1,ssrUmnr:0,ssrMeda:0,ssrInf:1,sbPax:1},
 ];
 LEGS.forEach(l => l.ssrCount = l.ssrWchr+l.ssrUmnr+l.ssrMeda+l.ssrInf);
@@ -1785,7 +1785,10 @@ function deriveAlerts(packState){
   const a = [];
   ALL_LEGS.forEach(l=>{
     if (l.status==="cancelled") a.push({sev:"bad", text:`${l.flightNo} bị huỷ`});
-    else if (l.status==="delayed") a.push({sev:"warn", text:`${l.flightNo} bị trễ`});
+    else if (l.status==="delayed") a.push({sev:"warn",
+      text:`${l.flightNo} trễ ${l.delayMin}′ · ${l.delayReason} · ${hhmm(l.origStd)} → ${hhmm(l.std)}`});
+    if (l.tailSwap) a.push({sev:"warn",
+      text:`${l.flightNo} đổi tàu · ${groupOfLeg(l).registration} → ${l.tailSwap.registration} · ${l.tailSwap.reason}`});
   });
   GROUPS.forEach(g => {
     for(let i=0;i<g.legs.length-1;i++){
@@ -1798,9 +1801,30 @@ function deriveAlerts(packState){
   return a.sort((x,y)=> (x.sev==="bad"?0:1) - (y.sev==="bad"?0:1));
 }
 
-// src/lib/mock — notifications (hộp thư vận hành)
+// src/lib/mock — notifications (hộp thư vận hành). Thông báo trễ/huỷ/đổi tàu
+// dẫn xuất trực tiếp từ ALL_LEGS (deriveAlerts) — không tự bịa số liệu, nên
+// khi đổi giờ delay/tailSwap trong LEGS, thông báo tự cập nhật theo, khỏi sửa
+// 2 chỗ. Dùng GROUPS.find(...) trực tiếp thay vì gọi groupOfLeg() — hằng số
+// này khởi tạo ngay lúc load script, trước khi groupOfLeg được khai báo.
+const FLIGHT_NOTIFS = ALL_LEGS
+  .filter(l => l.status === "delayed" || l.status === "cancelled")
+  .map(l => l.status === "cancelled"
+    ? {id:"NF-"+l.flightNo, icon:"warn", tone:"danger",
+        title:`${l.flightNo} bị huỷ`, body:`${l.origin} → ${l.destination} · ${hhmm(l.std)}`,
+        time:"Vừa cập nhật", unread:true}
+    : {id:"NF-"+l.flightNo, icon:"warn", tone:"danger",
+        title:`${l.flightNo} chuyển giờ`,
+        body:`${l.origin} → ${l.destination} trễ ${l.delayMin}′ · ${l.delayReason} · dự kiến ${hhmm(l.origStd)} → ${hhmm(l.std)}`,
+        time:"10 phút trước", unread:true})
+  .concat(ALL_LEGS.filter(l => l.tailSwap).map(l => {
+    const home = (GROUPS.find(gr => gr.legs.includes(l)) || {}).registration || "?";
+    return {id:"NS-"+l.flightNo, icon:"plane", tone:"danger",
+      title:`${l.flightNo} đổi tàu bay`,
+      body:`${home} → ${l.tailSwap.registration} · ${l.tailSwap.reason}`,
+      time:"15 phút trước", unread:true};
+  }));
 const NOTIFS = [
-  {id:"N1", icon:"warn",     tone:"danger", title:"VJ874 chuyển giờ",  body:"BMV → SGN trễ 45′ · dự kiến 12:05 → 12:50", time:"5 phút trước",  unread:true},
+  ...FLIGHT_NOTIFS,
   {id:"N2", icon:"cal",      tone:"info",   title:"Phân ca 15/07",     body:"Ca sáng SGN · báo cáo 05:30 tại phòng briefing", time:"1 giờ trước",  unread:true},
   {id:"N3", icon:"bell",     tone:"info",   title:"Thông báo nội bộ",  body:"Quy trình phục vụ khách SSR cập nhật từ 14/07", time:"Hôm qua",     unread:false},
   {id:"N4", icon:"down",     tone:"info",   title:"Gói bay đã sẵn sàng",body:"5 chặng · 12.4 MB đã tải xong, dùng được offline", time:"Hôm qua",  unread:false},
@@ -2045,6 +2069,12 @@ const DARK_BAR = new Set(["/login","/forgot","/unlock"]);
 const AURORA = new Set(["/login","/unlock"]);   // full-bleed brand gradient hero
 
 let animating = false;
+/* Trạng thái mở/tìm kiếm của danh sách hàng hoá dài (amenityChecklistCard) —
+   sống ngoài mọi hàm render vì màn dùng refresh() (build lại view từ đầu) chứ
+   không tự giữ state cục bộ; khoá theo id để "Nhận trolley cart" (theo nhóm)
+   và "Bàn giao" (theo từng chặng) không đụng state của nhau. */
+const amenityUI = {};
+function amenityUIFor(key){ return amenityUI[key] || (amenityUI[key] = {open:false, query:""}); }
 function go(path, mode="push"){
   if (animating || path === route()) return;
   if (mode==="push") S.stack.push(path);
@@ -2791,6 +2821,7 @@ function CrewDashboard(v){
   const passed = remaining === 0;
   const leg = LEGS[0];
   const delayedN = ALL_LEGS.filter(l => l.status === "delayed").length;
+  const legAc = legAircraft(leg);
 
   /* ── duty clock ── */
   const cd = h("div",{class:"count"}, formatCountdown(remaining));
@@ -2807,8 +2838,8 @@ function CrewDashboard(v){
       routeArc(leg)),
     h("div",{class:"tear"}, h("i")),
     h("div",{class:"bot"},
-      h("span",{class:"tag"}, GROUPS[0].ac),
-      h("span",{class:"tag"}, GROUPS[0].registration),
+      h("span",{class:"tag"}, legAc.ac),
+      h("span",{class:"tag", style: legAc.swapped ? "background:var(--warning-bg);color:var(--warning-text);border-color:var(--warning)" : ""}, legAc.registration),
       h("span",{class:"tag", style:"margin-left:auto;display:flex;align-items:center;gap:6px"},
         h("span",{class:"dot", style:`background:${delayedN ? "var(--warning)" : "var(--brand-green)"}`}),
         delayedN ? `${delayedN} chặng trễ` : "Đúng giờ")),
@@ -2938,6 +2969,22 @@ function legPhase(l){
   return {phase:"before", estimated:true, imminent: trolleyReady};
 }
 
+/* Tàu bay thực tế phục vụ 1 chặng — mặc định theo tổ (GROUPS[].ac/registration),
+   nhưng đổi tàu (AOG/bù giờ trễ) áp dụng từ 1 chặng trở đi trong CÙNG tổ, vì tổ
+   bay tiếp tục cùng nhau, chỉ đổi thân tàu vật lý. Set l.tailSwap = {registration,
+   ac?, reason} trên chặng bắt đầu đổi; các chặng sau đó trong tổ tự kế thừa. */
+function legAircraft(l){
+  const g = groupOfLeg(l);
+  if (!g) return {ac: ROTATION.aircraftType, registration: ROTATION.registration, swapped:false};
+  const idx = g.legs.indexOf(l);
+  let ac = g.ac, registration = g.registration, swapped = false, swapInfo = null, swapLeg = null;
+  for (let i = 0; i <= idx; i++){
+    const sw = g.legs[i].tailSwap;
+    if (sw){ ac = sw.ac || ac; registration = sw.registration; swapped = true; swapInfo = sw; swapLeg = g.legs[i]; }
+  }
+  return {ac, registration, swapped, swapInfo, swapLeg, homeAc:g.ac, homeRegistration:g.registration};
+}
+
 /* ═══ Hero vòng bay — cả rotation trong một hình ═══
    Trục x là thời gian thật từ STD chặng đầu tới STA chặng cuối, nên cung bay
    và đoạn nghỉ sân có bề rộng đúng tỉ lệ thời lượng. Không chia đều: nghỉ 65′
@@ -2962,12 +3009,14 @@ function rotationHero(){
     g += `<text class="flt" x="${mid.toFixed(1)}" y="40" text-anchor="middle">${l.flightNo}</text>`;
   });
 
-  // đoạn nghỉ sân, vẽ phẳng trên baseline
+  // đoạn nghỉ sân, vẽ phẳng trên baseline — đánh dấu riêng đoạn có đổi tàu
+  // (b.tailSwap), thường trùng luôn với đoạn quay đầu gấp do trễ dây chuyền.
   for (let i = 0; i < LEGS.length - 1; i++){
     const a = LEGS[i], b = LEGS[i+1];
     const m = groundMinutes(a.sta, b.std);
-    g += `<path class="grd${isTightGround(m) ? " tight" : ""}" d="M${x(a.sta).toFixed(1)} ${BASE} H${x(b.std).toFixed(1)}"/>`;
-    g += `<text class="gmin" x="${((x(a.sta)+x(b.std))/2).toFixed(1)}" y="${BASE - 8}" text-anchor="middle">${m}′</text>`;
+    const swap = b.tailSwap;
+    g += `<path class="grd${isTightGround(m) ? " tight" : ""}${swap ? " tight" : ""}" d="M${x(a.sta).toFixed(1)} ${BASE} H${x(b.std).toFixed(1)}"/>`;
+    g += `<text class="gmin${swap ? " swaplab" : ""}" x="${((x(a.sta)+x(b.std))/2).toFixed(1)}" y="${BASE - 8}" text-anchor="middle">${m}′${swap ? " · đổi tàu" : ""}</text>`;
   }
 
   // điểm dừng: mỗi mốc thời gian một chấm; nhãn sân bay gộp ở giữa cặp đến/đi
@@ -2975,12 +3024,12 @@ function rotationHero(){
   LEGS.forEach((l,i) => {
     const next = LEGS[i+1];
     stops.push(next
-      ? {t:l.sta, t2:next.std, iata:l.destination}   // sân quay đầu: có cả giờ đến và giờ đi
+      ? {t:l.sta, t2:next.std, iata:l.destination, swap: !!(next.tailSwap)}   // sân quay đầu: có cả giờ đến và giờ đi
       : {t:l.sta, iata:l.destination});
   });
   stops.forEach(s => {
     g += `<circle class="stop" cx="${x(s.t).toFixed(1)}" cy="${BASE}" r="4"/>`;
-    if (s.t2 !== undefined) g += `<circle class="stop" cx="${x(s.t2).toFixed(1)}" cy="${BASE}" r="4"/>`;
+    if (s.t2 !== undefined) g += `<circle class="stop${s.swap ? " swap" : ""}" cx="${x(s.t2).toFixed(1)}" cy="${BASE}" r="${s.swap ? 5 : 4}"/>`;
     const cx = s.t2 !== undefined ? (x(s.t) + x(s.t2)) / 2 : x(s.t);
     const anchor = s.t2 === undefined && s.t === t0 ? "start" : s.t2 === undefined ? "end" : "middle";
     const lx = anchor === "start" ? x(s.t) - 6 : anchor === "end" ? x(s.t) + 6 : cx;
@@ -3005,6 +3054,10 @@ function rotationHero(){
 
   const blockMin = LEGS.reduce((s,l)=>s + Math.round((l.sta-l.std)/MIN), 0);
   const pax = LEGS.reduce((s,l)=>s+l.pob, 0);
+  /* Tag tàu bay ở footer theo chặng ĐANG liên quan (đang bay/sắp bay) chứ không
+     cứng ROTATION.registration — vì tổ có thể đổi tàu giữa ca (xem legAircraft). */
+  const curLeg = flying || nextLeg || LEGS[LEGS.length-1];
+  const curAc = legAircraft(curLeg);
 
   return h("section",{class:"pass"},
     h("div",{class:"top"},
@@ -3017,8 +3070,9 @@ function rotationHero(){
       wrap.firstElementChild),
     h("div",{class:"tear"}, h("i")),
     h("div",{class:"bot rotfoot"},
-      h("span",{class:"tag"}, ROTATION.aircraftType),
-      h("span",{class:"tag"}, ROTATION.registration),
+      h("span",{class:"tag"}, curAc.ac),
+      h("span",{class:"tag", style: curAc.swapped ? "background:var(--warning-bg);color:var(--warning-text);border-color:var(--warning)" : ""},
+        curAc.swapped ? `${curAc.registration} · đổi tàu` : curAc.registration),
       h("span",{class:"tag"}, `${Math.floor(blockMin/60)}h${pad(blockMin%60)} bay`),
       h("span",{class:"tag"}, `${pax} khách`),
       h("span",{class:"tag", style:"margin-left:auto;display:flex;align-items:center;gap:6px"},
@@ -3035,19 +3089,21 @@ const STATUS_CHIP = {
 };
 
 /* Timeline dọc: 2 nhóm chặng bay hôm nay. Tap 1 chặng → chi tiết.
-   Action strip (tải + suất ăn) ngay dưới header nhóm — Approach A. */
+   Chỉ mang tính tham khảo (không có action) — tải gói/nhận trolley cart/bán
+   hàng/bàn giao đã có sẵn ở "Việc cần làm hôm nay" trên Trang chủ, tránh lặp
+   2 nơi. */
 function flightsTimeline(st){
   const wrap = h("div",{class:"vtl"});
   GROUPS.forEach((g, gi) => {
     const first = g.legs[0], last = g.legs[g.legs.length-1];
+    const groupSwap = g.legs.find(l => l.tailSwap);
     const grp = h("div",{class:"vgrp"});
     grp.appendChild(h("div",{class:"vgrp-hd"},
       h("span",{class:"gnum"}, String(gi+1)),
       h("div",{style:"min-width:0"},
         h("div",{class:"grt"}, `Nhóm ${gi+1} · ${g.route}`),
-        h("div",{class:"gsub"}, `${hhmm(first.std)} – ${hhmm(last.sta)} · ${g.legs.length} chặng · ${g.registration}`))));
-    const ops = groupActionStrip(g, gi);
-    grp.appendChild(st ? st(ops) : ops);
+        h("div",{class:"gsub"}, `${hhmm(first.std)} – ${hhmm(last.sta)} · ${g.legs.length} chặng · ${g.registration}`
+          + (groupSwap ? ` → ${groupSwap.tailSwap.registration} từ ${groupSwap.flightNo}` : "")))));
     const legs = h("div",{class:"vlegs"});
     g.legs.forEach((l, i) => {
       const mins = Math.round((l.sta - l.std)/MIN);
@@ -3061,7 +3117,9 @@ function flightsTimeline(st){
             h("span",{class:"chip "+chip[0]}, chip[1])),
           h("div",{class:"vr2"},
             h("span",{class:"vod"}, `${l.origin} → ${l.destination}`),
-            h("span",{class:"vtm"}, `${hhmm(l.std)}–${hhmm(l.sta)} · ${Math.floor(mins/60)}h${pad(mins%60)}`)),
+            h("span",{class:"vtm"}, l.status==="delayed"
+              ? `${hhmm(l.origStd)}→${hhmm(l.std)} · trễ ${l.delayMin}′`
+              : `${hhmm(l.std)}–${hhmm(l.sta)} · ${Math.floor(mins/60)}h${pad(mins%60)}`)),
           h("div",{class:"vr3"},
             h("span",{class:"vpax"}, `${l.pob}/${l.capacity} khách · ${pct}%`),
             h("span",{class:"chev"}, svg(I.chev,18)))));
@@ -3080,61 +3138,6 @@ function flightsTimeline(st){
     wrap.appendChild(grp);
   });
   return wrap;
-}
-
-/* 2 ô ngang trước bay: Tải gói | Nhận trolley cart (Bàn giao để sau chuyến).
-   Tải gói là quyền riêng của Purser (crew_ops.pack.download) — cabin chỉ xem trạng thái. */
-function groupActionStrip(g, gi){
-  const sum = groupPackSummary(g);
-  const mb = (PACK_SIZE_MB * g.legs.length / ALL_LEGS.length).toFixed(1);
-  const duty = dutyGroup();
-  const isDuty = g.id === duty.id;
-  const mealTot = groupMeals(duty).total;
-  const ack = S.mealAckByGroup[duty.id] || emptyMealAck();
-  const purser = isPurser(S.session.roles);
-  let packBtn;
-  if (sum.allReady){
-    packBtn = purser
-      ? h("button",{class:"gact pack done", onClick:()=>startDownloadGroup(g.id),
-          "aria-label":`Gói nhóm ${gi+1} đã tải · tải lại`},
-          h("div",{class:"gact-k"}, h("span",{class:"gact-ic"}, svg(I.check,16)), h("span",{class:"gact-t"},"Đã tải")),
-          h("span",{class:"gact-s"}, `${mb} MB · tải lại`))
-      : h("div",{class:"gact pack done"},
-          h("div",{class:"gact-k"}, h("span",{class:"gact-ic"}, svg(I.check,16)), h("span",{class:"gact-t"},"Đã tải")),
-          h("span",{class:"gact-s"}, `${mb} MB · ${sum.total} chặng`));
-  } else if (sum.downloading){
-    packBtn = h("div",{class:"gact pack", role:"status", "aria-live":"polite"},
-      h("div",{class:"gact-k"},
-        h("span",{class:"gact-ic"}, svg(I.down,16)),
-        h("span",{class:"gact-t"}, `Đang tải ${sum.ready}/${sum.total}`)),
-      h("div",{class:"gact-prog"}, h("i",{style:`width:${sum.total? sum.ready/sum.total*100 : 0}%`})));
-  } else if (purser){
-    packBtn = h("button",{class:"gact pack", onClick:()=>startDownloadGroup(g.id),
-      "aria-label":`Tải gói nhóm ${gi+1}`},
-      h("div",{class:"gact-k"},
-        h("span",{class:"gact-ic"}, svg(I.down,16)),
-        h("span",{class:"gact-t"},"Tải gói")),
-      h("span",{class:"gact-s"}, `${mb} MB · ${g.legs.length} chặng`));
-  } else {
-    packBtn = h("div",{class:"gact pack"},
-      h("div",{class:"gact-k"},
-        h("span",{class:"gact-ic"}, svg(I.down,16)),
-        h("span",{class:"gact-t"}, `${sum.ready}/${sum.total} chặng`)),
-      h("span",{class:"gact-s"}, "Chờ Purser tải gói bay"));
-  }
-  if (!isDuty) return h("div",{class:"gops"}, packBtn);
-  const mealSub = !ack.acked
-    ? `${mealTot} phần · trước bay`
-    : ack.match === false
-      ? (ack.totals ? `${mealTot} phần · Δ ${fmtDelta(ack.totals.delta)}` : `${mealTot} phần · ghi lệch`)
-      : `${mealTot} phần · đã đối chiếu`;
-  const mealBtn = h("button",{class:"gact meal", onClick:()=>go("/crew/meals"),
-    "aria-label":"Nhận trolley cart"},
-    h("div",{class:"gact-k"},
-      h("span",{class:"gact-ic"}, svg(I.food,16)),
-      h("span",{class:"gact-t"}, ack.acked ? "Đã nhận trolley" : "Nhận trolley cart")),
-    h("span",{class:"gact-s"}, mealSub));
-  return h("div",{class:"gops"}, packBtn, mealBtn);
 }
 
 /* CTA tải gói bay theo nhóm (dùng ở màn khác nếu cần). */
@@ -3199,8 +3202,7 @@ function FlightDetail(v, path){
   const mins = Math.round((l.sta - l.std)/MIN);
   const pct = Math.round(l.pob / l.capacity * 100);
   const chip = STATUS_CHIP[l.status];
-  const ac = g ? g.ac : ROTATION.aircraftType;
-  const reg = g ? g.registration : ROTATION.registration;
+  const {ac, registration: reg, swapped, swapInfo, homeRegistration} = legAircraft(l);
 
   const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
   let n = 0;
@@ -3218,9 +3220,28 @@ function FlightDetail(v, path){
     h("div",{class:"tear"}, h("i")),
     h("div",{class:"bot"},
       h("span",{class:"tag"}, ac),
-      h("span",{class:"tag"}, reg),
+      h("span",{class:"tag", style: swapped ? "background:var(--warning-bg);color:var(--warning-text);border-color:var(--warning)" : ""}, reg),
       h("span",{class:"tag", style:"margin-left:auto"}, chip[1])),
   )));
+
+  /* banner trễ chuyến — chỉ hiện khi status==="delayed"; giờ mới đã cập nhật
+     thẳng vào l.std/l.sta (mọi tính toán khác dùng chung), origStd/origSta chỉ
+     để so sánh "cũ → mới" ở đây. */
+  if (l.status === "delayed"){
+    body.appendChild(st(h("div",{class:"banner warn"}, svg(I.clock,18),
+      h("div",{},
+        h("b",{}, `Trễ ${l.delayMin}′ · ${l.delayReason}`),
+        h("span",{}, `STD ${hhmm(l.origStd)} → ${hhmm(l.std)} · STA ${hhmm(l.origSta)} → ${hhmm(l.sta)}`)))));
+  }
+
+  /* banner đổi tàu — swapInfo nằm trên chặng bắt đầu đổi; các chặng sau trong
+     tổ kế thừa qua legAircraft() nhưng vẫn hiện banner để crew biết lý do gốc. */
+  if (swapped){
+    body.appendChild(st(h("div",{class:"banner warn"}, svg(I.plane,18),
+      h("div",{},
+        h("b",{}, `Đổi tàu bay · ${homeRegistration} → ${reg}`),
+        h("span",{}, swapInfo.reason)))));
+  }
 
   /* trạng thái gói bay của chặng (tải riêng từng chặng, chỉ Purser tải) */
   const canDownload = hasPermission(S.session.roles,"crew_ops.pack.download");
@@ -3349,7 +3370,7 @@ function SeatScreen(v, path){
   const myStation = S.session.station || "L1";
 
   if (!packReady){
-    const ac = g ? g.ac : ROTATION.aircraftType;
+    const ac = legAircraft(l).ac;
     const canDownload = hasPermission(S.session.roles,"crew_ops.pack.download");
     seatChrome(v, {
       flightNo: l.flightNo, ac, origin: l.origin, destination: l.destination,
@@ -3420,7 +3441,7 @@ function SeatScreen(v, path){
 
   seatChrome(v, {
     flightNo: l.flightNo,
-    ac: (g&&g.ac)||ROTATION.aircraftType,
+    ac: legAircraft(l).ac,
     origin: l.origin, destination: l.destination,
     pob: l.pob, capacity: l.capacity,
     onBack: ()=>back(`/crew/flight/${no}`),
@@ -3722,30 +3743,59 @@ function trolleyDeviceCard(g, editing){
   });
   return card;
 }
-function trolleyAmenityCard(g, editing){
-  const rec = S.trolleyAmenityByGroup[g.id];
-  const card = h("section",{class:"card mealcard"});
-  card.appendChild(mealHd("④","Hàng hoá & amenities","Nhận tại "+g.legs[0].origin+" · số lượng thực tế", null));
-  HANDOVER_GOODS.forEach(a => {
+/* Danh sách hàng hoá dùng chung (34 SKU, phẳng, không nhóm được theo nghĩa) —
+   thu gọn mặc định, mở ra mới hiện ô tìm kiếm + từng dòng. Dùng ở cả "Nhận
+   trolley cart" (trolleyAmenityCard) và "Bàn giao" (HandoverDetail §2). */
+function amenityChecklistCard({num, title, sub, rec, editable, uiKey, padding}){
+  const ui = amenityUIFor(uiKey);
+  const total = HANDOVER_GOODS.length;
+  const filled = HANDOVER_GOODS.filter(a => (rec[a.code]||0) > 0).length;
+  const card = h("section",{class:"card", style:"padding:"+(padding || "14px 16px")});
+  card.appendChild(h("button",{type:"button", class:"amenity-toggle",
+      "aria-expanded": ui.open ? "true" : "false",
+      onClick:()=>{ ui.open = !ui.open; refresh(); }},
+    num ? h("span",{class:"mh-num"}, num) : null,
+    h("div",{class:"mh-tx"},
+      h("b",{}, title, h("span",{class:"amenity-count"}, `${filled}/${total} đã nhập`)),
+      h("span",{}, sub)),
+    h("span",{class:"chev"+(ui.open?" open":"")}, svg(I.chev,18))));
+  if (!ui.open) return card;
+  const searchIn = h("input",{type:"text", placeholder:"Tìm hàng hoá / mã…", value: ui.query,
+    "aria-label":"Tìm hàng hoá",
+    onInput:e=>{ ui.query = e.target.value; refresh(); }});
+  card.appendChild(h("div",{class:"pxsearch", style:"margin-bottom:8px"}, svg(I.search,16), searchIn));
+  const q = ui.query.trim().toLowerCase();
+  const items = HANDOVER_GOODS.filter(a => !q || (a.label+" "+a.code).toLowerCase().includes(q));
+  if (!items.length){
+    card.appendChild(h("p",{class:"sale-empty"}, "Không tìm thấy hàng hoá"));
+    return card;
+  }
+  items.forEach(a => {
     const qty = rec[a.code] || 0;
     card.appendChild(h("div",{class:"steprow"},
       h("div",{style:"flex:1;min-width:0"},
         h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, a.label),
         h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, a.code+" · "+a.unit)),
       h("div",{class:"stepper"},
-        h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: !editing || qty<=0, onClick:()=>{
-          if (!editing) return;
+        h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: !editable || qty<=0, onClick:()=>{
+          if (!editable) return;
           rec[a.code] = Math.max(0, qty - 1);
           refresh();
         }},"−"),
         h("span",{class:"sv"}, String(qty)),
-        h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: !editing, onClick:()=>{
-          if (!editing) return;
+        h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: !editable, onClick:()=>{
+          if (!editable) return;
           rec[a.code] = qty + 1;
           refresh();
         }},"+"))));
   });
   return card;
+}
+function trolleyAmenityCard(g, editing){
+  return amenityChecklistCard({
+    num:"④", title:"Hàng hoá & amenities", sub:"Nhận tại "+g.legs[0].origin+" · số lượng thực tế",
+    rec: S.trolleyAmenityByGroup[g.id], editable: editing, uiKey: "trolley:"+g.id,
+  });
 }
 function MealPrep(v){
   if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
@@ -3926,7 +3976,7 @@ function paxList(l, man, opts = {}){
     const meals = mealsOf(p);
     const served = !!S.served[l.flightNo+":"+s.id];
     const tags = [];
-    tags.push(h("span",{class:"chip info"}, CLS_LABEL[p.cls]||p.cls));
+    tags.push(h("span",{class:"clsbadge "+p.cls}, CLS_LABEL[p.cls]||p.cls));
     p.ssr.forEach(([code]) => tags.push(h("span",{class:"chip warn"}, code)));
     if (hasDuty(p)) tags.push(h("span",{class:"chip info"}, "DF"));
     if (p.transit) tags.push(h("span",{class:"chip ok"}, "Nối"));
@@ -3935,7 +3985,7 @@ function paxList(l, man, opts = {}){
       h("span",{class:"c-seat"}, h("span",{class:"seatpill "+(served?"served":p.cls)}, s.id)),
       h("span",{class:"c-name"},
         h("b",{}, p.name),
-        h("span",{class:"plsub"}, `${p.pnr} · ${p.type} · ${CLS_LABEL[p.cls]||p.cls}`),
+        h("span",{class:"plsub"}, `${p.pnr} · ${p.type}`),
         meals.length
           ? h("span",{class:"plmeal"}, svg(I.food,13),
               h("span",{}, meals.map(m => m[1] + (m[2]>1?` ×${m[2]}`:"")).join(", ")))
@@ -4666,33 +4716,10 @@ function HandoverDetail(v, path){
   body.appendChild(devCard);
 
   /* 2. Hàng hoá trả về — DM Amenity cột C */
-  const amCard = h("section",{class:"card", style:"padding:4px 14px 8px"});
-  amCard.appendChild(h("div",{style:"font:700 14px Plus Jakarta Sans;padding:12px 0 4px"},"2. Hàng hoá trả về"));
-  amCard.appendChild(h("p",{style:"font:400 12px/18px Plus Jakarta Sans;color:var(--n500);margin:0 0 6px"},
-    "Nhập số lượng còn lại / trả về kho sau chuyến."));
-  HANDOVER_GOODS.forEach(a => {
-    const qty = rec.amenityQty[a.code] || 0;
-    amCard.appendChild(h("div",{class:"steprow"},
-      h("div",{style:"flex:1;min-width:0"},
-        h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, a.label),
-        h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, a.code+" · "+a.unit)
-      ),
-      h("div",{class:"stepper"},
-        h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: !editable || qty<=0, onClick:()=>{
-          if (!editable) return;
-          rec.amenityQty[a.code] = Math.max(0, qty - 1);
-          refresh();
-        }},"−"),
-        h("span",{class:"sv"}, String(qty)),
-        h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: !editable, onClick:()=>{
-          if (!editable) return;
-          rec.amenityQty[a.code] = qty + 1;
-          refresh();
-        }},"+")
-      )
-    ));
-  });
-  body.appendChild(amCard);
+  body.appendChild(amenityChecklistCard({
+    title:"2. Hàng hoá trả về", sub:"Nhập số lượng còn lại / trả về kho sau chuyến.",
+    rec: rec.amenityQty, editable, uiKey:"handover:"+no, padding:"4px 14px 8px",
+  }));
 
   /* 3. Bàn giao vận hành — chỉ khi đổi tổ giữa rotation, tổ mới cần biết đã tới đâu */
   if (mode === "crew"){
