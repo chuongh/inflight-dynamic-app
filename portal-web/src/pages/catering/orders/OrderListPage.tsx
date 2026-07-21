@@ -34,82 +34,84 @@ export function OrderListPage() {
   }, [files, status, query])
 
   return (
-    <div>
-      <PageHeader
-        badge={t('catering.orders.badge')}
-        title={t('catering.orders.title')}
-        description={t('catering.orders.desc')}
-      />
+    <div className="page-shell page-shell--list">
+      <div className="thin-scroll page-shell__body">
+        <PageHeader
+          badge={t('catering.orders.badge')}
+          title={t('catering.orders.title')}
+          description={t('catering.orders.desc')}
+        />
 
-      {/* KPI tiles */}
-      <div className="mt-1 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Kpi
-          icon={<ShoppingBag size={18} />}
-          tone="red"
-          value={files.length}
-          label={t('catering.orders.kpiTotal')}
-        />
-        <Kpi icon={<Pencil size={18} />} tone="muted" value={draftCount} label={t('catering.orders.kpiDraft')} />
-        <Kpi icon={<CheckCheck size={18} />} tone="green" value={sentCount} label={t('catering.orders.kpiSent')} />
-        <Kpi
-          icon={<TrendingUp size={18} />}
-          tone="red"
-          value={totalPortions.toLocaleString()}
-          label={t('catering.orders.kpiPortions')}
-        />
-      </div>
+        {/* KPI tiles */}
+        <div className="mt-1 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Kpi
+            icon={<ShoppingBag size={18} />}
+            tone="red"
+            value={files.length}
+            label={t('catering.orders.kpiTotal')}
+          />
+          <Kpi icon={<Pencil size={18} />} tone="muted" value={draftCount} label={t('catering.orders.kpiDraft')} />
+          <Kpi icon={<CheckCheck size={18} />} tone="green" value={sentCount} label={t('catering.orders.kpiSent')} />
+          <Kpi
+            icon={<TrendingUp size={18} />}
+            tone="red"
+            value={totalPortions.toLocaleString()}
+            label={t('catering.orders.kpiPortions')}
+          />
+        </div>
 
-      {/* toolbar */}
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <Segmented
-          value={status}
-          onChange={(v) => setStatus(v as StatusFilter)}
-          options={[
-            { value: 'all', label: t('catering.orders.filterAll', { n: files.length }) },
-            { value: 'draft', label: t('catering.orders.filterDraft', { n: draftCount }) },
-            { value: 'sent', label: t('catering.orders.filterSent', { n: sentCount }) },
-          ]}
-        />
-        <Input
-          allowClear
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          prefix={<Search size={15} className="text-text-muted" />}
-          placeholder={t('catering.orders.searchPlaceholder')}
-          style={{ maxWidth: 320 }}
-        />
-      </div>
+        {/* toolbar */}
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Segmented
+            value={status}
+            onChange={(v) => setStatus(v as StatusFilter)}
+            options={[
+              { value: 'all', label: t('catering.orders.filterAll', { n: files.length }) },
+              { value: 'draft', label: t('catering.orders.filterDraft', { n: draftCount }) },
+              { value: 'sent', label: t('catering.orders.filterSent', { n: sentCount }) },
+            ]}
+          />
+          <Input
+            allowClear
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            prefix={<Search size={15} className="text-text-muted" />}
+            placeholder={t('catering.orders.searchPlaceholder')}
+            style={{ maxWidth: 320 }}
+          />
+        </div>
 
-      {/* table */}
-      <div className="border-border mt-4 overflow-hidden rounded-2xl border bg-white">
-        {visible.length === 0 ? (
-          <div className="py-16">
-            <Empty description={t('catering.orders.empty')} />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
-              <thead>
-                <tr className="text-text-secondary [&>th]:border-border [&>th]:border-b [&>th]:px-3 [&>th]:py-3 [&>th]:text-left [&>th]:text-[10.5px] [&>th]:font-extrabold [&>th]:tracking-wide [&>th]:uppercase">
-                  <th>{t('catering.orders.colOrder')}</th>
-                  <th>{t('catering.orders.colDate')}</th>
-                  <th>{t('catering.orders.colStatus')}</th>
-                  <th>{t('catering.orders.colVersion')}</th>
-                  <th className="!text-right">{t('catering.orders.colTotal')}</th>
-                  <th>{t('catering.orders.colBreakdown')}</th>
-                  <th>{t('catering.orders.colUpdatedBy')}</th>
-                  <th className="!text-right">{t('catering.orders.colUpdated')}</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map((f) => (
-                  <OrderRow key={f.fileId} file={f} onOpen={() => navigate(paths.catering.orders.detail(f.fileId))} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {/* table */}
+        <div className="border-border mt-4 overflow-hidden rounded-2xl border bg-white">
+          {visible.length === 0 ? (
+            <div className="py-16">
+              <Empty description={t('catering.orders.empty')} />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-[13px]">
+                <thead>
+                  <tr className="text-text-secondary [&>th]:border-border [&>th]:border-b [&>th]:px-3 [&>th]:py-3 [&>th]:text-left [&>th]:text-[10.5px] [&>th]:font-extrabold [&>th]:tracking-wide [&>th]:uppercase">
+                    <th>{t('catering.orders.colOrder')}</th>
+                    <th>{t('catering.orders.colDate')}</th>
+                    <th>{t('catering.orders.colStatus')}</th>
+                    <th>{t('catering.orders.colVersion')}</th>
+                    <th className="!text-right">{t('catering.orders.colTotal')}</th>
+                    <th>{t('catering.orders.colBreakdown')}</th>
+                    <th>{t('catering.orders.colUpdatedBy')}</th>
+                    <th className="!text-right">{t('catering.orders.colUpdated')}</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visible.map((f) => (
+                    <OrderRow key={f.fileId} file={f} onOpen={() => navigate(paths.catering.orders.detail(f.fileId))} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
