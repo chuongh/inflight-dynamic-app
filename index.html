@@ -465,6 +465,12 @@ body{
 .seatentry b{display:block;font:600 15px "Plus Jakarta Sans";color:var(--ink)}
 .seatentry span{display:block;font:400 12px "Plus Jakarta Sans";color:var(--n500);margin-top:1px}
 .seatentry .chev{margin-left:auto;color:var(--ink-3);flex:none}
+.seatentry.static{cursor:default}
+.seatentry.static:active{transform:none}
+
+/* ── "Việc cần làm hôm nay" — Trước bay / Đang bay / Sau bay (Home) ── */
+.dayshort-grp{display:flex;flex-direction:column;gap:8px}
+.dayshort-empty{padding:2px 2px 4px;font:500 13px/20px "Plus Jakarta Sans";color:var(--ink-2)}
 
 /* ── identity card (passenger / detail hero) — blush, không đỏ full ── */
 .idcard{border-radius:var(--r-lg);padding:20px;color:var(--ink);
@@ -574,31 +580,48 @@ body{
 @media (prefers-reduced-motion:reduce){
   .menuitem,.menuitem .svcic{transition:none}
 }
-/* Total order — đỏ chỉ ở số Tổng cộng */
-.ordertotal{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--n0);overflow:hidden;
-  transition:border-color 180ms ease, box-shadow 180ms ease}
-.ordertotal.has-items{border-color:var(--n300);box-shadow:var(--e1)}
-.ordertotal .ot-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  padding:10px 14px 8px;border-bottom:1px solid var(--line)}
-.ordertotal .ot-title{font:700 13px/18px "Plus Jakarta Sans";color:var(--ink);letter-spacing:.2px}
-.ordertotal .ot-meta{font:600 11px/16px "Plus Jakarta Sans";color:var(--ink-2);font-variant-numeric:tabular-nums}
-.ordertotal .ot-empty{padding:14px;font:500 13px/20px "Plus Jakarta Sans";color:var(--ink-2);text-align:center}
-.ordertotal .ot-lines{display:flex;flex-direction:column;padding:4px 0}
-.ordertotal .ot-line{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px 10px;align-items:baseline;
-  padding:8px 14px;font:500 13px/18px "Plus Jakarta Sans";color:var(--ink)}
-.ordertotal .ot-line + .ot-line{border-top:1px solid var(--n100)}
-.ordertotal .ot-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ordertotal .ot-qty{font:700 12px/16px "Plus Jakarta Sans";color:var(--ink-2);font-variant-numeric:tabular-nums;flex:none}
-.ordertotal .ot-amt{font:700 13px/18px "Plus Jakarta Sans";color:var(--ink);font-variant-numeric:tabular-nums;
-  text-align:right;min-width:4.5rem}
-.ordertotal .ot-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:10px 14px 12px;background:var(--n50);border-top:1px solid var(--line)}
-.ordertotal .ot-foot-lab{font:700 11px/16px "Plus Jakarta Sans";letter-spacing:.4px;text-transform:uppercase;color:var(--ink-2)}
-.ordertotal .ot-foot-amt{font-family:"JambonoVN Black","Jambono Black",Nunito,sans-serif;font-weight:800;
-  font-size:20px;line-height:24px;color:var(--brand);font-variant-numeric:tabular-nums}
-@media (prefers-reduced-motion:reduce){
-  .ordertotal,.ordertotal.has-items{transition:none}
-}
+/* Phase 1 — sticky bar mỏng: số món + tổng tiền + CTA "Thu tiền" (không list chi tiết) */
+.sellpay-bar{
+  position:absolute;left:0;right:0;bottom:0;
+  z-index:25;display:flex;align-items:center;gap:10px;
+  padding:12px calc(var(--sa-r) + 16px) calc(12px + var(--sa-bot)) calc(var(--sa-l) + 16px);
+  background:var(--n0);border-top:1px solid var(--line);
+  box-shadow:0 -8px 28px rgba(35,31,32,.12),0 -1px 0 rgba(35,31,32,.04)}
+.sellpay-bar .spb-count{flex:none;font:700 12px "Plus Jakarta Sans";color:var(--ink-2)}
+.sellpay-bar .spb-total{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:"JambonoVN Black","Jambono Black",Nunito,sans-serif;font-weight:800;
+  font-size:19px;line-height:24px;color:var(--brand);font-variant-numeric:tabular-nums}
+.sellpay-bar .cta{flex:none;width:auto;min-height:44px;padding:0 18px;font-size:14.5px}
+.body.sellpay{
+  padding-bottom:calc(var(--sa-bot) + 80px);
+  scroll-padding-bottom:calc(var(--sa-bot) + 96px)}
+/* Phase 2 — Payment sheet (sáng, tái dùng pattern .scrim/.insp nhưng style VJA sáng) */
+.pay-scrim{position:absolute;inset:0;z-index:70;background:rgba(35,31,32,.5);opacity:0;pointer-events:none;
+  transition:opacity 260ms var(--ease-out)}
+.pay-scrim.on{opacity:1;pointer-events:auto}
+.pay-sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:75;max-height:90vh;
+  background:var(--n0);border-top:1px solid var(--line);border-radius:22px 22px 0 0;color:var(--ink);
+  box-shadow:0 -14px 40px rgba(35,31,32,.2);
+  display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:8px calc(var(--sa-r) + 18px) calc(var(--sa-bot) + 18px) calc(var(--sa-l) + 18px);
+  transform:translateY(100%);transition:transform 320ms var(--ease-drawer,cubic-bezier(.32,.72,0,1))}
+.pay-sheet.on{transform:translateY(0)}
+.pay-sheet .grab{width:36px;height:4px;border-radius:var(--r-pill);background:var(--n300);margin:6px auto 12px;flex:none}
+.pay-sheet .ps-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.pay-sheet .ps-title{font-family:"JambonoVN Black","Jambono Black",Nunito,sans-serif;font-weight:800;font-size:16px;color:var(--ink)}
+.pay-sheet .ps-sub{font:500 12px "Plus Jakarta Sans";color:var(--ink-2);margin-top:2px}
+.pay-sheet .ps-close{flex:none;width:32px;height:32px;border-radius:var(--r-pill);background:var(--n100);color:var(--ink-2);display:grid;place-items:center}
+.pay-sheet .ps-summary{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:10px 12px;background:var(--n50);border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:14px;
+  font:600 12.5px "Plus Jakarta Sans";color:var(--ink-2)}
+.pay-sheet .ps-summary b{color:var(--ink);font-weight:700}
+.pay-sheet .ps-cancel{margin-top:10px}
+.sale-plbar{position:sticky;top:0;z-index:6;background:var(--surface-2);
+  margin:0 -4px 8px;padding:0 4px 10px;border-bottom:1px solid var(--n100)}
+.sale-plbar .pxsearch{margin-bottom:10px}
+.sale-plbar .salechips{margin:0}
+.sale-empty{padding:20px 12px;text-align:center;font:500 13px/20px "Plus Jakarta Sans";color:var(--ink-2)}
 .paybox{padding:14px 16px;border-radius:var(--r-lg);background:var(--n0);border:1px solid var(--line);box-shadow:var(--e1)}
 .paybox .plab{font:600 11px "Plus Jakarta Sans";letter-spacing:.4px;text-transform:uppercase;color:var(--ink-2)}
 /* Đồng bộ treatment với ot-foot-amt */
@@ -1337,8 +1360,9 @@ const CREW_ROLES = ["purser","cabin_crew"];
 // Launcher = danh sách tính năng theo vai trò. Ca trực/chuyến bay KHÔNG nằm ở đây —
 // nó là một tab điều hướng riêng. Ở đây chỉ là "việc tôi làm được trong app".
 const MODULES = [
-  // Tổ bay — Nhận suất ăn riêng; Bàn giao = thiết bị (iPad/POS) + hàng hoá trả về.
-  {id:"receive_uplift", title:"Nhận suất ăn", icon:"food", roles:CREW_ROLES, route:"/crew/meals", named:true, crewDashOnly:true},
+  // Tổ bay — Nhận trolley cart (suất ăn + thiết bị + hàng hoá nhận tại origin);
+  // Bàn giao (sau chuyến) = trả thiết bị (iPad/POS) + khai báo hàng hoá còn lại.
+  {id:"receive_uplift", title:"Nhận trolley cart", icon:"food", roles:CREW_ROLES, route:"/crew/meals", named:true, crewDashOnly:true},
   {id:"sell_meal",      title:"Bán hàng",      icon:"tag", roles:CREW_ROLES, route:"/crew/sell-meal", named:true},
   {id:"handover",       title:"Bàn giao",      icon:"cube", roles:CREW_ROLES, route:"/crew/handover", named:true},
   {id:"scan_bp",        title:"Scan boarding pass", icon:"scan", roles:CREW_ROLES, route:"/crew/scan-pick", named:true},
@@ -1358,16 +1382,16 @@ const modulesForRoles = roles => {
   return MODULES.filter(m => {
     if (!m.roles.some(r => roles.includes(r))) return false;
     if (crew && !m.route) return false; // crew: không hiện "Sắp có"
-    if (crew && m.crewDashOnly) return false; // Nhận suất ăn chỉ ở Ca trực
+    if (crew && m.crewDashOnly) return false; // Nhận trolley cart chỉ ở Ca trực
     return true;
   });
 };
 const canAccessModule = (roles,id) => { const m = MODULES.find(x=>x.id===id); return m ? m.roles.some(r=>roles.includes(r)) : false; };
 
 // src/lib/modules/permissions.ts
-const CREW_1 = ["crew_ops.pack.download","safety.report.submit"];
+const CREW_1 = ["safety.report.submit"];
 const CREW_PII = ["crew_ops.pax.view_sensitive"];
-const CREW_2 = ["crew_ops.duty.assign_stations","crew_ops.voyage.sign","crew_ops.bob.close"];
+const CREW_2 = ["crew_ops.pack.download","crew_ops.duty.assign_stations","crew_ops.voyage.sign","crew_ops.bob.close"];
 const ROLE_PERMISSIONS = {
   purser:[...CREW_1,...CREW_PII,...CREW_2],
   cabin_crew:[...CREW_1,...CREW_PII],
@@ -1536,9 +1560,9 @@ function seatInZone(seatId, station){
   if (station === "R2") return rc.row >= 14 && !left;
   return true;
 }
-function legServeStats(leg){
+function legServeStats(leg, zone){
   const man = buildManifest(leg);
-  const occ = man.seats.filter(s => man.map[s.id]);
+  const occ = man.seats.filter(s => man.map[s.id] && (!zone || zone==="ALL" || seatInZone(s.id, zone)));
   let served = 0, ssrOpen = 0, sbOpen = 0;
   occ.forEach(s => {
     const p = man.map[s.id];
@@ -1659,6 +1683,12 @@ function cateringUpliftOf(leg){
 }
 /** @deprecated alias — manifest vẫn dùng khi gán mon SB ghế */
 function skybossOrderOf(leg){ return cateringUpliftOf(leg); }
+
+/* Trạm có catering (nguồn: portal-web/docs/catering-grouping-engine-spec.md §7 — derive từ
+   airport master-data hasCatering+active). Chính sách VietJet: suất ăn nạp MỘT LẦN tại
+   origin của rotation, cover toàn bộ chặng; KHÔNG nạp lại khi chỉ quá cảnh 1 trạm catering
+   khác. Dùng để hiện ghi chú "không nạp lại" ở các chặng giữa rotation. */
+const CATERING_STATIONS = new Set(["SGN","HAN","DAD","CXR","PQC","VCA","VII","HPH","DLI"]);
 
 function buildManifest(leg){
   if (leg._manifest) return leg._manifest;
@@ -1859,6 +1889,8 @@ function emptyHandoverLeg(){
     amenityQty: Object.fromEntries(HANDOVER_GOODS.map(a => [a.code, 0])),
     confirmed: false,
     at: null,
+    mode: "ground",   // "ground" (bàn giao mặt đất) | "crew" (đổi tổ giữa rotation)
+    crewNote: "",     // ghi chú vận hành cho tổ mới — chỉ dùng khi mode==="crew"
   };
 }
 function handoverOf(flightNo){
@@ -1882,6 +1914,19 @@ function handoverStatus(flightNo){
   const dv = handoverDeviceCount(flightNo);
   if (am > 0 || dv > 0) return ["info","Đang nhập"];
   return ["", "Chưa bàn giao"];
+}
+
+/* Ghi nhận bất thường trên không — tổ bay ghi tại chỗ, đọc lại khi bàn giao đổi tổ. */
+const IRREGULARITY_KINDS = [
+  {id:"medical",   label:"Y tế",           icon:"warn"},
+  {id:"behavior",  label:"Hành vi khách",  icon:"user"},
+  {id:"equipment", label:"Thiết bị hỏng",  icon:"cube"},
+  {id:"other",     label:"Khác",           icon:"file"},
+];
+const IRREGULARITY_LAB = Object.fromEntries(IRREGULARITY_KINDS.map(k => [k.id, k.label]));
+function irregularitiesOf(flightNo){
+  if (!S.irregularities[flightNo]) S.irregularities[flightNo] = [];
+  return S.irregularities[flightNo];
 }
 const FX_RATES = { VND:1, USD:25500, THB:720, KRW:19, JPY:170 }; // 1 unit FX → VND (demo)
 const FX_CODES = ["VND","USD","THB","KRW","JPY"];
@@ -1969,10 +2014,15 @@ function fmtDelta(n){
 function emptyCrewOpsState(){
   return {
     mealAckByGroup: Object.fromEntries(GROUPS.map(g => [g.id, emptyMealAck()])),
+    /* Trolley cart nhận tại origin — thiết bị + hàng hoá, gộp chung luồng với suất ăn
+       (mealAckByGroup) nhưng lưu riêng vì thiết bị/amenity không có số "kế hoạch" nguồn. */
+    trolleyDeviceByGroup: Object.fromEntries(GROUPS.map(g => [g.id, Object.fromEntries(HANDOVER_DEVICES.map(d => [d.id, false]))])),
+    trolleyAmenityByGroup: Object.fromEntries(GROUPS.map(g => [g.id, Object.fromEntries(HANDOVER_GOODS.map(a => [a.code, 0]))])),
     served: {},          // `${flightNo}:${seat}` → true
     mealPurchases: [],   // {id,flightNo,seat,code,name,cat,qty,vnd,fx,fxAmt,at}
     handoverByLeg: {},   // flightNo → emptyHandoverLeg()
     syncHandoverAt: null,
+    irregularities: {},  // flightNo → [{id,at,kind,seat,note}] — ghi nhận bất thường trên không
   };
 }
 
@@ -1981,7 +2031,7 @@ const S = {
   stack: ["/login"],
   tab: "home",
   simNow: ROTATION.reportAt - 45*MIN,   // mô phỏng: 45' trước giờ báo cáo
-  packByGroup: Object.fromEntries(GROUPS.map(g => [g.id, {state:"missing", done:0, total:g.legs.length, syncedAt:null}])),
+  packByLeg: Object.fromEntries(ALL_LEGS.map(l => [l.flightNo, {state:"missing", syncedAt:null}])),
   salesFlight: null,
   ...emptyCrewOpsState(),
   scan: {count:activeFlight.scannedCount, result:null},
@@ -2117,6 +2167,7 @@ function buildView(path){
     path.includes("/pax/")            ? PaxDetail :
     path.endsWith("/scan")            ? CrewScanLeg :
     path.endsWith("/seats")           ? SeatScreen :
+    path.endsWith("/cabin")           ? CabinServing :
     path.startsWith("/crew/flight/")  ? FlightDetail :
     path.startsWith("/equipment/")    ? DeviceScreen : NotFound
   ))(v, path);
@@ -2242,14 +2293,14 @@ function signIn(code){
     trolley: id.trolley || null,
   };
   Object.assign(S, emptyCrewOpsState());
-  S.packByGroup = Object.fromEntries(GROUPS.map(g => [g.id, {state:"missing", done:0, total:g.legs.length, syncedAt:null}]));
+  S.packByLeg = Object.fromEntries(ALL_LEGS.map(l => [l.flightNo, {state:"missing", syncedAt:null}]));
   S.stack = ["/home"]; S.tab = "home";
   transition("fade");
 }
 function signOut(){
   S.session = {employeeCode:null, displayName:null, roles:[], baseStation:"SGN", station:null, trolley:null};
   Object.assign(S, emptyCrewOpsState());
-  S.packByGroup = Object.fromEntries(GROUPS.map(g => [g.id, {state:"missing", done:0, total:g.legs.length, syncedAt:null}]));
+  S.packByLeg = Object.fromEntries(ALL_LEGS.map(l => [l.flightNo, {state:"missing", syncedAt:null}]));
   S.login = {code:"", pw:"", show:false};
   S.scan = {count:activeFlight.scannedCount, result:null};
   S.equip.outcome = null; S.reg.issued = null;
@@ -2436,12 +2487,157 @@ const TILE_TINTS = [
   ["var(--muted)","var(--n700)"],                // Trung tính
 ];
 
+/* Tông màu ngắn gọn cho shortcut theo trạng thái — dùng lại token warning/success/danger/info sẵn có. */
+const SHORTCUT_TONES = {
+  warn: ["var(--warning-bg)","var(--warning-text)"],
+  ok:   ["var(--success-bg)","var(--success-text)"],
+  bad:  ["var(--danger-bg)","var(--danger-text)"],
+  info: ["var(--info-bg)","var(--info-text)"],
+};
+function shortcutRow({tone, icon, title, sub, onClick}){
+  const [bg,fg] = SHORTCUT_TONES[tone] || SHORTCUT_TONES.info;
+  return h(onClick ? "button" : "div", {
+    type: onClick ? "button" : null,
+    class:"seatentry"+(onClick?"":" static"),
+    onClick: onClick || null,
+  },
+    h("span",{class:"si", style:`background:${bg};color:${fg}`}, svg(icon,20)),
+    h("div",{style:"flex:1;text-align:left;min-width:0"}, h("b",{}, title), h("span",{}, sub)),
+    onClick ? h("span",{class:"chev"}, svg(I.chev,18)) : null);
+}
+function phaseGroup(label, cards){
+  return h("div",{class:"dayshort-grp"}, h("div",{class:"crewgrp"}, label), ...cards);
+}
+const emptyRow = text => h("p",{class:"dayshort-empty"}, text);
+
+/* Khách ưu tiên gần nhất chưa phục vụ trên 1 chặng — SSR hoặc hạng SkyBoss/SkyBoss Business. */
+function nextPriorityPax(l){
+  const man = buildManifest(l);
+  const occ = man.seats.filter(s => man.map[s.id]);
+  const seat = occ.find(s => {
+    if (S.served[l.flightNo+":"+s.id]) return false;
+    const p = man.map[s.id];
+    return p.ssr.length > 0 || p.cls === "sbbiz" || p.cls === "skyboss";
+  });
+  return seat ? {id: seat.id, pax: man.map[seat.id]} : null;
+}
+
+/* "Việc cần làm hôm nay" — 3 khối Trước bay / Đang bay / Sau bay, tính trực tiếp
+   từ S.simNow so với std/sta từng chặng trong ca (dutyGroup) — không thêm state mới. */
+function homeShortcutsSection(){
+  const g = dutyGroup();
+  const purser = isPurser(S.session.roles);
+  const inFlight = g.legs.find(l => legPhase(l).phase === "flying") || null;
+  const after = g.legs.filter(l => legPhase(l).phase === "after");
+
+  const wrap = h("div",{style:"display:flex;flex-direction:column;gap:14px"});
+  wrap.appendChild(h("div",{class:"sec", style:"margin:6px 2px 10px"},
+    h("h2",{style:"font-size:18px"},"Việc cần làm hôm nay"),
+    h("span",{class:"hint"}, g.route)));
+
+  /* ── Trước bay ── */
+  const preCards = [];
+  const sum = groupPackSummary(g);
+  const mbAll = (PACK_SIZE_MB * g.legs.length / ALL_LEGS.length).toFixed(1);
+  if (!sum.allReady){
+    preCards.push(shortcutRow({
+      tone:"warn", icon:I.down,
+      title: sum.downloading ? `Đang tải gói bay… ${sum.ready}/${sum.total} chặng` : (purser ? "Tải gói bay · "+g.legs.length+" chặng" : `Chờ Purser tải gói bay · ${sum.ready}/${sum.total} chặng`),
+      sub: sum.downloading ? "Vui lòng chờ" : mbAll+" MB · cần trước khi mở hồ sơ khách",
+      onClick: (sum.downloading || !purser) ? null : ()=>startDownloadGroup(g.id),
+    }));
+  } else {
+    preCards.push(shortcutRow({tone:"ok", icon:I.check, title:"Gói bay đã sẵn sàng", sub:mbAll+" MB · dùng offline cả ca", onClick:null}));
+  }
+  const ack = S.mealAckByGroup[g.id] || emptyMealAck();
+  const mealTot = groupMeals(g).total;
+  preCards.push(shortcutRow({
+    tone: !ack.acked ? "warn" : (ack.match===false ? "bad" : "ok"),
+    icon: I.food,
+    title: !ack.acked ? "Nhận trolley cart · chưa đối chiếu" : (ack.match===false ? "Trolley cart · đã ghi lệch" : "Trolley cart · đã xác nhận"),
+    sub: mealTot+" phần"+(purser ? "" : " · xem số liệu"),
+    onClick: ()=>go("/crew/meals"),
+  }));
+  wrap.appendChild(phaseGroup("Trước bay", preCards));
+
+  /* ── Đang bay ── */
+  const flyCards = [];
+  if (inFlight){
+    const ss = legServeStats(inFlight);
+    flyCards.push(shortcutRow({
+      tone:"info", icon:I.plane,
+      title:"Phục vụ khoang · "+inFlight.flightNo,
+      sub: purser ? "Toàn tàu · "+ss.pct+"% đã phục vụ" : "Zone của tôi · "+ss.pct+"% đã phục vụ",
+      onClick: ()=>go(`/crew/flight/${inFlight.flightNo}/cabin`),
+    }));
+    flyCards.push(shortcutRow({
+      tone:"info", icon:I.grid,
+      title:"Sơ đồ ghế động · "+inFlight.flightNo,
+      sub: inFlight.pob+" khách · "+ss.pct+"% đã phục vụ",
+      onClick: ()=>{ S.paxView = "map"; go(`/crew/flight/${inFlight.flightNo}/seats`); },
+    }));
+    flyCards.push(shortcutRow({
+      tone: ss.unserved>0 ? "warn" : "ok", icon:I.user,
+      title: "Danh sách chưa phục vụ · "+inFlight.flightNo,
+      sub: ss.unserved+" khách chưa phục vụ"+(purser ? "" : " · zone của tôi"),
+      onClick: ()=>{ S.paxView = "list"; go(`/crew/flight/${inFlight.flightNo}/seats`); },
+    }));
+    const prio = nextPriorityPax(inFlight);
+    flyCards.push(prio
+      ? shortcutRow({
+          tone:"warn", icon:I.warn,
+          title:"Khách ưu tiên · ghế "+prio.id+" · "+prio.pax.name,
+          sub: prio.pax.ssr.length ? prio.pax.ssr.map(x=>x[1]).join(", ") : (CLS_LABEL[prio.pax.cls]||prio.pax.cls),
+          onClick: ()=>go(`/crew/flight/${inFlight.flightNo}/pax/${prio.id}`),
+        })
+      : shortcutRow({tone:"ok", icon:I.check, title:"Không còn khách ưu tiên chưa phục vụ", sub:"SSR & SkyBoss đã phục vụ hết", onClick:null}));
+    const units = legSaleUnits(inFlight.flightNo);
+    flyCards.push(shortcutRow({
+      tone:"info", icon:I.tag,
+      title:"Bán hàng · "+inFlight.flightNo,
+      sub: units ? units+" món đã bán" : "Thu tiền suất ăn / đồ uống / merchandise",
+      onClick: ()=>go(`/crew/sell-meal/${inFlight.flightNo}`),
+    }));
+  } else {
+    flyCards.push(emptyRow("Chưa có chặng nào đang bay"));
+  }
+  wrap.appendChild(phaseGroup("Đang bay", flyCards));
+
+  /* ── Sau bay ── */
+  const afterCards = [];
+  const pendingHandover = after.find(l => !handoverOf(l.flightNo).confirmed);
+  if (pendingHandover){
+    const dv = handoverDeviceCount(pendingHandover.flightNo), am = handoverAmenityCount(pendingHandover.flightNo);
+    afterCards.push(shortcutRow({
+      tone:"warn", icon:I.cube,
+      title:"Bàn giao · "+pendingHandover.flightNo+" vừa hạ cánh",
+      sub: (dv||am) ? `${dv} thiết bị · ${am} hàng hoá đã nhập` : "Chưa nhập thiết bị / hàng hoá",
+      onClick: ()=>go(`/crew/handover/${pendingHandover.flightNo}`),
+    }));
+  } else if (after.length){
+    afterCards.push(shortcutRow({tone:"ok", icon:I.check, title: after.length+" chặng đã hạ cánh", sub:"Đã bàn giao đầy đủ", onClick:()=>go("/crew/handover")}));
+  } else {
+    afterCards.push(emptyRow("Chưa có chặng nào hạ cánh"));
+    afterCards.push(shortcutRow({
+      tone:"info", icon:I.cube,
+      title:"Bàn giao",
+      sub:"Xem thiết bị · hàng hoá — khả dụng sau khi hạ cánh chặng đầu",
+      onClick: ()=>go("/crew/handover"),
+    }));
+  }
+  wrap.appendChild(phaseGroup("Sau bay", afterCards));
+
+  return wrap;
+}
+
 function LauncherHome(v){
   const roles = S.session.roles;
   const isCrew = ROLE_DASHBOARDS[resolvePrimaryRole(roles)] === "CrewDashboard";
   launcherHero(v, isCrew ? dutyRibbon() : null);
   const mods = modulesForRoles(roles);
   const body = h("div",{class:"body pad-tabs"});
+
+  if (isCrew) body.appendChild(homeShortcutsSection());
 
   body.appendChild(h("div",{class:"sec"}, h("h2",{},"Tính năng"),
     h("span",{class:"hint"}, `${mods.length} mục`)));
@@ -2609,12 +2805,12 @@ function purserOverviewPanel(){
   const ssrTot = ALL_LEGS.reduce((s,l)=>s+(l.ssrCount||0),0);
   const dutyAck = S.mealAckByGroup[dutyGroup().id] || emptyMealAck();
   const mealCell = !dutyAck.acked
-    ? ["Chờ", "Suất chưa nhận"]
+    ? ["Chờ", "Trolley cart chưa nhận"]
     : dutyAck.match === false
-      ? [dutyAck.totals ? fmtDelta(dutyAck.totals.delta) : "Lệch", "Suất · ghi lệch"]
-      : ["✓", "Đã nhận suất"];
+      ? [dutyAck.totals ? fmtDelta(dutyAck.totals.delta) : "Lệch", "Trolley cart · ghi lệch"]
+      : ["✓", "Đã nhận trolley cart"];
   const pct = dutyServePct();
-  const next = ALL_LEGS.find(l => S.simNow < l.sta) || ALL_LEGS[0];
+  const next = ALL_LEGS.find(l => legPhase(l).phase !== "after") || ALL_LEGS[0];
   const ns = legServeStats(next);
   return h("section",{class:"purserpanel"},
     h("div",{class:"pp-t"},"Tiến độ ca · Purser"),
@@ -2628,7 +2824,7 @@ function purserOverviewPanel(){
 }
 
 function cabinFocusPanel(){
-  const next = ALL_LEGS.find(l => S.simNow < l.sta) || ALL_LEGS[0];
+  const next = ALL_LEGS.find(l => legPhase(l).phase !== "after") || ALL_LEGS[0];
   const done = legDownloaded(next);
   const st = done ? legServeStats(next) : null;
   const mySt = S.session.station || "L1";
@@ -2664,17 +2860,40 @@ function cabinFocusPanel(){
   );
 }
 
-/* Chặng đã tải khi pack của nhóm chứa chặng đó đã xong (done > index trong nhóm). */
 const groupOfLeg = leg => GROUPS.find(g => g.legs.includes(leg));
-const packOf = gid => S.packByGroup[gid] || (S.packByGroup[gid] = {state:"missing", done:0, total:0, syncedAt:null});
-const packMbOf = g => (PACK_SIZE_MB * g.legs.length / ALL_LEGS.length).toFixed(1);
-const legDownloaded = leg => {
-  const g = groupOfLeg(leg);
-  if (!g) return false;
-  const p = packOf(g.id);
-  const i = g.legs.indexOf(leg);
-  return p.state === "ready" || p.done > i;
+/* Gói bay tải theo TỪNG CHẶNG (không theo cả nhóm) — chỉ Purser có quyền
+   crew_ops.pack.download; cabin crew chỉ xem trạng thái, chờ Purser tải. */
+const packOf = flightNo => S.packByLeg[flightNo] || (S.packByLeg[flightNo] = {state:"missing", syncedAt:null});
+const packMbOf = () => (PACK_SIZE_MB / ALL_LEGS.length).toFixed(1);
+const legDownloaded = leg => packOf(leg.flightNo).state === "ready";
+const groupPackSummary = g => {
+  const legs = g.legs.map(l => packOf(l.flightNo));
+  const ready = legs.filter(p => p.state === "ready").length;
+  const downloading = legs.some(p => p.state === "downloading");
+  return {ready, total:g.legs.length, downloading, allReady: ready === g.legs.length};
 };
+
+/* Phase (Trước/Trong/Sau) của 1 chặng — ưu tiên tín hiệu nghiệp vụ thật, chỉ
+   dùng STD/STA làm fallback (đánh dấu estimated:true) khi chưa có tín hiệu nào.
+   Không khoá chức năng theo phase — đây chỉ là nhãn hiển thị, tự backfill khi
+   có tín hiệu thật đến sau (self-healing), không cần sửa tay. */
+function legPhase(l){
+  const no = l.flightNo;
+  const anyServed = buildManifest(l).seats.some(s => s.id && S.served[no+":"+s.id]);
+  const handoverStarted = handoverDeviceCount(no) > 0 || handoverAmenityCount(no) > 0 || handoverOf(no).confirmed;
+
+  if (handoverStarted) return {phase:"after", estimated:false};
+  if (anyServed) return {phase:"flying", estimated:false};
+
+  const g = groupOfLeg(l);
+  const ack = g && S.mealAckByGroup[g.id];
+  const trolleyReady = !!(ack && ack.acked);
+
+  const now = S.simNow;
+  if (now >= l.sta) return {phase:"after", estimated:true};
+  if (now >= l.std) return {phase:"flying", estimated:true};
+  return {phase:"before", estimated:true, imminent: trolleyReady};
+}
 
 /* ═══ Hero vòng bay — cả rotation trong một hình ═══
    Trục x là thời gian thật từ STD chặng đầu tới STA chặng cuối, nên cung bay
@@ -2686,8 +2905,8 @@ function rotationHero(){
   const x = t => L + (t - t0) / span * (R - L);
   const arc = l => `M${x(l.std).toFixed(1)} ${BASE} Q${((x(l.std)+x(l.sta))/2).toFixed(1)} ${CY} ${x(l.sta).toFixed(1)} ${BASE}`;
 
-  const flying = LEGS.find(l => S.simNow >= l.std && S.simNow < l.sta);
-  const nextLeg = LEGS.find(l => S.simNow < l.std);
+  const flying = LEGS.find(l => legPhase(l).phase === "flying");
+  const nextLeg = LEGS.find(l => legPhase(l).phase === "before");
   const inDuty = S.simNow >= t0 && S.simNow <= t1;
 
   let g = "";
@@ -2820,36 +3039,45 @@ function flightsTimeline(st){
   return wrap;
 }
 
-/* 2 ô ngang trước bay: Tải gói | Nhận suất ăn (Bàn giao để sau chuyến). */
+/* 2 ô ngang trước bay: Tải gói | Nhận trolley cart (Bàn giao để sau chuyến).
+   Tải gói là quyền riêng của Purser (crew_ops.pack.download) — cabin chỉ xem trạng thái. */
 function groupActionStrip(g, gi){
-  const p = packOf(g.id);
-  const mb = packMbOf(g);
+  const sum = groupPackSummary(g);
+  const mb = (PACK_SIZE_MB * g.legs.length / ALL_LEGS.length).toFixed(1);
   const duty = dutyGroup();
   const isDuty = g.id === duty.id;
   const mealTot = groupMeals(duty).total;
   const ack = S.mealAckByGroup[duty.id] || emptyMealAck();
   const purser = isPurser(S.session.roles);
   let packBtn;
-  if (p.state === "ready"){
-    packBtn = h("button",{class:"gact pack done", onClick:()=>startDownload(g.id),
-      "aria-label":`Gói nhóm ${gi+1} đã tải · tải lại`},
-      h("div",{class:"gact-k"},
-        h("span",{class:"gact-ic"}, svg(I.check,16)),
-        h("span",{class:"gact-t"},"Đã tải")),
-      h("span",{class:"gact-s"}, `${mb} MB · tải lại`));
-  } else if (p.state === "downloading"){
+  if (sum.allReady){
+    packBtn = purser
+      ? h("button",{class:"gact pack done", onClick:()=>startDownloadGroup(g.id),
+          "aria-label":`Gói nhóm ${gi+1} đã tải · tải lại`},
+          h("div",{class:"gact-k"}, h("span",{class:"gact-ic"}, svg(I.check,16)), h("span",{class:"gact-t"},"Đã tải")),
+          h("span",{class:"gact-s"}, `${mb} MB · tải lại`))
+      : h("div",{class:"gact pack done"},
+          h("div",{class:"gact-k"}, h("span",{class:"gact-ic"}, svg(I.check,16)), h("span",{class:"gact-t"},"Đã tải")),
+          h("span",{class:"gact-s"}, `${mb} MB · ${sum.total} chặng`));
+  } else if (sum.downloading){
     packBtn = h("div",{class:"gact pack", role:"status", "aria-live":"polite"},
       h("div",{class:"gact-k"},
         h("span",{class:"gact-ic"}, svg(I.down,16)),
-        h("span",{class:"gact-t"}, `Đang tải ${p.done}/${p.total}`)),
-      h("div",{class:"gact-prog"}, h("i",{style:`width:${p.total? p.done/p.total*100 : 0}%`})));
-  } else {
-    packBtn = h("button",{class:"gact pack", onClick:()=>startDownload(g.id),
+        h("span",{class:"gact-t"}, `Đang tải ${sum.ready}/${sum.total}`)),
+      h("div",{class:"gact-prog"}, h("i",{style:`width:${sum.total? sum.ready/sum.total*100 : 0}%`})));
+  } else if (purser){
+    packBtn = h("button",{class:"gact pack", onClick:()=>startDownloadGroup(g.id),
       "aria-label":`Tải gói nhóm ${gi+1}`},
       h("div",{class:"gact-k"},
         h("span",{class:"gact-ic"}, svg(I.down,16)),
         h("span",{class:"gact-t"},"Tải gói")),
       h("span",{class:"gact-s"}, `${mb} MB · ${g.legs.length} chặng`));
+  } else {
+    packBtn = h("div",{class:"gact pack"},
+      h("div",{class:"gact-k"},
+        h("span",{class:"gact-ic"}, svg(I.down,16)),
+        h("span",{class:"gact-t"}, `${sum.ready}/${sum.total} chặng`)),
+      h("span",{class:"gact-s"}, "Chờ Purser tải gói bay"));
   }
   if (!isDuty) return h("div",{class:"gops"}, packBtn);
   const mealSub = !ack.acked
@@ -2858,29 +3086,29 @@ function groupActionStrip(g, gi){
       ? (ack.totals ? `${mealTot} phần · Δ ${fmtDelta(ack.totals.delta)}` : `${mealTot} phần · ghi lệch`)
       : `${mealTot} phần · đã đối chiếu`;
   const mealBtn = h("button",{class:"gact meal", onClick:()=>go("/crew/meals"),
-    "aria-label":"Nhận suất ăn"},
+    "aria-label":"Nhận trolley cart"},
     h("div",{class:"gact-k"},
       h("span",{class:"gact-ic"}, svg(I.food,16)),
-      h("span",{class:"gact-t"}, purser ? (ack.acked ? "Đã nhận suất" : "Nhận suất ăn") : "Nhận suất ăn")),
+      h("span",{class:"gact-t"}, ack.acked ? "Đã nhận trolley" : "Nhận trolley cart")),
     h("span",{class:"gact-s"}, mealSub));
   return h("div",{class:"gops"}, packBtn, mealBtn);
 }
 
 /* CTA tải gói bay theo nhóm (dùng ở màn khác nếu cần). */
 function packCTA(g){
-  const p = packOf(g.id);
-  const mb = packMbOf(g);
-  const start = () => startDownload(g.id);
-  if (p.state === "ready")
+  const sum = groupPackSummary(g);
+  const mb = (PACK_SIZE_MB * g.legs.length / ALL_LEGS.length).toFixed(1);
+  const start = () => startDownloadGroup(g.id);
+  if (sum.allReady)
     return h("div",{class:"packcta sm done"},
       h("span",{class:"ic"}, svg(I.check,22)),
       h("div",{class:"t"}, h("b",{},"Gói nhóm đã tải"), h("span",{},`${mb} MB · ${g.legs.length} chặng · offline`)),
       h("button",{class:"reload", onClick:start},"Tải lại"));
-  if (p.state === "downloading")
+  if (sum.downloading)
     return h("div",{class:"packcta sm"},
       h("span",{class:"ic"}, svg(I.down,22)),
-      h("div",{class:"t"}, h("b",{},`Đang tải… ${p.done}/${p.total} chặng`),
-        h("div",{class:"cprog"}, h("i",{style:`width:${p.done/p.total*100}%`}))));
+      h("div",{class:"t"}, h("b",{},`Đang tải… ${sum.ready}/${sum.total} chặng`),
+        h("div",{class:"cprog"}, h("i",{style:`width:${sum.ready/sum.total*100}%`}))));
   return h("button",{class:"packcta sm", onClick:start},
     h("span",{class:"ic"}, svg(I.down,22)),
     h("div",{class:"t"}, h("b",{},"Tải gói nhóm này"), h("span",{},`${mb} MB · ${g.legs.length} chặng · offline`)),
@@ -2889,11 +3117,9 @@ function packCTA(g){
 
 function flightList(){
   const list = h("div",{class:"flist"});
-  const g1 = GROUPS[0];
-  const p = packOf(g1.id);
   LEGS.forEach((l,i) => {
     const done = legDownloaded(l);
-    const busy = p.state === "downloading" && p.done === i;
+    const busy = packOf(l.flightNo).state === "downloading";
     const chip = STATUS_CHIP[l.status];
 
     list.appendChild(h("button",{class:"fl", onClick:()=>go(`/crew/flight/${l.flightNo}`)},
@@ -2953,13 +3179,15 @@ function FlightDetail(v, path){
       h("span",{class:"tag", style:"margin-left:auto"}, chip[1])),
   )));
 
-  /* trạng thái gói bay của chặng (theo nhóm) */
+  /* trạng thái gói bay của chặng (tải riêng từng chặng, chỉ Purser tải) */
+  const canDownload = hasPermission(S.session.roles,"crew_ops.pack.download");
   body.appendChild(st(h("div",{class:"pack"},
     h("span",{style:`color:var(--${done?"info":"ink-3"})`}, svg(done ? I.check : I.down, 22)),
     h("div",{class:"txt"},
       h("b",{}, done ? "Đã tải về máy" : "Chưa tải gói bay"),
-      h("span",{}, done ? "Xem được khi không có mạng" : "Cần mạng để mở danh sách khách")),
-    done || !g ? null : h("button",{class:"btn", onClick:()=>startDownload(g.id)},"Tải"),
+      h("span",{}, done ? "Xem được khi không có mạng" : (canDownload ? "Cần mạng để mở danh sách khách" : "Chờ Purser tải gói bay")),
+    ),
+    done || !canDownload ? null : h("button",{class:"btn", onClick:()=>startDownload(l.flightNo)},"Tải"),
   )));
 
   /* số lượng khách (thay cho hệ số tải) */
@@ -3066,6 +3294,7 @@ function SeatScreen(v, path){
 
   if (!packReady){
     const ac = g ? g.ac : ROTATION.aircraftType;
+    const canDownload = hasPermission(S.session.roles,"crew_ops.pack.download");
     seatChrome(v, {
       flightNo: l.flightNo, ac, origin: l.origin, destination: l.destination,
       onBack: ()=>back(`/crew/flight/${no}`),
@@ -3073,8 +3302,10 @@ function SeatScreen(v, path){
     v.appendChild(h("div",{class:"blockpack"},
       h("span",{style:"color:var(--brand)"}, svg(I.down,36)),
       h("b",{},"Chưa có dữ liệu offline"),
-      h("p",{},"Cần tải gói bay của nhóm trước khi mở seatmap / danh sách khách (UC-03 · BRule-06)."),
-      g ? h("button",{class:"cta", onClick:()=>startDownload(g.id)},"Tải gói nhóm này", svg(I.down,18)) : null,
+      h("p",{}, canDownload
+        ? "Cần tải gói bay của chặng này trước khi mở seatmap / danh sách khách (UC-03 · BRule-06)."
+        : "Chờ Purser tải gói bay của chặng này trước khi mở seatmap / danh sách khách."),
+      canDownload ? h("button",{class:"cta", onClick:()=>startDownload(l.flightNo)},"Tải gói chặng này", svg(I.down,18)) : null,
       h("button",{class:"cta ghost", style:"margin-top:8px", onClick:()=>back(`/crew/flight/${no}`)},"Quay lại")));
     return;
   }
@@ -3141,6 +3372,122 @@ function SeatScreen(v, path){
   });
   v.appendChild(body);
   swap(S.paxView === "map" ? "map" : (purser ? "map" : "list"));
+}
+
+/* ── /crew/flight/:no/cabin — màn hình phục vụ khoang (cabin crew, trên không) ──
+   Chỉ tập trung giai đoạn cruise: zone của tôi, khách cần chú ý, lối tắt phục vụ/bán hàng,
+   ghi nhận bất thường. Nhận trolley cart/kiểm kê trước bay là việc của Purser (MealPrep), không lặp ở đây. */
+function CabinServing(v, path){
+  if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
+  const no = decodeURIComponent(path.split("/")[3]);
+  const l = ALL_LEGS.find(x => x.flightNo === no);
+  const purser = isPurser(S.session.roles);
+  const zone = purser ? "ALL" : (S.session.station || "L1");
+  bar(v,{title:"Phục vụ khoang",
+    subtitle: l ? l.flightNo+(zone!=="ALL" ? " · Cửa "+zone : " · Toàn tàu") : undefined,
+    onBack:()=>back(l ? `/crew/flight/${no}` : "/crew")});
+  if (!l){ v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng."))); return; }
+
+  if (!legDownloaded(l)){
+    v.appendChild(h("div",{class:"blockpack"},
+      h("span",{style:"color:var(--brand)"}, svg(I.down,36)),
+      h("b",{},"Chưa có dữ liệu offline"),
+      h("p",{},"Cần tải gói bay trước khi mở màn hình phục vụ."),
+      h("button",{class:"cta", onClick:()=>go("/crew/flight/"+no)},"Về chi tiết chặng")));
+    return;
+  }
+
+  const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
+
+  /* 1. Zone của tôi — số liệu tức thời */
+  const ss = legServeStats(l, zone);
+  body.appendChild(h("section",{class:"purserpanel"},
+    h("div",{class:"pp-t"}, zone==="ALL" ? "Toàn tàu · "+l.flightNo : "Zone của tôi · Cửa "+zone),
+    h("div",{class:"pp-prog"},
+      h("div",{class:"pp-cell"}, h("b",{}, ss.pct+"%"), h("span",{},"Đã phục vụ")),
+      h("div",{class:"pp-cell"}, h("b",{}, String(ss.unserved)), h("span",{},"Chưa phục vụ")),
+      h("div",{class:"pp-cell"}, h("b",{}, String(ss.ssrOpen)), h("span",{},"SSR còn")),
+      h("div",{class:"pp-cell"}, h("b",{}, String(ss.sbOpen)), h("span",{},"SB chưa phục vụ")))));
+
+  /* 2. Khách cần chú ý — SSR/SkyBoss chưa phục vụ trong zone, tối đa 3 */
+  const man = buildManifest(l);
+  const occ = man.seats.filter(s => man.map[s.id] && (zone==="ALL" || seatInZone(s.id, zone)));
+  const priority = occ.filter(s => {
+    if (S.served[l.flightNo+":"+s.id]) return false;
+    const p = man.map[s.id];
+    return p.ssr.length > 0 || p.cls === "sbbiz" || p.cls === "skyboss";
+  }).slice(0,3);
+  body.appendChild(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:4px"},"Khách cần chú ý"),
+    ...(priority.length ? priority.map(s => {
+      const p = man.map[s.id];
+      return h("button",{type:"button", class:"steprow", style:"width:100%;background:none;border:0;text-align:left;cursor:pointer",
+        onClick:()=>go(`/crew/flight/${no}/pax/${s.id}`)},
+        h("span",{class:"seatpill "+p.cls}, s.id),
+        h("div",{style:"flex:1;min-width:0"},
+          h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, p.name),
+          h("span",{style:"font:400 12px Plus Jakarta Sans;color:var(--n500)"},
+            p.ssr.length ? p.ssr.map(x=>x[1]).join(", ") : (CLS_LABEL[p.cls]||p.cls))),
+        h("span",{class:"chev"}, svg(I.chev,16)));
+    }) : [h("p",{style:"font:400 13px Plus Jakarta Sans;color:var(--ink-2)"},"Không còn khách ưu tiên chưa phục vụ")])));
+
+  /* 3. Lối tắt phục vụ */
+  body.appendChild(h("button",{type:"button", class:"seatentry", onClick:()=>{ S.paxView="map"; go(`/crew/flight/${no}/seats`); }},
+    h("span",{class:"si"}, svg(I.grid,20)),
+    h("div",{style:"flex:1;text-align:left;min-width:0"}, h("b",{},"Sơ đồ ghế"), h("span",{},"Xem trực quan zone")),
+    h("span",{class:"chev"}, svg(I.chev,18))));
+  body.appendChild(h("button",{type:"button", class:"seatentry", onClick:()=>{ S.paxView="list"; go(`/crew/flight/${no}/seats`); }},
+    h("span",{class:"si", style:"background:var(--warning-bg);color:var(--warning-text)"}, svg(I.user,20)),
+    h("div",{style:"flex:1;text-align:left;min-width:0"}, h("b",{},"Danh sách chưa phục vụ"), h("span",{}, ss.unserved+" khách")),
+    h("span",{class:"chev"}, svg(I.chev,18))));
+  body.appendChild(h("button",{type:"button", class:"seatentry", onClick:()=>go(`/crew/sell-meal/${no}`)},
+    h("span",{class:"si", style:"background:var(--success-bg);color:var(--success-text)"}, svg(I.tag,20)),
+    h("div",{style:"flex:1;text-align:left;min-width:0"}, h("b",{},"Bán hàng"),
+      h("span",{}, legSaleUnits(no) ? legSaleUnits(no)+" món đã bán" : "Thu tiền suất ăn / đồ uống / merchandise")),
+    h("span",{class:"chev"}, svg(I.chev,18))));
+
+  /* 4. Ghi nhận bất thường — đọc lại được khi bàn giao đổi tổ (HandoverDetail) */
+  let selKind = IRREGULARITY_KINDS[0].id;
+  let noteSeat = "", noteText = "";
+  const noteSeatIn = h("input",{type:"text", placeholder:"12A", "aria-label":"Ghế liên quan (tuỳ chọn)",
+    onInput:e=>{ noteSeat = e.target.value; }});
+  const noteTextIn = h("input",{type:"text", placeholder:"Mô tả ngắn gọn…", "aria-label":"Mô tả bất thường",
+    onInput:e=>{ noteText = e.target.value; }});
+  const kindChips = IRREGULARITY_KINDS.map(k => h("button",{type:"button", class:"zchip"+(selKind===k.id?" on":""),
+    onClick:function(){
+      selKind = k.id;
+      kindChips.forEach((b,i) => b.classList.toggle("on", IRREGULARITY_KINDS[i].id === selKind));
+    }}, k.label));
+  const irList = h("div");
+  const paintIrList = () => {
+    const list = irregularitiesOf(no);
+    irList.replaceChildren(list.length
+      ? h("div",{style:"display:flex;flex-direction:column;gap:2px;margin-bottom:12px"},
+          ...list.slice().reverse().map(r => h("div",{class:"steprow", style:"display:block;padding:9px 0"},
+            h("div",{style:"display:flex;align-items:center;gap:8px"},
+              h("span",{class:"chip warn"}, IRREGULARITY_LAB[r.kind]||r.kind),
+              r.seat ? h("span",{style:"font:600 12px Plus Jakarta Sans;color:var(--ink-2)"}, "Ghế "+r.seat) : null,
+              h("span",{style:"font:400 11px Plus Jakarta Sans;color:var(--ink-3);margin-left:auto"}, hhmm(r.at))),
+            h("p",{style:"font:400 13px/19px Plus Jakarta Sans;color:var(--ink);margin-top:4px"}, r.note))))
+      : h("p",{style:"font:400 13px Plus Jakarta Sans;color:var(--ink-2);margin-bottom:12px"},"Chưa có ghi nhận nào trên chuyến này."));
+  };
+  paintIrList();
+  const saveIrBtn = h("button",{type:"button", class:"cta ghost", style:"margin-top:12px", onClick:()=>{
+    if (!noteText.trim()) return;
+    irregularitiesOf(no).push({id:"IR"+Date.now().toString(36), at:S.simNow, kind:selKind, seat:noteSeat.trim()||null, note:noteText.trim()});
+    noteSeat = ""; noteText = ""; noteSeatIn.value = ""; noteTextIn.value = "";
+    paintIrList();
+  }}, "Lưu ghi nhận", svg(I.file,16));
+  body.appendChild(h("section",{class:"card", style:"padding:14px"},
+    h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:8px"},"Ghi nhận bất thường"),
+    irList,
+    h("div",{class:"zonechips", style:"margin-bottom:10px"}, ...kindChips),
+    h("div",{class:"cashgrid", style:"grid-template-columns:1fr 2fr;margin-top:0"},
+      h("div",{class:"cashfield"}, h("label",{},"Ghế (tuỳ chọn)"), noteSeatIn),
+      h("div",{class:"cashfield"}, h("label",{},"Mô tả"), noteTextIn)),
+    saveIrBtn));
+
+  v.appendChild(body);
 }
 
 /* ── /crew/meals — nhận uplift catering trước bay (trolley) ── */
@@ -3232,14 +3579,20 @@ function mealSections(g, ctx){
   const sbKids = [
     ...ackKids,
     mealHd("①","Suất theo chặng", g.region || "Theo chặng", m.sbTotal),
-    ...(m.sbOrders.length ? m.sbOrders.flatMap(({leg, order}) => [
-      h("div",{class:"legmeal", style:"border-top:1px solid var(--n100);padding-top:12px;margin-top:4px"},
-        h("div",{class:"lm-l"},
-          h("b",{}, leg.flightNo),
-          h("span",{}, `${leg.origin} → ${leg.destination} · ${hhmm(leg.std)}`)),
-        h("span",{class:"lm-n"}, String(order.total))),
-      ...order.lines.map(line => mealRow(line, leg.flightNo)),
-    ]) : [h("p",{class:"mealnote", style:"margin-top:8px"},"Không có suất theo chặng trên nhóm này.")]),
+    ...(m.sbOrders.length ? m.sbOrders.flatMap(({leg, order}) => {
+      const isOriginLeg = g.legs.indexOf(leg) === 0;
+      const transitNote = !isOriginLeg && CATERING_STATIONS.has(leg.origin);
+      return [
+        h("div",{class:"legmeal", style:"border-top:1px solid var(--n100);padding-top:12px;margin-top:4px"},
+          h("div",{class:"lm-l"},
+            h("b",{}, leg.flightNo),
+            h("span",{}, `${leg.origin} → ${leg.destination} · ${hhmm(leg.std)}`),
+            transitNote ? h("span",{style:"display:block;margin:2px 0 0;font:500 11px Plus Jakarta Sans;color:var(--warning-text)"},
+              `Không nạp lại tại ${leg.origin} — đã cover từ chặng đầu`) : null),
+          h("span",{class:"lm-n"}, String(order.total))),
+        ...order.lines.map(line => mealRow(line, leg.flightNo)),
+      ];
+    }) : [h("p",{class:"mealnote", style:"margin-top:8px"},"Không có suất theo chặng trên nhóm này.")]),
   ];
   out.push(h("section",{class:"card mealcard"}, ...sbKids));
 
@@ -3292,12 +3645,58 @@ function mealSections(g, ctx){
   out.push(h("section",{class:"card mealcard"}, ...cockpitKids));
   return out;
 }
+/* Thiết bị & hàng hoá nhận tại origin — phần của trolley cart không có số "kế hoạch"
+   nguồn (khác suất ăn), nên chỉ ghi nhận thực nhận, khoá theo cùng `editing` với suất ăn. */
+function trolleyDeviceCard(g, editing){
+  const rec = S.trolleyDeviceByGroup[g.id];
+  const card = h("section",{class:"card mealcard"});
+  card.appendChild(mealHd("③","Thiết bị","iPad · máy POS nhận tại "+g.legs[0].origin, null));
+  HANDOVER_DEVICES.forEach(d => {
+    const on = !!rec[d.id];
+    card.appendChild(h("button",{
+      type:"button", class:"steprow",
+      style:"width:100%;background:none;border:0;cursor:"+(editing?"pointer":"default")+";text-align:left",
+      disabled: !editing,
+      onClick:()=>{ if (!editing) return; rec[d.id] = !rec[d.id]; refresh(); },
+    },
+      h("div",{style:"flex:1"},
+        h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, d.label),
+        h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, d.sub)),
+      h("span",{class:"chip "+(on?"ok":"")}, on ? "Đã nhận" : "Chưa")));
+  });
+  return card;
+}
+function trolleyAmenityCard(g, editing){
+  const rec = S.trolleyAmenityByGroup[g.id];
+  const card = h("section",{class:"card mealcard"});
+  card.appendChild(mealHd("④","Hàng hoá & amenities","Nhận tại "+g.legs[0].origin+" · số lượng thực tế", null));
+  HANDOVER_GOODS.forEach(a => {
+    const qty = rec[a.code] || 0;
+    card.appendChild(h("div",{class:"steprow"},
+      h("div",{style:"flex:1;min-width:0"},
+        h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, a.label),
+        h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, a.code+" · "+a.unit)),
+      h("div",{class:"stepper"},
+        h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: !editing || qty<=0, onClick:()=>{
+          if (!editing) return;
+          rec[a.code] = Math.max(0, qty - 1);
+          refresh();
+        }},"−"),
+        h("span",{class:"sv"}, String(qty)),
+        h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: !editing, onClick:()=>{
+          if (!editing) return;
+          rec[a.code] = qty + 1;
+          refresh();
+        }},"+"))));
+  });
+  return card;
+}
 function MealPrep(v){
   if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
   const purser = isPurser(S.session.roles);
   const g = dutyGroup();
   const planLines = mealVariancePlanLines(g);
-  bar(v,{title:"Nhận suất ăn", subtitle: purser ? "Trước bay · đối chiếu số lượng" : "Trước bay · xem số liệu", onBack:()=>back("/crew")});
+  bar(v,{title:"Nhận trolley cart", subtitle: purser ? "Trước bay · suất ăn · thiết bị · hàng hoá" : "Trước bay · xem số liệu", onBack:()=>back("/crew")});
   const body = h("div",{class:"body pad-tabs white", style:"padding-top:14px;display:flex;flex-direction:column;gap:14px"});
   const content = h("div",{style:"display:flex;flex-direction:column;gap:14px"});
   let draftRecv = mealRecvMapFromPlan(planLines);
@@ -3347,7 +3746,7 @@ function MealPrep(v){
           };
           paint();
         },
-      }, "Xác nhận suất ăn", svg(snap.absDelta > 0 ? I.warn : I.check, 18));
+      }, "Xác nhận trolley cart", svg(snap.absDelta > 0 ? I.warn : I.check, 18));
       resetBtn = null;
     } else if (purser && ack.acked){
       confirmBtn = null;
@@ -3355,24 +3754,31 @@ function MealPrep(v){
         S.mealAckByGroup[g.id] = emptyMealAck();
         draftRecv = mealRecvMapFromPlan(planLines);
         paint();
-      }}, "Đã xác nhận · chạm để huỷ", svg(I.check,18));
+      }}, "Đã xác nhận trolley cart · chạm để huỷ", svg(I.check,18));
     } else {
       confirmBtn = null;
       resetBtn = null;
     }
 
+    /* confirmBtn/resetBtn hiển thị 1 lần dưới cùng — sau cả suất ăn lẫn thiết bị/hàng hoá,
+       nên không truyền vào ctx của mealSections (mealSections vẫn chỉ vẽ card suất ăn). */
     const ctx = {
-      purser, ack, planLines, snap, varSumEl, stepperEl, confirmBtn, resetBtn,
+      purser, ack, planLines, snap, varSumEl, stepperEl, confirmBtn:null, resetBtn:null,
     };
 
+    const origin = g.legs[0].origin;
     const kids = [
       h("div",{class:"dutybanner"},
         h("span",{class:"db-ic"}, svg(I.plane,18)),
         h("div",{style:"min-width:0"},
-          h("b",{}, `Ca trực · ${g.registration}`),
-          h("span",{}, `${g.route} · nhóm uplift nhận hàng`))),
+          h("b",{}, `Trolley cart · ${g.registration}`),
+          h("span",{}, `Nạp 1 lần tại ${origin} · cover ${g.legs.length} chặng · không nạp lại khi quá cảnh`))),
       ...mealSections(g, ctx),
+      trolleyDeviceCard(g, editing),
+      trolleyAmenityCard(g, editing),
     ];
+    if (confirmBtn) kids.push(confirmBtn);
+    if (resetBtn) kids.push(resetBtn);
     content.replaceChildren(...kids);
   };
 
@@ -3660,11 +4066,11 @@ function MealSellFlow(v, path){
   if (!seat){
     bar(v,{title:l.flightNo, subtitle:"Chọn số ghế · "+l.origin+"→"+l.destination, onBack:()=>back()});
     if (!legDownloaded(l)){
-      const g = groupOfLeg(l);
+      const canDownload = hasPermission(S.session.roles,"crew_ops.pack.download");
       const blk = h("div",{class:"blockpack"},
         h("b",{},"Chưa có pack offline"),
-        h("p",{},"Tải gói bay trước khi bán hàng theo ghế."),
-        g ? h("button",{type:"button", class:"cta", onClick:()=>startDownload(g.id)},"Tải gói bay ngay", svg(I.down,18)) : null,
+        h("p",{}, canDownload ? "Tải gói bay trước khi bán hàng theo ghế." : "Chờ Purser tải gói bay trước khi bán hàng theo ghế."),
+        canDownload ? h("button",{type:"button", class:"cta", onClick:()=>startDownload(l.flightNo)},"Tải gói bay ngay", svg(I.down,18)) : null,
         h("button",{type:"button", class:"cta ghost", style:"margin-top:8px", onClick:()=>go("/crew/flight/"+l.flightNo)},"Về chi tiết chặng", svg(I.back,18)));
       v.appendChild(blk);
       return;
@@ -3711,23 +4117,98 @@ function MealSellFlow(v, path){
   }
 
   let catFilter = "Tất cả";
+  let menuQuery = "";
   const qtyByCode = Object.fromEntries(SALE_MENU.map(m => [m.code, 0]));
   let fx = "VND";
   let chgFx = "VND";
   let tenderStr = "";
-  const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
+  const body = h("div",{class:"body sellpay", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
   const menuBox = h("div");
-  const orderBox = h("section",{
-    class:"ordertotal",
-    "aria-label":"Tổng đơn hàng",
-    "aria-live":"polite",
-  });
+  const menuList = h("div",{class:"sale-menu-list"});
+  const chipsHost = h("div",{class:"salechips", role:"tablist", "aria-label":"Danh mục bán hàng"});
+  const menuSearchInput = h("input",{type:"text", placeholder:"Tìm món / mã…",
+    "aria-label":"Tìm món hàng",
+    onInput:e=>{
+      menuQuery = e.target.value.trim().toLowerCase();
+      menuClearBtn.style.display = menuQuery ? "grid" : "none";
+      paintMenu();
+    }});
+  const menuClearBtn = h("button",{type:"button", class:"pxclear", "aria-label":"Xoá tìm kiếm", style:"display:none",
+    onClick:()=>{
+      menuSearchInput.value = "";
+      menuQuery = "";
+      menuClearBtn.style.display = "none";
+      paintMenu();
+      menuSearchInput.focus();
+    }}, svg(I.x,16));
+  const menuSearchBar = h("div",{class:"pxsearch"}, svg(I.search,18), menuSearchInput, menuClearBtn);
+  const menuSticky = h("div",{class:"plbar sale-plbar"}, menuSearchBar, chipsHost);
+  menuBox.appendChild(h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:8px"},"Chọn hàng"));
+  menuBox.appendChild(menuSticky);
+  menuBox.appendChild(menuList);
+
+  let payOpen = false;
+  const spbCount = h("span",{class:"spb-count"},"0 món");
+  const spbTotal = h("span",{class:"spb-total"},"0₫");
+  const barCta = h("button",{type:"button", class:"cta", disabled:true, onClick:()=>openPaySheet()},
+    "Thu tiền", svg(I.arrow,18));
+  const sellBar = h("div",{class:"sellpay-bar", "aria-label":"Tổng đơn", "aria-live":"polite"},
+    spbCount, spbTotal, barCta);
+  const psSummary = h("div",{class:"ps-summary"},"0 loại · 0 món", h("b",{},"0₫"));
+  const payScrim = h("div",{class:"pay-scrim"});
   const payBox = h("div");
   const dueEl = h("div",{class:"pamt"});
   const dueSub = h("div",{style:"font:500 12px Plus Jakarta Sans;color:var(--ink-2);margin-top:4px"});
   const changeEl = h("div",{class:"cashchg muted"},"Nhập tiền nhận");
   const confirmBtn = h("button",{type:"button", class:"cta", style:"margin-top:12px", disabled:true},
     "Xác nhận đã thu tiền", svg(I.check,18));
+  const cancelBtn = h("button",{type:"button", class:"cta ghost ps-cancel", onClick:()=>closePaySheet()},"Huỷ");
+  const psClose = h("button",{type:"button", class:"ps-close", "aria-label":"Đóng", onClick:()=>closePaySheet()}, svg(I.x,16));
+  const paySheet = h("aside",{class:"pay-sheet", role:"dialog", "aria-modal":"true", "aria-label":"Thu tiền", "aria-hidden":"true"},
+    h("div",{class:"grab"}),
+    h("div",{class:"ps-head"},
+      h("div",{},
+        h("div",{class:"ps-title"},"Thu tiền"),
+        h("div",{class:"ps-sub"}, "Ghế "+seat+" · "+pax.name)),
+      psClose),
+    psSummary,
+    payBox,
+    cancelBtn);
+  const openPaySheet = () => {
+    if (cartUnitCount() === 0) return;
+    payOpen = true;
+    paySheet.classList.add("on"); payScrim.classList.add("on");
+    paySheet.setAttribute("aria-hidden","false");
+    setTimeout(()=>{ try{ tenderIn.focus(); }catch(e){} }, 260);
+  };
+  const closePaySheet = () => {
+    payOpen = false;
+    paySheet.classList.remove("on"); payScrim.classList.remove("on");
+    paySheet.setAttribute("aria-hidden","true");
+  };
+  payScrim.onclick = closePaySheet;
+  paySheet.addEventListener("keydown", e => { if (e.key === "Escape") closePaySheet(); });
+  /* Vuốt xuống trên sheet để đóng — cùng pattern với .insp */
+  (() => {
+    let y0 = 0, t0 = 0, dragging = false;
+    paySheet.addEventListener("pointerdown", e => {
+      if (paySheet.scrollTop > 0) return;
+      dragging = true; y0 = e.clientY; t0 = e.timeStamp;
+      paySheet.style.transition = "none";
+    });
+    paySheet.addEventListener("pointermove", e => {
+      if (!dragging) return;
+      const dy = Math.max(0, e.clientY - y0);
+      paySheet.style.transform = `translateY(${dy}px)`;
+    });
+    paySheet.addEventListener("pointerup", e => {
+      if (!dragging) return;
+      dragging = false;
+      paySheet.style.transition = ""; paySheet.style.transform = "";
+      const dy = e.clientY - y0, v = dy / Math.max(1, e.timeStamp - t0);
+      if (dy > 90 || v > 0.11) closePaySheet();
+    });
+  })();
   const fmtFx = (amt, code) => {
     if (code==="VND") return Math.round(amt).toLocaleString("vi-VN")+"₫";
     const dig = code==="USD" ? 2 : 0;
@@ -3737,38 +4218,28 @@ function MealSellFlow(v, path){
     const n = parseFloat(String(s).replace(/,/g,"").replace(/\s/g,""));
     return Number.isFinite(n) ? n : NaN;
   };
-  const filteredMenu = () => catFilter === "Tất cả" ? SALE_MENU : SALE_MENU.filter(m => m.cat === catFilter);
+  const filteredMenu = () => {
+    let list = catFilter === "Tất cả" ? SALE_MENU : SALE_MENU.filter(m => m.cat === catFilter);
+    if (menuQuery){
+      list = list.filter(m =>
+        `${m.name} ${m.code} ${m.cat}`.toLowerCase().includes(menuQuery));
+    }
+    return list;
+  };
   const cartLines = () => SALE_MENU.filter(m => (qtyByCode[m.code] || 0) > 0)
     .map(m => ({...m, qty: qtyByCode[m.code]}));
   const cartVnd = () => cartLines().reduce((s, m) => s + m.vnd * m.qty, 0);
   const cartUnitCount = () => cartLines().reduce((s, m) => s + m.qty, 0);
-  const paintOrder = () => {
+  const paintBar = () => {
     const lines = cartLines();
     const total = cartVnd();
     const units = cartUnitCount();
-    orderBox.className = "ordertotal"+(lines.length ? " has-items" : "");
-    if (!lines.length){
-      orderBox.replaceChildren(
-        h("div",{class:"ot-head"},
-          h("span",{class:"ot-title"},"Tổng đơn"),
-          h("span",{class:"ot-meta"},"0 món")),
-        h("div",{class:"ot-empty"},"Chưa chọn món — tăng số lượng ở danh sách trên"));
-      return;
-    }
-    orderBox.replaceChildren(
-      h("div",{class:"ot-head"},
-        h("span",{class:"ot-title"},"Tổng đơn"),
-        h("span",{class:"ot-meta"}, lines.length+" loại · "+units+" món")),
-      h("div",{class:"ot-lines", role:"list"},
-        ...lines.map(m => h("div",{class:"ot-line", role:"listitem"},
-          h("span",{class:"ot-name", title:m.name}, m.name),
-          h("span",{class:"ot-qty"},"×"+m.qty),
-          h("span",{class:"ot-amt"}, (m.vnd * m.qty).toLocaleString("vi-VN")+"₫")
-        ))),
-      h("div",{class:"ot-foot"},
-        h("span",{class:"ot-foot-lab"},"Tổng cộng"),
-        h("span",{class:"ot-foot-amt"}, total.toLocaleString("vi-VN")+"₫"))
-    );
+    spbCount.textContent = units+" món";
+    spbTotal.textContent = total.toLocaleString("vi-VN")+"₫";
+    barCta.disabled = units === 0;
+    psSummary.replaceChildren(
+      lines.length ? (lines.length+" loại · "+units+" món") : "Chưa chọn món",
+      h("b",{}, total.toLocaleString("vi-VN")+"₫"));
   };
   const qtyStepper = (forCode) => {
     const qty = qtyByCode[forCode] || 0;
@@ -3777,13 +4248,13 @@ function MealSellFlow(v, path){
       onClick:e=>{
         e.stopPropagation();
         qtyByCode[forCode] = Math.max(0, qty - 1);
-        syncCash(); paint();
+        syncCash(); paintMenu();
       }}, "−");
     const plus = h("button",{type:"button", "aria-label":"Tăng số lượng",
       onClick:e=>{
         e.stopPropagation();
         qtyByCode[forCode] = qty + 1;
-        syncCash(); paint();
+        syncCash(); paintMenu();
       }}, "+");
     return h("div",{class:"stepper", onClick:e=>e.stopPropagation()},
       minus, h("span",{class:"sv"}, String(qty)), plus);
@@ -3795,12 +4266,12 @@ function MealSellFlow(v, path){
     const lines = cartLines();
     const total = cartVnd();
     const units = cartUnitCount();
-    paintOrder();
+    paintBar();
     dueEl.textContent = fxAmount(total, fx).label;
     if (!lines.length){
-      dueSub.textContent = "Xem chi tiết ở Tổng đơn phía trên";
+      dueSub.textContent = "Chưa chọn món";
     } else if (fx === "VND"){
-      dueSub.textContent = units+" món · khớp Tổng đơn";
+      dueSub.textContent = units+" món";
     } else {
       dueSub.textContent = units+" món · quy đổi từ "+total.toLocaleString("vi-VN")+"₫";
     }
@@ -3856,37 +4327,43 @@ function MealSellFlow(v, path){
       pax.services.push([bought.code, bought.name+" (mua trên chuyến ×"+bought.qty+")", bought.qty]);
     });
     S.served[l.flightNo+":"+seat] = true;
+    closePaySheet();
     go(`/crew/flight/${l.flightNo}/pax/${seat}`);
   });
-  const paint = () => {
+  const paintMenu = () => {
+    chipsHost.replaceChildren(
+      ...SALE_CATS.map(c => h("button",{
+        type:"button", class:"zchip"+(catFilter===c?" on":""),
+        role:"tab", "aria-selected": catFilter===c ? "true" : "false",
+        onClick:()=>{ catFilter = c; paintMenu(); },
+      }, c)));
     const items = filteredMenu();
-    menuBox.replaceChildren(
-      h("b",{class:"hdg", style:"font-size:15px;display:block;margin-bottom:8px"},"Chọn hàng"),
-      h("div",{class:"salechips", role:"tablist", "aria-label":"Danh mục bán hàng"},
-        ...SALE_CATS.map(c => h("button",{
-          type:"button", class:"zchip"+(catFilter===c?" on":""),
-          role:"tab", "aria-selected": catFilter===c ? "true" : "false",
-          onClick:()=>{ catFilter = c; paint(); },
-        }, c))),
-      ...items.map(m => {
-        const qty = qtyByCode[m.code] || 0;
-        const on = qty > 0;
-        const linePx = on ? m.vnd * qty : m.vnd;
-        return h("div",{class:"menuitem"+(on?" on":""), role:"group", "aria-label":m.name},
-          h("button",{type:"button", class:"mi-main", onClick:()=>{
-            if (qty === 0) qtyByCode[m.code] = 1;
-            syncCash(); paint();
-          }},
-            h("span",{class:"svcic"}, svg(saleIcon(m.cat),20)),
-            h("div",{style:"flex:1;min-width:0"},
-              h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, m.name),
-              h("span",{style:"font:400 12px Plus Jakarta Sans;color:var(--n500)"}, m.cat+" · "+m.code))),
-          h("div",{class:"mi-side"},
-            h("span",{class:"miprice"}, linePx.toLocaleString("vi-VN")+"₫"),
-            qtyStepper(m.code))
-        );
-      })
-    );
+    if (!items.length){
+      menuList.replaceChildren(h("div",{class:"sale-empty"},
+        menuQuery ? "Không tìm thấy món" : "Không có món trong danh mục này"));
+      return;
+    }
+    menuList.replaceChildren(...items.map(m => {
+      const qty = qtyByCode[m.code] || 0;
+      const on = qty > 0;
+      const linePx = on ? m.vnd * qty : m.vnd;
+      return h("div",{class:"menuitem"+(on?" on":""), role:"group", "aria-label":m.name},
+        h("button",{type:"button", class:"mi-main", onClick:()=>{
+          if (qty === 0) qtyByCode[m.code] = 1;
+          syncCash(); paintMenu();
+        }},
+          h("span",{class:"svcic"}, svg(saleIcon(m.cat),20)),
+          h("div",{style:"flex:1;min-width:0"},
+            h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, m.name),
+            h("span",{style:"font:400 12px Plus Jakarta Sans;color:var(--n500)"}, m.cat+" · "+m.code))),
+        h("div",{class:"mi-side"},
+          h("span",{class:"miprice"}, linePx.toLocaleString("vi-VN")+"₫"),
+          qtyStepper(m.code))
+      );
+    }));
+  };
+  const paint = () => {
+    paintMenu();
     payBox.replaceChildren(
       h("div",{class:"paybox"},
         h("div",{class:"plab"},"Số tiền phải thu"),
@@ -3914,7 +4391,9 @@ function MealSellFlow(v, path){
                 : "Khách đưa "+fx+" · crew trả lại bằng "+chgFx+" (quy đổi tỷ giá demo).")))),
       confirmBtn,
       h("p",{style:"font:400 12px Plus Jakarta Sans;color:var(--ink-3);margin-top:8px;text-align:center"},
-        "VD: khách đưa USD → chọn trả lại VND nếu không có USD lẻ")
+        fx === chgFx
+          ? "Nhập đủ số tiền nhận để xác nhận"
+          : "VD: khách đưa USD → chọn trả lại VND nếu không có USD lẻ")
     );
     syncCash();
   };
@@ -3926,10 +4405,11 @@ function MealSellFlow(v, path){
         h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"},
           (CLS_LABEL[pax.cls]||pax.cls)+" · PNR "+pax.pnr)))));
   body.appendChild(menuBox);
-  body.appendChild(orderBox);
-  body.appendChild(payBox);
   paint();
   v.appendChild(body);
+  v.appendChild(sellBar);
+  v.appendChild(payScrim);
+  v.appendChild(paySheet);
 }
 
 /* ── Bàn giao: thiết bị · hàng hoá trả về sau chặng ────────────── */
@@ -3941,7 +4421,7 @@ function HandoverHub(v){
     onBack:()=>back("/crew")});
   const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:10px;padding-top:16px"});
   body.appendChild(h("p",{style:"font:400 13px/20px Plus Jakarta Sans;color:var(--ink-2);margin:0 2px 4px"},
-    "Bàn giao iPad / máy POS và khai báo số hàng hoá trả về. Nhận suất ăn là mục riêng."));
+    "Trả iPad / máy POS và khai báo số hàng hoá còn lại sau chuyến. Nhận trolley cart trước bay là mục riêng."));
   ALL_LEGS.forEach(l => {
     const [tone, lab] = handoverStatus(l.flightNo);
     const am = handoverAmenityCount(l.flightNo);
@@ -3980,11 +4460,28 @@ function HandoverDetail(v, path){
 
   const rec = handoverOf(no);
   const locked = !!rec.confirmed;
+  const editable = purser && !locked;
+  const mode = rec.mode || "ground";
   const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
 
+  if (!purser){
+    body.appendChild(h("div",{class:"banner warn"}, svg(I.lock,18),
+      h("div",{}, h("b",{},"Chỉ Purser sửa được mục này"),
+        h("span",{}," Cabin crew chỉ xem — bàn giao thiết bị & hàng hoá do Purser phụ trách."))
+    ));
+  }
+
+  body.appendChild(h("div",{class:"zonechips"},
+    h("button",{type:"button", class:"zchip"+(mode==="ground"?" on":""), disabled:!editable,
+      onClick:()=>{ rec.mode = "ground"; refresh(); }}, "Bàn giao Ground"),
+    h("button",{type:"button", class:"zchip"+(mode==="crew"?" on":""), disabled:!editable,
+      onClick:()=>{ rec.mode = "crew"; refresh(); }}, "Đổi tổ bay")));
+
   body.appendChild(h("div",{class:"banner info"}, svg(I.cube,18),
-    h("div",{}, h("b",{},"Bàn giao thiết bị & hàng hoá"),
-      h("span",{}," Tick iPad / máy POS đã trả, nhập số hàng hoá trả về kho."))
+    h("div",{}, h("b",{}, mode==="crew" ? "Bàn giao vận hành cho tổ mới" : "Bàn giao thiết bị & hàng hoá"),
+      h("span",{}, mode==="crew"
+        ? "Tổ tiếp theo tiếp quản rotation — kèm ghi chú vận hành bên dưới."
+        : "Tick iPad / máy POS đã trả, nhập số hàng hoá trả về kho."))
   ));
 
   /* 1. Thiết bị — chỉ iPad & POS */
@@ -3995,9 +4492,9 @@ function HandoverDetail(v, path){
     devCard.appendChild(h("button",{
       type:"button",
       class:"steprow",
-      style:"width:100%;background:none;border:0;cursor:"+(locked?"default":"pointer")+";text-align:left",
-      disabled: locked,
-      onClick:()=>{ if (locked) return; rec.devices[d.id] = !rec.devices[d.id]; refresh(); },
+      style:"width:100%;background:none;border:0;cursor:"+(editable?"pointer":"default")+";text-align:left",
+      disabled: !editable,
+      onClick:()=>{ if (!editable) return; rec.devices[d.id] = !rec.devices[d.id]; refresh(); },
     },
       h("div",{style:"flex:1"},
         h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, d.label),
@@ -4021,14 +4518,14 @@ function HandoverDetail(v, path){
         h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, a.code+" · "+a.unit)
       ),
       h("div",{class:"stepper"},
-        h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: locked || qty<=0, onClick:()=>{
-          if (locked) return;
+        h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: !editable || qty<=0, onClick:()=>{
+          if (!editable) return;
           rec.amenityQty[a.code] = Math.max(0, qty - 1);
           refresh();
         }},"−"),
         h("span",{class:"sv"}, String(qty)),
-        h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: locked, onClick:()=>{
-          if (locked) return;
+        h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: !editable, onClick:()=>{
+          if (!editable) return;
           rec.amenityQty[a.code] = qty + 1;
           refresh();
         }},"+")
@@ -4037,13 +4534,40 @@ function HandoverDetail(v, path){
   });
   body.appendChild(amCard);
 
-  const canConfirm = handoverDeviceCount(no) > 0 || handoverAmenityCount(no) > 0;
-  if (purser || !locked){
+  /* 3. Bàn giao vận hành — chỉ khi đổi tổ giữa rotation, tổ mới cần biết đã tới đâu */
+  if (mode === "crew"){
+    const ss = legServeStats(l);
+    const irList = irregularitiesOf(no);
+    const opCard = h("section",{class:"card", style:"padding:4px 14px 8px"});
+    opCard.appendChild(h("div",{style:"font:700 14px Plus Jakarta Sans;padding:12px 0 6px"},"3. Bàn giao vận hành"));
+    opCard.appendChild(h("div",{class:"pp-prog"},
+      h("div",{class:"pp-cell"}, h("b",{}, String(ss.unserved)), h("span",{},"Chưa phục vụ")),
+      h("div",{class:"pp-cell"}, h("b",{}, String(legSaleTxCount(no))), h("span",{},"Giao dịch bán hàng")),
+      h("div",{class:"pp-cell"}, h("b",{}, legSaleVnd(no).toLocaleString("vi-VN")), h("span",{},"Doanh thu (₫)")),
+      h("div",{class:"pp-cell"}, h("b",{}, String(irList.length)), h("span",{},"Ghi nhận bất thường"))));
+    if (irList.length){
+      opCard.appendChild(h("div",{style:"display:flex;flex-direction:column;gap:2px;margin-top:4px"},
+        ...irList.slice().reverse().map(r => h("div",{class:"steprow"},
+          h("div",{style:"flex:1;min-width:0"},
+            h("div",{style:"display:flex;align-items:center;gap:8px"},
+              h("span",{class:"chip warn"}, IRREGULARITY_LAB[r.kind]||r.kind),
+              r.seat ? h("span",{style:"font:600 12px Plus Jakarta Sans;color:var(--ink-2)"}, "Ghế "+r.seat) : null),
+            h("p",{style:"font:400 13px Plus Jakarta Sans;color:var(--ink);margin-top:2px"}, r.note))))));
+    }
+    opCard.appendChild(h("p",{style:"font:600 12px Plus Jakarta Sans;color:var(--ink-2);margin:12px 0 6px"},"Ghi chú thêm cho tổ mới"));
+    opCard.appendChild(h("textarea",{rows:3, placeholder:"Ghi chú thêm cho tổ mới (nếu có)…", disabled: !editable,
+      style:"width:100%;padding:10px 12px;border-radius:var(--r-md);border:1px solid var(--line);font:400 14px Plus Jakarta Sans;resize:vertical",
+      onInput:e=>{ rec.crewNote = e.target.value; }}, rec.crewNote||""));
+    body.appendChild(opCard);
+  }
+
+  const canConfirm = handoverDeviceCount(no) > 0 || handoverAmenityCount(no) > 0
+    || (mode === "crew" && (rec.crewNote||"").trim().length > 0);
+  if (purser){
     body.appendChild(h("button",{type:"button", class:"cta"+(rec.confirmed?" servedon":""),
       disabled: !rec.confirmed && !canConfirm,
       onClick:()=>{
         if (rec.confirmed){
-          if (!purser) return;
           rec.confirmed = false;
           rec.at = null;
         } else {
@@ -4052,68 +4576,59 @@ function HandoverDetail(v, path){
         }
         refresh();
       }}, rec.confirmed
-        ? (purser ? ("Đã bàn giao · "+hhmm(rec.at)+" · chạm để huỷ") : ("Đã bàn giao · "+hhmm(rec.at)))
-        : "Xác nhận bàn giao",
+        ? ("Đã bàn giao · "+hhmm(rec.at)+" · chạm để huỷ")
+        : (mode==="crew" ? "Xác nhận bàn giao cho tổ mới" : "Xác nhận bàn giao"),
       svg(I.check,18)));
   }
-  if (!purser && !rec.confirmed){
-    body.appendChild(h("p",{style:"font:400 13px/20px Plus Jakarta Sans;color:var(--ink-2);margin:4px 2px 0"},
-      "Nhập thiết bị / hàng hoá, rồi xác nhận bàn giao."));
-  }
-
   v.appendChild(body);
 }
 
 function packStrip(){
-  const g = GROUPS[0];
-  const p = packOf(g.id);
-  const mb = packMbOf(g);
+  const l = LEGS[0];
+  const p = packOf(l.flightNo);
+  const mb = packMbOf();
   const el = h("div",{class:"pack"});
   const icon = h("span",{style:"color:var(--info)"}, svg(p.state==="ready"?I.check:I.down,22));
   const txt = h("div",{class:"txt"});
   el.appendChild(icon); el.appendChild(txt);
 
   if (p.state === "missing"){
-    txt.appendChild(h("b",{},"Tải gói nhóm 1"));
-    txt.appendChild(h("span",{},`${mb} MB · ${g.legs.length} chặng`));
-    el.appendChild(h("button",{class:"btn", onClick:()=>startDownload(g.id)},"Tải"));
+    txt.appendChild(h("b",{},"Tải gói chặng "+l.flightNo));
+    txt.appendChild(h("span",{},`${mb} MB`));
+    el.appendChild(h("button",{class:"btn", onClick:()=>startDownload(l.flightNo)},"Tải"));
   } else if (p.state === "downloading"){
-    txt.appendChild(h("b",{},`Đang tải… ${p.done}/${p.total} chặng`));
-    const bar = h("div",{class:"prog"}, h("i",{style:`width:${p.done/p.total*100}%`}));
-    txt.appendChild(bar);
+    txt.appendChild(h("b",{},"Đang tải…"));
     el.appendChild(h("button",{class:"btn", onClick:()=>{
       packGen++;
-      S.packByGroup[g.id] = {state:"missing", done:0, total:g.legs.length, syncedAt:null};
+      S.packByLeg[l.flightNo] = {state:"missing", syncedAt:null};
       refresh();
     }},"Huỷ"));
   } else {
     txt.appendChild(h("b",{},`Đã tải · ${hhmm(p.syncedAt)}`));
     txt.appendChild(h("span",{},`${mb} MB · sẵn sàng offline`));
-    el.appendChild(h("button",{class:"btn", onClick:()=>startDownload(g.id)},"Tải lại"));
+    el.appendChild(h("button",{class:"btn", onClick:()=>startDownload(l.flightNo)},"Tải lại"));
   }
   return el;
 }
 let packGen = 0;
-function startDownload(gid){
+/* Tải gói bay TỪNG CHẶNG — chỉ Purser (crew_ops.pack.download). */
+function startDownload(flightNo){
+  if (!hasPermission(S.session.roles,"crew_ops.pack.download")) return;
+  const gen = ++packGen;
+  S.packByLeg[flightNo] = {state:"downloading", syncedAt:null, gen};
+  refresh();
+  setTimeout(()=>{
+    const cur = S.packByLeg[flightNo];
+    if (!cur || cur.gen !== gen) return;
+    S.packByLeg[flightNo] = {state:"ready", syncedAt:S.simNow, gen};
+    refresh();
+  }, 500);
+}
+/* Tải tất cả chặng còn thiếu trong 1 nhóm — vẫn lưu trạng thái theo từng chặng riêng. */
+function startDownloadGroup(gid){
   if (!hasPermission(S.session.roles,"crew_ops.pack.download")) return;
   const g = GROUPS.find(x => x.id === gid) || GROUPS[0];
-  const total = g.legs.length;
-  const gen = ++packGen;
-  S.packByGroup[g.id] = {state:"downloading", done:0, total, syncedAt:null, gen};
-  refresh();
-  const step = i => setTimeout(()=>{
-    const p = S.packByGroup[g.id];
-    if (!p || p.gen !== gen) return;
-    p.done = i;
-    if (i === total){
-      S.packByGroup[g.id] = {state:"ready", done:total, total, syncedAt:S.simNow};
-      refresh();
-    } else {
-      refresh();
-      step(i+1);
-    }
-  }, 500);
-  step(1);
+  g.legs.forEach(l => { if (packOf(l.flightNo).state !== "ready") startDownload(l.flightNo); });
 }
 
 
