@@ -18,7 +18,7 @@ export function groupToRotation(group: FlightGroup): SampleRotation {
       ? roster.map((m) => ({
           name: m.name,
           code: m.code,
-          column: (m.riding ? 'positioning' : 'cockpit') as const,
+          column: m.riding ? ('positioning' as const) : ('cockpit' as const),
         }))
       : (() => {
           // Fallback: fabricate anonymous crew from per-leg counts.

@@ -40,7 +40,8 @@ import { useMeals } from '@/modules/catering/hooks/useMeals'
 import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
 import { useQuotaData } from '@/modules/catering/hooks/useQuota'
 import { useRuleConfigData } from '@/modules/catering/hooks/useRuleConfig'
-import { buildOrderLines, groupOrderFiles, makeCodeOf, orderFileId } from '@/modules/catering/orders'
+import { groupOrderFiles, makeCodeOf, orderFileId } from '@/modules/catering/orders'
+import { buildOrderSnapshot } from '@/modules/catering/orderSnapshot'
 import { activeVersion as activeQuotaVersion } from '@/modules/catering/quota'
 import { cateringAirports, cateringStationSet } from '@/modules/catering/stations'
 import { getSeedDataset } from '@/mock-data/loaders/loadFlightGroups'
@@ -311,7 +312,7 @@ export function GroupingPage() {
     }
     const crewVersion = activeCrewMealVersion(crewCfg?.versions ?? [])
     const profile = crewVersion ? profileFor(crewVersion, 'cockpit') : undefined
-    const lines = buildOrderLines(confirmed, profile, makeCodeOf(catalog))
+    const { lines, breakdown } = buildOrderSnapshot(confirmed, profile, makeCodeOf(catalog))
     const version = (existing?.latest.version ?? 0) + 1
     saveOrders.mutate(
       {
@@ -326,6 +327,7 @@ export function GroupingPage() {
             createdBy: session?.user.name ?? 'Catering Ops',
             status: 'draft' as const,
             lines,
+            breakdown,
           },
         ],
       },
