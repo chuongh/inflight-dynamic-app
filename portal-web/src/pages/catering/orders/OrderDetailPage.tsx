@@ -3,18 +3,15 @@ import {
   ArrowRightLeft,
   ChevronLeft,
   Info,
-  Minus,
   PlaneTakeoff,
-  Plus,
   Printer,
   RotateCcw,
-  Save,
   Send,
   ShoppingBag,
   UtensilsCrossed,
   Users,
 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '@/core/auth/useAuth'
@@ -55,14 +52,6 @@ export function OrderDetailPage() {
   const isLatest = !!current && !!latest && current.version === latest.version
   const editable = !!current && isLatest && current.status === 'draft'
 
-  // Local editable copy of the lines, reseeded when the shown version changes.
-  const [lines, setLines] = useState<CateringOrderLine[]>([])
-  const seedKey = current ? `${fileId}|${current.version}|${current.status}` : ''
-  useEffect(() => {
-    if (current) setLines(current.lines.map((l) => ({ ...l })))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedKey])
-
   if (!file || !current) {
     return (
       <div className="py-24">
@@ -74,9 +63,8 @@ export function OrderDetailPage() {
     )
   }
 
-  const setQty = (i: number, qty: number) =>
-    setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, qty: Math.max(0, Math.round(qty)) } : l)))
-  const resetSuggested = () => setLines((prev) => prev.map((l) => ({ ...l, qty: l.suggested })))
+  // Lines are derived (read-only) — all edits go through the flight editor.
+  const lines = current.lines
 
   const shownIdx = file.versions.findIndex((v) => v.version === current.version)
   const reconcileBase = shownIdx > 0 ? file.versions[shownIdx - 1] : null
@@ -92,28 +80,9 @@ export function OrderDetailPage() {
     saveOrders.mutate({ orders: [...others, record, ...extra] })
   }
 
-  const saveDraft = () => {
-    persist({ ...current, lines: lines.map((l) => ({ ...l })), createdAt: Date.now(), createdBy: userName() })
-    message.success(t('catering.orders.savedV', { v: current.version }))
-  }
   const send = () => {
-    persist({ ...current, status: 'sent', lines: lines.map((l) => ({ ...l })), createdAt: Date.now(), createdBy: userName() })
+    persist({ ...current, status: 'sent', createdAt: Date.now(), createdBy: userName() })
     message.success(t('catering.orders.sentV', { v: current.version }))
-  }
-  const newRevision = () => {
-    const v = latest!.version + 1
-    const rec: CateringOrder = {
-      ...latest!,
-      id: `${file.fileId}-v${v}`,
-      version: v,
-      status: 'draft',
-      createdAt: Date.now(),
-      createdBy: userName(),
-      lines: latest!.lines.map((l) => ({ ...l })),
-    }
-    saveOrders.mutate({ orders: [...(data?.orders ?? []), rec] })
-    setSelectedVersion(v)
-    message.success(t('catering.orders.revisionCreated', { v }))
   }
   const createVersionFromBreakdown = (nextBreakdown: OrderSourceCell[]) => {
     const v = latest!.version + 1
@@ -217,7 +186,7 @@ export function OrderDetailPage() {
 
           {/* category sections */}
           {CATS.map(({ key, icon }) => {
-            const rows = lines.map((l, i) => ({ l, i })).filter((x) => x.l.category === key)
+            const rows = lines.filter((l) => l.category === key)
             if (rows.length === 0) return null
             return (
               <section key={key} className="border-border mt-3.5 overflow-hidden rounded-2xl border">
@@ -233,7 +202,7 @@ export function OrderDetailPage() {
                     {t('catering.orders.portionsN', { n: catTotal(key).toLocaleString() })}
                   </span>
                 </div>
-                {rows.map(({ l, i }, idx) => (
+                {rows.map((l, idx) => (
                   <div key={`${l.category}-${l.name}`} className="border-border flex items-center gap-3 border-b px-3.5 py-2 last:border-b-0">
                     <span className="text-text-muted w-5 text-right text-[11px] font-extrabold tnum">{idx + 1}</span>
                     <div className="min-w-0 flex-1">
@@ -261,11 +230,7 @@ export function OrderDetailPage() {
                     <span className="text-text-muted shrink-0 text-[11px] font-semibold">
                       {t('catering.orders.suggestedShort', { n: l.suggested.toLocaleString() })}
                     </span>
-                    {editable ? (
-                      <QtyStepper value={l.qty} onChange={(v) => setQty(i, v)} />
-                    ) : (
-                      <span className="w-[92px] text-right text-[15px] font-extrabold tnum">{l.qty.toLocaleString()}</span>
-                    )}
+                    <span className="w-[92px] text-right text-[15px] font-extrabold tnum">{l.qty.toLocaleString()}</span>
                   </div>
                 ))}
               </section>
@@ -274,37 +239,22 @@ export function OrderDetailPage() {
 
           {/* actions */}
           <div className="border-border mt-[18px] flex items-center gap-2.5 border-t pt-4">
-            {isLatest ? (
+            {isLatest && current.breakdown ? (
               <Button icon={<PlaneTakeoff size={15} />} onClick={() => setFlightEditOpen(true)}>
                 {t('catering.orders.editByFlight.open')}
               </Button>
             ) : null}
             {editable ? (
-              <>
-                <Button icon={<RotateCcw size={15} />} onClick={resetSuggested}>
-                  {t('catering.orders.resetSuggested')}
-                </Button>
-                <div className="ml-auto flex items-center gap-2.5">
-                  <Button icon={<Save size={16} />} loading={saveOrders.isPending} onClick={saveDraft}>
-                    {t('catering.orders.saveV', { v: current.version })}
-                  </Button>
-                  <Button
-                    type="primary"
-                    icon={<Send size={16} />}
-                    loading={saveOrders.isPending}
-                    onClick={send}
-                    style={{ background: 'var(--color-vj-green-dark)', borderColor: 'var(--color-vj-green-dark)' }}
-                  >
-                    {t('catering.orders.sendSupplier')}
-                  </Button>
-                </div>
-              </>
-            ) : isLatest && current.status === 'sent' ? (
-              <div className="ml-auto">
-                <Button type="primary" icon={<Plus size={16} />} loading={saveOrders.isPending} onClick={newRevision}>
-                  {t('catering.orders.newRevision')}
-                </Button>
-              </div>
+              <Button
+                type="primary"
+                className="ml-auto"
+                icon={<Send size={16} />}
+                loading={saveOrders.isPending}
+                onClick={send}
+                style={{ background: 'var(--color-vj-green-dark)', borderColor: 'var(--color-vj-green-dark)' }}
+              >
+                {t('catering.orders.sendSupplier')}
+              </Button>
             ) : null}
           </div>
         </div>
@@ -383,35 +333,6 @@ export function OrderDetailPage() {
         pending={saveOrders.isPending}
       />
     </div>
-  )
-}
-
-function QtyStepper({ value, onChange }: { value: number; onChange: (v: number) => void }) {
-  return (
-    <span className="border-border inline-flex h-8 items-center overflow-hidden rounded-lg border bg-white">
-      <button
-        type="button"
-        onClick={() => onChange(value - 1)}
-        className="text-text-secondary hover:bg-muted grid h-full w-7 cursor-pointer place-items-center"
-        aria-label="minus"
-      >
-        <Minus size={14} />
-      </button>
-      <input
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value.replace(/\D/g, '')) || 0)}
-        className="w-12 border-x-0 text-center text-[13px] font-extrabold tnum outline-none"
-        inputMode="numeric"
-      />
-      <button
-        type="button"
-        onClick={() => onChange(value + 1)}
-        className="text-text-secondary hover:bg-muted grid h-full w-7 cursor-pointer place-items-center"
-        aria-label="plus"
-      >
-        <Plus size={14} />
-      </button>
-    </span>
   )
 }
 
