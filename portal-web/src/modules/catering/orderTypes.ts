@@ -20,6 +20,21 @@ export interface CateringOrderLine {
   qty: number
 }
 
+/**
+ * One traceable source contribution to an order line. Pre-book and sales cells
+ * are per-flight; crew cells are per-group (no single flight owns a crew meal).
+ * The sum of a line's cells === that line's qty at build time.
+ */
+export interface OrderSourceCell {
+  category: OrderCategory
+  name: string
+  groupId: string
+  flightNo?: string
+  dep?: string
+  arr?: string
+  qty: number
+}
+
 export type OrderStatus = 'draft' | 'sent'
 
 export interface CateringOrder {
@@ -32,6 +47,12 @@ export interface CateringOrder {
   createdBy: string
   status: OrderStatus
   lines: CateringOrderLine[]
+  /**
+   * Immutable per-flight/per-group source snapshot the `lines` were derived from
+   * — the reconciliation spine (enables per-flight trace and version deltas).
+   * Optional: versions created before reconciliation have no breakdown.
+   */
+  breakdown?: OrderSourceCell[]
 }
 
 export interface CateringOrderDataset {
