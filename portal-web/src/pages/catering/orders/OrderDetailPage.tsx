@@ -1,5 +1,6 @@
 import { App as AntApp, Button, Empty } from 'antd'
 import {
+  ArrowRightLeft,
   ChevronLeft,
   Info,
   Minus,
@@ -21,6 +22,7 @@ import type { CateringOrder, CateringOrderLine, OrderCategory } from '@/modules/
 import { categoryTotal, groupOrderFiles, lineTotal, suggestedTotal } from '@/modules/catering/orders'
 import { paths } from '@/routes/paths'
 import { CAT_COLOR, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
+import { ReconcileDrawer } from './ReconcileDrawer'
 
 const CATS: { key: OrderCategory; icon: React.ReactNode }[] = [
   { key: 'prebook', icon: <UtensilsCrossed size={15} className="text-vj-red" /> },
@@ -42,6 +44,7 @@ export function OrderDetailPage() {
   const latest = file?.latest
 
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null)
+  const [reconcileOpen, setReconcileOpen] = useState(false)
   const current: CateringOrder | undefined = file
     ? (file.versions.find((v) => v.version === (selectedVersion ?? latest!.version)) ?? latest)
     : undefined
@@ -70,6 +73,9 @@ export function OrderDetailPage() {
   const setQty = (i: number, qty: number) =>
     setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, qty: Math.max(0, Math.round(qty)) } : l)))
   const resetSuggested = () => setLines((prev) => prev.map((l) => ({ ...l, qty: l.suggested })))
+
+  const shownIdx = file.versions.findIndex((v) => v.version === current.version)
+  const reconcileBase = shownIdx > 0 ? file.versions[shownIdx - 1] : null
 
   const total = lineTotal(lines)
   const delta = total - suggestedTotal(lines)
@@ -113,7 +119,7 @@ export function OrderDetailPage() {
     l.category === 'prebook' ? l.name : t(`catering.orders.line.${l.name}`)
 
   return (
-    <div>
+    <div className="thin-scroll h-full overflow-auto p-5">
       {/* header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -278,9 +284,18 @@ export function OrderDetailPage() {
         {/* right rail */}
         <div>
           <div className="border-border rounded-2xl border p-3.5">
-            <div className="text-text-secondary mb-3 flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide uppercase">
-              <RotateCcw size={13} className="text-vj-red" />
-              {t('catering.orders.versionHistory')}
+            <div className="mb-3 flex items-center gap-1.5">
+              <span className="text-text-secondary flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide uppercase">
+                <RotateCcw size={13} className="text-vj-red" />
+                {t('catering.orders.versionHistory')}
+              </span>
+              <button
+                type="button"
+                onClick={() => setReconcileOpen(true)}
+                className="text-vj-red hover:text-vj-red-hover ml-auto flex cursor-pointer items-center gap-1 text-[11px] font-bold"
+              >
+                <ArrowRightLeft size={12} /> {t('catering.orders.reconcile.open')}
+              </button>
             </div>
             <div className="relative pl-5">
               <span className="bg-border absolute top-1 bottom-1 left-[6px] w-0.5" />
@@ -326,6 +341,12 @@ export function OrderDetailPage() {
           </div>
         </div>
       </div>
+      <ReconcileDrawer
+        open={reconcileOpen}
+        onClose={() => setReconcileOpen(false)}
+        current={current}
+        base={reconcileBase}
+      />
     </div>
   )
 }
