@@ -4,7 +4,7 @@ import configJson from '../catering/rule-configs.json'
 const DEMO_STORAGE_KEY = 'vj-mock-catering-rule-config-cache'
 const SEED_VERSION_KEY = `${DEMO_STORAGE_KEY}-seed-version`
 /** Bump whenever the seed JSON shape/content changes so stale caches self-refresh. */
-const SEED_VERSION = 2
+const SEED_VERSION = 3
 
 function readCache(): RuleConfigDataset | null {
   try {

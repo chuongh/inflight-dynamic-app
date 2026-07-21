@@ -10,12 +10,6 @@
       "note": "July 2026 — align with quota v5. Added diverted flights to exclusion.",
       "rules": [
         {
-          "id": "r-scope",
-          "kind": "scope_note",
-          "enabled": true,
-          "text": "Commercial hotmeal only — excludes crew meal, pre-book, SkyBoss, CIP…"
-        },
-        {
           "id": "r-prebook",
           "kind": "threshold_reduction",
           "enabled": true,
@@ -60,12 +54,6 @@
       "note": "Tighten pre-book threshold to 50.",
       "rules": [
         {
-          "id": "r-scope",
-          "kind": "scope_note",
-          "enabled": true,
-          "text": "Commercial hotmeal only — excludes crew meal, pre-book, SkyBoss, CIP…"
-        },
-        {
           "id": "r-prebook",
           "kind": "threshold_reduction",
           "enabled": true,
@@ -92,12 +80,6 @@
       "updatedAt": "30/05/2026",
       "note": "Initial rule set.",
       "rules": [
-        {
-          "id": "r-scope",
-          "kind": "scope_note",
-          "enabled": true,
-          "text": "Commercial hotmeal only — excludes crew meal, pre-book, SkyBoss, CIP…"
-        },
         {
           "id": "r-prebook",
           "kind": "threshold_reduction",

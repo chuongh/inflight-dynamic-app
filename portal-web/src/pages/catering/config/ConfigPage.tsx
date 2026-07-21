@@ -9,6 +9,8 @@ import {
   activeRuleCount,
   configVersionsNewestFirst,
   defaultRule,
+  GROUPING_RULE_KINDS,
+  QUOTA_RULE_KINDS,
   withNewConfigVersion,
 } from '@/modules/catering/config'
 import type { Rule, RuleConfigVersion, RuleKind } from '@/modules/catering/configTypes'
@@ -23,7 +25,7 @@ import { RuleEditorDrawer } from './RuleEditorDrawer'
 import { RulePickerModal } from './RulePickerModal'
 import { CrewMealTab } from './crew/CrewMealTab'
 
-type ConfigTab = 'commercial' | 'crew'
+type ConfigTab = 'commercial' | 'grouping' | 'crew'
 
 const STATUS_DOT: Record<VersionStatus, string> = {
   active: '#16a34a',
@@ -82,7 +84,10 @@ export function ConfigPage() {
   }
 
   const isActiveView = viewing.id === active?.id
-  const displayRules = editing ? workingRules : viewing.rules
+  const visibleKinds = tab === 'grouping' ? GROUPING_RULE_KINDS : QUOTA_RULE_KINDS
+  const displayRules = (editing ? workingRules : viewing.rules).filter((r) =>
+    visibleKinds.includes(r.kind),
+  )
 
   const startEdit = () => {
     setWorkingRules(structuredClone(viewing.rules))
@@ -163,6 +168,7 @@ export function ConfigPage() {
             size="large"
             options={[
               { value: 'commercial', label: t('catering.config.tab.commercial') },
+              { value: 'grouping', label: t('catering.config.tab.grouping') },
               { value: 'crew', label: t('catering.config.tab.crew') },
             ]}
           />
@@ -297,7 +303,12 @@ export function ConfigPage() {
         onClose={() => setEditorOpen(false)}
         onSave={saveRule}
       />
-      <RulePickerModal open={pickerOpen} onClose={() => setPickerOpen(false)} onPick={pickKind} />
+      <RulePickerModal
+        open={pickerOpen}
+        kinds={visibleKinds}
+        onClose={() => setPickerOpen(false)}
+        onPick={pickKind}
+      />
     </div>
   )
 }

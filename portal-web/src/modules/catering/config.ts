@@ -69,26 +69,25 @@ export function withNewConfigVersion(
 }
 
 /** Catalog category a rule kind belongs to (drives the card accent). */
-export type RuleCategory = 'reduction' | 'exclusion' | 'note' | 'grouping'
+export type RuleCategory = 'reduction' | 'exclusion' | 'grouping'
 
 export const RULE_CATEGORY: Record<RuleKind, RuleCategory> = {
   threshold_reduction: 'reduction',
   time_exclusion: 'exclusion',
   status_exclusion: 'exclusion',
-  scope_note: 'note',
   group_by_purser: 'grouping',
   group_by_flight_hour: 'grouping',
 }
 
-/** The catalog order shown in the picker and list. */
-export const RULE_KINDS: RuleKind[] = [
+/** Quota-shaping kinds — the catalog offered under the Hotmeal quota tab. */
+export const QUOTA_RULE_KINDS: RuleKind[] = [
   'threshold_reduction',
   'time_exclusion',
   'status_exclusion',
-  'group_by_purser',
-  'group_by_flight_hour',
-  'scope_note',
 ]
+
+/** Leg-grouping kinds — the catalog offered under the Flight grouping tab. */
+export const GROUPING_RULE_KINDS: RuleKind[] = ['group_by_purser', 'group_by_flight_hour']
 
 const ALL_STATUSES: FlightStatus[] = ['cancelled', 'ferry', 'diverted']
 
@@ -101,8 +100,6 @@ export function defaultRule(kind: RuleKind, id: string): Rule {
       return { id, kind, enabled: true, scope: 'DOM', fromTime: '21:00' }
     case 'status_exclusion':
       return { id, kind, enabled: true, statuses: ['cancelled', 'ferry'] }
-    case 'scope_note':
-      return { id, kind, enabled: true, text: '' }
     case 'group_by_purser':
       return { id, kind, enabled: true }
     case 'group_by_flight_hour':

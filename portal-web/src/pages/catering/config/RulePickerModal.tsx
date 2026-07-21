@@ -1,16 +1,17 @@
 import { Modal } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { RULE_KINDS } from '@/modules/catering/config'
 import type { RuleKind } from '@/modules/catering/configTypes'
 import { KIND_ICON, accentForKind } from './ruleMeta'
 
 interface Props {
   open: boolean
+  /** The rule kinds offered in this picker — scoped to the active tab. */
+  kinds: RuleKind[]
   onClose: () => void
   onPick: (kind: RuleKind) => void
 }
 
-export function RulePickerModal({ open, onClose, onPick }: Props) {
+export function RulePickerModal({ open, kinds, onClose, onPick }: Props) {
   const { t } = useTranslation()
 
   return (
@@ -24,7 +25,7 @@ export function RulePickerModal({ open, onClose, onPick }: Props) {
     >
       <p className="text-text-muted mt-0 mb-3 text-[13px]">{t('catering.config.pickerSubtitle')}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {RULE_KINDS.map((kind) => {
+        {kinds.map((kind) => {
           const accent = accentForKind(kind)
           return (
             <button
