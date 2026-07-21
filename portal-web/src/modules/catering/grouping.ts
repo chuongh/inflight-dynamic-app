@@ -321,12 +321,15 @@ export function splitGroupAt(groups: FlightGroup[], groupId: string, at: number)
   if (idx === -1) return groups
   const g = groups[idx]
   if (at <= 0 || at >= g.legs.length) return groups
+  const headLegs = g.legs.slice(0, at)
+  const tailLegs = g.legs.slice(at)
   const head: FlightGroup = {
     ...g,
     confidence: 'high',
     confirmed: false,
     reviewNote: undefined,
-    legs: g.legs.slice(0, at),
+    legs: headLegs,
+    meals: rollupLegMeals(headLegs),
   }
   const tail: FlightGroup = {
     ...g,
@@ -334,7 +337,8 @@ export function splitGroupAt(groups: FlightGroup[], groupId: string, at: number)
     confidence: 'high',
     confirmed: false,
     reviewNote: undefined,
-    legs: g.legs.slice(at),
+    legs: tailLegs,
+    meals: rollupLegMeals(tailLegs),
   }
   return [...groups.slice(0, idx), head, tail, ...groups.slice(idx + 1)]
 }
@@ -345,10 +349,12 @@ export function mergeGroups(groups: FlightGroup[], targetId: string, sourceId: s
   const target = groups.find((g) => g.id === targetId)
   const source = groups.find((g) => g.id === sourceId)
   if (!target || !source) return groups
+  const legs = [...target.legs, ...source.legs].sort((a, b) => legSortKey(a) - legSortKey(b))
   const merged: FlightGroup = {
     ...target,
     confirmed: false,
-    legs: [...target.legs, ...source.legs].sort((a, b) => legSortKey(a) - legSortKey(b)),
+    legs,
+    meals: rollupLegMeals(legs),
   }
   return groups.flatMap((g) => (g.id === sourceId ? [] : g.id === targetId ? [merged] : [g]))
 }
@@ -365,15 +371,19 @@ export function moveLeg(
   const dest = groups.find((g) => g.id === destId)
   if (!source || !dest || legIndex < 0 || legIndex >= source.legs.length) return groups
   const leg = source.legs[legIndex]
+  const sourceLegs = source.legs.filter((_, i) => i !== legIndex)
+  const destLegs = [...dest.legs, leg].sort((a, b) => legSortKey(a) - legSortKey(b))
   const nextSource: FlightGroup = {
     ...source,
     confirmed: false,
-    legs: source.legs.filter((_, i) => i !== legIndex),
+    legs: sourceLegs,
+    meals: rollupLegMeals(sourceLegs),
   }
   const nextDest: FlightGroup = {
     ...dest,
     confirmed: false,
-    legs: [...dest.legs, leg].sort((a, b) => legSortKey(a) - legSortKey(b)),
+    legs: destLegs,
+    meals: rollupLegMeals(destLegs),
   }
   return groups.flatMap((g) => {
     if (g.id === sourceId) return nextSource.legs.length === 0 ? [] : [nextSource]
