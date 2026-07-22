@@ -7,8 +7,8 @@
 ---
 
 **Project:** VietJet Ops Portal
-**Generated:** 2026-07-14 15:29:33
-**Category:** Airline
+**Generated:** 2026-07-22 10:12:01
+**Category:** Emergency SOS & Safety
 **Design Dials:** Variance 3/10 (Centered / Minimal) | Motion 4/10 (Standard) | Density 8/10 (Dense / Dashboard)
 
 ---
@@ -19,30 +19,24 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#1E3A8A` | `--color-primary` |
+| Primary | `#DC2626` | `--color-primary` |
 | On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#3B82F6` | `--color-secondary` |
-| Accent/CTA | `#EA580C` | `--color-accent` |
-| Background | `#EFF6FF` | `--color-background` |
-| Foreground | `#1E40AF` | `--color-foreground` |
-| Muted | `#E9EEF5` | `--color-muted` |
-| Border | `#BFDBFE` | `--color-border` |
+| Secondary | `#EF4444` | `--color-secondary` |
+| Accent/CTA | `#2563EB` | `--color-accent` |
+| Background | `#FFF1F2` | `--color-background` |
+| Foreground | `#0F172A` | `--color-foreground` |
+| Muted | `#FCF1F1` | `--color-muted` |
+| Border | `#FAE4E4` | `--color-border` |
 | Destructive | `#DC2626` | `--color-destructive` |
-| Ring | `#1E3A8A` | `--color-ring` |
+| Ring | `#DC2626` | `--color-ring` |
 
-**Color Notes:** Sky blue + booking orange [Accent adjusted from #F97316 for WCAG 3:1]
+**Color Notes:** Alert red + safety blue
 
 ### Typography
 
-- **Heading Font:** Amatic SC
-- **Body Font:** Cabin
-- **Mood:** indie, craft, handmade, artisan, organic, creative
-- **Google Fonts:** [Amatic SC + Cabin](https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cabin:wght@400;500;600;700&display=swap)
-
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cabin:wght@400;500;600;700&display=swap');
-```
+- **Heading Font:** Inter
+- **Body Font:** Inter
+- **Mood:** Bold + Clean + Sans-serif
 
 ### Spacing Variables
 
@@ -76,7 +70,7 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #EA580C;
+  background: #2563EB;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -93,8 +87,8 @@
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #1E3A8A;
-  border: 2px solid #1E3A8A;
+  color: #DC2626;
+  border: 2px solid #DC2626;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -107,7 +101,7 @@
 
 ```css
 .card {
-  background: #EFF6FF;
+  background: #FFF1F2;
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -133,9 +127,9 @@
 }
 
 .input:focus {
-  border-color: #1E3A8A;
+  border-color: #DC2626;
   outline: none;
-  box-shadow: 0 0 0 3px #1E3A8A20;
+  box-shadow: 0 0 0 3px #DC262620;
 }
 ```
 
@@ -171,34 +165,35 @@
 
 ### Page Pattern
 
-**Pattern Name:** Enterprise Gateway
+**Pattern Name:** Marketplace / Directory
 
-- **Conversion Strategy:** Path selection (I am a...). Mega menu navigation. Trust signals prominent.
-- **CTA Placement:** Contact Sales (Primary) + Login (Secondary)
-- **Section Order:** 1. Hero (Video/Mission), 2. Solutions by Industry, 3. Solutions by Role, 4. Client Logos, 5. Contact Sales
+- **Conversion Strategy:** Search bar is the CTA. Reduce friction to search. Popular searches suggestions.
+- **CTA Placement:** Hero Search Bar + Navbar 'List your item'
+- **Section Order:** 1. Hero (Search focused), 2. Categories, 3. Featured Listings, 4. Trust/Safety, 5. CTA (Become a host/seller)
 
 ---
 
 ## Motion
 
-**Page Transition** (Standard) — Trigger: route change | Duration: 400-600ms | Easing: `power2.inOut`
+**Hover Micro-interaction** (Standard) — Trigger: hover | Duration: 200-300ms | Easing: `power2.out`
 
 ```js
-const tl = gsap.timeline(); tl.to('.transition-overlay', { yPercent: 0, duration: 0.4, ease: 'power2.inOut' }).call(navigate).to('.transition-overlay', { yPercent: -100, duration: 0.4, ease: 'power2.inOut', delay: 0.1 });
+gsap.to(el, { y: -4, scale: 1.02, boxShadow: '0 12px 24px rgba(0,0,0,0.12)', duration: 0.25, ease: 'power2.out' });
 ```
 
-**Framework notes:** Keep the overlay element mounted at the layout root (outside the page component) so it survives the route swap
+**Framework notes:** Use gsap.quickTo(el, 'y') for cards with many hover targets to avoid re-creating tweens every event
 
-- ✅ Show a lightweight loading indicator if the destination route's data fetch outlasts the overlay
-- ❌ Don't tie the overlay's reveal directly to data-fetch completion without a max-wait timeout; a slow API stalls the whole transition
-- ⚡ Prefer CSS transform (yPercent) over top/left to keep the overlay animation on the compositor thread
+- ✅ Pair with a matching mouseleave tween that reverses the same properties
+- ❌ Don't leave the hover state stuck if the pointer leaves fast; always attach the reverse tween
+- ⚡ quickTo() avoids GC churn on lists with 20+ hoverable cards
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
 
-- ❌ Complex booking
-- ❌ Poor mobile
+- ❌ Complex shadows
+- ❌ 3D effects
+- ❌ Color-only indicators
 
 ### Additional Forbidden Patterns
 
