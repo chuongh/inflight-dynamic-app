@@ -5274,7 +5274,7 @@ function sendGateAlert(){
 function ScanScreen(v){
   if (!canAccessModule(S.session.roles,"ground_ops")) return NoAccess(v);
   bar(v,{title:"Scan boarding pass", subtitle:`${activeFlight.code} · ${activeFlight.from}→${activeFlight.to}`,
-    onBack:()=>back("/home"), action:"đổi", onAction:()=>back("/home")});
+    onBack:()=>back("/home")});
   const body = h("div",{class:"body white", style:"display:flex;flex-direction:column;gap:16px;padding-top:16px"});
 
   body.appendChild(h("div",{class:"finder"},
