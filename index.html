@@ -847,6 +847,48 @@ body{
 .amenity-toggle .chev.open{transform:rotate(90deg)}
 .amenity-toggle .mh-tx b{display:flex;align-items:center;gap:8px}
 .amenity-count{font:600 11px/16px "Plus Jakarta Sans";color:var(--ink-3);flex:none}
+/* Bàn giao — một cấp màu chủ đạo, trạng thái dùng màu semantic riêng. */
+.ho-body{display:flex;flex-direction:column;gap:16px;padding-top:12px;padding-bottom:calc(var(--sa-bot) + 88px)}
+.ho-seg{display:flex;gap:0;padding:0 4px;border-bottom:1px solid var(--line);background:var(--n0)}
+.ho-tab{position:relative;flex:1;min-height:48px;padding:0 8px;color:var(--ink-3);
+  font:600 12px/16px "Plus Jakarta Sans";transition:color 160ms ease}
+.ho-tab::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;border-radius:2px;background:transparent}
+.ho-tab[aria-selected="true"]{color:var(--brand);font-weight:700}
+.ho-tab[aria-selected="true"]::after{background:var(--brand)}
+.ho-dot{display:inline-block;width:6px;height:6px;margin-left:6px;border-radius:50%;background:var(--n300);vertical-align:middle}
+.ho-dot.done{background:var(--success-text)}
+.ho-section{padding:16px}
+.ho-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.ho-section-head .mh-tx b{display:flex;align-items:center;gap:8px}
+.ho-section-head .mh-tx span{margin-top:3px}
+.goods-list{border-top:1px solid var(--n100)}
+.goods-list .steprow{min-height:52px;padding:10px 0}
+.goods-empty{padding:24px 12px;text-align:center;color:var(--ink-3);font:500 13px/20px "Plus Jakarta Sans";
+  background:var(--surface-2);border-radius:var(--r-md)}
+.goods-add{width:100%;min-height:44px;margin-top:12px;border:1px dashed var(--n300);border-radius:var(--r-md);
+  color:var(--brand);font:700 13px "Plus Jakarta Sans";transition:background 160ms ease,border-color 160ms ease}
+.goods-add:active{background:var(--danger-bg);border-color:var(--brand)}
+.goods-catalog{margin-top:12px;padding-top:12px;border-top:1px solid var(--n100)}
+.goods-catalog .pxsearch{margin-bottom:12px}
+.ho-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.ho-choice{min-height:72px;padding:11px 12px;text-align:left;border:1px solid var(--line);border-radius:var(--r-md);background:var(--n0);
+  transition:border-color 160ms ease,box-shadow 160ms ease,transform 140ms var(--ease-out)}
+.ho-choice:active{transform:scale(.98)}
+.ho-choice.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.ho-choice b{display:block;font:700 13px/18px "Plus Jakarta Sans"}
+.ho-choice span{display:block;margin-top:3px;color:var(--ink-3);font:500 11px/15px "Plus Jakarta Sans"}
+.ho-field{display:block;margin:14px 0}
+.ho-field > span{display:block;margin-bottom:7px;color:var(--ink-2);font:600 12px "Plus Jakarta Sans"}
+.ho-input{height:44px;padding:0 12px!important;border:1px solid var(--line)!important;border-radius:var(--r-md)!important;background:var(--n0)!important}
+.ho-status{display:flex;gap:10px;align-items:flex-start;margin:12px 0;padding:11px 12px;border-radius:var(--r-md);
+  color:var(--ink-2);background:var(--surface-2);font:500 12px/18px "Plus Jakarta Sans"}
+.ho-status.complete{color:var(--success-text);background:var(--success-bg)}
+.ho-status.pending{color:var(--warning-text);background:var(--warning-bg)}
+.ho-status b{display:block;font-weight:700}
+.ho-foot{position:fixed;left:0;right:0;bottom:0;z-index:35;padding:10px 16px calc(max(var(--sa-bot),10px));
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(35,31,32,.06)}
+.ho-foot .cta{margin:0}
 .legmeal{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--n100)}
 .lm-l b{font:700 14px "Plus Jakarta Sans";color:var(--ink)}
 .lm-l span{font:500 12px "Plus Jakarta Sans";color:var(--n500);margin-left:8px}
@@ -1988,13 +2030,23 @@ function emptyHandoverLeg(){
     amenityQty: Object.fromEntries(HANDOVER_GOODS.map(a => [a.code, 0])),
     confirmed: false,
     at: null,
-    mode: "ground",   // "ground" (bàn giao mặt đất) | "crew" (đổi tổ giữa rotation)
-    crewNote: "",     // ghi chú vận hành cho tổ mới — chỉ dùng khi mode==="crew"
+    deviceMode: "onboard",       // Thiết bị không bàn giao Ground.
+    deviceLocation: "Hộc chứa phía trước",
+    deviceOnboardAt: null,
+    deviceOfferedAt: null,       // Tổ cũ xác nhận gửi bàn giao.
+    deviceReceivedAt: null,      // Tổ mới xác nhận đã nhận.
+    crewNote: "",
   };
 }
 function handoverOf(flightNo){
   if (!S.handoverByLeg[flightNo]) S.handoverByLeg[flightNo] = emptyHandoverLeg();
-  return S.handoverByLeg[flightNo];
+  const rec = S.handoverByLeg[flightNo];
+  if (!rec.deviceMode) rec.deviceMode = rec.mode === "crew" ? "crew" : "onboard";
+  if (rec.deviceLocation == null) rec.deviceLocation = "Hộc chứa phía trước";
+  if (rec.deviceOnboardAt === undefined) rec.deviceOnboardAt = null;
+  if (rec.deviceOfferedAt === undefined) rec.deviceOfferedAt = null;
+  if (rec.deviceReceivedAt === undefined) rec.deviceReceivedAt = null;
+  return rec;
 }
 function handoverAmenityCount(flightNo){
   const rec = S.handoverByLeg[flightNo];
@@ -2008,7 +2060,9 @@ function handoverDeviceCount(flightNo){
 }
 function handoverStatus(flightNo){
   const rec = S.handoverByLeg[flightNo];
-  if (rec && rec.confirmed) return ["ok","Đã bàn giao"];
+  const deviceDone = rec && (rec.deviceMode === "crew" ? !!rec.deviceReceivedAt : !!rec.deviceOnboardAt);
+  if (rec && rec.confirmed && deviceDone) return ["ok","Đã hoàn tất"];
+  if (rec && rec.deviceOfferedAt && !rec.deviceReceivedAt) return ["warn","Chờ tổ mới"];
   const am = handoverAmenityCount(flightNo);
   const dv = handoverDeviceCount(flightNo);
   if (am > 0 || dv > 0) return ["info","Đang nhập"];
@@ -2149,7 +2203,9 @@ let animating = false;
    không tự giữ state cục bộ; khoá theo id để "Nhận trolley cart" (theo nhóm)
    và "Bàn giao" (theo từng chặng) không đụng state của nhau. */
 const amenityUI = {};
-function amenityUIFor(key){ return amenityUI[key] || (amenityUI[key] = {open:false, query:""}); }
+function amenityUIFor(key){ return amenityUI[key] || (amenityUI[key] = {open:false, query:"", showCatalog:false}); }
+const handoverTabByLeg = {};
+function handoverTabFor(flightNo){ return handoverTabByLeg[flightNo] || (handoverTabByLeg[flightNo] = "goods"); }
 function go(path, mode="push"){
   if (animating || path === route()) return;
   if (mode==="push") S.stack.push(path);
@@ -3849,49 +3905,71 @@ function trolleyDeviceCard(g, editing){
 /* Danh sách hàng hoá dùng chung (34 SKU, phẳng, không nhóm được theo nghĩa) —
    thu gọn mặc định, mở ra mới hiện ô tìm kiếm + từng dòng. Dùng ở cả "Nhận
    trolley cart" (trolleyAmenityCard) và "Bàn giao" (HandoverDetail §2). */
-function amenityChecklistCard({num, title, sub, rec, editable, uiKey, padding}){
+function amenityChecklistCard({num, title, sub, rec, editable, uiKey, padding, alwaysOpen, enteredFirst}){
   const ui = amenityUIFor(uiKey);
   const total = HANDOVER_GOODS.length;
   const filled = HANDOVER_GOODS.filter(a => (rec[a.code]||0) > 0).length;
-  const card = h("section",{class:"card", style:"padding:"+(padding || "14px 16px")});
-  card.appendChild(h("button",{type:"button", class:"amenity-toggle",
-      "aria-expanded": ui.open ? "true" : "false",
-      onClick:()=>{ ui.open = !ui.open; refresh(); }},
+  const open = alwaysOpen || ui.open;
+  const card = h("section",{class:"card"+(enteredFirst?" ho-section":""), style:enteredFirst ? "" : "padding:"+(padding || "14px 16px")});
+  const hdKids = [
     num ? h("span",{class:"mh-num"}, num) : null,
     h("div",{class:"mh-tx"},
       h("b",{}, title, h("span",{class:"amenity-count"}, `${filled}/${total} đã nhập`)),
       h("span",{}, sub)),
-    h("span",{class:"chev"+(ui.open?" open":"")}, svg(I.chev,18))));
-  if (!ui.open) return card;
-  const searchIn = h("input",{type:"text", placeholder:"Tìm hàng hoá / mã…", value: ui.query,
+  ];
+  if (alwaysOpen){
+    card.appendChild(h("div",{class:"ho-section-head"}, ...hdKids.filter(Boolean)));
+  } else {
+    card.appendChild(h("button",{type:"button", class:"amenity-toggle",
+        "aria-expanded": open ? "true" : "false",
+        onClick:()=>{ ui.open = !ui.open; refresh(); }},
+      ...hdKids,
+      h("span",{class:"chev"+(open?" open":"")}, svg(I.chev,18))));
+  }
+  if (!open) return card;
+
+  const goodsRows = (items) => h("div",{class:"goods-list"}, ...items.map(a => {
+    const qty = rec[a.code] || 0;
+    return h("div",{class:"steprow"},
+        h("div",{style:"flex:1;min-width:0"},
+          h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, a.label),
+          h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, a.unit)),
+        h("div",{class:"stepper"},
+          h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: !editable || qty<=0, onClick:()=>{
+            if (!editable) return;
+            rec[a.code] = Math.max(0, qty - 1);
+            refresh();
+          }},"−"),
+          h("span",{class:"sv"}, String(qty)),
+          h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: !editable, onClick:()=>{
+            if (!editable) return;
+            rec[a.code] = qty + 1;
+            refresh();
+          }},"+")));
+  }));
+
+  if (enteredFirst){
+    const entered = HANDOVER_GOODS.filter(a => (rec[a.code]||0) > 0);
+    card.appendChild(entered.length
+      ? goodsRows(entered)
+      : h("div",{class:"goods-empty"}, "Chưa có hàng hoá trả về."));
+    if (editable){
+      card.appendChild(h("button",{type:"button", class:"goods-add", "aria-expanded":ui.showCatalog?"true":"false",
+        onClick:()=>{ ui.showCatalog = !ui.showCatalog; ui.query = ""; refresh(); }},
+        ui.showCatalog ? "Đóng danh sách" : "+ Thêm hàng hoá"));
+    }
+    if (!ui.showCatalog) return card;
+  }
+
+  const catalog = h("div",{class:"goods-catalog"});
+  const searchIn = h("input",{type:"text", placeholder:"Tìm hàng hoá…", value: ui.query,
     "aria-label":"Tìm hàng hoá",
     onInput:e=>{ ui.query = e.target.value; refresh(); }});
-  card.appendChild(h("div",{class:"pxsearch", style:"margin-bottom:8px"}, svg(I.search,16), searchIn));
+  catalog.appendChild(h("div",{class:"pxsearch"}, svg(I.search,16), searchIn));
   const q = ui.query.trim().toLowerCase();
-  const items = HANDOVER_GOODS.filter(a => !q || (a.label+" "+a.code).toLowerCase().includes(q));
-  if (!items.length){
-    card.appendChild(h("p",{class:"sale-empty"}, "Không tìm thấy hàng hoá"));
-    return card;
-  }
-  items.forEach(a => {
-    const qty = rec[a.code] || 0;
-    card.appendChild(h("div",{class:"steprow"},
-      h("div",{style:"flex:1;min-width:0"},
-        h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, a.label),
-        h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, a.code+" · "+a.unit)),
-      h("div",{class:"stepper"},
-        h("button",{type:"button", "aria-label":"Giảm "+a.label, disabled: !editable || qty<=0, onClick:()=>{
-          if (!editable) return;
-          rec[a.code] = Math.max(0, qty - 1);
-          refresh();
-        }},"−"),
-        h("span",{class:"sv"}, String(qty)),
-        h("button",{type:"button", "aria-label":"Tăng "+a.label, disabled: !editable, onClick:()=>{
-          if (!editable) return;
-          rec[a.code] = qty + 1;
-          refresh();
-        }},"+"))));
-  });
+  const items = HANDOVER_GOODS.filter(a => !q || a.label.toLowerCase().includes(q));
+  catalog.appendChild(items.length ? goodsRows(items) : h("div",{class:"goods-empty"}, "Không tìm thấy hàng hoá."));
+  card.appendChild(catalog);
   return card;
 }
 function trolleyAmenityCard(g, editing){
@@ -4730,11 +4808,11 @@ function HandoverHub(v){
   if (!S.session.roles.some(r => CREW_ROLES.includes(r))) return NoAccess(v);
   const purser = isPurser(S.session.roles);
   bar(v,{title:"Bàn giao",
-    subtitle: "Thiết bị · hàng hoá trả về sau hạ cánh",
+    subtitle: "Hàng hoá về Ground · thiết bị ở lại tàu bay",
     onBack:()=>back("/crew")});
   const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:10px;padding-top:16px"});
   body.appendChild(h("p",{style:"font:400 13px/20px Plus Jakarta Sans;color:var(--ink-2);margin:0 2px 4px"},
-    "Trả iPad / máy POS và khai báo số hàng hoá còn lại sau chuyến. Nhận trolley cart trước bay là mục riêng."));
+    "Khai báo hàng hoá trả Ground; thiết bị được để lại trên tàu bay hoặc bàn giao hai bước cho tổ tiếp theo."));
   ALL_LEGS.forEach(l => {
     const [tone, lab] = handoverStatus(l.flightNo);
     const am = handoverAmenityCount(l.flightNo);
@@ -4772,10 +4850,21 @@ function HandoverDetail(v, path){
   if (!l){ v.appendChild(h("div",{class:"center"}, h("p",{},"Không tìm thấy chặng."))); return; }
 
   const rec = handoverOf(no);
-  const locked = !!rec.confirmed;
-  const editable = purser && !locked;
-  const mode = rec.mode || "ground";
-  const body = h("div",{class:"body", style:"display:flex;flex-direction:column;gap:12px;padding-top:16px"});
+  const goodsEditable = purser && !rec.confirmed;
+  const deviceEditable = purser && !rec.deviceReceivedAt;
+  const crewTransfer = rec.deviceMode === "crew";
+  const tab = handoverTabFor(no);
+  const devCount = handoverDeviceCount(no);
+  const devDone = crewTransfer ? !!rec.deviceReceivedAt : !!rec.deviceOnboardAt;
+  const amFilled = HANDOVER_GOODS.filter(a => (rec.amenityQty[a.code]||0) > 0).length;
+  const tabs = [
+    {id:"goods", label:"Hàng hoá", done:!!rec.confirmed},
+    {id:"devices", label:"Thiết bị", done:devDone},
+    ...(crewTransfer ? [{id:"ops", label:"Vận hành", done:!!(rec.crewNote||"").trim()}] : []),
+  ];
+  const activeTab = tabs.some(t => t.id === tab) ? tab : tabs[0].id;
+
+  const body = h("div",{class:"body ho-body"});
 
   if (!purser){
     body.appendChild(h("div",{class:"banner warn"}, svg(I.lock,18),
@@ -4784,52 +4873,103 @@ function HandoverDetail(v, path){
     ));
   }
 
-  body.appendChild(h("div",{class:"zonechips"},
-    h("button",{type:"button", class:"zchip"+(mode==="ground"?" on":""), disabled:!editable,
-      onClick:()=>{ rec.mode = "ground"; refresh(); }}, "Bàn giao Ground"),
-    h("button",{type:"button", class:"zchip"+(mode==="crew"?" on":""), disabled:!editable,
-      onClick:()=>{ rec.mode = "crew"; refresh(); }}, "Đổi tổ bay")));
+  body.appendChild(h("div",{class:"ho-seg", role:"tablist", "aria-label":"Các bước bàn giao"},
+    ...tabs.map(t => h("button",{type:"button", role:"tab", class:"ho-tab",
+        "aria-selected": activeTab===t.id ? "true" : "false",
+        onClick:()=>{ handoverTabByLeg[no] = t.id; refresh(); }},
+      t.label, h("span",{class:"ho-dot"+(t.done?" done":""), "aria-hidden":"true"})))));
 
-  body.appendChild(h("div",{class:"banner info"}, svg(I.cube,18),
-    h("div",{}, h("b",{}, mode==="crew" ? "Bàn giao vận hành cho tổ mới" : "Bàn giao thiết bị & hàng hoá"),
-      h("span",{}, mode==="crew"
-        ? "Tổ tiếp theo tiếp quản rotation — kèm ghi chú vận hành bên dưới."
-        : "Tick iPad / máy POS đã trả, nhập số hàng hoá trả về kho."))
-  ));
+  if (activeTab === "goods"){
+    body.appendChild(amenityChecklistCard({
+      title:"Hàng hoá trả về", sub:"Bàn giao cho Ground sau hạ cánh.",
+      rec: rec.amenityQty, editable: goodsEditable, uiKey:"handover:"+no,
+      alwaysOpen:true, enteredFirst:true,
+    }));
+  }
 
-  /* 1. Thiết bị — chỉ iPad & POS */
-  const devCard = h("section",{class:"card", style:"padding:4px 14px 8px"});
-  devCard.appendChild(h("div",{style:"font:700 14px Plus Jakarta Sans;padding:12px 0 6px"},"1. Thiết bị"));
-  HANDOVER_DEVICES.forEach(d => {
-    const on = !!rec.devices[d.id];
-    devCard.appendChild(h("button",{
-      type:"button",
-      class:"steprow",
-      style:"width:100%;background:none;border:0;cursor:"+(editable?"pointer":"default")+";text-align:left",
-      disabled: !editable,
-      onClick:()=>{ if (!editable) return; rec.devices[d.id] = !rec.devices[d.id]; refresh(); },
-    },
-      h("div",{style:"flex:1"},
-        h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, d.label),
-        h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, d.sub)
-      ),
-      h("span",{class:"chip "+(on?"ok":"")}, on ? "Đã bàn giao" : "Chưa")
-    ));
-  });
-  body.appendChild(devCard);
+  if (activeTab === "devices"){
+    const devCard = h("section",{class:"card ho-section"});
+    devCard.appendChild(h("div",{class:"ho-section-head"},
+      h("div",{class:"mh-tx"},
+        h("b",{}, "Thiết bị trên tàu bay"),
+        h("span",{}, "iPad và máy POS không bàn giao cho Ground."))));
+    devCard.appendChild(h("div",{class:"ho-choices"},
+      h("button",{type:"button", class:"ho-choice"+(!crewTransfer?" on":""), disabled:!deviceEditable || !!rec.deviceOfferedAt,
+        onClick:()=>{
+          rec.deviceMode = "onboard";
+          rec.deviceOfferedAt = null;
+          rec.deviceReceivedAt = null;
+          if (handoverTabFor(no) === "ops") handoverTabByLeg[no] = "devices";
+          refresh();
+        }},
+        h("b",{}, "Để lại trên tàu bay"),
+        h("span",{}, "Không có tổ nhận trực tiếp")),
+      h("button",{type:"button", class:"ho-choice"+(crewTransfer?" on":""), disabled:!deviceEditable || !!rec.deviceOfferedAt,
+        onClick:()=>{
+          rec.deviceMode = "crew";
+          rec.deviceOnboardAt = null;
+          refresh();
+        }},
+        h("b",{}, "Bàn giao tổ bay"),
+        h("span",{}, "Tổ mới xác nhận đã nhận"))));
 
-  /* 2. Hàng hoá trả về — DM Amenity cột C */
-  body.appendChild(amenityChecklistCard({
-    title:"2. Hàng hoá trả về", sub:"Nhập số lượng còn lại / trả về kho sau chuyến.",
-    rec: rec.amenityQty, editable, uiKey:"handover:"+no, padding:"4px 14px 8px",
-  }));
+    if (!crewTransfer){
+      devCard.appendChild(h("label",{class:"ho-field"},
+        h("span",{}, "Vị trí để thiết bị"),
+        h("input",{class:"ho-input", type:"text", value:rec.deviceLocation,
+          "aria-label":"Vị trí để thiết bị trên tàu bay", disabled:!deviceEditable,
+          onInput:e=>{ rec.deviceLocation = e.target.value; rec.deviceOnboardAt = null; }})));
+      if (rec.deviceOnboardAt){
+        devCard.appendChild(h("div",{class:"ho-status complete"}, svg(I.check,18),
+          h("div",{}, h("b",{}, "Đã ghi nhận trên tàu bay"),
+            h("span",{}, rec.deviceLocation+" · "+hhmm(rec.deviceOnboardAt)))));
+      }
+    } else if (rec.deviceOfferedAt && !rec.deviceReceivedAt){
+      devCard.appendChild(h("div",{class:"ho-status pending"}, svg(I.warn,18),
+        h("div",{}, h("b",{}, "Chờ tổ mới xác nhận"),
+          h("span",{}, devCount+" thiết bị · tổ cũ gửi lúc "+hhmm(rec.deviceOfferedAt)))));
+    } else if (rec.deviceReceivedAt){
+      devCard.appendChild(h("div",{class:"ho-status complete"}, svg(I.check,18),
+        h("div",{}, h("b",{}, "Tổ mới đã xác nhận nhận"),
+          h("span",{}, devCount+" thiết bị · "+hhmm(rec.deviceReceivedAt)))));
+    } else {
+      devCard.appendChild(h("div",{class:"ho-status"}, svg(I.cube,18),
+        h("div",{}, h("b",{}, "Quy trình xác nhận hai bước"),
+          h("span",{}, "Tổ cũ gửi bàn giao, sau đó Purser tổ mới kiểm tra và xác nhận."))));
+    }
 
-  /* 3. Bàn giao vận hành — chỉ khi đổi tổ giữa rotation, tổ mới cần biết đã tới đâu */
-  if (mode === "crew"){
+    HANDOVER_DEVICES.forEach(d => {
+      const on = !!rec.devices[d.id];
+      devCard.appendChild(h("button",{
+        type:"button",
+        class:"steprow",
+        style:"width:100%;background:none;border:0;cursor:"+(deviceEditable?"pointer":"default")+";text-align:left",
+        disabled: !deviceEditable || !!rec.deviceOfferedAt,
+        onClick:()=>{
+          if (!deviceEditable || rec.deviceOfferedAt) return;
+          rec.devices[d.id] = !rec.devices[d.id];
+          rec.deviceOnboardAt = null;
+          refresh();
+        },
+      },
+        h("div",{style:"flex:1"},
+          h("b",{style:"font:600 14px Plus Jakarta Sans;display:block"}, d.label),
+          h("span",{style:"font:500 12px Plus Jakarta Sans;color:var(--n500)"}, d.sub)
+        ),
+        h("span",{class:"chip "+(on?"ok":"")}, on ? "Đã chọn" : "Chưa chọn")
+      ));
+    });
+    body.appendChild(devCard);
+  }
+
+  if (activeTab === "ops" && crewTransfer){
     const ss = legServeStats(l);
     const irList = irregularitiesOf(no);
-    const opCard = h("section",{class:"card", style:"padding:4px 14px 8px"});
-    opCard.appendChild(h("div",{style:"font:700 14px Plus Jakarta Sans;padding:12px 0 6px"},"3. Bàn giao vận hành"));
+    const opCard = h("section",{class:"card ho-section"});
+    opCard.appendChild(h("div",{class:"ho-section-head"},
+      h("div",{class:"mh-tx"},
+        h("b",{}, "Bàn giao vận hành"),
+        h("span",{}, "Thông tin để tổ tiếp theo tiếp quản rotation."))));
     opCard.appendChild(h("div",{class:"pp-prog"},
       h("div",{class:"pp-cell"}, h("b",{}, String(ss.unserved)), h("span",{},"Chưa phục vụ")),
       h("div",{class:"pp-cell"}, h("b",{}, String(legSaleTxCount(no))), h("span",{},"Giao dịch bán hàng")),
@@ -4845,32 +4985,50 @@ function HandoverDetail(v, path){
             h("p",{style:"font:400 13px Plus Jakarta Sans;color:var(--ink);margin-top:2px"}, r.note))))));
     }
     opCard.appendChild(h("p",{style:"font:600 12px Plus Jakarta Sans;color:var(--ink-2);margin:12px 0 6px"},"Ghi chú thêm cho tổ mới"));
-    opCard.appendChild(h("textarea",{rows:3, placeholder:"Ghi chú thêm cho tổ mới (nếu có)…", disabled: !editable,
+    opCard.appendChild(h("textarea",{rows:3, placeholder:"Ghi chú thêm cho tổ mới (nếu có)…", disabled: !purser,
       style:"width:100%;padding:10px 12px;border-radius:var(--r-md);border:1px solid var(--line);font:400 14px Plus Jakarta Sans;resize:vertical",
       onInput:e=>{ rec.crewNote = e.target.value; }}, rec.crewNote||""));
     body.appendChild(opCard);
   }
 
-  const canConfirm = handoverDeviceCount(no) > 0 || handoverAmenityCount(no) > 0
-    || (mode === "crew" && (rec.crewNote||"").trim().length > 0);
-  if (purser){
-    body.appendChild(h("button",{type:"button", class:"cta"+(rec.confirmed?" servedon":""),
-      disabled: !rec.confirmed && !canConfirm,
-      onClick:()=>{
-        if (rec.confirmed){
-          rec.confirmed = false;
-          rec.at = null;
-        } else {
-          rec.confirmed = true;
-          rec.at = S.simNow;
-        }
-        refresh();
-      }}, rec.confirmed
-        ? ("Đã bàn giao · "+hhmm(rec.at)+" · chạm để huỷ")
-        : (mode==="crew" ? "Xác nhận bàn giao cho tổ mới" : "Xác nhận bàn giao"),
-      svg(I.check,18)));
-  }
   v.appendChild(body);
+
+  if (purser){
+    const foot = h("div",{class:"ho-foot"});
+    let action = null;
+    if (activeTab === "goods"){
+      action = h("button",{type:"button", class:"cta"+(rec.confirmed?" servedon":""),
+        onClick:()=>{
+          rec.confirmed = !rec.confirmed;
+          rec.at = rec.confirmed ? S.simNow : null;
+          refresh();
+        }}, rec.confirmed ? ("Đã xác nhận Ground · "+hhmm(rec.at)+" · chạm để huỷ") : "Xác nhận hàng hoá trả về Ground",
+        svg(I.check,18));
+    } else if (activeTab === "devices" && !crewTransfer){
+      action = h("button",{type:"button", class:"cta"+(rec.deviceOnboardAt?" servedon":""),
+        disabled: !rec.deviceOnboardAt && (devCount===0 || !rec.deviceLocation.trim()),
+        onClick:()=>{
+          rec.deviceOnboardAt = rec.deviceOnboardAt ? null : S.simNow;
+          refresh();
+        }}, rec.deviceOnboardAt ? ("Đã để thiết bị trên tàu · "+hhmm(rec.deviceOnboardAt)) : "Xác nhận để thiết bị trên tàu",
+        svg(I.check,18));
+    } else if (activeTab === "devices" && crewTransfer && !rec.deviceOfferedAt){
+      action = h("button",{type:"button", class:"cta", disabled:devCount===0,
+        onClick:()=>{ rec.deviceOfferedAt = S.simNow; refresh(); }},
+        "Gửi bàn giao cho tổ mới", svg(I.check,18));
+    } else if (activeTab === "devices" && crewTransfer && !rec.deviceReceivedAt){
+      action = h("button",{type:"button", class:"cta",
+        onClick:()=>{ rec.deviceReceivedAt = S.simNow; refresh(); }},
+        "Tổ mới xác nhận đã nhận", svg(I.check,18));
+    } else if (activeTab === "devices" && crewTransfer){
+      action = h("button",{type:"button", class:"cta servedon", disabled:true},
+        "Đã hoàn tất bàn giao thiết bị", svg(I.check,18));
+    }
+    if (action){
+      foot.appendChild(action);
+      v.appendChild(foot);
+    }
+  }
 }
 
 function packStrip(){
