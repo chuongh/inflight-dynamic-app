@@ -223,6 +223,71 @@ body{
 .banner.bad{background:var(--danger-bg);border-color:var(--danger);color:var(--danger-text)}
 .banner.info{background:var(--note-bg);border-color:var(--note);color:var(--note-text)}
 
+/* ── Alert Card B — Split panel (amber rail) ────────────────────────
+   Trái amber (đồng bộ Báo động, tránh trùng header đỏ); phải trắng + 2 actions. */
+.urgentwrap{display:flex;flex-direction:column;gap:10px;margin:16px 2px 20px}
+.urgentcard{display:flex;align-items:stretch;overflow:hidden;padding:0;
+  border-radius:var(--r-xl);background:var(--n0);border:1px solid #E8D4A8;
+  box-shadow:0 8px 22px rgba(154,106,0,.10);animation:urgentEnter 640ms var(--ease-out) both}
+.urgentrail{flex:none;width:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:14px 8px;background:linear-gradient(165deg,#C98900 0%,#9A6A00 100%);color:#fff}
+.urgentic{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);
+  animation:urgentIconPop 500ms var(--ease-out) .12s 2 both}
+.urgentrail-lab{font:800 9px/1 "Plus Jakarta Sans";letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,.92)}
+.urgentbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px 12px 10px 14px}
+.urgentcopy{flex:1;min-width:0;text-align:left;background:none;border:0;color:inherit;padding:0;cursor:pointer}
+.urgentcopy:focus-visible{outline:2px solid #9A6A00;outline-offset:2px;border-radius:8px}
+.urgentcard b{display:block;font:800 14.5px/19px "Plus Jakarta Sans";color:var(--ink);letter-spacing:-.01em}
+.urgentcard p{font:500 12.5px/17px "Plus Jakarta Sans";margin-top:4px;color:var(--ink-2);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.urgenttime{display:block;font:600 11px/15px "Plus Jakarta Sans";color:var(--ink-3);margin-top:6px}
+.urgentfoot{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.urgentack,.urgentmore{font:700 12.5px/16px "Plus Jakarta Sans";background:none;border:0;
+  min-height:36px;padding:0 10px;border-radius:var(--r-pill);
+  transition:background var(--dur) ease, color var(--dur) ease, transform var(--dur-fast) var(--ease-out)}
+.urgentack{color:var(--ink-2)}
+.urgentack:hover{background:var(--surface-2);color:var(--ink)}
+.urgentmore{color:#8A5F00}
+.urgentmore:hover{background:#FFF6E0}
+.urgentack:active,.urgentmore:active{transform:scale(.97)}
+.urgentack:focus-visible,.urgentmore:focus-visible{outline:2px solid #9A6A00;outline-offset:2px}
+@keyframes urgentEnter{
+  0%{opacity:0;transform:translateY(-7px) scale(.98)}
+  55%{opacity:1;transform:translateY(0) scale(1)}
+  72%{transform:translateY(-2px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes urgentIconPop{
+  0%,100%{transform:scale(1)}
+  45%{transform:scale(1.08)}
+  70%{transform:scale(.97)}
+}
+@media (prefers-reduced-motion:reduce){
+  .urgentcard,.urgentic{animation:none}
+}
+
+/* ── Nút Báo động (sai boarding) ────────────────────────────────────
+   Amber — tách khỏi .cta đỏ (Quét) và .cta.mismatch vẫn dùng tông vàng
+   riêng cho lệch suất ăn; giữ amber theo yêu cầu product. */
+.cta.alert{position:relative;isolation:isolate;
+  background:linear-gradient(135deg,#C98900,#9A6A00);color:#fff;
+  border:0;box-shadow:0 10px 24px rgba(154,106,0,.28);
+  animation:alertCtaFade 400ms var(--ease-out) both, alertCtaNudge 700ms var(--ease-out) .3s 2 both}
+.cta.alert:hover{filter:brightness(1.05)}
+.cta.alert:active{transform:scale(.975);filter:brightness(.95)}
+.cta.alert:focus-visible{outline:2px solid #9A6A00;outline-offset:3px}
+@keyframes alertCtaFade{from{opacity:0}to{opacity:1}}
+@keyframes alertCtaNudge{
+  0%,100%{transform:translateY(0)}
+  40%{transform:translateY(-3px)}
+  65%{transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .cta.alert{animation:none}
+}
+
 /* ── tabs — vjMobile / MobileDesignPreview (surface + active đỏ) ── */
 .body.pad-tabs{padding-bottom:calc(var(--sa-bot) + 88px)}
 .tabs{position:absolute;left:0;right:0;bottom:0;z-index:40;display:flex;flex-direction:column;
@@ -1356,6 +1421,7 @@ const MODULES = [
   {id:"scan_bp",        title:"Scan boarding pass", icon:"scan", roles:CREW_ROLES, route:"/crew/scan-pick", named:true},
   // Vai trò khác
   {id:"ground_ops",  title:"Mặt đất · Quét thẻ",  icon:"scan", roles:["ground_staff","gate_supervisor"], route:"/scan"},
+  {id:"gate_ride",   title:"Đặt xe",              icon:"car",  roles:["gate_supervisor"],                route:null, named:true},
   {id:"ops_ride",    title:"Xe vận hành",         icon:"car",  roles:["ramp_driver"],                    route:null, named:true},
   {id:"catering_ops",title:"Suất ăn & Hàng hoá",  icon:"food", roles:["catering"],                       route:null, named:true},
   {id:"devices",     title:"Thiết bị",            icon:"cube", roles:["engineer"],                       route:null, named:true},
@@ -1829,7 +1895,16 @@ const NOTIFS = [
   {id:"N3", icon:"bell",     tone:"info",   title:"Thông báo nội bộ",  body:"Quy trình phục vụ khách SSR cập nhật từ 14/07", time:"Hôm qua",     unread:false},
   {id:"N4", icon:"down",     tone:"info",   title:"Gói bay đã sẵn sàng",body:"5 chặng · 12.4 MB đã tải xong, dùng được offline", time:"Hôm qua",  unread:false},
 ];
-const unreadNotifs = () => NOTIFS.filter(n => n.unread).length;
+/* n.roles không set → hiện cho mọi vai trò (giữ hành vi cũ của các thông báo
+   sẵn có); n.roles có set → chỉ hiện cho ai có ít nhất 1 vai trò trùng (dùng
+   cho cảnh báo nhắm riêng 1 vai trò, vd sai chuyến báo Gate Supervisor). */
+const notifVisibleTo = (n, roles) => !n.roles || n.roles.some(r => roles.includes(r));
+const visibleNotifs = () => NOTIFS.filter(n => notifVisibleTo(n, S.session.roles));
+const unreadNotifs = () => visibleNotifs().filter(n => n.unread).length;
+/* Cảnh báo nhắm riêng 1 vai trò (n.roles có set, vd gate_supervisor) và chưa
+   đọc → đủ "khẩn" để nổi ngay Trang chủ, không tính các thông báo chung
+   (phân ca, gói bay…) vốn không cần phản ứng ngay. */
+const urgentNotifsFor = roles => NOTIFS.filter(n => n.unread && n.roles && notifVisibleTo(n, roles));
 
 // src/lib/mock — scan, passenger, flight
 const activeFlight = {code:"VJ127", from:"HAN", to:"SGN", scannedCount:128};
@@ -2696,12 +2771,39 @@ function homeShortcutsSection(){
   return wrap;
 }
 
+/* Thẻ cảnh báo khẩn — split panel B: rail đỏ + nội dung trắng + 2 text action.
+   Chạm nội dung / Xử lý → Thông báo; Đã xem → đánh dấu đọc tại chỗ. */
+function urgentAlertsSection(list){
+  const wrap = h("div",{class:"urgentwrap"});
+  list.forEach(n => {
+    wrap.appendChild(h("div",{class:"urgentcard", role:"alert"},
+      h("div",{class:"urgentrail","aria-hidden":"true"},
+        h("span",{class:"urgentic"}, svg(I[n.icon] ?? I.warn, 22)),
+        h("span",{class:"urgentrail-lab"},"Khẩn")),
+      h("div",{class:"urgentbody"},
+        h("button",{type:"button", class:"urgentcopy",
+            onClick:()=>go("/notifications"), "aria-label":`Mở thông báo: ${n.title}`},
+          h("b",{}, n.title),
+          h("p",{}, n.body),
+          h("span",{class:"urgenttime"}, n.time)),
+        h("div",{class:"urgentfoot"},
+          h("button",{type:"button", class:"urgentack", "aria-label":"Đánh dấu đã xem cảnh báo",
+              onClick:()=>{ n.unread=false; refresh(); }},"Đã xem"),
+          h("button",{type:"button", class:"urgentmore",
+              onClick:()=>go("/notifications"), "aria-label":`Xử lý: ${n.title}`},
+            "Xử lý →")))));
+  });
+  return wrap;
+}
 function LauncherHome(v){
   const roles = S.session.roles;
   const isCrew = ROLE_DASHBOARDS[resolvePrimaryRole(roles)] === "CrewDashboard";
   launcherHero(v, isCrew ? dutyRibbon() : null);
   const mods = modulesForRoles(roles);
   const body = h("div",{class:"body pad-tabs"});
+
+  const urgent = urgentNotifsFor(roles);
+  if (urgent.length) body.appendChild(urgentAlertsSection(urgent));
 
   if (isCrew) body.appendChild(homeShortcutsSection());
 
@@ -2740,12 +2842,13 @@ function LauncherHome(v){
 /* ── Notifications = hộp thư vận hành ────────────────────────────── */
 function Notifications(v){
   S.tab = "notif";
+  const mine = visibleNotifs();
   const unread = unreadNotifs();
   subHeader(v, "Thông báo", unread ? `${unread} thông báo chưa đọc` : "Đã đọc hết");
   const body = h("div",{class:"body pad-tabs"});
   if (unread) body.appendChild(h("div",{class:"sec", style:"justify-content:flex-end"},
-    h("button",{class:"link", style:"font-size:13px", onClick:()=>{ NOTIFS.forEach(n=>n.unread=false); go("/notifications","reset"); }},"Đánh dấu đã đọc")));
-  body.appendChild(h("div",{class:"ntlist"}, ...NOTIFS.map(n =>
+    h("button",{class:"link", style:"font-size:13px", onClick:()=>{ mine.forEach(n=>n.unread=false); go("/notifications","reset"); }},"Đánh dấu đã đọc")));
+  body.appendChild(h("div",{class:"ntlist"}, ...mine.map(n =>
     h("button",{class:"nt"+(n.unread?" unread":"")+(n.tone==="danger"?" danger":""),
         onClick:()=>{ n.unread=false; go("/notifications","reset"); }},
       h("span",{class:"ntic"}, svg(I[n.icon] ?? I.bell, 20)),
@@ -5153,6 +5256,21 @@ function RegisterScreen(v){
 }
 
 /* ── scan (ground_ops) ──────────────────────────────────────────── */
+/* Sai chuyến → nhân viên mặt đất chủ động bấm mới báo (không tự gửi), tránh
+   làm phiền Gate Supervisor với báo động chưa xác nhận là thật. Thông báo chỉ
+   hiện cho vai trò gate_supervisor (roles:[...] trên notif — xem notifVisibleTo). */
+function sendGateAlert(){
+  const r = S.scan.result;
+  if (!r || r.kind !== "wrong" || r.alerted) return;
+  r.alerted = true;
+  NOTIFS.unshift({
+    id:"NA"+Date.now().toString(36), icon:"warn", tone:"danger", roles:["gate_supervisor"],
+    title:"Cảnh báo sai chuyến · "+activeFlight.code,
+    body:`${S.session.displayName || "Nhân viên mặt đất"} quét nhầm khách tại quầy ${activeFlight.code} (${activeFlight.from}→${activeFlight.to}) — khách thuộc ${r.scannedFlight}.`,
+    time:"Vừa gửi", unread:true,
+  });
+  refresh();
+}
 function ScanScreen(v){
   if (!canAccessModule(S.session.roles,"ground_ops")) return NoAccess(v);
   bar(v,{title:"Scan boarding pass", subtitle:`${activeFlight.code} · ${activeFlight.from}→${activeFlight.to}`,
@@ -5168,7 +5286,14 @@ function ScanScreen(v){
     h("div",{}, h("b",{},"Đúng chuyến"), h("span",{},"Hành khách thuộc chuyến đang phục vụ. Đã ghi nhận lên tàu."))));
   if (r?.kind === "wrong") body.appendChild(h("div",{class:"banner bad"}, svg(I.warn,20),
     h("div",{}, h("b",{},"Sai chuyến"),
-      h("span",{},`HK thuộc ${r.scannedFlight}, không phải ${activeFlight.code}. Đã gửi cảnh báo tới supervisor.`))));
+      h("span",{},`HK thuộc ${r.scannedFlight}, không phải ${activeFlight.code}.`))));
+
+  if (r?.kind === "wrong") body.appendChild(
+    r.alerted
+      ? h("div",{class:"banner warn"}, svg(I.check,20),
+          h("div",{}, h("b",{},"Đã báo Gate Supervisor"), h("span",{},"Chờ supervisor xử lý.")))
+      : h("button",{type:"button", class:"cta alert", onClick:sendGateAlert},
+          "Báo động cho Gate Supervisor", svg(I.bell,18)));
 
   // supervisor-only action, permission-gated
   if (r?.kind === "wrong" && hasPermission(S.session.roles,"ground_ops.wrongboarding.accept"))
@@ -5177,15 +5302,16 @@ function ScanScreen(v){
 
   const doScan = () => { S.scan.result = nextScanResult(S.scan.count); S.scan.count++; refresh(); };
 
+  /* "QUÉT" chỉ dùng cho lần quét ĐẦU TIÊN (chưa có kết quả). Sau khi đã có kết
+     quả (đúng hoặc sai chuyến), nút chính luôn ghi rõ "Quét khách tiếp theo" —
+     trước đây cùng 1 nút "QUÉT" vừa có nghĩa "bắt đầu quét" vừa có nghĩa "bỏ
+     qua cảnh báo sai chuyến, sang khách kế" tuỳ trạng thái, gây nhầm lẫn. */
   body.appendChild(h("div",{style:"display:flex;flex-direction:column;gap:12px;margin-top:auto;padding-bottom:16px"},
     r?.kind === "correct"
       ? h("button",{class:"cta", onClick:()=>go("/passenger")},"Xem hồ sơ HK", svg(I.arrow,18))
-      : h("button",{class:"cta", onClick:doScan},"QUÉT"),
-    // ĐỀ XUẤT — không có trong source. Sau khi quét đúng, màn hình thật chỉ còn
-    // "Xem hồ sơ HK": không có đường quét khách kế tiếp mà không rời màn.
+      : h("button",{class:"cta", onClick:doScan}, r ? "Quét khách tiếp theo" : "QUÉT"),
     r?.kind === "correct"
-      ? h("button",{class:"cta ghost", onClick:doScan},"Quét khách tiếp theo",
-          h("span",{class:"chip warn", style:"margin-left:6px;font-size:10px"},"đề xuất"))
+      ? h("button",{class:"cta ghost", onClick:doScan},"Quét khách tiếp theo")
       : null,
     h("p",{style:"text-align:center;font:400 14px Plus Jakarta Sans;color:var(--n500)"}, `Đã quét: ${S.scan.count}`),
     h("button",{class:"link", style:"display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;width:100%", onClick:()=>{}},
