@@ -743,7 +743,34 @@
       "savedV": "Đã lưu nháp v{{v}}",
       "sentV": "Đã gửi nhà cung cấp · v{{v}}",
       "revisionCreated": "Đã tạo version mới v{{v}} để chỉnh sửa",
-      "needConfirmed": "Chưa có nhóm nào được xác nhận để lên order."
+      "needConfirmed": "Chưa có nhóm nào được xác nhận để lên order.",
+      "supplier": {
+        "title": "ECO / SkyBoss Business",
+        "flightsN": "{{n}} chuyến",
+        "pendingBanner": "Còn {{n}} chuyến chưa xác nhận nhóm — xem lại phân nhóm trước khi gửi.",
+        "openGrouping": "Mở phân nhóm chuyến bay",
+        "exportFailed": "Không thể xuất file nhà cung cấp. Vui lòng thử lại.",
+        "tabDishes": "Tổng quan món",
+        "tabSupplier": "ECO / SkyBoss",
+        "emptySupplier": "Chưa có chuyến confirmed để review ECO / SkyBoss. Xác nhận nhóm chuyến trước.",
+        "flightStrip": "Chọn chuyến",
+        "editorTitle": "Chi tiết chuyến",
+        "previewTitle": "Bảng xuất NCC",
+        "pendingShort": "{{n}} chưa xác nhận",
+        "rollupHint": "Tổng hợp từ ECO / SkyBoss (không gồm amenities). Sửa số ở tab ECO / SkyBoss.",
+        "kpiEcoMeals": "ECO · suất & bánh",
+        "kpiEcoCommercial": "ECO · thương mại",
+        "kpiSbbSales": "SBB · suất",
+        "kpiCrewNa": "Crew (N/A)",
+        "cockpitTopTitle": "Top món theo số lượng",
+        "cockpitTopDesc": "{{n}} món lớn nhất trong đơn — dùng để review nhanh trước khi gửi.",
+        "cockpitExceptionsTitle": "Lệch so với đề xuất",
+        "cockpitExceptionsDesc": "{{n}} dòng cần chú ý",
+        "cockpitShowAll": "Xem đầy đủ theo nhóm",
+        "cockpitHideAll": "Thu gọn danh sách đầy đủ",
+        "cockpitLegacyHint": "Pre-book {{pre}} · Crew {{crew}} · Bán thêm {{sales}}",
+        "gotoEditFlights": "Chỉnh theo chuyến"
+      }
     },
     "quota": {
       "badge": "UC-10 · Suất ăn trên tàu bay",
@@ -902,7 +929,36 @@
       "tab": {
         "commercial": "Định mức hotmeal",
         "grouping": "Phân nhóm chuyến bay",
+        "supplier": "Quy tắc ECO / SkyBoss",
         "crew": "Suất ăn tổ bay"
+      },
+      "supplier": {
+        "loading": "Đang tải quy tắc nhà cung cấp…",
+        "versionSelect": "Phiên bản quy tắc nhà cung cấp",
+        "edit": "Chỉnh quy tắc nhà cung cấp",
+        "editBanner": "Chỉnh sửa sẽ tạo phiên bản mới khi phát hành. Route không khớp sẽ dùng số liệu từ chuyến bay.",
+        "created": "Đã phát hành quy tắc {{id}} — hiệu lực {{date}}.",
+        "ecoTitle": "Công thức ECO theo đường bay",
+        "ecoDesc": "Áp dụng khi chuyến bay chạm một trong các sân bay Úc được liệt kê.",
+        "airports": "Sân bay (cách nhau bằng dấu phẩy)",
+        "noodleVeg": "Rau mỳ Úc (số cố định)",
+        "skybossEggs": "Trứng SkyBoss = số khách SkyBoss ECO",
+        "skybossYogurt": "Sữa chua SkyBoss Úc = số khách SkyBoss ECO",
+        "roundBread": "Bánh tròn Úc = số khách SkyBoss ECO",
+        "sbbTitle": "Bảng lookup SkyBoss Business",
+        "sbbDesc": "Dòng khớp đúng businessPax theo từng sheet. Không có dòng thì ô để trống.",
+        "addRow": "Thêm dòng businessPax",
+        "removeRow": "Xóa dòng",
+        "emptySheet": "Sheet này chưa có dòng lookup.",
+        "item": {
+          "bread": "Bánh mì",
+          "basa": "Cá basa",
+          "pho": "Phở",
+          "bunBo": "Bún bò",
+          "stickyRice": "Xôi",
+          "chickenGravy": "Gà sốt",
+          "blanket": "Chăn"
+        }
       },
       "crew": {
         "editConfig": "Chỉnh cấu hình",

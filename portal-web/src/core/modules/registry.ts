@@ -166,6 +166,7 @@ export const NAV_SECTION_KEYS: Record<
   'design-system': { sectionTitleKey: 'nav.designSystem' },
   catering: { sectionTitleKey: 'nav.catering' },
   'catering-grouping': { sectionTitleKey: 'nav.cateringGrouping', moduleLabelKey: 'nav.catering' },
+  'catering-orders': { sectionTitleKey: 'nav.cateringOrders', moduleLabelKey: 'nav.catering' },
   'catering-meals': { sectionTitleKey: 'nav.cateringMeals', moduleLabelKey: 'nav.catering' },
   'catering-quota': { sectionTitleKey: 'nav.inflightMealQuota', moduleLabelKey: 'nav.catering' },
   'catering-config': { sectionTitleKey: 'nav.cateringConfig', moduleLabelKey: 'nav.catering' },

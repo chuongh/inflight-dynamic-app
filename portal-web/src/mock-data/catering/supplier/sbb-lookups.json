@@ -1,0 +1,241 @@
+{
+  "effectiveFrom": "08/07/2026",
+  "effectiveTo": "31/12/2026",
+  "source": "GC-SGN C 08 JUL VER 01.xlsx · QUY TẮC C ÚC&KAZ + QUY TẮC C (pax 1–12; Phở/Bún cùng cột Phở bò/Bún bò)",
+  "sheets": {
+    "VIET-HAN-NHAT": [
+      {
+        "businessPax": 1,
+        "items": {
+          "bread": 1,
+          "pho": 1,
+          "stickyRice": 1
+        }
+      },
+      {
+        "businessPax": 2,
+        "items": {
+          "bread": 1,
+          "pho": 2,
+          "stickyRice": 1
+        }
+      },
+      {
+        "businessPax": 3,
+        "items": {
+          "bread": 1,
+          "pho": 2,
+          "stickyRice": 2
+        }
+      },
+      {
+        "businessPax": 4,
+        "items": {
+          "bread": 2,
+          "pho": 2,
+          "stickyRice": 2
+        }
+      },
+      {
+        "businessPax": 5,
+        "items": {
+          "bread": 2,
+          "pho": 3,
+          "stickyRice": 2
+        }
+      },
+      {
+        "businessPax": 6,
+        "items": {
+          "bread": 2,
+          "pho": 3,
+          "stickyRice": 3
+        }
+      },
+      {
+        "businessPax": 7,
+        "items": {
+          "bread": 3,
+          "pho": 3,
+          "stickyRice": 3
+        }
+      },
+      {
+        "businessPax": 8,
+        "items": {
+          "bread": 3,
+          "pho": 4,
+          "stickyRice": 3
+        }
+      },
+      {
+        "businessPax": 9,
+        "items": {
+          "bread": 3,
+          "pho": 4,
+          "stickyRice": 4
+        }
+      },
+      {
+        "businessPax": 10,
+        "items": {
+          "bread": 4,
+          "pho": 4,
+          "stickyRice": 4
+        }
+      },
+      {
+        "businessPax": 11,
+        "items": {
+          "bread": 4,
+          "pho": 5,
+          "stickyRice": 4
+        }
+      },
+      {
+        "businessPax": 12,
+        "items": {
+          "bread": 4,
+          "pho": 5,
+          "stickyRice": 5
+        }
+      }
+    ],
+    "CHAY(VIỆT-HÀN-NHẬT)": [],
+    "ẤN": [],
+    "ÚC&KAZ": [
+      {
+        "businessPax": 1,
+        "items": {
+          "bread": 1,
+          "basa": 1,
+          "pho": 1,
+          "bunBo": 1,
+          "stickyRice": 1,
+          "chickenGravy": 1
+        }
+      },
+      {
+        "businessPax": 2,
+        "items": {
+          "bread": 1,
+          "basa": 2,
+          "pho": 2,
+          "bunBo": 2,
+          "stickyRice": 1,
+          "chickenGravy": 2
+        }
+      },
+      {
+        "businessPax": 3,
+        "items": {
+          "bread": 2,
+          "basa": 2,
+          "pho": 3,
+          "bunBo": 3,
+          "stickyRice": 2,
+          "chickenGravy": 2
+        }
+      },
+      {
+        "businessPax": 4,
+        "items": {
+          "bread": 2,
+          "basa": 2,
+          "pho": 3,
+          "bunBo": 3,
+          "stickyRice": 2,
+          "chickenGravy": 2
+        }
+      },
+      {
+        "businessPax": 5,
+        "items": {
+          "bread": 2,
+          "basa": 2,
+          "pho": 4,
+          "bunBo": 4,
+          "stickyRice": 2,
+          "chickenGravy": 2
+        }
+      },
+      {
+        "businessPax": 6,
+        "items": {
+          "bread": 3,
+          "basa": 2,
+          "pho": 4,
+          "bunBo": 4,
+          "stickyRice": 3,
+          "chickenGravy": 2
+        }
+      },
+      {
+        "businessPax": 7,
+        "items": {
+          "bread": 3,
+          "basa": 3,
+          "pho": 5,
+          "bunBo": 5,
+          "stickyRice": 3,
+          "chickenGravy": 3
+        }
+      },
+      {
+        "businessPax": 8,
+        "items": {
+          "bread": 3,
+          "basa": 3,
+          "pho": 5,
+          "bunBo": 5,
+          "stickyRice": 3,
+          "chickenGravy": 3
+        }
+      },
+      {
+        "businessPax": 9,
+        "items": {
+          "bread": 4,
+          "basa": 4,
+          "pho": 6,
+          "bunBo": 6,
+          "stickyRice": 4,
+          "chickenGravy": 4
+        }
+      },
+      {
+        "businessPax": 10,
+        "items": {
+          "bread": 4,
+          "basa": 4,
+          "pho": 6,
+          "bunBo": 6,
+          "stickyRice": 4,
+          "chickenGravy": 4
+        }
+      },
+      {
+        "businessPax": 11,
+        "items": {
+          "bread": 5,
+          "basa": 4,
+          "pho": 7,
+          "bunBo": 7,
+          "stickyRice": 5,
+          "chickenGravy": 4
+        }
+      },
+      {
+        "businessPax": 12,
+        "items": {
+          "bread": 5,
+          "basa": 5,
+          "pho": 7,
+          "bunBo": 7,
+          "stickyRice": 5,
+          "chickenGravy": 5
+        }
+      }
+    ]
+  }
+}

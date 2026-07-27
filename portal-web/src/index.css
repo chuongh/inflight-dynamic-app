@@ -7,7 +7,8 @@
   --color-foreground: #231f20;
   --color-muted: #e8ecf1;
   --color-border: #e2e8f0;
-  --color-ring: #f02823;
+  /* Focus ring: slate (ops chrome). Brand red reserved for primary CTAs / danger. */
+  --color-ring: #0f172a;
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
@@ -34,13 +35,26 @@
   --font-subhead: 'JambonoVN Medium', 'Jambono Medium', Nunito, sans-serif;
   --color-text-secondary: #6b7280;
   --color-text-muted: #9ca3af;
+  /*
+   * Ops chrome (ui-ux-pro-max data-dense): navy ink + sky accent.
+   * VietJet red stays on primary buttons / destructive only — not surface chrome.
+   */
+  --color-planner-ink: #0f172a;
+  --color-planner-accent: #0369a1;
+  --color-planner-accent-soft: #e8f1f8;
+  --color-planner-text-subtle: #475569;
+  --color-planner-text-warning: #765b00;
+  --color-planner-border-brand: #94a3b8;
+  --color-planner-border-success: #83bd9d;
+  --color-planner-focus-soft: rgba(3, 105, 161, 0.16);
   --color-surface: #ffffff;
   --shadow-soft: 0 2px 8px rgba(35, 31, 32, 0.05), 0 4px 16px rgba(35, 31, 32, 0.04);
   --shadow-card: 0 2px 8px rgba(35, 31, 32, 0.06), 0 8px 24px rgba(35, 31, 32, 0.08);
   --shadow-panel: var(--shadow-card);
+  --shadow-planner-sticky: 8px 0 10px -10px rgba(35, 31, 32, 0.4);
   --shadow-elevated: 0 12px 32px -6px rgba(35, 31, 32, 0.12), 0 4px 12px -4px rgba(35, 31, 32, 0.06);
   --vj-gradient-hero: radial-gradient(ellipse 55% 45% at 88% 12%, rgba(255, 221, 50, 0.2), transparent 55%), linear-gradient(155deg, #f02823 0%, #d91e1a 48%, #b70005 100%);
-  --vj-gradient-soft: radial-gradient(ellipse 70% 50% at 8% 0%, rgba(240, 40, 35, 0.05), transparent 55%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --vj-gradient-soft: radial-gradient(ellipse 70% 50% at 8% 0%, rgba(3, 105, 161, 0.06), transparent 55%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   --vj-gradient-bar: linear-gradient(90deg, #f02823 0%, #f02823 76%, #ffdd32 76%, #ffdd32 100%);
   --vj-gradient-sidebar: radial-gradient(ellipse 100% 55% at -8% 0%, rgba(255, 221, 50, 0.16), transparent 52%), linear-gradient(180deg, #f02823 0%, #d91e1a 50%, #b70005 100%);
   --shadow-sidebar: 6px 0 36px -6px rgba(183, 0, 5, 0.38), 2px 0 14px rgba(35, 31, 32, 0.1);
@@ -180,17 +194,27 @@ a[href],
   background: var(--color-vj-canvas);
 }
 
-.admin-sidebar {
+.admin-sidebar-slot {
   position: relative;
-  z-index: 10;
+  z-index: 30;
+  flex-shrink: 0;
+  width: 72px;
+}
+
+.admin-sidebar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  width: 260px;
+  width: 72px;
+  height: 100%;
   background: var(--vj-gradient-sidebar);
   border-right: none;
   box-shadow: var(--shadow-sidebar);
-  /* No width transition — collapse is a high-frequency action */
+  transition: width var(--motion-normal) var(--motion-ease);
 }
 .admin-sidebar::after {
   content: '';
@@ -199,8 +223,14 @@ a[href],
   background: linear-gradient(90deg, transparent 72%, rgba(0, 0, 0, 0.07) 100%);
   pointer-events: none;
 }
-.admin-sidebar--collapsed {
+.admin-sidebar--compact {
   width: 72px;
+}
+.admin-sidebar--expanded {
+  width: 260px;
+  box-shadow:
+    var(--shadow-sidebar),
+    12px 0 40px rgba(35, 31, 32, 0.18);
 }
 
 .admin-sidebar__brand {
@@ -223,7 +253,7 @@ a[href],
   background: var(--color-vj-yellow);
   box-shadow: 0 1px 8px rgba(255, 221, 50, 0.45);
 }
-.admin-sidebar--collapsed .admin-sidebar__brand {
+.admin-sidebar--compact .admin-sidebar__brand {
   justify-content: center;
   padding: 0 12px;
 }
@@ -271,7 +301,7 @@ a[href],
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.42);
 }
-.admin-sidebar--collapsed .admin-nav-group__label {
+.admin-sidebar--compact .admin-nav-group__label {
   display: none;
 }
 
@@ -351,14 +381,14 @@ a[href],
   padding-left: 42px;
   font-size: 12.5px;
 }
-.admin-sidebar--collapsed .admin-nav-item {
+.admin-sidebar--compact .admin-nav-item {
   justify-content: center;
   padding: 10px;
 }
-.admin-sidebar--collapsed .admin-nav-item__label {
+.admin-sidebar--compact .admin-nav-item__label {
   display: none;
 }
-.admin-sidebar--collapsed .admin-nav-item--child {
+.admin-sidebar--compact .admin-nav-item--child {
   padding-left: 10px;
 }
 
@@ -380,16 +410,12 @@ a[href],
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.88);
   cursor: pointer;
-  transition:
-    background var(--motion-normal) var(--motion-ease),
-    color var(--motion-normal) var(--motion-ease),
-    border-color var(--motion-normal) var(--motion-ease),
-    transform var(--motion-press) var(--motion-ease);
 }
-.admin-sidebar__collapse-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.38);
-  color: #fff;
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar {
+    transition: none;
+  }
 }
 
 .admin-main {
@@ -752,9 +778,9 @@ a[href],
   opacity: 1;
   transform: translateZ(0);
 }
-.kpi-card--brand .kpi-card__stripe { background: var(--color-vj-red); }
+.kpi-card--brand .kpi-card__stripe { background: var(--color-planner-accent); }
 .kpi-card--brand .kpi-card__glow {
-  background: radial-gradient(circle, rgba(240, 40, 35, 0.42) 0%, rgba(240, 40, 35, 0) 68%);
+  background: radial-gradient(circle, rgba(3, 105, 161, 0.28) 0%, rgba(3, 105, 161, 0) 68%);
 }
 .kpi-card--success .kpi-card__stripe { background: var(--color-vj-green); }
 .kpi-card--success .kpi-card__glow {
@@ -769,7 +795,7 @@ a[href],
   background: radial-gradient(circle, rgba(183, 0, 5, 0.36) 0%, rgba(183, 0, 5, 0) 68%);
 }
 .kpi-card:hover {
-  border-color: rgba(240, 40, 35, 0.18);
+  border-color: rgba(15, 23, 42, 0.14);
   box-shadow: var(--shadow-elevated);
 }
 .kpi-card__header {
@@ -841,15 +867,15 @@ a[href],
   background: var(--color-text-muted);
 }
 .kpi-card--brand .kpi-card__icon {
-  background: #fdeded;
-  color: var(--color-vj-red);
+  background: var(--color-planner-accent-soft);
+  color: var(--color-planner-accent);
 }
 .kpi-card--brand .kpi-card__hint {
-  color: var(--color-vj-red-dark);
-  border-color: rgba(240, 40, 35, 0.12);
-  background: rgba(253, 237, 237, 0.75);
+  color: var(--color-planner-ink);
+  border-color: rgba(3, 105, 161, 0.14);
+  background: rgba(232, 241, 248, 0.85);
 }
-.kpi-card--brand .kpi-card__hint-dot { background: var(--color-vj-red); }
+.kpi-card--brand .kpi-card__hint-dot { background: var(--color-planner-accent); }
 .kpi-card--success .kpi-card__icon {
   background: var(--color-vj-green-muted);
   color: var(--color-vj-green);
@@ -2757,6 +2783,11 @@ a[href],
    ============================================================ */
 .text-vj-red { color: var(--color-vj-red); }
 .text-vj-green { color: var(--color-vj-green-dark); }
+.text-planner-accent { color: var(--color-planner-accent); }
+.text-planner-ink { color: var(--color-planner-ink); }
+.bg-planner-accent { background-color: var(--color-planner-accent); }
+.bg-planner-accent-soft { background-color: var(--color-planner-accent-soft); }
+.hover\:text-planner-ink:hover { color: var(--color-planner-ink); }
 
 .airport-code {
   font-weight: 800;

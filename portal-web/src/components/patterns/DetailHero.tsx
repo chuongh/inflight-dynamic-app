@@ -10,8 +10,11 @@ interface DetailHeroProps {
   backTo: string
   backLabel?: string
   title: string
+  /** Equipment status — ignored when `badge` is provided. */
   status?: TrolleyStatus
   statusLabel?: string
+  /** Custom status / chips (e.g. order draft/sent). Prefer over `status` for non-equipment pages. */
+  badge?: ReactNode
   meta?: ReactNode
   actions?: ReactNode
 }
@@ -22,6 +25,7 @@ export function DetailHero({
   title,
   status,
   statusLabel: statusLabelProp,
+  badge,
   meta,
   actions,
 }: DetailHeroProps) {
@@ -40,12 +44,10 @@ export function DetailHero({
       </div>
       <div className="detail-hero__main">
         <h1 className="detail-hero__title font-vja-heading">{title}</h1>
-        {status ? (
-          <EquipmentBadge
-            status={status}
-            label={statusLabelProp ?? statusLabel(status)}
-          />
-        ) : null}
+        {badge ??
+          (status ? (
+            <EquipmentBadge status={status} label={statusLabelProp ?? statusLabel(status)} />
+          ) : null)}
       </div>
       {meta ? <div className="detail-hero__meta">{meta}</div> : null}
     </div>

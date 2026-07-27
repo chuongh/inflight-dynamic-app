@@ -743,7 +743,34 @@
       "savedV": "Draft v{{v}} saved",
       "sentV": "Sent to supplier · v{{v}}",
       "revisionCreated": "New version v{{v}} created for editing",
-      "needConfirmed": "No confirmed groups to build an order from."
+      "needConfirmed": "No confirmed groups to build an order from.",
+      "supplier": {
+        "title": "ECO / SkyBoss Business",
+        "flightsN": "{{n}} flights",
+        "pendingBanner": "{{n}} flights still pending confirmation — review grouping before send.",
+        "openGrouping": "Open flight grouping",
+        "exportFailed": "Could not export supplier workbooks. Please try again.",
+        "tabDishes": "Dish overview",
+        "tabSupplier": "ECO / SkyBoss",
+        "emptySupplier": "No confirmed flights to review ECO / SkyBoss yet. Confirm flight groups first.",
+        "flightStrip": "Select flight",
+        "editorTitle": "Flight detail",
+        "previewTitle": "Supplier export table",
+        "pendingShort": "{{n}} pending",
+        "rollupHint": "Rolled up from ECO / SkyBoss (amenities excluded). Edit quantities on the ECO / SkyBoss tab.",
+        "kpiEcoMeals": "ECO · meals & bread",
+        "kpiEcoCommercial": "ECO · commercial",
+        "kpiSbbSales": "SBB · meals",
+        "kpiCrewNa": "Crew (N/A)",
+        "cockpitTopTitle": "Top dishes by quantity",
+        "cockpitTopDesc": "Top {{n}} dishes in this order — quick review before send.",
+        "cockpitExceptionsTitle": "Variance vs suggested",
+        "cockpitExceptionsDesc": "{{n}} lines to review",
+        "cockpitShowAll": "Show full breakdown",
+        "cockpitHideAll": "Hide full breakdown",
+        "cockpitLegacyHint": "Pre-book {{pre}} · Crew {{crew}} · Upsell {{sales}}",
+        "gotoEditFlights": "Edit by flight"
+      }
     },
     "quota": {
       "badge": "UC-10 · Inflight meal quota",
@@ -902,7 +929,36 @@
       "tab": {
         "commercial": "Hotmeal quota",
         "grouping": "Flight grouping",
+        "supplier": "ECO / SkyBoss rules",
         "crew": "Crew meal"
+      },
+      "supplier": {
+        "loading": "Loading supplier rules…",
+        "versionSelect": "Supplier rule version",
+        "edit": "Edit supplier rules",
+        "editBanner": "Editing creates a new version when you publish. Route formulas that do not match fall back to flight data.",
+        "created": "Published supplier rules {{id}} — effective {{date}}.",
+        "ecoTitle": "ECO route formulas",
+        "ecoDesc": "Applied when the flight touches one of the listed Australia airports.",
+        "airports": "Airports (comma-separated)",
+        "noodleVeg": "Australia noodle vegetables (fixed qty)",
+        "skybossEggs": "SkyBoss eggs = SkyBoss ECO passenger count",
+        "skybossYogurt": "Australia SkyBoss yogurt = SkyBoss ECO passenger count",
+        "roundBread": "Australia round bread = SkyBoss ECO passenger count",
+        "sbbTitle": "SkyBoss Business lookup",
+        "sbbDesc": "Exact businessPax rows per route sheet. Missing rows leave cells blank.",
+        "addRow": "Add businessPax row",
+        "removeRow": "Remove row",
+        "emptySheet": "No lookup rows on this sheet.",
+        "item": {
+          "bread": "Bread",
+          "basa": "Basa",
+          "pho": "Pho",
+          "bunBo": "Bun bo",
+          "stickyRice": "Sticky rice",
+          "chickenGravy": "Chicken gravy",
+          "blanket": "Blanket"
+        }
       },
       "crew": {
         "editConfig": "Edit configuration",

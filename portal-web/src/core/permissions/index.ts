@@ -463,6 +463,7 @@ export const ROLES: Record<RoleId, RoleDefinition> = {
       'portal.notifications.receive',
       'catering.read',
       'catering.plan.compute',
+      'catering.finalize',
     ],
   },
   commercial: {

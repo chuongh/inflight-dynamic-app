@@ -3,10 +3,10 @@ import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import type { OrderCategory, OrderStatus } from '@/modules/catering/orderTypes'
 
-/** Category colours (all brand-derived): pre-book red · crew dark-red · sales gold. */
+/** Category colours — ops palette (sky / slate / gold), not double-red. */
 export const CAT_COLOR: Record<OrderCategory, string> = {
-  prebook: 'var(--color-vj-red)',
-  crew: 'var(--color-vj-red-dark)',
+  prebook: 'var(--color-planner-accent)',
+  crew: 'var(--color-planner-ink)',
   sales: 'var(--color-vj-yellow-dark)',
 }
 

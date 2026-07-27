@@ -53,6 +53,11 @@ export interface CateringOrder {
    * Optional: versions created before reconciliation have no breakdown.
    */
   breakdown?: OrderSourceCell[]
+  /** Direct numeric patches keyed by flightKey → product → field → number */
+  supplierEdits?: Record<string, {
+    eco?: Partial<Record<string, number>>
+    sbb?: Partial<Record<string, number>>
+  }>
 }
 
 export interface CateringOrderDataset {

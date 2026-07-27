@@ -1,0 +1,24 @@
+{
+  "effectiveFrom": "08/07/2026",
+  "effectiveTo": "08/07/2026",
+  "airports": ["BNE", "MEL", "SYD"],
+  "source": "QUY_TAC_DIEN_SO_LUONG_ECO_SKYBOSS_BUSINESS.md §1.3, verified 08/07/2026",
+  "fields": {
+    "australiaNoodleVegetables": {
+      "value": 25,
+      "ruleId": "ECO.Z.AU_NOODLE_VEGETABLES"
+    },
+    "skybossEggs": {
+      "input": "skybossEco",
+      "ruleId": "ECO.AE.SKYBOSS_EGGS_AU"
+    },
+    "australiaSkybossYogurt": {
+      "input": "skybossEco",
+      "ruleId": "ECO.AG.AU_SKYBOSS_YOGURT"
+    },
+    "australiaRoundBread": {
+      "input": "skybossEco",
+      "ruleId": "ECO.AW.AU_ROUND_BREAD"
+    }
+  }
+}

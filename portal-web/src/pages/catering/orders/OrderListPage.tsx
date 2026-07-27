@@ -1,8 +1,11 @@
-import { Empty, Input, Segmented } from 'antd'
+import { Empty, Input, Segmented, Table } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
 import { CheckCheck, ChevronRight, Pencil, Search, ShoppingBag, TrendingUp } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { FilterBar } from '@/components/patterns/FilterBar'
+import { KpiCard } from '@/components/patterns/KpiCard'
 import { PageHeader } from '@/components/patterns/PageHeader'
 import { useOrders } from '@/modules/catering/hooks/useOrders'
 import { categoryTotal, groupOrderFiles, lineTotal, type OrderFile } from '@/modules/catering/orders'
@@ -33,6 +36,95 @@ export function OrderListPage() {
     })
   }, [files, status, query])
 
+  const columns: ColumnsType<OrderFile> = [
+    {
+      title: t('catering.orders.colOrder'),
+      key: 'order',
+      render: (_v, file) => (
+        <div>
+          <div className="font-extrabold">{file.fileId}</div>
+          <div className="text-text-muted text-[11.5px] font-semibold">{file.latest.station}</div>
+        </div>
+      ),
+    },
+    {
+      title: t('catering.orders.colDate'),
+      key: 'date',
+      width: 130,
+      render: (_v, file) => (
+        <div>
+          <div className="font-extrabold">{file.serviceDate}</div>
+          <div className="text-text-secondary text-[11.5px] font-semibold">{weekdayOf(t, file.serviceDate)}</div>
+        </div>
+      ),
+    },
+    {
+      title: t('catering.orders.colStatus'),
+      key: 'status',
+      width: 120,
+      render: (_v, file) => <OrderStatusBadge status={file.latest.status} />,
+    },
+    {
+      title: t('catering.orders.colVersion'),
+      key: 'version',
+      width: 80,
+      render: (_v, file) => <VerTag v={file.latest.version} />,
+    },
+    {
+      title: t('catering.orders.colTotal'),
+      key: 'total',
+      width: 100,
+      align: 'right',
+      render: (_v, file) => (
+        <span className="font-extrabold tnum">{lineTotal(file.latest.lines).toLocaleString()}</span>
+      ),
+    },
+    {
+      title: t('catering.orders.colBreakdown'),
+      key: 'breakdown',
+      width: 180,
+      render: (_v, file) => {
+        const o = file.latest
+        return (
+          <CatSplit
+            pre={categoryTotal(o.lines, 'prebook')}
+            crew={categoryTotal(o.lines, 'crew')}
+            sales={categoryTotal(o.lines, 'sales')}
+          />
+        )
+      },
+    },
+    {
+      title: t('catering.orders.colUpdatedBy'),
+      key: 'by',
+      width: 160,
+      render: (_v, file) => (
+        <div className="flex items-center gap-2">
+          <span className="bg-planner-accent grid h-6 w-6 place-items-center rounded-full text-[10px] font-extrabold text-white">
+            {initials(file.latest.createdBy)}
+          </span>
+          <span className="font-semibold">{file.latest.createdBy}</span>
+        </div>
+      ),
+    },
+    {
+      title: t('catering.orders.colUpdated'),
+      key: 'updated',
+      width: 110,
+      align: 'right',
+      render: (_v, file) => (
+        <span className="text-text-secondary text-[12px] font-semibold tnum">{fmtStamp(file.latest.createdAt)}</span>
+      ),
+    },
+    {
+      title: '',
+      key: 'go',
+      width: 40,
+      align: 'right',
+      render: () => <ChevronRight size={16} className="text-text-muted" aria-hidden />,
+    },
+  ]
+
   return (
     <div className="page-shell page-shell--list">
       <div className="thin-scroll page-shell__body">
@@ -42,26 +134,34 @@ export function OrderListPage() {
           description={t('catering.orders.desc')}
         />
 
-        {/* KPI tiles */}
-        <div className="mt-1 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Kpi
-            icon={<ShoppingBag size={18} />}
-            tone="red"
+        <div className="kpi-grid kpi-grid--4 mb-4">
+          <KpiCard
+            icon={ShoppingBag}
+            tone="brand"
             value={files.length}
             label={t('catering.orders.kpiTotal')}
           />
-          <Kpi icon={<Pencil size={18} />} tone="muted" value={draftCount} label={t('catering.orders.kpiDraft')} />
-          <Kpi icon={<CheckCheck size={18} />} tone="green" value={sentCount} label={t('catering.orders.kpiSent')} />
-          <Kpi
-            icon={<TrendingUp size={18} />}
-            tone="red"
+          <KpiCard
+            icon={Pencil}
+            tone="default"
+            value={draftCount}
+            label={t('catering.orders.kpiDraft')}
+          />
+          <KpiCard
+            icon={CheckCheck}
+            tone="success"
+            value={sentCount}
+            label={t('catering.orders.kpiSent')}
+          />
+          <KpiCard
+            icon={TrendingUp}
+            tone="brand"
             value={totalPortions.toLocaleString()}
             label={t('catering.orders.kpiPortions')}
           />
         </div>
 
-        {/* toolbar */}
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+        <FilterBar className="grid grid-cols-1 gap-2 lg:grid-cols-[auto_1fr]">
           <Segmented
             value={status}
             onChange={(v) => setStatus(v as StatusFilter)}
@@ -77,113 +177,31 @@ export function OrderListPage() {
             onChange={(e) => setQuery(e.target.value)}
             prefix={<Search size={15} className="text-text-muted" />}
             placeholder={t('catering.orders.searchPlaceholder')}
-            style={{ maxWidth: 320 }}
+            style={{ maxWidth: 360 }}
           />
-        </div>
+        </FilterBar>
 
-        {/* table */}
-        <div className="border-border mt-4 overflow-hidden rounded-2xl border bg-white">
+        <div className="data-table-wrap data-table-wrap--ops">
           {visible.length === 0 ? (
             <div className="py-16">
               <Empty description={t('catering.orders.empty')} />
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-[13px]">
-                <thead>
-                  <tr className="text-text-secondary [&>th]:border-border [&>th]:border-b [&>th]:px-3 [&>th]:py-3 [&>th]:text-left [&>th]:text-[10.5px] [&>th]:font-extrabold [&>th]:tracking-wide [&>th]:uppercase">
-                    <th>{t('catering.orders.colOrder')}</th>
-                    <th>{t('catering.orders.colDate')}</th>
-                    <th>{t('catering.orders.colStatus')}</th>
-                    <th>{t('catering.orders.colVersion')}</th>
-                    <th className="!text-right">{t('catering.orders.colTotal')}</th>
-                    <th>{t('catering.orders.colBreakdown')}</th>
-                    <th>{t('catering.orders.colUpdatedBy')}</th>
-                    <th className="!text-right">{t('catering.orders.colUpdated')}</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visible.map((f) => (
-                    <OrderRow key={f.fileId} file={f} onOpen={() => navigate(paths.catering.orders.detail(f.fileId))} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              rowKey="fileId"
+              size="middle"
+              columns={columns}
+              dataSource={visible}
+              pagination={false}
+              scroll={{ x: 'max-content' }}
+              onRow={(file) => ({
+                onClick: () => navigate(paths.catering.orders.detail(file.fileId)),
+                style: { cursor: 'pointer' },
+              })}
+            />
           )}
         </div>
       </div>
-    </div>
-  )
-}
-
-function OrderRow({ file, onOpen }: { file: OrderFile; onOpen: () => void }) {
-  const { t } = useTranslation()
-  const o = file.latest
-  const pre = categoryTotal(o.lines, 'prebook')
-  const crew = categoryTotal(o.lines, 'crew')
-  const sales = categoryTotal(o.lines, 'sales')
-  return (
-    <tr
-      onClick={onOpen}
-      className="[&>td]:border-border cursor-pointer hover:bg-[#FCFDFE] [&>td]:border-b [&>td]:px-3 [&>td]:py-3 [&>td]:align-middle"
-    >
-      <td>
-        <div className="font-extrabold">{file.fileId}</div>
-        <div className="text-text-muted text-[11.5px] font-semibold">{o.station}</div>
-      </td>
-      <td>
-        <div className="font-extrabold">{file.serviceDate}</div>
-        <div className="text-text-secondary text-[11.5px] font-semibold">{weekdayOf(t, file.serviceDate)}</div>
-      </td>
-      <td>
-        <OrderStatusBadge status={o.status} />
-      </td>
-      <td>
-        <VerTag v={o.version} />
-      </td>
-      <td className="!text-right font-extrabold tnum">{lineTotal(o.lines).toLocaleString()}</td>
-      <td>
-        <CatSplit pre={pre} crew={crew} sales={sales} />
-      </td>
-      <td>
-        <div className="flex items-center gap-2">
-          <span className="bg-vj-red grid h-6 w-6 place-items-center rounded-full text-[10px] font-extrabold text-white">
-            {initials(o.createdBy)}
-          </span>
-          <span className="font-semibold">{o.createdBy}</span>
-        </div>
-      </td>
-      <td className="text-text-secondary !text-right text-[12px] font-semibold tnum">{fmtStamp(o.createdAt)}</td>
-      <td className="!text-right">
-        <ChevronRight size={16} className="text-text-muted" />
-      </td>
-    </tr>
-  )
-}
-
-function Kpi({
-  icon,
-  tone,
-  value,
-  label,
-}: {
-  icon: React.ReactNode
-  tone: 'red' | 'green' | 'muted'
-  value: number | string
-  label: string
-}) {
-  const toneCls =
-    tone === 'red'
-      ? 'bg-vj-red-50 text-vj-red'
-      : tone === 'green'
-        ? 'bg-vj-green-muted text-vj-green-dark'
-        : 'bg-muted text-text-secondary'
-  return (
-    <div className="border-border rounded-2xl border bg-[#FCFDFE] px-4 py-3.5">
-      <span className={`grid h-8 w-8 place-items-center rounded-lg ${toneCls}`}>{icon}</span>
-      <div className="mt-2.5 text-[26px] leading-none font-extrabold tnum">{value}</div>
-      <div className="text-text-secondary mt-1.5 text-[12px] font-semibold">{label}</div>
     </div>
   )
 }

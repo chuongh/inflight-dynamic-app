@@ -24,8 +24,9 @@ import { RuleCard } from './RuleCard'
 import { RuleEditorDrawer } from './RuleEditorDrawer'
 import { RulePickerModal } from './RulePickerModal'
 import { CrewMealTab } from './crew/CrewMealTab'
+import { SupplierRulesTab } from './SupplierRulesTab'
 
-type ConfigTab = 'commercial' | 'grouping' | 'crew'
+type ConfigTab = 'commercial' | 'grouping' | 'crew' | 'supplier'
 
 const STATUS_DOT: Record<VersionStatus, string> = {
   active: '#16a34a',
@@ -169,6 +170,7 @@ export function ConfigPage() {
             options={[
               { value: 'commercial', label: t('catering.config.tab.commercial') },
               { value: 'grouping', label: t('catering.config.tab.grouping') },
+              { value: 'supplier', label: t('catering.config.tab.supplier') },
               { value: 'crew', label: t('catering.config.tab.crew') },
             ]}
           />
@@ -176,6 +178,8 @@ export function ConfigPage() {
 
         {tab === 'crew' ? (
           <CrewMealTab />
+        ) : tab === 'supplier' ? (
+          <SupplierRulesTab />
         ) : (
           <>
         <div className="flex flex-col gap-4">
