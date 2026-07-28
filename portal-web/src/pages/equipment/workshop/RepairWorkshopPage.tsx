@@ -1,5 +1,4 @@
 import { App as AntApp, Spin } from 'antd'
-import { AlertTriangle, Clock, Wrench } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CompleteRepairModal } from '@/components/equipment/CompleteRepairModal'
@@ -16,8 +15,8 @@ import {
 } from '@/modules/equipment/hooks/useEquipment'
 import { formatEquipmentCodes, summarizeRepairRequests } from '@/modules/equipment/repairRequest'
 import type { CompleteRepairRequestInput, RepairRequest } from '@/modules/equipment/types'
-import { KpiCard } from '@/components/patterns/KpiCard'
 import { PageHeader } from '@/components/patterns/PageHeader'
+import { StatStrip } from '@/components/patterns/StatStrip'
 import { Button as VjButton } from '@/components/primitives/Button'
 import { Text } from '@/components/primitives/Text'
 import { useEquipmentLabels } from '@/i18n/hooks/useEquipmentLabels'
@@ -191,33 +190,32 @@ export function RepairWorkshopPage() {
           description={t('equipment.workshop.subtitle')}
         />
 
-        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <KpiCard
-            label={t('equipment.workshop.kpiWaiting')}
-            value={waitingTrolleys.length}
-            hint={t('equipment.workshop.kpiWaitingHint', { count: waitingSlaBreaches })}
-            icon={AlertTriangle}
-            tone="danger"
-          />
-          <KpiCard
-            label={t('equipment.workshop.kpiInRepair')}
-            value={openRequests.length}
-            hint={t('equipment.workshop.kpiInRepairHint')}
-            icon={Wrench}
-            tone="warning"
-          />
-          <KpiCard
-            label={t('equipment.workshop.kpiAvgTat')}
-            value={
-              summary.avgTurnaround > 0
-                ? `${summary.avgTurnaround} ${t('equipment.workshop.kpiAvgTatUnit')}`
-                : '—'
-            }
-            hint={t('equipment.workshop.kpiAvgTatHint')}
-            icon={Clock}
-            tone="brand"
-          />
-        </div>
+        <StatStrip
+          className="mb-4"
+          columns={3}
+          items={[
+            {
+              label: t('equipment.workshop.kpiWaiting'),
+              value: waitingTrolleys.length,
+              featured: true,
+              hint: t('equipment.workshop.kpiWaitingHint', { count: waitingSlaBreaches }),
+            },
+            {
+              label: t('equipment.workshop.kpiInRepair'),
+              value: openRequests.length,
+              tone: 'warning',
+              hint: t('equipment.workshop.kpiInRepairHint'),
+            },
+            {
+              label: t('equipment.workshop.kpiAvgTat'),
+              value:
+                summary.avgTurnaround > 0
+                  ? `${summary.avgTurnaround} ${t('equipment.workshop.kpiAvgTatUnit')}`
+                  : '—',
+              hint: t('equipment.workshop.kpiAvgTatHint'),
+            },
+          ]}
+        />
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-vj-canvas)] p-3">

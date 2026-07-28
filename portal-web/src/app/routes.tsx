@@ -2,6 +2,7 @@ import { Spin } from 'antd'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import { useAuth } from '@/core/auth/useAuth'
+import type { PermissionKey } from '@/core/permissions'
 import type { TrolleyUnit } from '@/modules/equipment/constants'
 import {
   useRepairRequests,
@@ -36,6 +37,18 @@ import { paths } from '@/routes/paths'
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { session } = useAuth()
   if (!session) return <Navigate to={paths.login} replace />
+  return children
+}
+
+function RequirePermission({
+  permission,
+  children,
+}: {
+  permission: PermissionKey
+  children: React.ReactNode
+}) {
+  const { hasPermission } = useAuth()
+  if (!hasPermission(permission)) return <Navigate to={paths.dashboard} replace />
   return children
 }
 
@@ -104,7 +117,14 @@ export function AppRoutes() {
         }
       >
         <Route path={paths.dashboard} element={<DashboardRoute />} />
-        <Route path={paths.designSystem} element={<DesignSystemPage />} />
+        <Route
+          path={paths.designSystem}
+          element={
+            <RequirePermission permission="admin.users.read">
+              <DesignSystemPage />
+            </RequirePermission>
+          }
+        />
         <Route path={paths.equipment.pos.list} element={<PosPage />} />
         <Route path={`${paths.equipment.pos.list}/:code`} element={<PosDetailPage />} />
         <Route path={paths.equipment.ipad.list} element={<IpadPage />} />

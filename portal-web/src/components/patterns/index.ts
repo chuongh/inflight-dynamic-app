@@ -1,6 +1,7 @@
 export { ListPageLayout } from './ListPageLayout'
 export { PageHeader } from './PageHeader'
 export { KpiCard } from './KpiCard'
+export { StatStrip } from './StatStrip'
 export { SurfaceCard } from './SurfaceCard'
 export { FilterBar } from './FilterBar'
 export { DataTableShell } from './DataTableShell'

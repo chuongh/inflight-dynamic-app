@@ -1,6 +1,6 @@
 import { Drawer, Input, Select, Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table/interface'
-import { Search, Wrench } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -10,8 +10,8 @@ import {
   summarizeRepairRequests,
 } from '@/modules/equipment/repairRequest'
 import type { RepairRequest, RepairRequestStatus } from '@/modules/equipment/types'
-import { KpiCard } from '../patterns/KpiCard'
 import { DataTableShell } from '../patterns/DataTableShell'
+import { StatStrip } from '../patterns/StatStrip'
 import { RepairRequestBadge } from '../primitives/Badge'
 import { DaysBadge } from '../primitives/DaysBadge'
 import { useEquipmentLabels } from '@/i18n/hooks/useEquipmentLabels'
@@ -152,34 +152,34 @@ export function TrolleyRepairHistoryDrawer({
       >
         <p className="mb-4 text-sm text-[var(--color-text-secondary)]">{t('equipment.repairDrawer.description')}</p>
 
-        <div className="kpi-grid kpi-grid--4 mb-4">
-          <KpiCard
-            label={t('equipment.repairDrawer.totalRequests')}
-            value={summary.total}
-            icon={Wrench}
-            tone="brand"
-          />
-          <KpiCard
-            label={t('equipment.repairDrawer.openRequests')}
-            value={summary.open}
-            icon={Wrench}
-            tone="warning"
-          />
-          <KpiCard
-            label={t('equipment.repairDrawer.unitsInRepair')}
-            value={summary.unitsInOpenRequests}
-            hint={t('equipment.repairDrawer.fromOpenRequests')}
-            icon={Wrench}
-            tone="warning"
-          />
-          <KpiCard
-            label={t('equipment.repairDrawer.avgTurnaround')}
-            value={summary.avgTurnaround > 0 ? `${summary.avgTurnaround}d` : '—'}
-            hint={t('equipment.repairDrawer.completedRequests')}
-            icon={Wrench}
-            tone="success"
-          />
-        </div>
+        <StatStrip
+          className="mb-4"
+          columns={4}
+          items={[
+            {
+              label: t('equipment.repairDrawer.totalRequests'),
+              value: summary.total,
+              featured: true,
+            },
+            {
+              label: t('equipment.repairDrawer.openRequests'),
+              value: summary.open,
+              tone: 'warning',
+            },
+            {
+              label: t('equipment.repairDrawer.unitsInRepair'),
+              value: summary.unitsInOpenRequests,
+              tone: 'warning',
+              hint: t('equipment.repairDrawer.fromOpenRequests'),
+            },
+            {
+              label: t('equipment.repairDrawer.avgTurnaround'),
+              value: summary.avgTurnaround > 0 ? `${summary.avgTurnaround}d` : '—',
+              tone: 'success',
+              hint: t('equipment.repairDrawer.completedRequests'),
+            },
+          ]}
+        />
 
         <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <Input

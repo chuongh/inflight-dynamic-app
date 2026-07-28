@@ -2,18 +2,17 @@ import type { CateringOrderDataset, CateringOrderLine } from '../../modules/cate
 
 const STORAGE_KEY = 'vj-mock-catering-orders'
 
-/** WIP catalog rename briefly wrote `productCodes` onto cached order lines. */
-type LegacyLine = CateringOrderLine & { productCodes?: string[] }
+type LegacyLine = CateringOrderLine & { pbmlCodes?: string[] }
 
 function migrateLine(line: LegacyLine): CateringOrderLine {
-  if (Array.isArray(line.pbmlCodes)) {
-    const { productCodes: _drop, ...rest } = line
+  if (line.productCodes) {
+    const { pbmlCodes: _drop, ...rest } = line
     return rest
   }
   return {
     name: line.name,
     category: line.category,
-    pbmlCodes: line.productCodes ?? [],
+    productCodes: line.pbmlCodes ?? [],
     suggested: line.suggested,
     qty: line.qty,
   }

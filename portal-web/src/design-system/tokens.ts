@@ -124,10 +124,10 @@ export const vjTokens = {
   },
 
   typography: {
-    display: { size: 32, weight: 900, lineHeight: 1.15, letterSpacing: '-0.02em', font: 'heading' as const },
-    h1: { size: 24, weight: 900, lineHeight: 1.2, letterSpacing: '-0.02em', font: 'heading' as const },
+    display: { size: 32, weight: 800, lineHeight: 1.2, letterSpacing: '-0.01em', font: 'heading' as const },
+    h1: { size: 24, weight: 800, lineHeight: 1.3, letterSpacing: '-0.01em', font: 'heading' as const },
     h2: { size: 18, weight: 700, lineHeight: 1.3, letterSpacing: '-0.01em', font: 'subhead' as const },
-    h3: { size: 15, weight: 500, lineHeight: 1.4, letterSpacing: '0', font: 'subhead' as const },
+    h3: { size: 15, weight: 600, lineHeight: 1.4, letterSpacing: '0', font: 'subhead' as const },
     body: { size: 14, weight: 400, lineHeight: 1.6, letterSpacing: '0', font: 'body' as const },
     bodySm: { size: 13, weight: 400, lineHeight: 1.5, letterSpacing: '0', font: 'body' as const },
     caption: { size: 12, weight: 400, lineHeight: 1.4, letterSpacing: '0', font: 'body' as const },

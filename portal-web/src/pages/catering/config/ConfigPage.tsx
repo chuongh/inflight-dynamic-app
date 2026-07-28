@@ -1,6 +1,8 @@
-import { Alert, App as AntApp, Button, Input, Popover, Segmented, Select, Space, Spin } from 'antd'
+import { Alert, App as AntApp, Button, DatePicker, Popover, Segmented, Select, Space, Spin } from 'antd'
+import dayjs, { type Dayjs } from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { Info, Pencil, Plus, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '@/components/patterns/PageHeader'
 import { useAuth } from '@/core/auth/useAuth'
@@ -24,8 +26,19 @@ import { RuleCard } from './RuleCard'
 import { RuleEditorDrawer } from './RuleEditorDrawer'
 import { RulePickerModal } from './RulePickerModal'
 import { CrewMealTab } from './crew/CrewMealTab'
+import { SupplierRulesTab } from './SupplierRulesTab'
 
-type ConfigTab = 'commercial' | 'grouping' | 'crew'
+dayjs.extend(customParseFormat)
+
+const DMY = 'DD/MM/YYYY'
+
+function parseDmy(dmy: string): Dayjs | null {
+  if (!dmy.trim()) return null
+  const d = dayjs(dmy, DMY, true)
+  return d.isValid() ? d : null
+}
+
+type ConfigTab = 'commercial' | 'grouping' | 'crew' | 'supplier'
 
 const STATUS_DOT: Record<VersionStatus, string> = {
   active: '#16a34a',
@@ -62,6 +75,16 @@ export function ConfigPage() {
   const [editing, setEditing] = useState(false)
   const [workingRules, setWorkingRules] = useState<Rule[]>([])
   const [effDate, setEffDate] = useState('')
+  const [crewHeaderActions, setCrewHeaderActions] = useState<ReactNode>(null)
+  const [supplierHeaderActions, setSupplierHeaderActions] = useState<ReactNode>(null)
+
+  const onCrewHeaderActions = useCallback((actions: ReactNode | null) => {
+    setCrewHeaderActions(actions)
+  }, [])
+
+  const onSupplierHeaderActions = useCallback((actions: ReactNode | null) => {
+    setSupplierHeaderActions(actions)
+  }, [])
 
   const [editorRule, setEditorRule] = useState<Rule | null>(null)
   const [editorNew, setEditorNew] = useState(false)
@@ -159,69 +182,81 @@ export function ConfigPage() {
           badge={t('catering.config.badge')}
           title={t('catering.config.title')}
           description={t('catering.config.desc')}
+          actions={
+            tab === 'crew' ? (
+              crewHeaderActions
+            ) : tab === 'supplier' ? (
+              supplierHeaderActions
+            ) : (
+              <>
+                <Select
+                  value={viewing.id}
+                  onChange={(id) => {
+                    setViewingId(id)
+                    if (editing) cancelEdit()
+                  }}
+                  style={{ minWidth: 150 }}
+                  optionLabelProp="label"
+                  options={versions.map((v) => ({ value: v.id, label: renderVersion(v) }))}
+                />
+                <span className="border-border bg-background inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold tnum">
+                  {effRange}
+                </span>
+                <Popover
+                  placement="bottomLeft"
+                  trigger="click"
+                  content={
+                    <div className="max-w-xs space-y-1 text-[12.5px] leading-relaxed">
+                      <div>
+                        {t('catering.config.updatedMeta', { by: viewing.updatedBy, at: viewing.updatedAt })}
+                      </div>
+                      {viewing.note ? <div className="text-text-muted">{viewing.note}</div> : null}
+                    </div>
+                  }
+                >
+                  <button
+                    type="button"
+                    className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
+                    aria-label={t('catering.quota.detailsAria')}
+                  >
+                    <Info size={16} />
+                  </button>
+                </Popover>
+                {isActiveView && !editing ? (
+                  <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
+                    {t('catering.config.editConfig')}
+                  </Button>
+                ) : null}
+              </>
+            )
+          }
         />
 
         <div className="config-tab-scroll mt-1 mb-4">
           <Segmented<ConfigTab>
             value={tab}
-            onChange={(v) => setTab(v)}
+            onChange={(v) => {
+              setTab(v)
+              if (v !== 'crew') setCrewHeaderActions(null)
+              if (v !== 'supplier') setSupplierHeaderActions(null)
+            }}
             size="large"
             options={[
               { value: 'commercial', label: t('catering.config.tab.commercial') },
               { value: 'grouping', label: t('catering.config.tab.grouping') },
+              { value: 'supplier', label: t('catering.config.tab.supplier') },
               { value: 'crew', label: t('catering.config.tab.crew') },
             ]}
           />
         </div>
 
         {tab === 'crew' ? (
-          <CrewMealTab />
+          <CrewMealTab onHeaderActions={onCrewHeaderActions} />
+        ) : tab === 'supplier' ? (
+          <SupplierRulesTab onHeaderActions={onSupplierHeaderActions} />
         ) : (
           <>
         <div className="flex w-full min-w-0 flex-col gap-4">
-          {/* Version context bar */}
-          <div className="border-border bg-surface flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border px-4 py-3">
-            <Select
-              value={viewing.id}
-              onChange={(id) => {
-                setViewingId(id)
-                if (editing) cancelEdit()
-              }}
-              style={{ minWidth: 150 }}
-              optionLabelProp="label"
-              options={versions.map((v) => ({ value: v.id, label: renderVersion(v) }))}
-            />
-            <span className="border-border bg-background inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold tnum">
-              {effRange}
-            </span>
-            <Popover
-              placement="bottomLeft"
-              trigger="click"
-              content={
-                <div className="max-w-xs space-y-1 text-[12.5px] leading-relaxed">
-                  <div>{t('catering.config.updatedMeta', { by: viewing.updatedBy, at: viewing.updatedAt })}</div>
-                  {viewing.note ? <div className="text-text-muted">{viewing.note}</div> : null}
-                </div>
-              }
-            >
-              <button
-                type="button"
-                className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
-                aria-label={t('catering.quota.detailsAria')}
-              >
-                <Info size={16} />
-              </button>
-            </Popover>
-
-            <div className="ml-auto">
-              {isActiveView && !editing ? (
-                <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
-                  {t('catering.config.editConfig')}
-                </Button>
-              ) : null}
-            </div>
-          </div>
-
           {!isActiveView && !editing ? (
             <Alert type="info" showIcon title={t('catering.config.readonlyHint')} />
           ) : null}
@@ -275,7 +310,12 @@ export function ConfigPage() {
                 <div className="text-text-muted mb-1 text-[11.5px] font-bold">
                   {t('catering.config.effectiveFrom')}
                 </div>
-                <Input value={effDate} onChange={(e) => setEffDate(e.target.value)} style={{ width: 150 }} />
+                <DatePicker
+                  format={DMY}
+                  value={parseDmy(effDate)}
+                  onChange={(d) => setEffDate(d ? d.format(DMY) : '')}
+                  style={{ width: 150 }}
+                />
               </div>
               <div className="text-text-muted max-w-[34ch] text-[12.5px] font-medium">
                 {t('catering.config.publishHint')}

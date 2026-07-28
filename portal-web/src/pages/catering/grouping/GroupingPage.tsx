@@ -35,14 +35,20 @@ import {
 } from '@/modules/catering/grouping'
 import type { FlightGroup } from '@/modules/catering/groupingTypes'
 import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
+import { useAmenityCatalogData, useMealCatalogData } from '@/modules/catering/hooks/useCatalog'
 import { useFlightGroups, useSaveFlightGroups } from '@/modules/catering/hooks/useFlightGroups'
 import { useMeals } from '@/modules/catering/hooks/useMeals'
 import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
 import { useQuotaData } from '@/modules/catering/hooks/useQuota'
 import { useRuleConfigData } from '@/modules/catering/hooks/useRuleConfig'
+import { useSupplierRuleConfigData } from '@/modules/catering/hooks/useSupplierRuleConfig'
 import { groupOrderFiles, makeCodeOf, orderFileId } from '@/modules/catering/orders'
 import { buildOrderSnapshot } from '@/modules/catering/orderSnapshot'
 import { activeVersion as activeQuotaVersion } from '@/modules/catering/quota'
+import { buildEcoSupplySnapshot } from '@/modules/catering/supplier/buildEcoSupplySnapshot'
+import { DEFAULT_ECO_AMENITY_CONFIG } from '@/modules/catering/supplier/amenityDefaults'
+import { DEFAULT_ECO_QUANTITY_RULES } from '@/modules/catering/supplier/ecoQuantityEval'
+import { activeSupplierRuleVersion } from '@/modules/catering/supplierRuleConfig'
 import { cateringAirports, cateringStationSet } from '@/modules/catering/stations'
 import { getSeedDataset } from '@/mock-data/loaders/loadFlightGroups'
 import { paths } from '@/routes/paths'
@@ -62,9 +68,12 @@ export function GroupingPage() {
   const { data: ordersData } = useOrders()
   const saveOrders = useSaveOrders()
   const { data: catalog } = useMeals()
+  const { data: mealCatalog } = useMealCatalogData()
+  const { data: amenityCatalog } = useAmenityCatalogData()
   const { data: crewCfg } = useCrewMealConfigData()
   const { data: ruleCfg } = useRuleConfigData()
   const { data: quotaData } = useQuotaData()
+  const { data: supplierRuleData } = useSupplierRuleConfigData()
   const { data: airportsData } = useAirports()
 
   const [selectedDate, setSelectedDate] = useState('')
@@ -305,14 +314,36 @@ export function GroupingPage() {
     const fileId = orderFileId(station, day.serviceDate)
     const files = groupOrderFiles(ordersData?.orders ?? [])
     const existing = files.find((f) => f.fileId === fileId)
-    // A draft already open for this day → just go edit it.
-    if (existing && existing.latest.status === 'draft') {
-      navigate(paths.catering.orders.detail(fileId))
-      return
-    }
     const crewVersion = activeCrewMealVersion(crewCfg?.versions ?? [])
     const profile = crewVersion ? profileFor(crewVersion, 'cockpit') : undefined
     const { lines, breakdown } = buildOrderSnapshot(confirmed, profile, makeCodeOf(catalog))
+    const supplierRules = activeSupplierRuleVersion(supplierRuleData?.versions ?? [])
+    const ecoSupplyLines = buildEcoSupplySnapshot({
+      day,
+      station,
+      mealCatalog,
+      amenityCatalog,
+      ecoRouteRules: supplierRules?.ecoRouteRules ?? null,
+      quantityConfig: {
+        amenity: supplierRules?.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG,
+        quantityRules: supplierRules?.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
+      },
+    })
+
+    // A draft already open for this day → refresh ECO supply snapshot then go edit.
+    if (existing && existing.latest.status === 'draft') {
+      const draft = existing.latest
+      saveOrders.mutate(
+        {
+          orders: (ordersData?.orders ?? []).map((o) =>
+            o.id === draft.id ? { ...o, ecoSupplyLines } : o,
+          ),
+        },
+        { onSuccess: () => navigate(paths.catering.orders.detail(fileId)) },
+      )
+      return
+    }
+
     const version = (existing?.latest.version ?? 0) + 1
     saveOrders.mutate(
       {
@@ -328,6 +359,7 @@ export function GroupingPage() {
             status: 'draft' as const,
             lines,
             breakdown,
+            ecoSupplyLines,
           },
         ],
       },

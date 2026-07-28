@@ -1,0 +1,343 @@
+import {
+  derivedFrom,
+  ecoCell,
+  sumHotmealItems,
+} from './ecoRules'
+import {
+  createFlightJoinKey,
+  normalizeFlightIdentity,
+  parseProjectDate,
+} from './normalize'
+import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
+import { resolveAmenityPackages } from './amenityResolver'
+import {
+  DEFAULT_ECO_QUANTITY_RULES,
+  evalQuantityRule,
+  type EcoQuantityEvalContext,
+} from './ecoQuantityEval'
+import type { EcoQuantityConfig, EcoUpliftType } from './ecoQuantityTypes'
+import type {
+  EcoCells,
+  EcoSupplierInput,
+  EcoSupplierRow,
+  HotmealItemKey,
+  SupplierCell,
+} from './types'
+
+const HOTMEAL_KEYS: HotmealItemKey[] = [
+  'spaghetti',
+  'glassNoodles',
+  'banhChung',
+  'stirFriedNoodles',
+  'thaiFriedRice',
+  'savoryStickyRice',
+  'khucStickyRice',
+  'beefRice',
+  'coconutRice',
+  'indianPotatoParatha',
+  'chickenCurry',
+  'fishCurry',
+  'vegetarianYangzhouRice',
+  'vegetarianBasmatiCurry',
+]
+
+const EMPTY_OPS_SOURCE = 'Not provided'
+
+function inputCell(
+  value: number | null | undefined,
+  source: string,
+): SupplierCell<number> {
+  return ecoCell(value ?? null, source)
+}
+
+function normalizeUpliftType(
+  raw: string | null | undefined,
+): EcoUpliftType | null {
+  if (!raw) return null
+  if (raw === 'DAU_NGAY' || raw === 'DOI_TO' || raw === 'NIGHTSTOP') return raw
+  const u = raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/\s+/g, '_')
+  if (u.includes('DAU') || u.includes('START')) return 'DAU_NGAY'
+  if (u.includes('DOI') || u.includes('CHANGE')) return 'DOI_TO'
+  if (u.includes('NIGHT')) return 'NIGHTSTOP'
+  return null
+}
+
+export function buildEcoSupplierRow(
+  input: EcoSupplierInput,
+  /** @deprecated Legacy EcoRouteRuleDataset — AU formulas now live in quantityRules. Kept for call-site compat. */
+  _routeRulesInput?: unknown,
+  quantityConfig?: EcoQuantityConfig | null,
+): EcoSupplierRow {
+  const parsedDate = parseProjectDate(input.operatingDate)
+  const identity = normalizeFlightIdentity(input)
+  const effectiveDate = parsedDate ?? input.operatingDate.trim()
+  const sourceRefs = input.sourceRefs ?? {}
+  const amenityConfig = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG
+  const quantityRules =
+    quantityConfig?.quantityRules ?? DEFAULT_ECO_QUANTITY_RULES
+  const upliftType = normalizeUpliftType(input.upliftType)
+
+  const amenity = resolveAmenityPackages(
+    {
+      aircraftType: input.aircraftType,
+      dep: identity.dep,
+      arr: identity.arr,
+      upliftType,
+      flightKind: input.flightKind,
+      amenityOverride: input.amenityOverride,
+    },
+    amenityConfig,
+  )
+
+  const hotmealCells = Object.fromEntries(
+    HOTMEAL_KEYS.map((key) => [
+      key,
+      inputCell(
+        input.hotmealItems[key],
+        `${sourceRefs.hotmealItems ?? 'FlightView item allocation plus item-level adjustments'}; ${key}`,
+      ),
+    ]),
+  ) as Record<HotmealItemKey, SupplierCell<number>>
+
+  const boiledEggs = inputCell(
+    input.boiledEggs,
+    sourceRefs.boiledEggs ?? 'Operational input',
+  )
+  const skyboss = inputCell(
+    input.skybossEco,
+    sourceRefs.skybossEco ?? 'FlightView SkyBoss ECO passenger count',
+  )
+  const prebook = inputCell(
+    input.totalPrebook,
+    sourceRefs.totalPrebook ?? 'FlightView Meal Info Prebook',
+  )
+  const quota = inputCell(
+    input.quotaCommercial,
+    sourceRefs.quotaCommercial ?? 'Commercial quota source',
+  )
+
+  const hotmealValues = HOTMEAL_KEYS.map((key) => hotmealCells[key].value)
+  const hotmealTotalValue = sumHotmealItems(hotmealValues)
+  const hotmealTotal = ecoCell(
+    hotmealTotalValue,
+    'Sum of 14 hotmeal items; bread excluded',
+  )
+
+  const columnSnapshot: Record<string, number | null> = {
+    spaghetti: hotmealCells.spaghetti.value,
+    skyboss: skyboss.value,
+    prebook: prebook.value,
+  }
+
+  const evalCtx: EcoQuantityEvalContext = {
+    columns: columnSnapshot,
+    metrics: {
+      quotaCommercial: quota.value,
+      totalPrebook: prebook.value,
+      skybossEco: skyboss.value,
+    },
+    hotmealTotal: hotmealTotalValue,
+    dep: identity.dep,
+    arr: identity.arr,
+    aircraftType: input.aircraftType,
+    upliftType,
+    hourClassId: amenity.hourClassId,
+    amenityPackageIds: amenity.packageIds,
+    flightKind: input.flightKind,
+    routeGroups: amenityConfig.routeGroups,
+  }
+
+  const ruleByTarget = (target: string) =>
+    quantityRules.find((r) => r.enabled && r.targetColumn === target)
+
+  const resolveRuleCell = (
+    target: string,
+    fallbackSource: string,
+  ): SupplierCell<number> => {
+    const rule = ruleByTarget(target)
+    if (!rule) return ecoCell(null, `${target} rule not configured`)
+    const resolved = evalQuantityRule(rule, evalCtx)
+    return ecoCell(resolved.value, resolved.source || fallbackSource)
+  }
+
+  let bread: SupplierCell<number>
+  if (input.workbookReferenceBread != null) {
+    bread = ecoCell(
+      input.workbookReferenceBread,
+      `${sourceRefs.workbookReferenceBread ?? 'Workbook bread column'}; workbookReferenceBread`,
+    )
+  } else {
+    bread = resolveRuleCell('bread', 'quotaCommercial + totalPrebook')
+  }
+
+  const ketchup = resolveRuleCell('ketchup', 'J spaghetti quantity')
+  const chiliSauce = resolveRuleCell('chiliSauce', 'ceil(AH hotmeal total / 2)')
+  const soySauce = resolveRuleCell('soySauce', 'ceil(AH hotmeal total / 2)')
+  const hotmealUtensils = resolveRuleCell('hotmealUtensils', 'AH hotmeal total')
+
+  // Keep derived columns visible to later rules (e.g. indian salt ← soySauce).
+  evalCtx.columns.ketchup = ketchup.value
+  evalCtx.columns.chiliSauce = chiliSauce.value
+  evalCtx.columns.soySauce = soySauce.value
+  evalCtx.columns.hotmealUtensils = hotmealUtensils.value
+  evalCtx.columns.bread = bread.value
+
+  const skybossEggs = resolveRuleCell('skybossEggs', 'SkyBoss ECO on AU routes')
+  const australiaNoodleVegetables = resolveRuleCell(
+    'australiaNoodleVegetables',
+    'AU noodle vegetables const',
+  )
+  const australiaSkybossYogurt = resolveRuleCell(
+    'australiaSkybossYogurt',
+    'SkyBoss ECO on AU routes',
+  )
+  const australiaRoundBread = resolveRuleCell(
+    'australiaRoundBread',
+    'SkyBoss ECO on AU routes',
+  )
+
+  const indianSaltRule = ruleByTarget('indianSaltPepper')
+  const indianSaltPepper = indianSaltRule
+    ? (() => {
+        const resolved = evalQuantityRule(indianSaltRule, evalCtx)
+        return ecoCell(resolved.value, resolved.source)
+      })()
+    : ecoCell(null, 'indianSaltPepper rule not configured')
+
+  const reserveRule = ruleByTarget('reserveUtensils')
+  let reserveUtensils: SupplierCell<number>
+  if (input.reserveUtensils != null) {
+    reserveUtensils = inputCell(
+      input.reserveUtensils,
+      sourceRefs.reserveUtensils ?? 'Manual package/route reserve input',
+    )
+  } else if (reserveRule) {
+    const resolved = evalQuantityRule(reserveRule, evalCtx)
+    reserveUtensils = ecoCell(resolved.value, resolved.source)
+  } else {
+    reserveUtensils = inputCell(
+      null,
+      sourceRefs.reserveUtensils ?? 'Manual package/route reserve input',
+    )
+  }
+
+  const prebookCashews = resolveRuleCell('prebookCashews', 'AQ total prebook')
+
+  let freshWater: SupplierCell<number>
+  if (input.freshWaterOverride != null) {
+    freshWater = ecoCell(
+      input.freshWaterOverride,
+      'Manual freshWaterOverride',
+    )
+  } else {
+    freshWater = resolveRuleCell('freshWater', 'AY = totalPrebook')
+  }
+
+  const manualSnack = (value: number | null | undefined, label: string) =>
+    inputCell(value, `Manual/operational input; ${label}`)
+
+  const cells: EcoCells = {
+    ...hotmealCells,
+    bread,
+    boiledEggs,
+    skybossEggs,
+    totalEggs: ecoCell(
+      derivedFrom(
+        [boiledEggs.value, skybossEggs.value],
+        ([boiled, skybossValue]) => boiled + skybossValue,
+      ),
+      'AD boiled eggs + AE SkyBoss eggs',
+    ),
+    australiaNoodleVegetables,
+    australiaSkybossYogurt,
+    australiaRoundBread,
+    australiaBeefFreshVegetables: inputCell(
+      input.australiaBeefFreshVegetables,
+      'Australia beef/fresh vegetables input',
+    ),
+    australiaBreadVegetables: inputCell(
+      input.australiaBreadVegetables,
+      'Australia bread vegetables input',
+    ),
+    hotmealTotal,
+    ketchup,
+    chiliSauce,
+    soySauce,
+    indianSaltPepper,
+    hotmealUtensils,
+    reserveUtensils,
+    totalUtensils: ecoCell(
+      derivedFrom(
+        [hotmealUtensils.value, reserveUtensils.value],
+        ([hotmeal, reserve]) => hotmeal + reserve,
+      ),
+      'AM hotmeal utensils + AN reserve utensils',
+    ),
+    skyboss,
+    prebook,
+    prebookCashews,
+    freshWater,
+    maccaSkybossRaisins: manualSnack(input.maccaSkybossRaisins, 'AR Macca nho khô SkyBoss'),
+    maccaKazSalted: manualSnack(input.maccaKazSalted, 'AS Macca muối KAZ'),
+    charterSnack: manualSnack(input.charterSnack, 'AT Snack charter'),
+    wine: manualSnack(input.wine, 'AU Rượu vang'),
+    blanketCSkyboss: manualSnack(input.blanketCSkyboss, 'AV Chăn C SkyBoss'),
+    blanket3in1Prebook: manualSnack(input.blanket3in1Prebook, 'AX Chăn 3in1 Prebook'),
+    maccaRegular: manualSnack(input.maccaRegular, 'BA Macca thường'),
+    mangoChiliSaltGdsDeluxe: manualSnack(
+      input.mangoChiliSaltGdsDeluxe,
+      'BB Xoài muối ớt GDS/DELUXE',
+    ),
+    beerSnackComboBC: manualSnack(input.beerSnackComboBC, 'BC Bia + khô gà + snack'),
+    sodaMaccaComboBD: manualSnack(input.sodaMaccaComboBD, 'BD Soda dâu + Macca'),
+    reserveCrewWater: inputCell(
+      input.reserveCrewWater,
+      sourceRefs.reserveCrewWater ?? EMPTY_OPS_SOURCE,
+    ),
+    smallIceBox: inputCell(
+      input.smallIceBox,
+      sourceRefs.smallIceBox ?? EMPTY_OPS_SOURCE,
+    ),
+    largeIceBox: inputCell(
+      input.largeIceBox,
+      sourceRefs.largeIceBox ?? EMPTY_OPS_SOURCE,
+    ),
+    wetIceKg: inputCell(
+      input.wetIceKg,
+      sourceRefs.wetIceKg ?? EMPTY_OPS_SOURCE,
+    ),
+    dryIceKg: inputCell(
+      input.dryIceKg,
+      sourceRefs.dryIceKg ?? EMPTY_OPS_SOURCE,
+    ),
+    dutyFree: inputCell(
+      input.dutyFree,
+      sourceRefs.dutyFree ?? EMPTY_OPS_SOURCE,
+    ),
+    highlift: inputCell(
+      input.highlift,
+      sourceRefs.highlift ?? EMPTY_OPS_SOURCE,
+    ),
+    smallTruck: inputCell(
+      input.smallTruck,
+      sourceRefs.smallTruck ?? EMPTY_OPS_SOURCE,
+    ),
+    lastMinuteTopUp: inputCell(
+      input.lastMinuteTopUp,
+      sourceRefs.lastMinuteTopUp ?? EMPTY_OPS_SOURCE,
+    ),
+  }
+
+  return {
+    ...identity,
+    operatingDate: effectiveDate,
+    key: createFlightJoinKey({ ...identity, operatingDate: effectiveDate }),
+    cells,
+    amenityLabel: amenity.label,
+    amenityPackageIds: amenity.packageIds,
+  }
+}

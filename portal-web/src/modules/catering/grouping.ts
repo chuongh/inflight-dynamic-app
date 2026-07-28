@@ -306,6 +306,7 @@ export function autoGroupFlights(flights: RawFlight[], opts: AutoGroupOptions): 
         meals: f.meals,
         cockpitCrew: f.cockpitCrew,
         salesQuota: quotaByFlightNo?.get(f.flightNo),
+        supplier: f.supplier,
       })
       cumMin += legMin
     }

@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-28-catalog-v3",
+  "seedVersion": "2026-07-28-catalog-v4",
   "versions": [
     {
       "id": "m1",
@@ -535,7 +535,7 @@
             "vi": "Trứng luộc"
           },
           "unit": null,
-          "category": "dessert",
+          "category": "snack",
           "cabinScopes": [
             "SBB"
           ],

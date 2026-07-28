@@ -3,7 +3,7 @@ import { changedLines, changedLinesFromLines } from './orderSnapshot'
 import type { CateringOrderLine, OrderSourceCell } from './orderTypes'
 
 const line = (p: Partial<CateringOrderLine> & { name: string; qty: number }): CateringOrderLine => ({
-  category: 'prebook', pbmlCodes: [], suggested: p.qty, ...p,
+  category: 'prebook', productCodes: [], suggested: p.qty, ...p,
 })
 
 describe('changedLinesFromLines (fallback when no breakdown)', () => {

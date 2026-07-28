@@ -11,6 +11,12 @@ import type { CrewMealProfile } from './crewMealTypes'
 import type { MealCatalog } from './mealsTypes'
 import type { CateringOrder, CateringOrderLine, OrderCategory } from './orderTypes'
 
+/** Number of flight groups that contributed to this order version. */
+export function orderGroupCount(order: CateringOrder): number {
+  if (!order.breakdown?.length) return 0
+  return new Set(order.breakdown.map((c) => c.groupId)).size
+}
+
 /** Accent-insensitive, đ→d, collapsed-space name key for dish matching. */
 export function normalizeName(s: string): string {
   return [...s.toLowerCase().normalize('NFD')]
@@ -24,10 +30,7 @@ export function normalizeName(s: string): string {
     .trim()
 }
 
-/**
- * Build a dish-name → PBML-codes lookup from the meal catalog.
- * Catalog items store `productCodes`; those stamp onto order lines as `pbmlCodes`.
- */
+/** Build a dish-name → product-codes lookup from the meal catalog. */
 export function makeCodeOf(catalog: MealCatalog | undefined): (name: string) => string[] {
   const m = new Map<string, string[]>()
   ;(catalog?.meals ?? []).forEach((x) => m.set(normalizeName(x.name), x.productCodes))
@@ -59,7 +62,7 @@ export function suggestedTotal(lines: CateringOrderLine[]): number {
 
 /**
  * Build the merged order lines from confirmed groups. `codeOf` maps a dish name
- * to its PBML codes (from the meal catalog); `profile` is the active cockpit
+ * to its product codes (from the meal catalog); `profile` is the active cockpit
  * crew-meal profile (crew line omitted when absent).
  */
 export function buildOrderLines(

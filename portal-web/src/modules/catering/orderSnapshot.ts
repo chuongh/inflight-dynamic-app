@@ -15,7 +15,7 @@ const SALES: Array<[SalesKey, string]> = [
   ['traSua', 'TSA'],
 ]
 
-/** PBML code(s) for a system (crew/sales) line. */
+/** Product-code placeholder(s) for a system (crew/sales) line. */
 function systemCode(category: OrderCategory, name: string): string {
   if (category === 'crew') return 'CRWM'
   const s = SALES.find(([k]) => k === name)
@@ -77,7 +77,7 @@ export function deriveLines(
     .map((x) => ({
       name: x.name,
       category: x.category,
-      pbmlCodes: x.category === 'prebook' ? codeOf(x.name) : [systemCode(x.category, x.name)],
+      productCodes: x.category === 'prebook' ? codeOf(x.name) : [systemCode(x.category, x.name)],
       suggested: x.qty,
       qty: x.qty,
     }))

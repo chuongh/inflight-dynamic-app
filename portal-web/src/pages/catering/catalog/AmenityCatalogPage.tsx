@@ -1,19 +1,26 @@
-import { App as AntApp, Button, Drawer, Input, Select, Space, Spin, Switch, Table, Tag } from 'antd'
+import { App as AntApp, Button, Drawer, Input, Space, Spin, Switch, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { Pencil, Search } from 'lucide-react'
+import { Pencil, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ListPageLayout } from '@/components/patterns/ListPageLayout'
 import { EquipmentBadge } from '@/components/primitives/Badge'
 import { useAuth } from '@/core/auth/useAuth'
-import {
-  activeCatalogVersion,
-  catalogVersionsNewestFirst,
-  withNewAmenityCatalogVersion,
-} from '@/modules/catering/catalog'
+import { activeCatalogVersion, replaceActiveCatalogItems } from '@/modules/catering/catalog'
 import type { AmenityCatalogItem } from '@/modules/catering/catalogTypes'
 import { useAmenityCatalogData, useSaveAmenityCatalogData } from '@/modules/catering/hooks/useCatalog'
 import { formatDateDMY } from '@/shared/utils/format'
+
+function blankAmenity(): AmenityCatalogItem {
+  return {
+    id: `amn-${Date.now()}`,
+    productCode: null,
+    name: { vi: '' },
+    unit: null,
+    active: true,
+    needsCode: true,
+  }
+}
 
 export function AmenityCatalogPage() {
   const { t } = useTranslation()
@@ -22,20 +29,13 @@ export function AmenityCatalogPage() {
   const { data, isLoading } = useAmenityCatalogData()
   const save = useSaveAmenityCatalogData()
 
-  const [viewingId, setViewingId] = useState<string | null>(null)
-  const [editing, setEditing] = useState(false)
-  const [working, setWorking] = useState<AmenityCatalogItem[]>([])
   const [search, setSearch] = useState('')
   const [needsCodeOnly, setNeedsCodeOnly] = useState(false)
   const [drawerItem, setDrawerItem] = useState<AmenityCatalogItem | null>(null)
+  const [drawerMode, setDrawerMode] = useState<'add' | 'edit'>('edit')
 
-  const versions = useMemo(() => catalogVersionsNewestFirst(data?.versions ?? []), [data])
-  const active = useMemo(() => activeCatalogVersion(versions), [versions])
-  const viewing = useMemo(
-    () => versions.find((v) => v.id === viewingId) ?? active,
-    [versions, viewingId, active],
-  )
-  const items = editing ? working : (viewing?.items ?? [])
+  const active = useMemo(() => activeCatalogVersion(data?.versions ?? []), [data])
+  const items = active?.items ?? []
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return items.filter((it) => {
@@ -48,7 +48,7 @@ export function AmenityCatalogPage() {
     })
   }, [items, search, needsCodeOnly])
 
-  if (isLoading || !data || !viewing) {
+  if (isLoading || !data || !active) {
     return (
       <div className="page-loading">
         <Spin size="large" />
@@ -56,31 +56,35 @@ export function AmenityCatalogPage() {
     )
   }
 
-  const startEdit = () => {
-    setWorking(structuredClone(viewing.items))
-    setEditing(true)
+  const openAdd = () => {
+    setDrawerMode('add')
+    setDrawerItem(blankAmenity())
   }
-  const cancelEdit = () => {
-    setEditing(false)
-    setWorking([])
-    setDrawerItem(null)
+
+  const openEdit = (item: AmenityCatalogItem) => {
+    setDrawerMode('edit')
+    setDrawerItem({ ...item, name: { ...item.name } })
   }
-  const publish = () => {
+
+  const saveDrawer = (item: AmenityCatalogItem) => {
+    if (!item.name.vi.trim()) {
+      message.warning(t('catering.catalog.nameRequired'))
+      return
+    }
+    const nextItems = drawerMode === 'add' ? [...items, item] : items.map((x) => (x.id === item.id ? item : x))
     const today = formatDateDMY(Date.now())
-    const next = withNewAmenityCatalogVersion(data.versions, working, {
-      effectiveFrom: today,
-      updatedBy: session?.user.name ?? 'Commercial',
-      updatedAt: today,
-      startsInFuture: false,
-    })
     save.mutate(
-      { ...data, versions: next },
+      {
+        ...data,
+        versions: replaceActiveCatalogItems(data.versions, nextItems, {
+          updatedBy: session?.user.name ?? 'Commercial',
+          updatedAt: today,
+        }),
+      },
       {
         onSuccess: () => {
-          setViewingId(next[0].id)
-          setEditing(false)
-          setWorking([])
-          message.success(t('catering.catalog.published', { id: next[0].id }))
+          setDrawerItem(null)
+          message.success(t('catering.catalog.saved'))
         },
       },
     )
@@ -127,24 +131,21 @@ export function AmenityCatalogPage() {
           <EquipmentBadge status="retired" label={t('catering.catalog.status.inactive')} />
         ),
     },
-    ...(editing
-      ? [
-          {
-            title: '',
-            key: 'edit',
-            width: 56,
-            render: (_: unknown, r: AmenityCatalogItem) => (
-              <Button
-                type="text"
-                size="small"
-                icon={<Pencil size={15} />}
-                aria-label={t('catering.catalog.edit')}
-                onClick={() => setDrawerItem({ ...r })}
-              />
-            ),
-          } as const,
-        ]
-      : []),
+    {
+      title: '',
+      key: 'edit',
+      width: 56,
+      align: 'center',
+      render: (_v, r) => (
+        <Button
+          type="text"
+          size="small"
+          icon={<Pencil size={15} />}
+          aria-label={t('catering.catalog.edit')}
+          onClick={() => openEdit(r)}
+        />
+      ),
+    },
   ]
 
   return (
@@ -153,25 +154,9 @@ export function AmenityCatalogPage() {
       title={t('catering.catalog.amenity.title')}
       description={t('catering.catalog.amenity.desc')}
       actions={
-        <>
-          <Select
-            value={viewing.id}
-            onChange={(id) => {
-              setViewingId(id)
-              if (editing) cancelEdit()
-            }}
-            style={{ minWidth: 150 }}
-            options={versions.map((v) => ({
-              value: v.id,
-              label: `${v.id} · ${t(`catering.quota.status.${v.status}`)}`,
-            }))}
-          />
-          {viewing.id === active?.id && !editing ? (
-            <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
-              {t('catering.catalog.edit')}
-            </Button>
-          ) : null}
-        </>
+        <Button type="primary" icon={<Plus size={15} />} onClick={openAdd}>
+          {t('catering.catalog.addItem')}
+        </Button>
       }
       filterBarClassName="grid grid-cols-1 gap-2 lg:grid-cols-[1.5fr_auto]"
       filterBar={
@@ -190,42 +175,22 @@ export function AmenityCatalogPage() {
         </>
       }
       footer={
-        editing ? (
-          <>
-            <span className="text-text-secondary text-[12.5px] font-semibold">
-              {filtered.length}/{items.length} {t('catering.catalog.items')}
-            </span>
-            <div className="flex items-center gap-2">
-              <Button onClick={cancelEdit}>{t('common.cancel')}</Button>
-              <Button type="primary" onClick={publish}>
-                {t('catering.catalog.publish')}
-              </Button>
-            </div>
-          </>
-        ) : (
-          <span className="text-text-secondary text-[12.5px] font-semibold">
-            {filtered.length}/{items.length} {t('catering.catalog.items')}
-          </span>
-        )
+        <span className="text-text-secondary text-[12.5px] font-semibold">
+          {filtered.length}/{items.length} {t('catering.catalog.items')}
+        </span>
       }
       modals={
         <Drawer
           open={!!drawerItem}
           onClose={() => setDrawerItem(null)}
-          title={drawerItem?.name.vi}
+          title={drawerMode === 'add' ? t('catering.catalog.newItem') : drawerItem?.name.vi}
           width={400}
           destroyOnHidden
           extra={
             drawerItem ? (
               <Space>
                 <Button onClick={() => setDrawerItem(null)}>{t('common.cancel')}</Button>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    setWorking((prev) => prev.map((x) => (x.id === drawerItem.id ? drawerItem : x)))
-                    setDrawerItem(null)
-                  }}
-                >
+                <Button type="primary" loading={save.isPending} onClick={() => saveDrawer(drawerItem)}>
                   {t('common.save')}
                 </Button>
               </Space>

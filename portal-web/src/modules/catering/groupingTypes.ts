@@ -6,10 +6,42 @@
  *  - a group loads its whole rotation's premeal at a catering station
  *    (SGN/HAN/CXR); a new group breaks when the purser changes
  *  - only rotations departing the staff's station have orders to prep here
- * Meal quantities are intentionally NOT modelled here — there are many meal
- * types and the per-type detail belongs to the supplier order, not this
- * grouping step. This screen focuses on WHICH groups need preparing.
+ * Meal quantities for the ECO/SBB supplier workbook live on `supplier`
+ * (optional extension) so Order Detail can derive the review tables.
  */
+import type {
+  EcoAmenityOpsInput,
+  EcoSnackOpsInput,
+  HotmealItemKey,
+  SupplierSourceRefs,
+} from './supplier/types'
+
+/** ECO/SBB quantities carried on a leg for the supplier order review. */
+export interface SupplierLegExtension extends EcoAmenityOpsInput, EcoSnackOpsInput {
+  quotaCommercial?: number | null
+  /** Falls back to `leg.premeal` when absent. */
+  totalPrebook?: number | null
+  skybossEco?: number | null
+  businessPax?: number | null
+  boiledEggs?: number | null
+  reserveUtensils?: number | null
+  workbookReferenceBread?: number | null
+  hotmealItems?: Partial<Record<HotmealItemKey, number | null>>
+  australiaBeefFreshVegetables?: number | null
+  australiaBreadVegetables?: number | null
+  sbbCocktail?: number | null
+  sbbMaccaRaisins?: number | null
+  sbbUtensils?: number | null
+  sbbKit?: number | null
+  sbbPillow?: number | null
+  sbbMattress?: number | null
+  sbbMealType?: 'standard' | 'vegetarian'
+  aircraftType?: string | null
+  upliftType?: string | null
+  flightKind?: 'ferry_cargo' | 'charter_china' | 'normal' | null
+  amenityOverride?: string | null
+  sourceRefs?: SupplierSourceRefs
+}
 
 export interface FlightLeg {
   flightNo: string
@@ -48,6 +80,8 @@ export interface FlightLeg {
   cockpitCrew?: CockpitCrewMember[]
   /** Commercial upsell quota for this leg (from the inflight meal quota, UC-10). */
   salesQuota?: { hotmeal: number; banhMi: number; traSua: number }
+  /** ECO/SBB supplier quantities for this leg (Order Detail review). */
+  supplier?: SupplierLegExtension
 }
 
 /** One cockpit crew member on a leg, parsed from the crew-list COCKPIT column. */
@@ -118,6 +152,8 @@ export interface RawFlight {
   meals?: MealBreakdownItem[]
   /** Named cockpit roster (CP + FO) for this flight, from the crew-list source. */
   cockpitCrew?: CockpitCrewMember[]
+  /** ECO/SBB supplier quantities (carried through into the grouped leg). */
+  supplier?: SupplierLegExtension
 }
 
 export type DayStatus = 'grouped' | 'ungrouped'

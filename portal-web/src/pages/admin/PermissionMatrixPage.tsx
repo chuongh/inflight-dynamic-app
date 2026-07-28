@@ -33,9 +33,9 @@ const SHORT_ROLE: Record<RoleId, string> = {
   viewer: 'VWR',
 }
 
-const CORNER = 'sticky left-0 z-30 bg-[var(--color-surface)]'
-const HEAD = 'sticky top-0 z-20 bg-[var(--color-surface)]'
-const FIRSTCOL = 'sticky left-0 z-10 bg-[var(--color-surface)]'
+const CORNER = 'sticky left-0 z-[3] bg-[var(--color-surface)]'
+const HEAD = 'sticky top-0 z-[2] bg-[var(--color-surface)]'
+const FIRSTCOL = 'sticky left-0 z-[1] bg-[var(--color-surface)]'
 const CELL = 'border border-[color:var(--color-border)]'
 
 export function PermissionMatrixPage() {
@@ -105,7 +105,7 @@ export function PermissionMatrixPage() {
         </div>
       }
     >
-      <div className="thin-scroll overflow-x-auto rounded-xl border border-[color:var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)]">
+      <div className="relative z-0 isolate overflow-x-auto rounded-xl border border-[color:var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)]">
         <table className="min-w-max border-collapse text-[12px]">
           <thead>
             <tr>

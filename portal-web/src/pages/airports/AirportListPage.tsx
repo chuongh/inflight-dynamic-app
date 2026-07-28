@@ -2,21 +2,18 @@ import { App as AntApp, Button, Dropdown, Input, Select, Spin, Switch, Table, Ta
 import type { MenuProps } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import {
-  Building2,
   Map as MapIcon,
-  MapPinned,
   MoreHorizontal,
   Pencil,
   Plus,
   Search,
-  UtensilsCrossed,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { FilterBar } from '@/components/patterns/FilterBar'
-import { KpiCard } from '@/components/patterns/KpiCard'
 import { PageHeader } from '@/components/patterns/PageHeader'
+import { StatStrip } from '@/components/patterns/StatStrip'
 import { useAirports, useSaveAirports } from '@/modules/airports/hooks/useAirports'
 import type { Airport, AirportFormValues, AirportMap } from '@/modules/airports/types'
 import { AirportFormModal } from './AirportFormModal'
@@ -258,29 +255,31 @@ export function AirportListPage() {
           }
         />
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <KpiCard
-            icon={Building2}
-            label={t('airports.kpiTotal')}
-            value={airports.length}
-            hint={t('airports.kpiTotalHint', {
-              dom: airports.filter((a) => a.kind === 'domestic').length,
-              intl: airports.filter((a) => a.kind === 'international').length,
-            })}
-          />
-          <KpiCard
-            icon={UtensilsCrossed}
-            tone="brand"
-            label={t('airports.kpiCatering')}
-            value={cateringCount}
-            hint={t('airports.kpiCateringHint')}
-          />
-          <KpiCard
-            icon={MapPinned}
-            label={t('airports.kpiMapped')}
-            value={mappedCount}
-            hint={t('airports.kpiMappedHint')}
-            badge={<LaterTag />}
+        <div className="mb-4">
+          <StatStrip
+            columns={3}
+            items={[
+              {
+                label: t('airports.kpiTotal'),
+                value: airports.length,
+                featured: true,
+                hint: t('airports.kpiTotalHint', {
+                  dom: airports.filter((a) => a.kind === 'domestic').length,
+                  intl: airports.filter((a) => a.kind === 'international').length,
+                }),
+              },
+              {
+                label: t('airports.kpiCatering'),
+                value: cateringCount,
+                hint: t('airports.kpiCateringHint'),
+              },
+              {
+                label: t('airports.kpiMapped'),
+                value: mappedCount,
+                tone: 'muted',
+                hint: t('airports.kpiMappedHint'),
+              },
+            ]}
           />
         </div>
 
