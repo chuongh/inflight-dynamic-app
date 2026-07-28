@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { resolveAmenityPackages } from './amenityResolver'
+import {
+  appendOddSectorShortRoundTripPackage,
+  resolveAmenityComposition,
+  resolveAmenityPackages,
+} from './amenityResolver'
 import { DEFAULT_ECO_QUANTITY_RULES, evalQuantityRule } from './ecoQuantityEval'
 import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
+import { DEFAULT_AMENITY_PACKAGE_COMPOSITIONS } from './amenityQuantityDefaults'
 import { buildEcoSupplierRow } from './ecoBuilder'
 import ecoRouteRulesJson from '../../../mock-data/catering/supplier/eco-route-rules.json'
 import type { EcoRouteRuleDataset, EcoSupplierInput } from './types'
@@ -136,5 +141,34 @@ describe('eco quantity rules', () => {
     expect(row.amenityLabel).toBe('10+15')
     expect(row.cells.reserveUtensils.value).toBe(30)
     expect(row.cells.indianSaltPepper.value).toBe(0)
+  })
+})
+
+describe('resolveAmenityComposition', () => {
+  it('sums products across multiple packages', () => {
+    const pkg2 = DEFAULT_AMENITY_PACKAGE_COMPOSITIONS.find((c) => c.packageId === 2)!
+    const pkg5 = DEFAULT_AMENITY_PACKAGE_COMPOSITIONS.find((c) => c.packageId === 5)!
+    expect(pkg2.items.length).toBeGreaterThan(0)
+    expect(pkg5.items.length).toBeGreaterThan(0)
+
+    const single = resolveAmenityComposition([2])
+    const trashBagMid = single.find((i) => i.productCode === '30000879')
+    expect(trashBagMid?.quantity).toBe(3)
+
+    const combined = resolveAmenityComposition([2, 5])
+    const combinedTrash = combined.find((i) => i.productCode === '30000879')
+    expect(combinedTrash?.quantity).toBe(3 + 8)
+  })
+
+  it('appends short round-trip package on odd-sector last leg and doubles its qty', () => {
+    const base = [1, 5]
+    const withExtra = appendOddSectorShortRoundTripPackage(base, 3, true)
+    expect(withExtra).toEqual([1, 5, 2])
+    expect(appendOddSectorShortRoundTripPackage(base, 3, false)).toEqual(base)
+    expect(appendOddSectorShortRoundTripPackage(base, 2, true)).toEqual(base)
+
+    const once = resolveAmenityComposition([2]).find((i) => i.productCode === '30000879')
+    const twice = resolveAmenityComposition([2, 2]).find((i) => i.productCode === '30000879')
+    expect(twice?.quantity).toBe((once?.quantity ?? 0) * 2)
   })
 })

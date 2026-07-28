@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import ecoRouteRulesJson from '../../../mock-data/catering/supplier/eco-route-rules.json'
 import supplierFlightsJson from '../../../mock-data/catering/supplier/flights-2026-07-08.json'
+import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
 import { buildEcoSupplierRow } from './ecoBuilder'
 import type { EcoRouteRuleDataset, EcoSupplierInput } from './types'
 
@@ -88,7 +89,24 @@ describe('buildEcoSupplierRow', () => {
     })
 
     expect(withQuota.cells.bread.value).toBe(286)
+    expect(withQuota.cells.bread.source).toContain('ECO.S.bread')
     expect(neither.cells.bread.value).toBeNull()
+  })
+
+  it('resolves prebookCashews via the quantity rule engine', () => {
+    const row = buildEco(vj81Input)
+    expect(row.cells.prebookCashews.value).toBe(282)
+    expect(row.cells.prebookCashews.source).toContain('ECO.AZ.prebookCashews')
+  })
+
+  it('resolves freshWater as totalPrebook and prefers freshWaterOverride', () => {
+    const row = buildEco(vj81Input)
+    expect(row.cells.freshWater.value).toBe(282)
+    expect(row.cells.freshWater.source).toContain('ECO.AY.freshWater')
+
+    const overridden = buildEco({ ...vj81Input, freshWaterOverride: 40 })
+    expect(overridden.cells.freshWater.value).toBe(40)
+    expect(overridden.cells.freshWater.source).toContain('freshWaterOverride')
   })
 
   it('prefers workbookReferenceBread over the quota+prebook formula', () => {
@@ -119,11 +137,10 @@ describe('buildEcoSupplierRow', () => {
     })
 
     expect(row.cells.australiaNoodleVegetables.value).toBe(25)
-    expect(row.cells.australiaNoodleVegetables.source).toContain(
-      'QUY_TAC_DIEN_SO_LUONG',
-    )
+    expect(row.cells.australiaNoodleVegetables.source).toContain('ECO.Z.auNoodleVeg')
     expect(row.cells.australiaSkybossYogurt.value).toBe(13)
     expect(row.cells.australiaRoundBread.value).toBe(13)
+    expect(row.cells.skybossEggs.value).toBe(13)
     expect(row.cells.australiaBeefFreshVegetables.value).toBe(4)
     expect(row.cells.australiaBreadVegetables.value).toBe(5)
   })
@@ -161,44 +178,42 @@ describe('buildEcoSupplierRow', () => {
     expect(row.cells.highlift.value).toBeNull()
   })
 
-  it('leaves Australia route fields null when date or route does not match', () => {
-    const dateOutOfRange = buildEco({
-      ...vj81Input,
-      operatingDate: '09/07/2026',
-    })
+  it('leaves Australia route fields null when route does not match AU group', () => {
     const unsupportedRoute = buildEco({
       ...vj81Input,
       dep: 'SGN',
       arr: 'HAN',
     })
 
-    expect(dateOutOfRange.cells.australiaNoodleVegetables.value).toBeNull()
     expect(unsupportedRoute.cells.australiaNoodleVegetables.value).toBeNull()
+    expect(unsupportedRoute.cells.skybossEggs.value).toBeNull()
+    expect(unsupportedRoute.cells.australiaSkybossYogurt.value).toBeNull()
+    expect(unsupportedRoute.cells.australiaRoundBread.value).toBeNull()
   })
 
-  it('uses the supplied provenance-backed route rule dataset instead of hardcoded values', () => {
-    const rules: EcoRouteRuleDataset = {
-      effectiveFrom: '08/07/2026',
-      effectiveTo: '08/07/2026',
-      airports: ['MEL'],
-      source: 'Synthetic compliance rule source',
-      fields: {
-        australiaNoodleVegetables: {
-          value: 99,
-          ruleId: 'TEST.Z',
+  it('uses quantityConfig rules for AU noodle vegetables instead of legacy dataset', () => {
+    const row = buildEcoSupplierRow(vj81Input, null, {
+      amenity: DEFAULT_ECO_AMENITY_CONFIG,
+      quantityRules: [
+        {
+          id: 'TEST.Z',
+          base: 'by_std_arr',
+          targetColumn: 'australiaNoodleVegetables',
+          enabled: true,
+          branches: [
+            {
+              id: 'au',
+              when: { routeGroups: ['AU'] },
+              value: { kind: 'const', value: 99 },
+            },
+          ],
+          fallback: { kind: 'manual' },
         },
-        skybossEggs: { input: 'skybossEco', ruleId: 'TEST.AE' },
-        australiaSkybossYogurt: { input: 'skybossEco', ruleId: 'TEST.AG' },
-        australiaRoundBread: { input: 'skybossEco', ruleId: 'TEST.AW' },
-      },
-    }
-
-    const row = buildEcoSupplierRow(vj81Input, rules)
+      ],
+    })
 
     expect(row.cells.australiaNoodleVegetables.value).toBe(99)
-    expect(row.cells.australiaNoodleVegetables.source).toBe(
-      'Synthetic compliance rule source',
-    )
+    expect(row.cells.australiaNoodleVegetables.source).toContain('TEST.Z')
   })
 
   it('uses the reserve utensil source reference', () => {

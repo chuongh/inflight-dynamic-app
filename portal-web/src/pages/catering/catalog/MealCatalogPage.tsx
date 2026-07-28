@@ -1,40 +1,31 @@
 import { App as AntApp, Button, Drawer, Input, Select, Space, Spin, Switch, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { Pencil, Search } from 'lucide-react'
+import { Pencil, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ListPageLayout } from '@/components/patterns/ListPageLayout'
 import { EquipmentBadge } from '@/components/primitives/Badge'
 import { useAuth } from '@/core/auth/useAuth'
-import {
-  activeCatalogVersion,
-  catalogVersionsNewestFirst,
-  withNewMealCatalogVersion,
-} from '@/modules/catering/catalog'
+import { activeCatalogVersion, replaceActiveCatalogItems } from '@/modules/catering/catalog'
 import type { MealCatalogItem, MealItemCategory } from '@/modules/catering/catalogTypes'
+import {
+  MEAL_CATEGORIES,
+  MEAL_CATEGORY_STYLE,
+} from '@/modules/catering/mealCategoryMeta'
 import { useMealCatalogData, useSaveMealCatalogData } from '@/modules/catering/hooks/useCatalog'
 import { formatDateDMY } from '@/shared/utils/format'
 
-const CATEGORIES: MealItemCategory[] = [
-  'eco_main',
-  'sbb_main',
-  'appetizer',
-  'dessert',
-  'bread',
-  'drink',
-  'snack',
-  'condiment',
-]
-
-const CATEGORY_STYLE: Record<MealItemCategory, { bg: string; color: string; border: string }> = {
-  eco_main: { bg: '#EDF9E0', color: '#4A7A00', border: '#B8E67A' },
-  sbb_main: { bg: '#FFF4C4', color: '#C9A000', border: '#F0DC7A' },
-  appetizer: { bg: '#FEEAE9', color: '#B91C1C', border: '#FECACA' },
-  dessert: { bg: '#FCE7F3', color: '#BE185D', border: '#FBCFE8' },
-  bread: { bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA' },
-  drink: { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
-  snack: { bg: '#F0FDFA', color: '#0F766E', border: '#99F6E4' },
-  condiment: { bg: '#F1F5F9', color: '#475569', border: '#E2E8F0' },
+function blankMeal(): MealCatalogItem {
+  return {
+    id: `meal-${Date.now()}`,
+    productCode: null,
+    name: { vi: '' },
+    unit: null,
+    category: 'eco_main',
+    cabinScopes: ['ECO'],
+    active: true,
+    needsCode: true,
+  }
 }
 
 export function MealCatalogPage() {
@@ -44,22 +35,14 @@ export function MealCatalogPage() {
   const { data, isLoading } = useMealCatalogData()
   const save = useSaveMealCatalogData()
 
-  const [viewingId, setViewingId] = useState<string | null>(null)
-  const [editing, setEditing] = useState(false)
-  const [working, setWorking] = useState<MealCatalogItem[]>([])
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<MealItemCategory | 'all'>('all')
   const [needsCodeOnly, setNeedsCodeOnly] = useState(false)
   const [drawerItem, setDrawerItem] = useState<MealCatalogItem | null>(null)
+  const [drawerMode, setDrawerMode] = useState<'add' | 'edit'>('edit')
 
-  const versions = useMemo(() => catalogVersionsNewestFirst(data?.versions ?? []), [data])
-  const active = useMemo(() => activeCatalogVersion(versions), [versions])
-  const viewing = useMemo(
-    () => versions.find((v) => v.id === viewingId) ?? active,
-    [versions, viewingId, active],
-  )
-
-  const items = editing ? working : (viewing?.items ?? [])
+  const active = useMemo(() => activeCatalogVersion(data?.versions ?? []), [data])
+  const items = active?.items ?? []
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return items.filter((it) => {
@@ -73,7 +56,7 @@ export function MealCatalogPage() {
     })
   }, [items, search, category, needsCodeOnly])
 
-  if (isLoading || !data || !viewing) {
+  if (isLoading || !data || !active) {
     return (
       <div className="page-loading">
         <Spin size="large" />
@@ -81,38 +64,38 @@ export function MealCatalogPage() {
     )
   }
 
-  const startEdit = () => {
-    setWorking(structuredClone(viewing.items))
-    setEditing(true)
+  const openAdd = () => {
+    setDrawerMode('add')
+    setDrawerItem(blankMeal())
   }
-  const cancelEdit = () => {
-    setEditing(false)
-    setWorking([])
-    setDrawerItem(null)
+
+  const openEdit = (item: MealCatalogItem) => {
+    setDrawerMode('edit')
+    setDrawerItem({ ...item, name: { ...item.name } })
   }
-  const publish = () => {
+
+  const saveDrawer = (item: MealCatalogItem) => {
+    if (!item.name.vi.trim()) {
+      message.warning(t('catering.catalog.nameRequired'))
+      return
+    }
+    const nextItems = drawerMode === 'add' ? [...items, item] : items.map((x) => (x.id === item.id ? item : x))
     const today = formatDateDMY(Date.now())
-    const next = withNewMealCatalogVersion(data.versions, working, {
-      effectiveFrom: today,
-      updatedBy: session?.user.name ?? 'Commercial',
-      updatedAt: today,
-      startsInFuture: false,
-    })
     save.mutate(
-      { ...data, versions: next },
+      {
+        ...data,
+        versions: replaceActiveCatalogItems(data.versions, nextItems, {
+          updatedBy: session?.user.name ?? 'Commercial',
+          updatedAt: today,
+        }),
+      },
       {
         onSuccess: () => {
-          setViewingId(next[0].id)
-          setEditing(false)
-          setWorking([])
-          message.success(t('catering.catalog.published', { id: next[0].id }))
+          setDrawerItem(null)
+          message.success(t('catering.catalog.saved'))
         },
       },
     )
-  }
-  const saveDrawer = (item: MealCatalogItem) => {
-    setWorking((prev) => prev.map((x) => (x.id === item.id ? item : x)))
-    setDrawerItem(null)
   }
 
   const columns: ColumnsType<MealCatalogItem> = [
@@ -142,7 +125,7 @@ export function MealCatalogPage() {
       width: 140,
       sorter: (a, b) => a.category.localeCompare(b.category),
       render: (c: MealItemCategory) => {
-        const s = CATEGORY_STYLE[c]
+        const s = MEAL_CATEGORY_STYLE[c]
         return (
           <Tag style={{ background: s.bg, color: s.color, borderColor: s.border, fontWeight: 700 }}>
             {t(`catering.catalog.category.${c}`)}
@@ -170,24 +153,21 @@ export function MealCatalogPage() {
           <EquipmentBadge status="retired" label={t('catering.catalog.status.inactive')} />
         ),
     },
-    ...(editing
-      ? [
-          {
-            title: '',
-            key: 'edit',
-            width: 56,
-            render: (_: unknown, r: MealCatalogItem) => (
-              <Button
-                type="text"
-                size="small"
-                icon={<Pencil size={15} />}
-                aria-label={t('catering.catalog.edit')}
-                onClick={() => setDrawerItem({ ...r })}
-              />
-            ),
-          } as const,
-        ]
-      : []),
+    {
+      title: '',
+      key: 'edit',
+      width: 56,
+      align: 'center',
+      render: (_v, r) => (
+        <Button
+          type="text"
+          size="small"
+          icon={<Pencil size={15} />}
+          aria-label={t('catering.catalog.edit')}
+          onClick={() => openEdit(r)}
+        />
+      ),
+    },
   ]
 
   return (
@@ -196,25 +176,9 @@ export function MealCatalogPage() {
       title={t('catering.catalog.meals.title')}
       description={t('catering.catalog.meals.desc')}
       actions={
-        <>
-          <Select
-            value={viewing.id}
-            onChange={(id) => {
-              setViewingId(id)
-              if (editing) cancelEdit()
-            }}
-            style={{ minWidth: 150 }}
-            options={versions.map((v) => ({
-              value: v.id,
-              label: `${v.id} · ${t(`catering.quota.status.${v.status}`)}`,
-            }))}
-          />
-          {viewing.id === active?.id && !editing ? (
-            <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
-              {t('catering.catalog.edit')}
-            </Button>
-          ) : null}
-        </>
+        <Button type="primary" icon={<Plus size={15} />} onClick={openAdd}>
+          {t('catering.catalog.addItem')}
+        </Button>
       }
       filterBarClassName="grid grid-cols-1 gap-2 lg:grid-cols-[1.5fr_220px_auto]"
       filterBar={
@@ -231,7 +195,7 @@ export function MealCatalogPage() {
             onChange={setCategory}
             options={[
               { value: 'all', label: t('catering.catalog.category.all') },
-              ...CATEGORIES.map((c) => ({ value: c, label: t(`catering.catalog.category.${c}`) })),
+              ...MEAL_CATEGORIES.map((c) => ({ value: c, label: t(`catering.catalog.category.${c}`) })),
             ]}
           />
           <label className="text-text-secondary flex items-center gap-2 text-[13px] font-semibold">
@@ -241,40 +205,22 @@ export function MealCatalogPage() {
         </>
       }
       footer={
-        editing ? (
-          <>
-            <span className="text-text-secondary text-[12.5px] font-semibold tnum">
-              {viewing.effectiveFrom} → {viewing.effectiveTo ?? t('catering.quota.untilNextShort')}
-              {' · '}
-              {filtered.length}/{items.length} {t('catering.catalog.items')}
-            </span>
-            <div className="flex items-center gap-2">
-              <Button onClick={cancelEdit}>{t('common.cancel')}</Button>
-              <Button type="primary" onClick={publish}>
-                {t('catering.catalog.publish')}
-              </Button>
-            </div>
-          </>
-        ) : (
-          <span className="text-text-secondary text-[12.5px] font-semibold tnum">
-            {viewing.effectiveFrom} → {viewing.effectiveTo ?? t('catering.quota.untilNextShort')}
-            {' · '}
-            {filtered.length}/{items.length} {t('catering.catalog.items')}
-          </span>
-        )
+        <span className="text-text-secondary text-[12.5px] font-semibold tnum">
+          {filtered.length}/{items.length} {t('catering.catalog.items')}
+        </span>
       }
       modals={
         <Drawer
           open={!!drawerItem}
           onClose={() => setDrawerItem(null)}
-          title={drawerItem?.name.vi}
+          title={drawerMode === 'add' ? t('catering.catalog.newItem') : drawerItem?.name.vi}
           width={420}
           destroyOnHidden
           extra={
             drawerItem ? (
               <Space>
                 <Button onClick={() => setDrawerItem(null)}>{t('common.cancel')}</Button>
-                <Button type="primary" onClick={() => saveDrawer(drawerItem)}>
+                <Button type="primary" loading={save.isPending} onClick={() => saveDrawer(drawerItem)}>
                   {t('common.save')}
                 </Button>
               </Space>
@@ -313,8 +259,8 @@ export function MealCatalogPage() {
                   id="meal-category"
                   className="w-full"
                   value={drawerItem.category}
-                  onChange={(category) => setDrawerItem({ ...drawerItem, category })}
-                  options={CATEGORIES.map((c) => ({
+                  onChange={(next) => setDrawerItem({ ...drawerItem, category: next })}
+                  options={MEAL_CATEGORIES.map((c) => ({
                     value: c,
                     label: t(`catering.catalog.category.${c}`),
                   }))}

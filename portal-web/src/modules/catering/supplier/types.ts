@@ -65,9 +65,28 @@ export interface EcoAmenityOpsInput {
   lastMinuteTopUp?: number | null
 }
 
+/** §1.5 snack / prebook / water — mostly manual until formulas are confirmed. */
+export interface EcoSnackOpsInput {
+  /** Override AY fresh water (else rule = totalPrebook). */
+  freshWaterOverride?: number | null
+  maccaSkybossRaisins?: number | null
+  maccaKazSalted?: number | null
+  charterSnack?: number | null
+  wine?: number | null
+  blanketCSkyboss?: number | null
+  blanket3in1Prebook?: number | null
+  maccaRegular?: number | null
+  mangoChiliSaltGdsDeluxe?: number | null
+  beerSnackComboBC?: number | null
+  sodaMaccaComboBD?: number | null
+}
+
 export type EcoUpliftTypeInput = 'DAU_NGAY' | 'DOI_TO' | 'NIGHTSTOP'
 
-export interface SupplierFlightInput extends FlightIdentity, EcoAmenityOpsInput {
+export interface SupplierFlightInput
+  extends FlightIdentity,
+    EcoAmenityOpsInput,
+    EcoSnackOpsInput {
   quotaCommercial?: number | null
   totalPrebook?: number | null
   skybossEco?: number | null
@@ -95,7 +114,10 @@ export interface SupplierFlightInput extends FlightIdentity, EcoAmenityOpsInput 
   sourceRefs?: SupplierSourceRefs
 }
 
-export interface EcoSupplierInput extends FlightIdentity, EcoAmenityOpsInput {
+export interface EcoSupplierInput
+  extends FlightIdentity,
+    EcoAmenityOpsInput,
+    EcoSnackOpsInput {
   quotaCommercial: number | null
   totalPrebook: number | null
   skybossEco: number | null
@@ -167,6 +189,17 @@ export interface EcoCells {
   skyboss: SupplierCell<number>
   prebook: SupplierCell<number>
   prebookCashews: SupplierCell<number>
+  freshWater: SupplierCell<number>
+  maccaSkybossRaisins: SupplierCell<number>
+  maccaKazSalted: SupplierCell<number>
+  charterSnack: SupplierCell<number>
+  wine: SupplierCell<number>
+  blanketCSkyboss: SupplierCell<number>
+  blanket3in1Prebook: SupplierCell<number>
+  maccaRegular: SupplierCell<number>
+  mangoChiliSaltGdsDeluxe: SupplierCell<number>
+  beerSnackComboBC: SupplierCell<number>
+  sodaMaccaComboBD: SupplierCell<number>
   reserveCrewWater: SupplierCell<number>
   smallIceBox: SupplierCell<number>
   largeIceBox: SupplierCell<number>

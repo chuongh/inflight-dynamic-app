@@ -1,13 +1,66 @@
 /** Shared presentational bits for the order list + detail pages. */
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { StatStrip, type StatStripItem, type StatStripTone } from '@/components/patterns/StatStrip'
 import type { OrderCategory, OrderStatus } from '@/modules/catering/orderTypes'
+import './orders.css'
 
-/** Category colours — ops palette (sky / slate / gold), not double-red. */
+/** Category colours — brand red / ink / gold for scannable share bars. */
 export const CAT_COLOR: Record<OrderCategory, string> = {
-  prebook: 'var(--color-planner-accent)',
-  crew: 'var(--color-planner-ink)',
+  prebook: 'var(--color-vj-red)',
+  crew: 'var(--color-vj-red-dark)',
   sales: 'var(--color-vj-yellow-dark)',
+}
+
+export type OrderStatTone = StatStripTone
+export type OrderStatItem = StatStripItem
+
+/** @deprecated Prefer StatStrip — kept as alias for order pages. */
+export const OrderStatStrip = StatStrip
+
+export type OrderCatSegment = { color: string; label: string; n: number }
+
+/** Thin category share bar + legends for the detail overview. */
+export function OrderCatBar({
+  total,
+  segments,
+  delta,
+  deltaLabel,
+}: {
+  total: number
+  segments: OrderCatSegment[]
+  delta?: number
+  deltaLabel?: string
+}) {
+  const denom = total || 1
+  return (
+    <div>
+      <div className="order-cat-bar" aria-hidden>
+        {segments.map((s) =>
+          s.n > 0 ? (
+            <span key={s.label} style={{ width: `${(s.n / denom) * 100}%`, background: s.color }} />
+          ) : null,
+        )}
+      </div>
+      <div className="order-cat-bar__legends">
+        {segments.map((s) => (
+          <span key={s.label} className="order-cat-bar__leg">
+            <span className="order-cat-bar__swatch" style={{ background: s.color }} />
+            {s.label} <b className="order-cat-bar__n">{s.n.toLocaleString()}</b>
+          </span>
+        ))}
+        {delta != null && deltaLabel ? (
+          <span
+            className={`order-cat-bar__delta order-cat-bar__delta--${
+              delta === 0 ? 'flat' : delta > 0 ? 'up' : 'down'
+            }`}
+          >
+            {deltaLabel} {delta > 0 ? `+${delta}` : delta}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  )
 }
 
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {

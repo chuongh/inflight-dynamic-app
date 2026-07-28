@@ -26,12 +26,6 @@ export const PORTAL_MODULES: PortalModule[] = [
     permission: 'portal.dashboard.view',
   },
   {
-    id: 'design-system',
-    labelKey: 'nav.designSystem',
-    path: paths.designSystem,
-    permission: 'portal.dashboard.view',
-  },
-  {
     id: 'equipment',
     labelKey: 'nav.equipment',
     path: paths.equipment.trolley.list,
@@ -157,6 +151,12 @@ export const PORTAL_MODULES: PortalModule[] = [
         path: paths.admin.permissions,
         permission: 'admin.users.read',
       },
+      {
+        id: 'design-system',
+        labelKey: 'nav.designSystem',
+        path: paths.designSystem,
+        permission: 'admin.users.read',
+      },
     ],
   },
 ]
@@ -183,7 +183,7 @@ export const NAV_SECTION_KEYS: Record<
   { sectionTitleKey: string; moduleLabelKey?: string }
 > = {
   dashboard: { sectionTitleKey: 'nav.dashboard' },
-  'design-system': { sectionTitleKey: 'nav.designSystem' },
+  'design-system': { sectionTitleKey: 'nav.designSystem', moduleLabelKey: 'nav.administration' },
   catering: { sectionTitleKey: 'nav.catering' },
   'catering-grouping': { sectionTitleKey: 'nav.cateringGrouping', moduleLabelKey: 'nav.catering' },
   'catering-orders': { sectionTitleKey: 'nav.cateringOrders', moduleLabelKey: 'nav.catering' },

@@ -1,6 +1,7 @@
 import { groupOrigin } from '../grouping'
 import type { DayGrouping, FlightLeg, SupplierLegExtension } from '../groupingTypes'
-import type { SupplierFlightInput } from './types'
+import { mapMealNameToHotmealField } from './ecoSupplyRegistry'
+import type { HotmealInput, SupplierFlightInput } from './types'
 
 function mapLegToInput(
   operatingDate: string,
@@ -8,6 +9,19 @@ function mapLegToInput(
   aircraftType?: string,
 ): SupplierFlightInput {
   const s: SupplierLegExtension = leg.supplier ?? {}
+  const hotmealFromMeals: HotmealInput | undefined = (() => {
+    if (s.hotmealItems && Object.keys(s.hotmealItems).length > 0) return s.hotmealItems
+    if (!leg.meals?.length) return undefined
+    const hotmealItems: HotmealInput = {}
+    for (const m of leg.meals) {
+      const field = mapMealNameToHotmealField(m.name)
+      if (!field) continue
+      const key = field as keyof HotmealInput
+      hotmealItems[key] = (hotmealItems[key] ?? 0) + m.count
+    }
+    return Object.keys(hotmealItems).length > 0 ? hotmealItems : undefined
+  })()
+
   return {
     operatingDate,
     flightNo: leg.flightNo,
@@ -17,16 +31,27 @@ function mapLegToInput(
     upliftType: s.upliftType ?? null,
     flightKind: s.flightKind ?? null,
     amenityOverride: s.amenityOverride ?? null,
-    quotaCommercial: s.quotaCommercial,
+    quotaCommercial: s.quotaCommercial ?? leg.salesQuota?.hotmeal ?? null,
     totalPrebook: s.totalPrebook ?? leg.premeal ?? null,
     skybossEco: s.skybossEco,
     businessPax: s.businessPax,
     boiledEggs: s.boiledEggs,
     reserveUtensils: s.reserveUtensils,
     workbookReferenceBread: s.workbookReferenceBread,
-    hotmealItems: s.hotmealItems,
+    hotmealItems: hotmealFromMeals,
     australiaBeefFreshVegetables: s.australiaBeefFreshVegetables,
     australiaBreadVegetables: s.australiaBreadVegetables,
+    freshWaterOverride: s.freshWaterOverride,
+    maccaSkybossRaisins: s.maccaSkybossRaisins,
+    maccaKazSalted: s.maccaKazSalted,
+    charterSnack: s.charterSnack,
+    wine: s.wine,
+    blanketCSkyboss: s.blanketCSkyboss,
+    blanket3in1Prebook: s.blanket3in1Prebook,
+    maccaRegular: s.maccaRegular,
+    mangoChiliSaltGdsDeluxe: s.mangoChiliSaltGdsDeluxe,
+    beerSnackComboBC: s.beerSnackComboBC,
+    sodaMaccaComboBD: s.sodaMaccaComboBD,
     reserveCrewWater: s.reserveCrewWater,
     smallIceBox: s.smallIceBox,
     largeIceBox: s.largeIceBox,

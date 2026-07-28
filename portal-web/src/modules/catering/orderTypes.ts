@@ -20,6 +20,34 @@ export interface CateringOrderLine {
   qty: number
 }
 
+/** ECO supply line rolled up across confirmed flights (catalog-backed). */
+export type EcoSupplyGroupId =
+  | 'eco_main'
+  | 'sbb_main'
+  | 'appetizer'
+  | 'dessert'
+  | 'bread'
+  | 'drink'
+  | 'snack'
+  | 'condiment'
+  | 'amenity'
+  | 'amenity_composition'
+  | 'other'
+
+export interface EcoSupplyLine {
+  id: string
+  field: string
+  group: EcoSupplyGroupId
+  catalogItemId: string | null
+  productCode: string | null
+  name: string
+  unit: string | null
+  suggested: number
+  qty: number
+  source: string
+  overridden: boolean
+}
+
 /**
  * One traceable source contribution to an order line. Pre-book and sales cells
  * are per-flight; crew cells are per-group (no single flight owns a crew meal).
@@ -53,6 +81,8 @@ export interface CateringOrder {
    * Optional: versions created before reconciliation have no breakdown.
    */
   breakdown?: OrderSourceCell[]
+  /** ECO supply lines (catalog items) computed at create-order time. */
+  ecoSupplyLines?: EcoSupplyLine[]
   /** Direct numeric patches keyed by flightKey → product → field → number */
   supplierEdits?: Record<string, {
     eco?: Partial<Record<string, number>>

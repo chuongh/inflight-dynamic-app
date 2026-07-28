@@ -1,15 +1,14 @@
 import { Empty, Input, Segmented, Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { CheckCheck, ChevronRight, Pencil, Search, ShoppingBag, TrendingUp } from 'lucide-react'
+import { ChevronRight, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { KpiCard } from '@/components/patterns/KpiCard'
 import { ListPageLayout } from '@/components/patterns/ListPageLayout'
 import { useOrders } from '@/modules/catering/hooks/useOrders'
-import { categoryTotal, groupOrderFiles, lineTotal, type OrderFile } from '@/modules/catering/orders'
+import { categoryTotal, groupOrderFiles, lineTotal, orderGroupCount, type OrderFile } from '@/modules/catering/orders'
 import { paths } from '@/routes/paths'
-import { CatSplit, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
+import { CatSplit, OrderStatStrip, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
 
 type StatusFilter = 'all' | 'draft' | 'sent'
 
@@ -62,6 +61,20 @@ export function OrderListPage() {
       key: 'status',
       width: 120,
       render: (_v, file) => <OrderStatusBadge status={file.latest.status} />,
+    },
+    {
+      title: t('catering.orders.colGroups'),
+      key: 'groups',
+      width: 100,
+      align: 'right',
+      render: (_v, file) => {
+        const n = orderGroupCount(file.latest)
+        return (
+          <span className="font-extrabold tnum">
+            {n > 0 ? n : '—'}
+          </span>
+        )
+      },
     },
     {
       title: t('catering.orders.colVersion'),
@@ -152,32 +165,17 @@ export function OrderListPage() {
         </>
       }
       lead={
-        <div className="kpi-grid kpi-grid--4">
-          <KpiCard
-            icon={ShoppingBag}
-            tone="brand"
-            value={files.length}
-            label={t('catering.orders.kpiTotal')}
-          />
-          <KpiCard
-            icon={Pencil}
-            tone="default"
-            value={draftCount}
-            label={t('catering.orders.kpiDraft')}
-          />
-          <KpiCard
-            icon={CheckCheck}
-            tone="success"
-            value={sentCount}
-            label={t('catering.orders.kpiSent')}
-          />
-          <KpiCard
-            icon={TrendingUp}
-            tone="brand"
-            value={totalPortions.toLocaleString()}
-            label={t('catering.orders.kpiPortions')}
-          />
-        </div>
+        <OrderStatStrip
+          items={[
+            { label: t('catering.orders.kpiTotal'), value: files.length, featured: true },
+            { label: t('catering.orders.kpiDraft'), value: draftCount },
+            { label: t('catering.orders.kpiSent'), value: sentCount, tone: 'success' },
+            {
+              label: t('catering.orders.kpiPortions'),
+              value: totalPortions.toLocaleString(),
+            },
+          ]}
+        />
       }
       footer={
         <span className="text-text-secondary text-[12.5px] font-semibold tnum">

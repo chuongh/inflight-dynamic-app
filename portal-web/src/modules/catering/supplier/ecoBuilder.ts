@@ -1,8 +1,6 @@
 import {
   derivedFrom,
   ecoCell,
-  isEcoRouteRuleApplicable,
-  resolveEcoRouteRuleValue,
   sumHotmealItems,
 } from './ecoRules'
 import {
@@ -20,13 +18,11 @@ import {
 import type { EcoQuantityConfig, EcoUpliftType } from './ecoQuantityTypes'
 import type {
   EcoCells,
-  EcoRoutePolicyField,
   EcoSupplierInput,
   EcoSupplierRow,
   HotmealItemKey,
   SupplierCell,
 } from './types'
-import { parseEcoRouteRuleDataset } from './validation'
 
 const HOTMEAL_KEYS: HotmealItemKey[] = [
   'spaghetti',
@@ -72,14 +68,13 @@ function normalizeUpliftType(
 
 export function buildEcoSupplierRow(
   input: EcoSupplierInput,
-  routeRulesInput: unknown,
+  /** @deprecated Legacy EcoRouteRuleDataset — AU formulas now live in quantityRules. Kept for call-site compat. */
+  _routeRulesInput?: unknown,
   quantityConfig?: EcoQuantityConfig | null,
 ): EcoSupplierRow {
   const parsedDate = parseProjectDate(input.operatingDate)
   const identity = normalizeFlightIdentity(input)
   const effectiveDate = parsedDate ?? input.operatingDate.trim()
-  const parsedRules = parseEcoRouteRuleDataset(routeRulesInput)
-  const routeRules = parsedRules.ok ? parsedRules.value : null
   const sourceRefs = input.sourceRefs ?? {}
   const amenityConfig = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG
   const quantityRules =
@@ -125,32 +120,6 @@ export function buildEcoSupplierRow(
     sourceRefs.quotaCommercial ?? 'Commercial quota source',
   )
 
-  const routePolicyCell = (
-    field: EcoRoutePolicyField,
-  ): SupplierCell<number> => {
-    if (
-      !routeRules ||
-      !isEcoRouteRuleApplicable(
-        routeRules,
-        effectiveDate,
-        identity.dep,
-        identity.arr,
-      )
-    ) {
-      return ecoCell(null, routeRules?.source ?? 'ECO route rule not applicable')
-    }
-    const rule = routeRules.fields[field]
-    const source =
-      rule.input === 'skybossEco'
-        ? `${routeRules.source}; ${skyboss.source}`
-        : routeRules.source
-    return ecoCell(
-      resolveEcoRouteRuleValue(rule, skyboss.value),
-      source,
-    )
-  }
-
-  const skybossEggs = routePolicyCell('skybossEggs')
   const hotmealValues = HOTMEAL_KEYS.map((key) => hotmealCells[key].value)
   const hotmealTotalValue = sumHotmealItems(hotmealValues)
   const hotmealTotal = ecoCell(
@@ -158,43 +127,8 @@ export function buildEcoSupplierRow(
     'Sum of 14 hotmeal items; bread excluded',
   )
 
-  const breadValue =
-    input.workbookReferenceBread != null
-      ? input.workbookReferenceBread
-      : input.quotaCommercial != null || input.totalPrebook != null
-        ? (input.quotaCommercial ?? 0) + (input.totalPrebook ?? 0)
-        : null
-  const bread = ecoCell(
-    breadValue,
-    input.workbookReferenceBread != null
-      ? `${sourceRefs.workbookReferenceBread ?? 'Workbook bread column'}; workbookReferenceBread`
-      : `quotaCommercial + totalPrebook; ${quota.source}; ${prebook.source}`,
-  )
-
-  const ketchup = ecoCell(
-    hotmealCells.spaghetti.value,
-    'J spaghetti quantity',
-  )
-  const chiliSauce = ecoCell(
-    hotmealTotalValue == null ? null : Math.ceil(hotmealTotalValue / 2),
-    'ceil(AH hotmeal total / 2)',
-  )
-  const soySauce = ecoCell(
-    hotmealTotalValue == null ? null : Math.ceil(hotmealTotalValue / 2),
-    'ceil(AH hotmeal total / 2)',
-  )
-  const hotmealUtensils = ecoCell(
-    hotmealTotalValue,
-    'AH hotmeal total',
-  )
-
   const columnSnapshot: Record<string, number | null> = {
     spaghetti: hotmealCells.spaghetti.value,
-    ketchup: ketchup.value,
-    chiliSauce: chiliSauce.value,
-    soySauce: soySauce.value,
-    hotmealUtensils: hotmealUtensils.value,
-    bread: bread.value,
     skyboss: skyboss.value,
     prebook: prebook.value,
   }
@@ -219,6 +153,52 @@ export function buildEcoSupplierRow(
 
   const ruleByTarget = (target: string) =>
     quantityRules.find((r) => r.enabled && r.targetColumn === target)
+
+  const resolveRuleCell = (
+    target: string,
+    fallbackSource: string,
+  ): SupplierCell<number> => {
+    const rule = ruleByTarget(target)
+    if (!rule) return ecoCell(null, `${target} rule not configured`)
+    const resolved = evalQuantityRule(rule, evalCtx)
+    return ecoCell(resolved.value, resolved.source || fallbackSource)
+  }
+
+  let bread: SupplierCell<number>
+  if (input.workbookReferenceBread != null) {
+    bread = ecoCell(
+      input.workbookReferenceBread,
+      `${sourceRefs.workbookReferenceBread ?? 'Workbook bread column'}; workbookReferenceBread`,
+    )
+  } else {
+    bread = resolveRuleCell('bread', 'quotaCommercial + totalPrebook')
+  }
+
+  const ketchup = resolveRuleCell('ketchup', 'J spaghetti quantity')
+  const chiliSauce = resolveRuleCell('chiliSauce', 'ceil(AH hotmeal total / 2)')
+  const soySauce = resolveRuleCell('soySauce', 'ceil(AH hotmeal total / 2)')
+  const hotmealUtensils = resolveRuleCell('hotmealUtensils', 'AH hotmeal total')
+
+  // Keep derived columns visible to later rules (e.g. indian salt ← soySauce).
+  evalCtx.columns.ketchup = ketchup.value
+  evalCtx.columns.chiliSauce = chiliSauce.value
+  evalCtx.columns.soySauce = soySauce.value
+  evalCtx.columns.hotmealUtensils = hotmealUtensils.value
+  evalCtx.columns.bread = bread.value
+
+  const skybossEggs = resolveRuleCell('skybossEggs', 'SkyBoss ECO on AU routes')
+  const australiaNoodleVegetables = resolveRuleCell(
+    'australiaNoodleVegetables',
+    'AU noodle vegetables const',
+  )
+  const australiaSkybossYogurt = resolveRuleCell(
+    'australiaSkybossYogurt',
+    'SkyBoss ECO on AU routes',
+  )
+  const australiaRoundBread = resolveRuleCell(
+    'australiaRoundBread',
+    'SkyBoss ECO on AU routes',
+  )
 
   const indianSaltRule = ruleByTarget('indianSaltPepper')
   const indianSaltPepper = indianSaltRule
@@ -245,6 +225,21 @@ export function buildEcoSupplierRow(
     )
   }
 
+  const prebookCashews = resolveRuleCell('prebookCashews', 'AQ total prebook')
+
+  let freshWater: SupplierCell<number>
+  if (input.freshWaterOverride != null) {
+    freshWater = ecoCell(
+      input.freshWaterOverride,
+      'Manual freshWaterOverride',
+    )
+  } else {
+    freshWater = resolveRuleCell('freshWater', 'AY = totalPrebook')
+  }
+
+  const manualSnack = (value: number | null | undefined, label: string) =>
+    inputCell(value, `Manual/operational input; ${label}`)
+
   const cells: EcoCells = {
     ...hotmealCells,
     bread,
@@ -257,9 +252,9 @@ export function buildEcoSupplierRow(
       ),
       'AD boiled eggs + AE SkyBoss eggs',
     ),
-    australiaNoodleVegetables: routePolicyCell('australiaNoodleVegetables'),
-    australiaSkybossYogurt: routePolicyCell('australiaSkybossYogurt'),
-    australiaRoundBread: routePolicyCell('australiaRoundBread'),
+    australiaNoodleVegetables,
+    australiaSkybossYogurt,
+    australiaRoundBread,
     australiaBeefFreshVegetables: inputCell(
       input.australiaBeefFreshVegetables,
       'Australia beef/fresh vegetables input',
@@ -284,7 +279,21 @@ export function buildEcoSupplierRow(
     ),
     skyboss,
     prebook,
-    prebookCashews: ecoCell(prebook.value, 'AQ total prebook'),
+    prebookCashews,
+    freshWater,
+    maccaSkybossRaisins: manualSnack(input.maccaSkybossRaisins, 'AR Macca nho khô SkyBoss'),
+    maccaKazSalted: manualSnack(input.maccaKazSalted, 'AS Macca muối KAZ'),
+    charterSnack: manualSnack(input.charterSnack, 'AT Snack charter'),
+    wine: manualSnack(input.wine, 'AU Rượu vang'),
+    blanketCSkyboss: manualSnack(input.blanketCSkyboss, 'AV Chăn C SkyBoss'),
+    blanket3in1Prebook: manualSnack(input.blanket3in1Prebook, 'AX Chăn 3in1 Prebook'),
+    maccaRegular: manualSnack(input.maccaRegular, 'BA Macca thường'),
+    mangoChiliSaltGdsDeluxe: manualSnack(
+      input.mangoChiliSaltGdsDeluxe,
+      'BB Xoài muối ớt GDS/DELUXE',
+    ),
+    beerSnackComboBC: manualSnack(input.beerSnackComboBC, 'BC Bia + khô gà + snack'),
+    sodaMaccaComboBD: manualSnack(input.sodaMaccaComboBD, 'BD Soda dâu + Macca'),
     reserveCrewWater: inputCell(
       input.reserveCrewWater,
       sourceRefs.reserveCrewWater ?? EMPTY_OPS_SOURCE,

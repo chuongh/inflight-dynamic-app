@@ -1,10 +1,8 @@
-# JambonoVN fonts (VJA Brand Kit)
+# Fonts
 
-Place licensed font files from the official VietJet brand kit here:
+Portal typography is loaded from Google Fonts (see `src/index.css`):
 
-- `JambonoVN-Black.woff2` — Tiêu đề (headings)
-- `JambonoVN-Medium.woff2` — Subhead
+- **Nunito** — headings / subheads (Vietnamese supported)
+- **Plus Jakarta Sans** — body
 
-Until these files are added, the app falls back to **Nunito** (headings) and **Inter** (body).
-
-Reference: VJA Brand Guidelines — Kiểu chữ thương hiệu
+No local font files are required for the admin UI.

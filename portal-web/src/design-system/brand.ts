@@ -58,20 +58,18 @@ export const vjBrand = {
 
   typography: {
     heading: {
-      family: '"JambonoVN Black", "Jambono Black", "Nunito", sans-serif',
-      weight: 900,
+      family: '"Nunito", "Plus Jakarta Sans", Inter, system-ui, sans-serif',
+      weight: 800,
     },
     subhead: {
-      family: '"JambonoVN Medium", "Jambono Medium", "Nunito", sans-serif',
-      weight: 500,
+      family: '"Nunito", "Plus Jakarta Sans", Inter, system-ui, sans-serif',
+      weight: 600,
     },
     body: {
       family: '"Plus Jakarta Sans", Inter, system-ui, sans-serif',
       weight: 400,
     },
   },
-
-  fontsPath: '/fonts',
 } as const
 
 export type VjBrandGradient = keyof typeof vjBrand.gradient

@@ -1,5 +1,6 @@
 import { normalizeAirport } from './normalize'
 import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
+import { DEFAULT_AMENITY_PACKAGE_COMPOSITIONS } from './amenityQuantityDefaults'
 import type {
   AircraftFamily,
   AmenityPackageDef,
@@ -9,6 +10,11 @@ import type {
   EcoUpliftType,
   RouteHourClassId,
 } from './ecoQuantityTypes'
+
+/** Package 2 = A321 khứ hồi ngắn (DOM ≤ 1h15) — odd-sector last-leg top-up. */
+export const SHORT_ROUND_TRIP_PACKAGE_ID = 2
+
+const ODD_SECTOR_COUNTS = new Set([1, 3, 5])
 
 function normalizeUplift(raw: string | null | undefined): EcoUpliftType | null {
   if (!raw) return null
@@ -229,4 +235,47 @@ export function resolveAmenityPackages(
 export function formatAmenityLabel(packageIds: number[]): string | null {
   if (packageIds.length === 0) return null
   return packageIds.join('+')
+}
+
+/**
+ * When a flight group has 1/3/5 sectors, the last leg also loads one extra
+ * "khứ hồi ngắn" bag (package 2). Duplicates are intentional so composition sums twice.
+ */
+export function appendOddSectorShortRoundTripPackage(
+  packageIds: number[],
+  sectorCount: number,
+  isLastLegOfGroup: boolean,
+): number[] {
+  if (!isLastLegOfGroup || !ODD_SECTOR_COUNTS.has(sectorCount)) {
+    return packageIds
+  }
+  return [...packageIds, SHORT_ROUND_TRIP_PACKAGE_ID]
+}
+
+/**
+ * Sum fixed product quantities across selected amenity packages.
+ * Duplicate packageIds are summed again (used by odd-sector short round-trip extra).
+ * String / periodic top-up items are excluded — see DEFAULT_PERIODIC_TOPUP_ITEMS.
+ */
+export function resolveAmenityComposition(
+  packageIds: number[],
+): Array<{ productCode: string; quantity: number }> {
+  const totals = new Map<string, number>()
+  for (const packageId of packageIds) {
+    const composition = DEFAULT_AMENITY_PACKAGE_COMPOSITIONS.find(
+      (c) => c.packageId === packageId,
+    )
+    if (!composition) continue
+    for (const item of composition.items) {
+      if (typeof item.quantity !== 'number') continue
+      totals.set(
+        item.productCode,
+        (totals.get(item.productCode) ?? 0) + item.quantity,
+      )
+    }
+  }
+  return [...totals.entries()]
+    .filter(([, quantity]) => quantity > 0)
+    .map(([productCode, quantity]) => ({ productCode, quantity }))
+    .sort((a, b) => a.productCode.localeCompare(b.productCode))
 }

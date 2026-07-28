@@ -1,0 +1,58 @@
+/* UC-11 · Supplier orders — category share bar (metrics use shared StatStrip) */
+
+.order-cat-bar {
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--color-muted);
+}
+
+.order-cat-bar__legends {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-top: 10px;
+}
+
+.order-cat-bar__leg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.order-cat-bar__swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.order-cat-bar__n {
+  color: var(--color-foreground);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-cat-bar__delta {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-cat-bar__delta--flat {
+  color: var(--color-text-secondary);
+}
+
+.order-cat-bar__delta--up {
+  color: var(--color-vj-green-dark);
+}
+
+.order-cat-bar__delta--down {
+  color: var(--color-vj-red-dark);
+}

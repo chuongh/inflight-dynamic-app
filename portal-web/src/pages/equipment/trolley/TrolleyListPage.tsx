@@ -1,6 +1,6 @@
 import { App as AntApp, Button, Input, Modal, Select, Table } from 'antd'
 import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
-import { AlertTriangle, CheckCircle2, Download, FileUp, Radio, Search, Wrench } from 'lucide-react'
+import { Download, FileUp, Search, Wrench } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -22,8 +22,8 @@ import { computeHealthScore } from '@/modules/equipment/lib/analytics'
 import { isStale } from '@/modules/equipment/lib/movement'
 import { useRepairRequests, useSendTrolleysToRepair } from '@/modules/equipment/hooks/useEquipment'
 import { summarizeRepairRequests } from '@/modules/equipment/repairRequest'
-import { KpiCard } from '@/components/patterns/KpiCard'
 import { ListPageLayout } from '@/components/patterns/ListPageLayout'
+import { StatStrip } from '@/components/patterns/StatStrip'
 import { EquipmentBadge } from '@/components/primitives/Badge'
 import { Button as VjButton } from '@/components/primitives/Button'
 import { Text } from '@/components/primitives/Text'
@@ -429,6 +429,30 @@ export function TrolleyListPage({ trolleys, onTrolleysChange }: TrolleyListPageP
           />
         </>
       }
+      lead={
+        <StatStrip
+          columns={4}
+          items={[
+            {
+              label: statusLabel('service'),
+              value: summary.service,
+              tone: 'success',
+              featured: true,
+            },
+            { label: statusLabel('in-transit'), value: summary.inTransit },
+            {
+              label: statusLabel('not-service'),
+              value: summary.notService,
+              tone: 'muted',
+            },
+            {
+              label: statusLabel('repairing'),
+              value: summary.repairing,
+              tone: 'warning',
+            },
+          ]}
+        />
+      }
       footer={
         <>
           <Text variant="caption" tone="secondary" className="tnum font-semibold">
@@ -516,13 +540,6 @@ export function TrolleyListPage({ trolleys, onTrolleysChange }: TrolleyListPageP
         </>
       }
     >
-      <div className="kpi-grid kpi-grid--4 mb-4">
-        <KpiCard label={statusLabel('service')} value={summary.service} icon={CheckCircle2} tone="success" />
-        <KpiCard label={statusLabel('in-transit')} value={summary.inTransit} icon={Radio} tone="brand" />
-        <KpiCard label={statusLabel('not-service')} value={summary.notService} icon={AlertTriangle} tone="danger" />
-        <KpiCard label={statusLabel('repairing')} value={summary.repairing} icon={Wrench} tone="warning" />
-      </div>
-
       <Table
         rowKey="code"
         size="middle"

@@ -1,30 +1,23 @@
-import { Alert, Button, Input, InputNumber, Popover, Select, Space, Switch, Table, Tag } from 'antd'
+import { Alert, Button, Input, InputNumber, Select, Switch, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { Info, Pencil, Search, SlidersHorizontal, UploadCloud, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Search, X } from 'lucide-react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { FilterBar } from '@/components/patterns/FilterBar'
 import { distinctTypes } from '@/modules/catering/quota'
-import { paths } from '@/routes/paths'
-import type { QuotaRow, QuotaVersion, SourceKind, VersionStatus } from '@/modules/catering/types'
+import type { QuotaRow, QuotaVersion, SourceKind } from '@/modules/catering/types'
 import { formatDateDMY } from '@/shared/utils/format'
 
-/** Status dot colour — always paired with the text label (never colour-only). */
-const STATUS_DOT: Record<VersionStatus, string> = {
-  active: '#16a34a',
-  scheduled: '#2563eb',
-  superseded: '#9ca3af',
-  draft: '#c9a000',
+export type QuotaTableViewHandle = {
+  startEdit: () => void
 }
 
 interface Props {
   version: QuotaVersion
-  versions: QuotaVersion[]
   isActive: boolean
-  onSelectVersion: (id: string) => void
-  onGotoImport: () => void
+  editing: boolean
+  onEditingChange: (editing: boolean) => void
   onCreateVersion: (
     rows: QuotaRow[],
     effectiveFrom: string,
@@ -33,33 +26,38 @@ interface Props {
   ) => void
 }
 
-function Dot({ status }: { status: VersionStatus }) {
-  return (
-    <span
-      className="inline-block h-2 w-2 shrink-0 rounded-full"
-      style={{ background: STATUS_DOT[status] }}
-      aria-hidden
-    />
-  )
-}
-
-export function QuotaTableView({
-  version,
-  versions,
-  isActive,
-  onSelectVersion,
-  onGotoImport,
-  onCreateVersion,
-}: Props) {
+export const QuotaTableView = forwardRef<QuotaTableViewHandle, Props>(function QuotaTableView(
+  { version, isActive, editing, onEditingChange, onCreateVersion },
+  ref,
+) {
   const { t } = useTranslation()
 
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [hideZero, setHideZero] = useState(false)
 
-  const [editing, setEditing] = useState(false)
   const [editRows, setEditRows] = useState<QuotaRow[]>(version.rows)
   const [effDate, setEffDate] = useState(formatDateDMY(Date.now()))
+
+  const startEdit = () => {
+    if (!isActive) return
+    setEditRows(version.rows.map((r) => ({ ...r })))
+    setEffDate(formatDateDMY(Date.now()))
+    onEditingChange(true)
+  }
+
+  useImperativeHandle(
+    ref,
+    () => ({ startEdit }),
+    // startEdit reads latest version + isActive via closure
+    [isActive, version.id, version.rows, onEditingChange],
+  )
+
+  useEffect(() => {
+    if (!editing) return
+    setEditRows(version.rows.map((r) => ({ ...r })))
+    setEffDate(formatDateDMY(Date.now()))
+  }, [version.id]) // eslint-disable-line react-hooks/exhaustive-deps -- reset draft when version changes mid-edit
 
   const typeOptions = useMemo(
     () => [
@@ -81,17 +79,12 @@ export function QuotaTableView({
     })
   }, [rows, search, typeFilter, hideZero])
 
-  const startEdit = () => {
-    setEditRows(version.rows.map((r) => ({ ...r })))
-    setEffDate(formatDateDMY(Date.now()))
-    setEditing(true)
-  }
   const patchRow = (flightNo: string, field: 'hotmeal' | 'banhMi' | 'traSua', value: number) => {
     setEditRows((prev) => prev.map((r) => (r.flightNo === flightNo ? { ...r, [field]: value } : r)))
   }
   const saveEdit = () => {
     onCreateVersion(editRows, effDate, t('catering.quota.manualSource'), 'manual')
-    setEditing(false)
+    onEditingChange(false)
   }
 
   const editNumber = (r: QuotaRow, field: 'hotmeal' | 'banhMi' | 'traSua') =>
@@ -119,79 +112,13 @@ export function QuotaTableView({
     { title: t('catering.quota.col.traSua'), key: 'traSua', align: 'right', width: 100, render: (_v, r) => editNumber(r, 'traSua') },
   ]
 
-  const effRange = `${version.effectiveFrom} → ${version.effectiveTo ?? t('catering.quota.untilNextShort')}`
-
   return (
     <>
-      {/* Version context bar — one compact row */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-border bg-surface px-4 py-3">
-        <Select
-          value={version.id}
-          onChange={onSelectVersion}
-          style={{ minWidth: 150 }}
-          optionLabelProp="label"
-          options={versions.map((v) => ({
-            value: v.id,
-            label: (
-              <span className="inline-flex items-center gap-2">
-                <Dot status={v.status} /> {v.id} · {t(`catering.quota.status.${v.status}`)}
-              </span>
-            ),
-          }))}
-        />
-
-        <span className="border-border bg-background inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold tnum">
-          {effRange}
-        </span>
-
-        <Popover
-          placement="bottomLeft"
-          trigger="click"
-          content={
-            <div className="max-w-xs text-[12.5px] leading-relaxed">
-              {t('catering.quota.importedMeta', {
-                by: version.importedBy,
-                at: version.importedAt,
-                source: version.source,
-              })}
-            </div>
-          }
-        >
-          <button
-            type="button"
-            className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
-            aria-label={t('catering.quota.detailsAria')}
-          >
-            <Info size={16} />
-          </button>
-        </Popover>
-
-        <Link
-          to={paths.catering.config.list}
-          className="text-text-muted hover:text-vj-red inline-flex items-center gap-1.5 text-[12.5px] font-semibold transition-colors"
-        >
-          <SlidersHorizontal size={14} />
-          {t('catering.quota.rulesLink')}
-        </Link>
-
-        <div className="ml-auto">
-          <Space>
-            {isActive ? (
-              <Button icon={<Pencil size={15} />} onClick={startEdit} disabled={editing}>
-                {t('catering.quota.manualEdit')}
-              </Button>
-            ) : null}
-            <Button type="primary" icon={<UploadCloud size={15} />} onClick={onGotoImport}>
-              {t('catering.quota.importNew')}
-            </Button>
-          </Space>
-        </div>
-      </div>
-
       {editing ? (
         <Alert
           type="info"
           showIcon
+          className="mb-4"
           title={t('catering.quota.editBannerTitle')}
           description={
             <div className="flex flex-wrap items-center gap-3">
@@ -200,7 +127,7 @@ export function QuotaTableView({
                 <span className="text-text-muted text-[12.5px] font-semibold">{t('catering.quota.effectiveLabel')}</span>
                 <Input value={effDate} onChange={(e) => setEffDate(e.target.value)} style={{ width: 130 }} />
                 <Button type="primary" size="small" onClick={saveEdit}>{t('catering.quota.saveAsNew')}</Button>
-                <Button size="small" icon={<X size={14} />} onClick={() => setEditing(false)}>{t('common.cancel')}</Button>
+                <Button size="small" icon={<X size={14} />} onClick={() => onEditingChange(false)}>{t('common.cancel')}</Button>
               </span>
             </div>
           }
@@ -239,4 +166,4 @@ export function QuotaTableView({
       </DataTableShell>
     </>
   )
-}
+})

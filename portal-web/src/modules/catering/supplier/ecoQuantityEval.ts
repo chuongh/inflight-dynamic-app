@@ -53,6 +53,17 @@ export function evalQuantityValue(
       return applyCoef(ctx.metrics[value.metricId] ?? null, value.coef ?? 1)
     case 'column':
       return applyCoef(ctx.columns[value.columnId] ?? null, value.coef ?? 1)
+    case 'sum': {
+      let total = 0
+      let any = false
+      for (const part of value.parts) {
+        const v = evalQuantityValue(part, ctx)
+        if (v == null) continue
+        total += v
+        any = true
+      }
+      return any ? total : null
+    }
     default:
       return null
   }
@@ -159,8 +170,7 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     id: 'ECO.AI.ketchup',
     base: 'by_item',
     targetColumn: 'ketchup',
-    enabled: true,
-    label: 'Tương cà',
+    enabled: true,
     docRef: '§1.4 AI',
     expr: { source: 'column', id: 'spaghetti', coef: 1, round: 'none' },
   },
@@ -168,8 +178,7 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     id: 'ECO.AJ.chili',
     base: 'by_hotmeal_total',
     targetColumn: 'chiliSauce',
-    enabled: true,
-    label: 'Tương ớt',
+    enabled: true,
     docRef: '§1.4 AJ',
     expr: { source: 'hotmeal_total', coef: 0.5, round: 'ceil' },
   },
@@ -177,8 +186,7 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     id: 'ECO.AK.soy',
     base: 'by_hotmeal_total',
     targetColumn: 'soySauce',
-    enabled: true,
-    label: 'Xì dầu',
+    enabled: true,
     docRef: '§1.4 AK',
     expr: { source: 'hotmeal_total', coef: 0.5, round: 'ceil' },
   },
@@ -186,8 +194,7 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     id: 'ECO.AM.hotmealUtensils',
     base: 'by_hotmeal_total',
     targetColumn: 'hotmealUtensils',
-    enabled: true,
-    label: 'Bộ theo hotmeal',
+    enabled: true,
     docRef: '§1.4 AM',
     expr: { source: 'hotmeal_total', coef: 1, round: 'none' },
   },
@@ -195,8 +202,7 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     id: 'ECO.AL.indianSalt',
     base: 'by_std_arr',
     targetColumn: 'indianSaltPepper',
-    enabled: true,
-    label: 'Muối tiêu đường Ấn',
+    enabled: true,
     docRef: '§1.4 AL',
     branches: [
       {
@@ -212,8 +218,7 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     id: 'ECO.AN.reserveUtensils',
     base: 'by_std_arr',
     targetColumn: 'reserveUtensils',
-    enabled: true,
-    label: 'Bộ dự phòng',
+    enabled: true,
     docRef: '§1.4 AN',
     branches: [
       {
@@ -242,6 +247,101 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
         when: { upliftTypes: ['DOI_TO'] },
         value: { kind: 'const', value: 12 },
         note: 'Đổi tổ = 12',
+      },
+    ],
+    fallback: { kind: 'manual' },
+  },
+  {
+    id: 'ECO.S.bread',
+    base: 'by_std_arr',
+    targetColumn: 'bread',
+    enabled: true,
+    docRef: '§1.3 S',
+    branches: [],
+    fallback: {
+      kind: 'sum',
+      parts: [
+        { kind: 'metric', metricId: 'quotaCommercial', coef: 1 },
+        { kind: 'metric', metricId: 'totalPrebook', coef: 1 },
+      ],
+    },
+  },
+  {
+    id: 'ECO.AZ.prebookCashews',
+    base: 'by_item',
+    targetColumn: 'prebookCashews',
+    enabled: true,
+    docRef: '§1.5 AZ',
+    expr: { source: 'metric', id: 'totalPrebook', coef: 1, round: 'none' },
+  },
+  {
+    id: 'ECO.AY.freshWater',
+    base: 'by_item',
+    targetColumn: 'freshWater',
+    enabled: true,
+    docRef: '§1.5 AY',
+    expr: { source: 'metric', id: 'totalPrebook', coef: 1, round: 'none' },
+  },
+  {
+    id: 'ECO.Z.auNoodleVeg',
+    base: 'by_std_arr',
+    targetColumn: 'australiaNoodleVegetables',
+    enabled: true,
+    docRef: '§1.3 Z',
+    branches: [
+      {
+        id: 'au',
+        when: { routeGroups: ['AU'] },
+        value: { kind: 'const', value: 25 },
+        note: 'DEP/ARR Úc = 25',
+      },
+    ],
+    fallback: { kind: 'manual' },
+  },
+  {
+    id: 'ECO.AE.skybossEggs',
+    base: 'by_std_arr',
+    targetColumn: 'skybossEggs',
+    enabled: true,
+    docRef: '§1.3 AE',
+    branches: [
+      {
+        id: 'au',
+        when: { routeGroups: ['AU'] },
+        value: { kind: 'metric', metricId: 'skybossEco', coef: 1 },
+        note: 'DEP/ARR Úc = SkyBoss ECO',
+      },
+    ],
+    fallback: { kind: 'manual' },
+  },
+  {
+    id: 'ECO.AG.auSkybossYogurt',
+    base: 'by_std_arr',
+    targetColumn: 'australiaSkybossYogurt',
+    enabled: true,
+    docRef: '§1.3 AG',
+    branches: [
+      {
+        id: 'au',
+        when: { routeGroups: ['AU'] },
+        value: { kind: 'metric', metricId: 'skybossEco', coef: 1 },
+        note: 'DEP/ARR Úc = SkyBoss ECO',
+      },
+    ],
+    fallback: { kind: 'manual' },
+  },
+  {
+    id: 'ECO.AW.auRoundBread',
+    base: 'by_std_arr',
+    targetColumn: 'australiaRoundBread',
+    enabled: true,
+    docRef: '§1.3 AW',
+    branches: [
+      {
+        id: 'au',
+        when: { routeGroups: ['AU'] },
+        value: { kind: 'metric', metricId: 'skybossEco', coef: 1 },
+        note: 'DEP/ARR Úc = SkyBoss ECO',
       },
     ],
     fallback: { kind: 'manual' },

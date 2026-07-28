@@ -11,12 +11,13 @@
  */
 import type {
   EcoAmenityOpsInput,
+  EcoSnackOpsInput,
   HotmealItemKey,
   SupplierSourceRefs,
 } from './supplier/types'
 
 /** ECO/SBB quantities carried on a leg for the supplier order review. */
-export interface SupplierLegExtension extends EcoAmenityOpsInput {
+export interface SupplierLegExtension extends EcoAmenityOpsInput, EcoSnackOpsInput {
   quotaCommercial?: number | null
   /** Falls back to `leg.premeal` when absent. */
   totalPrebook?: number | null

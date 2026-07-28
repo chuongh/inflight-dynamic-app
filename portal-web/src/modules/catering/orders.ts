@@ -11,6 +11,12 @@ import type { CrewMealProfile } from './crewMealTypes'
 import type { MealCatalog } from './mealsTypes'
 import type { CateringOrder, CateringOrderLine, OrderCategory } from './orderTypes'
 
+/** Number of flight groups that contributed to this order version. */
+export function orderGroupCount(order: CateringOrder): number {
+  if (!order.breakdown?.length) return 0
+  return new Set(order.breakdown.map((c) => c.groupId)).size
+}
+
 /** Accent-insensitive, đ→d, collapsed-space name key for dish matching. */
 export function normalizeName(s: string): string {
   return [...s.toLowerCase().normalize('NFD')]

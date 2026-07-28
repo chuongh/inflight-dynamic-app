@@ -52,6 +52,7 @@ export type EcoQuantityValue =
   | { kind: 'metric'; metricId: string; coef?: number }
   | { kind: 'column'; columnId: string; coef?: number }
   | { kind: 'hotmeal_total'; coef?: number }
+  | { kind: 'sum'; parts: EcoQuantityValue[] }
   | { kind: 'manual' }
 
 export interface EcoQuantityExpr {
@@ -84,7 +85,6 @@ export interface EcoQuantityRule {
   /** Target EcoCells key or logical column id */
   targetColumn: string
   enabled: boolean
-  label?: string
   docRef?: string
   /** Base 1–2 */
   expr?: EcoQuantityExpr

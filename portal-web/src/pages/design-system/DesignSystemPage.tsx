@@ -5,6 +5,7 @@ import { MobileDesignPreview } from '@/components/patterns/MobileDesignPreview'
 import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { KpiCard } from '@/components/patterns/KpiCard'
 import { PageHeader } from '@/components/patterns/PageHeader'
+import { StatStrip } from '@/components/patterns/StatStrip'
 import { SurfaceCard } from '@/components/patterns/SurfaceCard'
 import { VietJetLogo } from '@/components/brand/VietJetLogo'
 import { DetailHero } from '@/components/patterns/DetailHero'
@@ -212,21 +213,24 @@ export function DesignSystemPage() {
           </div>
         </DsSection>
 
-        <DsSection title="Kiểu chữ thương hiệu" description="JambonoVN (heading) + Plus Jakarta Sans (body).">
+        <DsSection
+          title="Kiểu chữ"
+          description="Nunito (heading) + Plus Jakarta Sans (body)."
+        >
           <SurfaceCard padding="none">
             <TypeSample
-              label="Tiêu đề"
+              label="Tiêu đề UI"
               sample={
-                <span className="font-vja-heading text-2xl uppercase">
+                <span className="font-vja-heading text-2xl">
                   Tất cả vì sự hài lòng của khách hàng
                 </span>
               }
-              spec="JambonoVN Black · fallback Nunito 900"
+              spec="Nunito 800"
             />
             <TypeSample
               label="Subhead"
               sample={<span className="font-vja-subhead text-lg">Bay là Thích ngay!</span>}
-              spec="JambonoVN Medium · fallback Nunito 500"
+              spec="Nunito 600"
             />
             <TypeSample
               label="Body"
@@ -405,13 +409,31 @@ export function DesignSystemPage() {
           </Modal>
         </DsSection>
 
-        <DsSection title="KPI cards" description="Component: KpiCard — dùng trên Dashboard & reports.">
+        <DsSection
+          title="KPI cards (Dashboard only)"
+          description="Component: KpiCard — chỉ dùng trên Dashboard / command views. Không dùng trên list pages."
+        >
           <div className="kpi-grid kpi-grid--4">
             <KpiCard label="Total carts" value={364} hint="Full · Half breakdown" icon={ShoppingCart} tone="brand" />
             <KpiCard label="In service" value={298} hint="81.9% fleet ready" icon={CheckCircle2} tone="success" />
             <KpiCard label="Repairing" value={42} hint="Avg 4.2 days" icon={Wrench} tone="warning" />
             <KpiCard label="Not in service" value={24} hint="3 SLA overdue" icon={AlertTriangle} tone="danger" />
           </div>
+        </DsSection>
+
+        <DsSection
+          title="Overview strip (list pages)"
+          description="Component: StatStrip — overview mặc định cho Airport, Catalog, Equipment list, Supplier orders, Workshop…"
+        >
+          <StatStrip
+            columns={4}
+            items={[
+              { label: 'Total orders', value: 12, featured: true },
+              { label: 'In draft', value: 3 },
+              { label: 'Sent', value: 9, tone: 'success' },
+              { label: 'Portions', value: '4,820' },
+            ]}
+          />
         </DsSection>
 
         <DsSection title="Tags & alerts" description="Muted surface + text đậm — đồng bộ với equipment status badges.">

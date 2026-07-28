@@ -1,16 +1,12 @@
 /**
- * Pure helpers for versioned catering catalogs (meal / combo / amenity).
+ * Pure helpers for catering catalogs (meal / combo / amenity).
  */
 import type {
   AmenityCatalogDataset,
-  AmenityCatalogItem,
-  AmenityCatalogVersion,
   ComboCatalogDataset,
-  ComboCatalogItem,
-  ComboCatalogVersion,
   MealCatalogDataset,
   MealCatalogItem,
-  MealCatalogVersion,
+  ComboCatalogItem,
 } from './catalogTypes'
 import type { VersionStatus } from './types'
 
@@ -28,103 +24,15 @@ export function catalogVersionsNewestFirst<T extends AnyVersion>(versions: T[]):
   return [...versions].sort((a, b) => b.version - a.version)
 }
 
-function nextVersionNumber(versions: { version: number }[]): number {
-  return versions.reduce((max, v) => Math.max(max, v.version), 0) + 1
-}
-
-function publishMeta(
-  versions: AnyVersion[],
-  meta: {
-    effectiveFrom: string
-    updatedBy: string
-    updatedAt: string
-    note?: string
-    startsInFuture: boolean
-  },
-) {
-  const num = nextVersionNumber(versions)
-  const newStatus: VersionStatus = meta.startsInFuture ? 'scheduled' : 'active'
-  const updated = versions.map((v) =>
-    v.status === 'active' && !meta.startsInFuture
-      ? { ...v, status: 'superseded' as VersionStatus, effectiveTo: meta.effectiveFrom }
-      : v,
-  )
-  return { num, newStatus, updated }
-}
-
-export function withNewMealCatalogVersion(
-  versions: MealCatalogVersion[],
-  items: MealCatalogItem[],
-  meta: {
-    effectiveFrom: string
-    updatedBy: string
-    updatedAt: string
-    note?: string
-    startsInFuture: boolean
-  },
-): MealCatalogVersion[] {
-  const { num, newStatus, updated } = publishMeta(versions, meta)
-  const created: MealCatalogVersion = {
-    id: `m${num}`,
-    version: num,
-    status: newStatus,
-    effectiveFrom: meta.effectiveFrom,
-    updatedBy: meta.updatedBy,
-    updatedAt: meta.updatedAt,
-    note: meta.note,
-    items,
-  }
-  return [created, ...updated]
-}
-
-export function withNewComboCatalogVersion(
-  versions: ComboCatalogVersion[],
-  items: ComboCatalogItem[],
-  meta: {
-    effectiveFrom: string
-    updatedBy: string
-    updatedAt: string
-    note?: string
-    startsInFuture: boolean
-  },
-): ComboCatalogVersion[] {
-  const { num, newStatus, updated } = publishMeta(versions, meta)
-  const created: ComboCatalogVersion = {
-    id: `c${num}`,
-    version: num,
-    status: newStatus,
-    effectiveFrom: meta.effectiveFrom,
-    updatedBy: meta.updatedBy,
-    updatedAt: meta.updatedAt,
-    note: meta.note,
-    items,
-  }
-  return [created, ...updated]
-}
-
-export function withNewAmenityCatalogVersion(
-  versions: AmenityCatalogVersion[],
-  items: AmenityCatalogItem[],
-  meta: {
-    effectiveFrom: string
-    updatedBy: string
-    updatedAt: string
-    note?: string
-    startsInFuture: boolean
-  },
-): AmenityCatalogVersion[] {
-  const { num, newStatus, updated } = publishMeta(versions, meta)
-  const created: AmenityCatalogVersion = {
-    id: `a${num}`,
-    version: num,
-    status: newStatus,
-    effectiveFrom: meta.effectiveFrom,
-    updatedBy: meta.updatedBy,
-    updatedAt: meta.updatedAt,
-    note: meta.note,
-    items,
-  }
-  return [created, ...updated]
+/** Update items on the active catalog version in place (no new version). */
+export function replaceActiveCatalogItems<T extends AnyVersion & { items: unknown }>(
+  versions: T[],
+  items: T['items'],
+  patch?: { updatedBy?: string; updatedAt?: string },
+): T[] {
+  const active = activeCatalogVersion(versions)
+  if (!active) return versions
+  return versions.map((v) => (v.id === active.id ? { ...v, items, ...patch } : v))
 }
 
 /** Legacy MealCatalog shape for order prebook product-code lookup. */

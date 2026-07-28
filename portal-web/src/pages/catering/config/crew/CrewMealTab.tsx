@@ -14,7 +14,7 @@ import {
 } from 'antd'
 import { Info, Lock, Pencil, Plane, Users, X } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/core/auth/useAuth'
 import {
@@ -82,7 +82,12 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
   )
 }
 
-export function CrewMealTab() {
+type Props = {
+  /** Push version / date / Edit CTA into the parent PageHeader. */
+  onHeaderActions?: (actions: ReactNode | null) => void
+}
+
+export function CrewMealTab({ onHeaderActions }: Props) {
   const { t } = useTranslation()
   const { message } = AntApp.useApp()
   const { session } = useAuth()
@@ -102,6 +107,83 @@ export function CrewMealTab() {
     [versions, viewingId, active],
   )
 
+  const isActiveView = !!viewing && viewing.id === active?.id
+
+  useEffect(() => {
+    if (!onHeaderActions) return
+    if (!viewing) {
+      onHeaderActions(null)
+      return
+    }
+
+    const effRange = `${viewing.effectiveFrom} → ${viewing.effectiveTo ?? t('catering.quota.untilNextShort')}`
+    const renderVersion = (v: CrewMealConfigVersion) => (
+      <span className="inline-flex items-center gap-2">
+        <Dot status={v.status} /> {v.id} · {t(`catering.quota.status.${v.status}`)}
+      </span>
+    )
+
+    onHeaderActions(
+      <>
+        <Select
+          value={viewing.id}
+          onChange={(id) => {
+            setViewingId(id)
+            setEditing(false)
+            setWorkingProfiles([])
+          }}
+          style={{ minWidth: 150 }}
+          optionLabelProp="label"
+          options={versions.map((v) => ({ value: v.id, label: renderVersion(v) }))}
+        />
+        <span className="border-border bg-background tnum inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold">
+          {effRange}
+        </span>
+        <Popover
+          placement="bottomLeft"
+          trigger="click"
+          content={
+            <div className="max-w-xs space-y-1 text-[12.5px] leading-relaxed">
+              <div>
+                {t('catering.config.updatedMeta', { by: viewing.updatedBy, at: viewing.updatedAt })}
+              </div>
+              {viewing.note ? <div className="text-text-muted">{viewing.note}</div> : null}
+            </div>
+          }
+        >
+          <button
+            type="button"
+            className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
+            aria-label={t('catering.quota.detailsAria')}
+          >
+            <Info size={16} />
+          </button>
+        </Popover>
+        {isActiveView && !editing ? (
+          <Button
+            type="primary"
+            icon={<Pencil size={15} />}
+            onClick={() => {
+              setWorkingProfiles(structuredClone(viewing.profiles))
+              setEffDate(formatDateDMY(Date.now()))
+              setEditing(true)
+            }}
+          >
+            {t('catering.config.crew.editConfig')}
+          </Button>
+        ) : null}
+      </>,
+    )
+  }, [onHeaderActions, viewing, versions, isActiveView, editing, t])
+
+  useEffect(() => {
+    return () => onHeaderActions?.(null)
+  }, [onHeaderActions])
+
+  const cancelEdit = () => {
+    setEditing(false)
+    setWorkingProfiles([])
+  }
   if (isLoading || !data || !viewing) {
     return (
       <div className="page-loading">
@@ -110,7 +192,6 @@ export function CrewMealTab() {
     )
   }
 
-  const isActiveView = viewing.id === active?.id
   const displayProfiles = editing ? workingProfiles : viewing.profiles
 
   // Only groups the airline applies a meal policy to are selectable. Vietjet
@@ -124,16 +205,6 @@ export function CrewMealTab() {
   const timeInvalid = displayProfiles.some((p) =>
     p.windows.some((w) => !TIME_RE.test(w.start) || !TIME_RE.test(w.end)),
   )
-
-  const startEdit = () => {
-    setWorkingProfiles(structuredClone(viewing.profiles))
-    setEffDate(formatDateDMY(Date.now()))
-    setEditing(true)
-  }
-  const cancelEdit = () => {
-    setEditing(false)
-    setWorkingProfiles([])
-  }
 
   const patchProfile = (partial: Partial<CrewMealProfile>) =>
     setWorkingProfiles((prev) =>
@@ -170,60 +241,10 @@ export function CrewMealTab() {
     )
   }
 
-  const effRange = `${viewing.effectiveFrom} → ${viewing.effectiveTo ?? t('catering.quota.untilNextShort')}`
   const disabled = !editing
-
-  const renderVersion = (v: CrewMealConfigVersion) => (
-    <span className="inline-flex items-center gap-2">
-      <Dot status={v.status} /> {v.id} · {t(`catering.quota.status.${v.status}`)}
-    </span>
-  )
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Version context bar */}
-      <div className="border-border bg-surface flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border px-4 py-3">
-        <Select
-          value={viewing.id}
-          onChange={(id) => {
-            setViewingId(id)
-            if (editing) cancelEdit()
-          }}
-          style={{ minWidth: 150 }}
-          optionLabelProp="label"
-          options={versions.map((v) => ({ value: v.id, label: renderVersion(v) }))}
-        />
-        <span className="border-border bg-background tnum inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold">
-          {effRange}
-        </span>
-        <Popover
-          placement="bottomLeft"
-          trigger="click"
-          content={
-            <div className="max-w-xs space-y-1 text-[12.5px] leading-relaxed">
-              <div>{t('catering.config.updatedMeta', { by: viewing.updatedBy, at: viewing.updatedAt })}</div>
-              {viewing.note ? <div className="text-text-muted">{viewing.note}</div> : null}
-            </div>
-          }
-        >
-          <button
-            type="button"
-            className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
-            aria-label={t('catering.quota.detailsAria')}
-          >
-            <Info size={16} />
-          </button>
-        </Popover>
-
-        <div className="ml-auto">
-          {isActiveView && !editing ? (
-            <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
-              {t('catering.config.crew.editConfig')}
-            </Button>
-          ) : null}
-        </div>
-      </div>
-
       {!isActiveView && !editing ? (
         <Alert type="info" showIcon message={t('catering.config.readonlyHint')} />
       ) : null}
