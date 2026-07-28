@@ -65,6 +65,8 @@ export interface EcoAmenityOpsInput {
   lastMinuteTopUp?: number | null
 }
 
+export type EcoUpliftTypeInput = 'DAU_NGAY' | 'DOI_TO' | 'NIGHTSTOP'
+
 export interface SupplierFlightInput extends FlightIdentity, EcoAmenityOpsInput {
   quotaCommercial?: number | null
   totalPrebook?: number | null
@@ -85,6 +87,11 @@ export interface SupplierFlightInput extends FlightIdentity, EcoAmenityOpsInput 
   sbbMealType?: 'standard' | 'vegetarian'
   /** Cockpit headcount for this leg (interim rail KPI until crew-meal engine is wired). */
   crewHeadcount?: number | null
+  aircraftType?: string | null
+  upliftType?: EcoUpliftTypeInput | string | null
+  flightKind?: 'ferry_cargo' | 'charter_china' | 'normal' | null
+  /** Workbook Amenity cell override, e.g. "10+15" */
+  amenityOverride?: string | null
   sourceRefs?: SupplierSourceRefs
 }
 
@@ -98,6 +105,10 @@ export interface EcoSupplierInput extends FlightIdentity, EcoAmenityOpsInput {
   hotmealItems: HotmealInput
   australiaBeefFreshVegetables?: number | null
   australiaBreadVegetables?: number | null
+  aircraftType?: string | null
+  upliftType?: EcoUpliftTypeInput | string | null
+  flightKind?: 'ferry_cargo' | 'charter_china' | 'normal' | null
+  amenityOverride?: string | null
   sourceRefs?: SupplierSourceRefs
 }
 
@@ -149,6 +160,7 @@ export interface EcoCells {
   ketchup: SupplierCell<number>
   chiliSauce: SupplierCell<number>
   soySauce: SupplierCell<number>
+  indianSaltPepper: SupplierCell<number>
   hotmealUtensils: SupplierCell<number>
   reserveUtensils: SupplierCell<number>
   totalUtensils: SupplierCell<number>
@@ -169,6 +181,9 @@ export interface EcoCells {
 export interface EcoSupplierRow extends FlightIdentity {
   key: string
   cells: EcoCells
+  /** Amenity column D, e.g. "10+15" or "4" */
+  amenityLabel: string | null
+  amenityPackageIds: number[]
 }
 
 export type SbbRouteSheet =
@@ -176,6 +191,21 @@ export type SbbRouteSheet =
   | 'CHAY(VIỆT-HÀN-NHẬT)'
   | 'ẤN'
   | 'ÚC&KAZ'
+
+/**
+ * Connects a SkyBoss Business lookup sheet to flights via STD/ARR.
+ * Match when DEP or ARR is in `airports` (or an optional explicit route pair).
+ */
+export interface SbbSheetRouteBinding {
+  /** IATA airports — sheet applies when DEP or ARR matches. */
+  airports: string[]
+  /** Optional explicit pairs e.g. "SGN-PQC". */
+  routePairs?: string[]
+  /** Lower runs first when several sheets could match. */
+  priority?: number
+  /** Human note shown in config UI. */
+  note?: string
+}
 
 export type SbbLookupItem =
   | 'bread'
@@ -196,6 +226,8 @@ export interface SbbLookupDataset {
   effectiveTo: string
   source: string
   sheets: Record<SbbRouteSheet, SbbLookupRow[]>
+  /** STD/ARR → sheet mapping. When absent, engine uses built-in defaults. */
+  sheetBindings?: Partial<Record<SbbRouteSheet, SbbSheetRouteBinding>>
 }
 
 export interface SbbCells {

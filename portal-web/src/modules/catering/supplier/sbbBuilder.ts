@@ -42,7 +42,15 @@ export function buildSbbSupplierRow(
   const parsedDate = parseProjectDate(input.operatingDate)
   const identity = normalizeFlightIdentity(input)
   const effectiveDate = parsedDate ?? input.operatingDate.trim()
-  const sheet = selectSbbRouteSheet(identity.dep, identity.arr, input.sbbMealType)
+  const parsedLookup = parseSbbLookupDataset(lookupInput)
+  const lookup = parsedLookup.ok ? parsedLookup.value : null
+  const sheetBindings = lookup?.sheetBindings
+  const sheet = selectSbbRouteSheet(
+    identity.dep,
+    identity.arr,
+    input.sbbMealType,
+    sheetBindings,
+  )
   const businessPaxValue = input.businessPax ?? null
 
   if (businessPaxValue == null || businessPaxValue === 0) return null
@@ -60,8 +68,6 @@ export function buildSbbSupplierRow(
       'Verified business passenger input; distinct from skybossEco',
   )
 
-  const parsedLookup = parseSbbLookupDataset(lookupInput)
-  const lookup = parsedLookup.ok ? parsedLookup.value : null
   const lookupInRange =
     lookup != null &&
     isDateWithinRange(effectiveDate, lookup.effectiveFrom, lookup.effectiveTo)
@@ -74,7 +80,11 @@ export function buildSbbSupplierRow(
   const lookupSource = lookup?.source ?? 'SBB lookup unavailable'
 
   const australiaKazakhstan = sheet === 'ÚC&KAZ'
-  const outbound = isOutboundAustraliaKazakhstan(identity.dep, identity.arr)
+  const outbound = isOutboundAustraliaKazakhstan(
+    identity.dep,
+    identity.arr,
+    sheetBindings,
+  )
   const amenityValue = australiaKazakhstan
     ? businessPaxValue + (outbound ? 1 : 0)
     : null

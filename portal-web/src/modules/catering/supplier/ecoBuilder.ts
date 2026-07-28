@@ -10,6 +10,14 @@ import {
   normalizeFlightIdentity,
   parseProjectDate,
 } from './normalize'
+import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
+import { resolveAmenityPackages } from './amenityResolver'
+import {
+  DEFAULT_ECO_QUANTITY_RULES,
+  evalQuantityRule,
+  type EcoQuantityEvalContext,
+} from './ecoQuantityEval'
+import type { EcoQuantityConfig, EcoUpliftType } from './ecoQuantityTypes'
 import type {
   EcoCells,
   EcoRoutePolicyField,
@@ -46,9 +54,26 @@ function inputCell(
   return ecoCell(value ?? null, source)
 }
 
+function normalizeUpliftType(
+  raw: string | null | undefined,
+): EcoUpliftType | null {
+  if (!raw) return null
+  if (raw === 'DAU_NGAY' || raw === 'DOI_TO' || raw === 'NIGHTSTOP') return raw
+  const u = raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/\s+/g, '_')
+  if (u.includes('DAU') || u.includes('START')) return 'DAU_NGAY'
+  if (u.includes('DOI') || u.includes('CHANGE')) return 'DOI_TO'
+  if (u.includes('NIGHT')) return 'NIGHTSTOP'
+  return null
+}
+
 export function buildEcoSupplierRow(
   input: EcoSupplierInput,
   routeRulesInput: unknown,
+  quantityConfig?: EcoQuantityConfig | null,
 ): EcoSupplierRow {
   const parsedDate = parseProjectDate(input.operatingDate)
   const identity = normalizeFlightIdentity(input)
@@ -56,6 +81,22 @@ export function buildEcoSupplierRow(
   const parsedRules = parseEcoRouteRuleDataset(routeRulesInput)
   const routeRules = parsedRules.ok ? parsedRules.value : null
   const sourceRefs = input.sourceRefs ?? {}
+  const amenityConfig = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG
+  const quantityRules =
+    quantityConfig?.quantityRules ?? DEFAULT_ECO_QUANTITY_RULES
+  const upliftType = normalizeUpliftType(input.upliftType)
+
+  const amenity = resolveAmenityPackages(
+    {
+      aircraftType: input.aircraftType,
+      dep: identity.dep,
+      arr: identity.arr,
+      upliftType,
+      flightKind: input.flightKind,
+      amenityOverride: input.amenityOverride,
+    },
+    amenityConfig,
+  )
 
   const hotmealCells = Object.fromEntries(
     HOTMEAL_KEYS.map((key) => [
@@ -70,10 +111,6 @@ export function buildEcoSupplierRow(
   const boiledEggs = inputCell(
     input.boiledEggs,
     sourceRefs.boiledEggs ?? 'Operational input',
-  )
-  const reserveUtensils = inputCell(
-    input.reserveUtensils,
-    sourceRefs.reserveUtensils ?? 'Manual package/route reserve input',
   )
   const skyboss = inputCell(
     input.skybossEco,
@@ -134,10 +171,79 @@ export function buildEcoSupplierRow(
       : `quotaCommercial + totalPrebook; ${quota.source}; ${prebook.source}`,
   )
 
+  const ketchup = ecoCell(
+    hotmealCells.spaghetti.value,
+    'J spaghetti quantity',
+  )
+  const chiliSauce = ecoCell(
+    hotmealTotalValue == null ? null : Math.ceil(hotmealTotalValue / 2),
+    'ceil(AH hotmeal total / 2)',
+  )
+  const soySauce = ecoCell(
+    hotmealTotalValue == null ? null : Math.ceil(hotmealTotalValue / 2),
+    'ceil(AH hotmeal total / 2)',
+  )
   const hotmealUtensils = ecoCell(
     hotmealTotalValue,
     'AH hotmeal total',
   )
+
+  const columnSnapshot: Record<string, number | null> = {
+    spaghetti: hotmealCells.spaghetti.value,
+    ketchup: ketchup.value,
+    chiliSauce: chiliSauce.value,
+    soySauce: soySauce.value,
+    hotmealUtensils: hotmealUtensils.value,
+    bread: bread.value,
+    skyboss: skyboss.value,
+    prebook: prebook.value,
+  }
+
+  const evalCtx: EcoQuantityEvalContext = {
+    columns: columnSnapshot,
+    metrics: {
+      quotaCommercial: quota.value,
+      totalPrebook: prebook.value,
+      skybossEco: skyboss.value,
+    },
+    hotmealTotal: hotmealTotalValue,
+    dep: identity.dep,
+    arr: identity.arr,
+    aircraftType: input.aircraftType,
+    upliftType,
+    hourClassId: amenity.hourClassId,
+    amenityPackageIds: amenity.packageIds,
+    flightKind: input.flightKind,
+    routeGroups: amenityConfig.routeGroups,
+  }
+
+  const ruleByTarget = (target: string) =>
+    quantityRules.find((r) => r.enabled && r.targetColumn === target)
+
+  const indianSaltRule = ruleByTarget('indianSaltPepper')
+  const indianSaltPepper = indianSaltRule
+    ? (() => {
+        const resolved = evalQuantityRule(indianSaltRule, evalCtx)
+        return ecoCell(resolved.value, resolved.source)
+      })()
+    : ecoCell(null, 'indianSaltPepper rule not configured')
+
+  const reserveRule = ruleByTarget('reserveUtensils')
+  let reserveUtensils: SupplierCell<number>
+  if (input.reserveUtensils != null) {
+    reserveUtensils = inputCell(
+      input.reserveUtensils,
+      sourceRefs.reserveUtensils ?? 'Manual package/route reserve input',
+    )
+  } else if (reserveRule) {
+    const resolved = evalQuantityRule(reserveRule, evalCtx)
+    reserveUtensils = ecoCell(resolved.value, resolved.source)
+  } else {
+    reserveUtensils = inputCell(
+      null,
+      sourceRefs.reserveUtensils ?? 'Manual package/route reserve input',
+    )
+  }
 
   const cells: EcoCells = {
     ...hotmealCells,
@@ -163,18 +269,10 @@ export function buildEcoSupplierRow(
       'Australia bread vegetables input',
     ),
     hotmealTotal,
-    ketchup: ecoCell(
-      hotmealCells.spaghetti.value,
-      'J spaghetti quantity',
-    ),
-    chiliSauce: ecoCell(
-      hotmealTotalValue == null ? null : Math.ceil(hotmealTotalValue / 2),
-      'ceil(AH hotmeal total / 2)',
-    ),
-    soySauce: ecoCell(
-      hotmealTotalValue == null ? null : Math.ceil(hotmealTotalValue / 2),
-      'ceil(AH hotmeal total / 2)',
-    ),
+    ketchup,
+    chiliSauce,
+    soySauce,
+    indianSaltPepper,
     hotmealUtensils,
     reserveUtensils,
     totalUtensils: ecoCell(
@@ -230,5 +328,7 @@ export function buildEcoSupplierRow(
     operatingDate: effectiveDate,
     key: createFlightJoinKey({ ...identity, operatingDate: effectiveDate }),
     cells,
+    amenityLabel: amenity.label,
+    amenityPackageIds: amenity.packageIds,
   }
 }

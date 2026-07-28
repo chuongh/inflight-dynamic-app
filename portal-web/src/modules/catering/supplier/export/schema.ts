@@ -5,7 +5,7 @@ export interface ExportColumn<TField extends string> {
   productCode: string
   header: string
   field?: TField
-  identity?: 'operatingDate' | 'flightNo' | 'dep' | 'arr'
+  identity?: 'operatingDate' | 'flightNo' | 'dep' | 'arr' | 'amenityLabel'
 }
 
 export function excelColumnLetter(columnNumber: number): string {
@@ -37,7 +37,7 @@ const ecoDefinitions: readonly ColumnDefinition<keyof EcoCells>[] = [
   { productCode: '', header: 'STT/No' },
   { productCode: '', header: 'Ngày/Date', identity: 'operatingDate' },
   { productCode: '', header: 'A/C' },
-  { productCode: '', header: 'Amenity' },
+  { productCode: '', header: 'Amenity', identity: 'amenityLabel' },
   { productCode: '', header: 'Type' },
   { productCode: '', header: 'FLT NO', identity: 'flightNo' },
   { productCode: '', header: 'DEP', identity: 'dep' },
@@ -99,7 +99,7 @@ const ecoDefinitions: readonly ColumnDefinition<keyof EcoCells>[] = [
   { productCode: 'DC07', header: 'Tương cà', field: 'ketchup' },
   { productCode: 'DC06', header: 'Tương ớt', field: 'chiliSauce' },
   { productCode: 'DC08', header: 'Xì dầu', field: 'soySauce' },
-  { productCode: 'DC10', header: 'Muối tiêu đường Ấn' },
+  { productCode: 'DC10', header: 'Muối tiêu đường Ấn', field: 'indianSaltPepper' },
   {
     productCode: '',
     header: 'Bộ thìa, dĩa, tăm theo hotmeal',

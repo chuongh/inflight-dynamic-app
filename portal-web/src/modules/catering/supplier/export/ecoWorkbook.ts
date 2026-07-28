@@ -71,6 +71,9 @@ export async function buildEcoWorkbook(
       if (column.identity === 'operatingDate') {
         return parseIsoExcelDate(supplierRow.operatingDate)
       }
+      if (column.identity === 'amenityLabel') {
+        return supplierRow.amenityLabel ?? ''
+      }
       if (column.identity) return supplierRow[column.identity]
       if (column.field) return effectiveValue(supplierRow.cells[column.field])
       return ''

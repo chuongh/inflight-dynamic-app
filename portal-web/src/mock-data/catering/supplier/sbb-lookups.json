@@ -237,5 +237,27 @@
         }
       }
     ]
+  },
+  "sheetBindings": {
+    "ẤN": {
+      "airports": ["AMD", "BLR", "BOM", "COK", "DEL", "HYD"],
+      "priority": 10,
+      "note": "DEP hoặc ARR thuộc Ấn Độ → sheet ẤN"
+    },
+    "ÚC&KAZ": {
+      "airports": ["ADL", "ALA", "BNE", "MEL", "NQZ", "PER", "SYD"],
+      "priority": 20,
+      "note": "DEP hoặc ARR thuộc Úc / KAZ → sheet ÚC&KAZ"
+    },
+    "VIET-HAN-NHAT": {
+      "airports": [],
+      "priority": 100,
+      "note": "Fallback khi không khớp Ấn / Úc&KAZ"
+    },
+    "CHAY(VIỆT-HÀN-NHẬT)": {
+      "airports": [],
+      "priority": 0,
+      "note": "Chọn theo mealType = vegetarian"
+    }
   }
 }

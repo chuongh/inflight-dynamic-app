@@ -248,6 +248,10 @@ function toEcoInput(input: SupplierFlightInput): EcoSupplierInput {
     highlift: input.highlift,
     smallTruck: input.smallTruck,
     lastMinuteTopUp: input.lastMinuteTopUp,
+    aircraftType: input.aircraftType,
+    upliftType: input.upliftType,
+    flightKind: input.flightKind,
+    amenityOverride: input.amenityOverride,
     sourceRefs: input.sourceRefs,
   }
 }

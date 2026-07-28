@@ -7,6 +7,7 @@ import type {
   SbbLookupItem,
   SbbLookupRow,
   SbbRouteSheet,
+  SbbSheetRouteBinding,
 } from './types'
 
 export type ParseResult<T> =
@@ -184,6 +185,35 @@ function parseSbbLookupDatasetUncached(value: unknown): ParseResult<SbbLookupDat
       effectiveTo: range.value.effectiveTo,
       source: value.source,
       sheets,
+      sheetBindings: parseSbbSheetBindings(value.sheetBindings),
     },
   }
+}
+
+function parseSbbSheetBindings(
+  raw: unknown,
+): Partial<Record<SbbRouteSheet, SbbSheetRouteBinding>> | undefined {
+  if (!isRecord(raw)) return undefined
+  const result: Partial<Record<SbbRouteSheet, SbbSheetRouteBinding>> = {}
+  for (const sheet of SBB_SHEETS) {
+    const entry = raw[sheet]
+    if (!isRecord(entry)) continue
+    const airports = Array.isArray(entry.airports)
+      ? entry.airports
+          .filter((a): a is string => typeof a === 'string' && a.trim().length > 0)
+          .map(normalizeAirport)
+      : []
+    const routePairs = Array.isArray(entry.routePairs)
+      ? entry.routePairs.filter(
+          (p): p is string => typeof p === 'string' && p.trim().length > 0,
+        )
+      : undefined
+    const priority =
+      typeof entry.priority === 'number' && Number.isFinite(entry.priority)
+        ? entry.priority
+        : undefined
+    const note = typeof entry.note === 'string' ? entry.note : undefined
+    result[sheet] = { airports, routePairs, priority, note }
+  }
+  return Object.keys(result).length > 0 ? result : undefined
 }

@@ -2,13 +2,21 @@ import { groupOrigin } from '../grouping'
 import type { DayGrouping, FlightLeg, SupplierLegExtension } from '../groupingTypes'
 import type { SupplierFlightInput } from './types'
 
-function mapLegToInput(operatingDate: string, leg: FlightLeg): SupplierFlightInput {
+function mapLegToInput(
+  operatingDate: string,
+  leg: FlightLeg,
+  aircraftType?: string,
+): SupplierFlightInput {
   const s: SupplierLegExtension = leg.supplier ?? {}
   return {
     operatingDate,
     flightNo: leg.flightNo,
     dep: leg.dep,
     arr: leg.arr,
+    aircraftType: s.aircraftType ?? aircraftType ?? null,
+    upliftType: s.upliftType ?? null,
+    flightKind: s.flightKind ?? null,
+    amenityOverride: s.amenityOverride ?? null,
     quotaCommercial: s.quotaCommercial,
     totalPrebook: s.totalPrebook ?? leg.premeal ?? null,
     skybossEco: s.skybossEco,
@@ -59,7 +67,7 @@ export function flightGroupsToSupplierInputs(
     if (groupOrigin(group) !== station) continue
     if (group.confirmed) {
       for (const leg of group.legs) {
-        inputs.push(mapLegToInput(day.serviceDate, leg))
+        inputs.push(mapLegToInput(day.serviceDate, leg, group.aircraftType))
       }
     } else {
       pendingCount += group.legs.length

@@ -15,6 +15,16 @@ describe('SBB route selection', () => {
     expect(selectSbbRouteSheet('SGN', 'DEL')).toBe('ẤN')
     expect(selectSbbRouteSheet('SGN', 'MEL')).toBe('ÚC&KAZ')
   })
+
+  it('uses configurable STD/ARR bindings when provided', () => {
+    const bindings = {
+      ẤN: { airports: ['DEL'], priority: 10 },
+      'ÚC&KAZ': { airports: ['ICN'], priority: 20 },
+    } as const
+    expect(selectSbbRouteSheet('SGN', 'DEL', 'standard', bindings)).toBe('ẤN')
+    expect(selectSbbRouteSheet('SGN', 'ICN', 'standard', bindings)).toBe('ÚC&KAZ')
+    expect(selectSbbRouteSheet('SGN', 'MEL', 'standard', bindings)).toBe('VIET-HAN-NHAT')
+  })
 })
 
 describe('buildSbbSupplierRow', () => {

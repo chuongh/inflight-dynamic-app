@@ -7,6 +7,10 @@ import type {
   SbbLookupDataset,
 } from './supplier/types'
 import type {
+  EcoAmenityConfig,
+  EcoQuantityRule,
+} from './supplier/ecoQuantityTypes'
+import type {
   SupplierRuleConfigDataset,
   SupplierRuleConfigVersion,
 } from './supplierRuleConfigTypes'
@@ -39,6 +43,8 @@ export function withNewSupplierRuleVersion(
   payload: {
     ecoRouteRules: EcoRouteRuleDataset
     sbbLookups: SbbLookupDataset
+    ecoAmenity?: EcoAmenityConfig
+    ecoQuantityRules?: EcoQuantityRule[]
   },
   meta: {
     effectiveFrom: string
@@ -67,6 +73,8 @@ export function withNewSupplierRuleVersion(
     note: meta.note,
     ecoRouteRules: payload.ecoRouteRules,
     sbbLookups: payload.sbbLookups,
+    ecoAmenity: payload.ecoAmenity,
+    ecoQuantityRules: payload.ecoQuantityRules,
   }
 
   return [created, ...updated]
