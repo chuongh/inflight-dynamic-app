@@ -56,6 +56,8 @@ export function EcoSupplyPanel({
     const map = new Map<EcoSupplyGroupId, EcoSupplyLine[]>()
     for (const g of ECO_SUPPLY_GROUP_ORDER) map.set(g, [])
     for (const line of lines) {
+      // Prebook total lives on the overview StatStrip — never list it again below.
+      if (line.field === 'prebook') continue
       if (!showZero && line.qty === 0 && !line.overridden) {
         // Keep manual §1.5 placeholders visible so ops can enter qty.
         const isManualPlaceholder =
@@ -94,7 +96,12 @@ export function EcoSupplyPanel({
           const groupLines = byGroup.get(group) ?? []
           const groupTotal = groupLines.reduce((s, l) => s + l.qty, 0)
           return (
-            <section key={group} className="eco-supply__section">
+            <section
+              key={group}
+              className={`eco-supply__section${
+                group === 'amenity_composition' ? ' eco-supply__section--full' : ''
+              }`}
+            >
               <header className="eco-supply__section-head">
                 <h3>{groupLabel(t, group)}</h3>
                 <span className="text-text-secondary tnum text-[12.5px] font-semibold">

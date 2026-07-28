@@ -59,7 +59,7 @@ export const ECO_FIELD_GROUPS: readonly PlannerFieldGroup<keyof EcoCells>[] = [
   {
     key: 'commercial',
     label: 'Thương mại',
-    fields: ['skyboss', 'prebook', 'prebookCashews'],
+    fields: ['skyboss', 'prebookCashews'],
   },
   {
     key: 'amenity-ops',
@@ -467,6 +467,8 @@ const DISH_ROLLUP_SKIP_FIELDS = new Set([
   'totalEggs',
   'totalUtensils',
   'businessPax',
+  /** Shown on order overview KPI only — not as a dish line. */
+  'prebook',
 ])
 
 export interface DishRollupLine {

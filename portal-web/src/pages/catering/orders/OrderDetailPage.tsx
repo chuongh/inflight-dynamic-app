@@ -319,6 +319,10 @@ export function OrderDetailPage() {
                 hint: t('catering.orders.supply.kpiTotalMealsHint'),
               },
               {
+                label: t('catering.orders.supply.kpiPrebook'),
+                value: mealStats.prebook.toLocaleString(),
+              },
+              {
                 label: t('catering.orders.supply.kpiCrew'),
                 value: mealStats.crew.toLocaleString(),
               },

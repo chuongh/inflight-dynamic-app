@@ -76,6 +76,45 @@
   break-inside: avoid;
 }
 
+/** Amenity theo gói — full-width section; items 1→2 cols responsive */
+.eco-supply__section--full {
+  grid-column: 1 / -1;
+}
+
+.eco-supply__section--full .eco-supply__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.eco-supply__section--full .eco-supply__row:last-child {
+  border-bottom: 1px solid #f0f1f3;
+}
+
+@media (min-width: 640px) {
+  .eco-supply__section--full .eco-supply__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .eco-supply__section--full .eco-supply__row:nth-child(odd) {
+    border-right: 1px solid #f0f1f3;
+  }
+
+  .eco-supply__section--full .eco-supply__row:nth-last-child(1),
+  .eco-supply__section--full .eco-supply__row:nth-last-child(2):nth-child(odd) {
+    border-bottom: none;
+  }
+
+  .eco-supply__section--full .eco-supply__row:nth-last-child(2):nth-child(even) {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .eco-supply__section--full .eco-supply__row:last-child {
+    border-bottom: none;
+  }
+}
+
 .eco-supply__section-head {
   display: flex;
   align-items: center;
