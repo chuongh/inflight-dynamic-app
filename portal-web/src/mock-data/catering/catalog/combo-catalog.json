@@ -1,0 +1,255 @@
+{
+  "seedVersion": "2026-07-28-catalog-v2",
+  "versions": [
+    {
+      "id": "c1",
+      "version": 1,
+      "status": "active",
+      "effectiveFrom": "28/07/2026",
+      "updatedBy": "System",
+      "updatedAt": "28/07/2026",
+      "items": [
+        {
+          "id": "combo-40000294",
+          "name": {
+            "vi": "Set bánh mì tách tp (SGN-ADL)"
+          },
+          "description": "",
+          "kind": "set",
+          "productCode": "40000294",
+          "active": true
+        },
+        {
+          "id": "combo-meal-box-chay",
+          "name": {
+            "vi": "Meal box chay"
+          },
+          "description": "",
+          "kind": "meal_box",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-meal-box-thuong",
+          "name": {
+            "vi": "Meal box thường"
+          },
+          "description": "",
+          "kind": "meal_box",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-sbb20",
+          "name": {
+            "vi": "Set hoa quả 3 miếng"
+          },
+          "description": "",
+          "kind": "set",
+          "productCode": "SBB20",
+          "active": true
+        },
+        {
+          "id": "combo-happy-meal-my-y-banh-que-coca",
+          "name": {
+            "vi": "Happy meal (Mỳ ý + Bánh que + Coca)"
+          },
+          "description": "Mỳ ý + Bánh quy socola + Coca",
+          "kind": "happy_meal",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-combo-snack",
+          "name": {
+            "vi": "Combo snack"
+          },
+          "description": "Snack for prebook meal of short route",
+          "kind": "prebook_combo",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-combo-mien-xao-cua-va-nuoc-suoi-free-for-china",
+          "name": {
+            "vi": "Combo Miến xào cua và nước suối (free for China)"
+          },
+          "description": "Combo Crab and Shrimp Glass Noodles and Water (Free for China)",
+          "kind": "prebook_combo",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-bia-kho-ga-snack-cha-gio",
+          "name": {
+            "vi": "Bia + Khô gà + snack chả giò"
+          },
+          "description": "Bia + Khô gà + snack chả giò",
+          "kind": "prebook_combo",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-soda-dau-macca",
+          "name": {
+            "vi": "Soda Dâu + Macca"
+          },
+          "description": "Soda Dâu + Macca",
+          "kind": "prebook_combo",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-vcs-vegetarian-meal-box",
+          "name": {
+            "vi": "VCS Vegetarian meal box"
+          },
+          "description": "VCS Vegetarian meal box",
+          "kind": "meal_box",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-1",
+          "name": {
+            "vi": "Combo charter 1"
+          },
+          "description": "50% Thai fired rice + 50% Crab & shimp glass noodles",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-2",
+          "name": {
+            "vi": "Combo charter 2"
+          },
+          "description": "50% Steamed Sticky Rice +50% Singaporean noodles",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-3",
+          "name": {
+            "vi": "Combo charter 3"
+          },
+          "description": "2 mineral water + 01 coffee or tea + 1 Snack + 50% Thai fired rice (300gr) + 50% Beef bolognese spaghetti (300gr) + 01 Bread w butter =>from 17Jul: 2 mineral water + 01 coffee or tea + 1 Snack + 30% Thai fired rice (300gr) + 70% Beef bolognese spaghetti (300gr) + 01 Bread w butter",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-4",
+          "name": {
+            "vi": "Combo charter 4"
+          },
+          "description": "100% Beef bolognese spaghetti",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-5",
+          "name": {
+            "vi": "Combo charter 5"
+          },
+          "description": "50% Beef rice+ 50% Beef bolognese spaghetti",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-6",
+          "name": {
+            "vi": "Combo charter 8"
+          },
+          "description": "50% beef rice & 50% Singaporean noodles",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-7",
+          "name": {
+            "vi": "Combo charter 7"
+          },
+          "description": "100% Crab & shimp glass noodles",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-8",
+          "name": {
+            "vi": "Combo hotmeal charter 6"
+          },
+          "description": "2 mineral water & 1snack & 50% Beef Rice and 50% Bolognese Spagetti",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-9",
+          "name": {
+            "vi": "Combo charter 9"
+          },
+          "description": "100% Thai fired rice + 100% macca",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-10",
+          "name": {
+            "vi": "Combo charter 10"
+          },
+          "description": "100% Singaporean noodles + 100% macca",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-11",
+          "name": {
+            "vi": "Combo charter 11"
+          },
+          "description": "2 mineral water + 01 coffee or tea + 1snack & 50% Thai fired rice (300gr) + 50% Beef bolognese spaghetti (300gr) =>from 17Jul: 2 mineral water + 01 coffee or tea + 1snack & 30% Thai fired rice (300gr) + 70% Beef bolognese spaghetti (300gr)",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-12",
+          "name": {
+            "vi": "Combo charter 12"
+          },
+          "description": "2 mineral water & 100% Beef Rice & 01 Snack",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-13",
+          "name": {
+            "vi": "VGML"
+          },
+          "description": "vegetarian + macca",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        },
+        {
+          "id": "combo-charter-14",
+          "name": {
+            "vi": "combo charter 14"
+          },
+          "description": "100% Beef bolognese spaghetti & 01 snack",
+          "kind": "charter",
+          "productCode": null,
+          "active": true
+        }
+      ]
+    }
+  ]
+}

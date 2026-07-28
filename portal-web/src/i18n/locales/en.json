@@ -20,7 +20,10 @@
     "selected": "selected",
     "information": "Information",
     "back": "Back",
-    "delete": "Delete"
+    "delete": "Delete",
+    "save": "Save",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -46,7 +49,11 @@
     "cateringConfig": "Configuration",
     "cateringGrouping": "Flight grouping",
     "cateringOrders": "Supplier orders",
-    "cateringMeals": "Meal catalog"
+    "cateringMeals": "Meal catalog",
+    "catalog": "Catalog",
+    "catalogMeals": "Meal catalog",
+    "catalogCombos": "Combo catalog",
+    "catalogAmenity": "Amenity catalog"
   },
   "airports": {
     "badge": "WP-B · Airports",
@@ -166,7 +173,9 @@
     "passwordRequired": "Enter password",
     "invalidCredentials": "Staff ID or password is incorrect.",
     "demoAdmin": "Demo — Admin",
-    "demoPassword": "password"
+    "demoPassword": "password",
+    "demoRoles": "Quick demo roles",
+    "demoHint": "Pick a role to fill Staff ID · password {{password}}"
   },
   "dashboard": {
     "badge": "Control Tower",
@@ -503,15 +512,15 @@
     "meals": {
       "badge": "Catalog · PBML",
       "title": "Meal catalog",
-      "desc": "Premeal dish metadata with PBML booking codes. Dish names match the premeal breakdown in Flight grouping.",
+      "desc": "Premeal dish metadata with product codes. Dish names match the premeal breakdown in Flight grouping.",
       "dishes": "dishes",
-      "pbmlCodes": "PBML codes",
-      "searchPlaceholder": "Search dish, description, PBML code…",
+      "productCodes": "product codes",
+      "searchPlaceholder": "Search dish, description, product code…",
       "col": {
         "kind": "Type",
         "name": "Dish",
         "description": "Description",
-        "codes": "PBML codes"
+        "codes": "Product codes"
       },
       "kind": {
         "all": "All",
@@ -519,6 +528,65 @@
         "veg": "Vegetarian",
         "business": "Business",
         "snack": "Snack & Drinks"
+      }
+    },
+    "catalog": {
+      "items": "items",
+      "edit": "Edit catalog",
+      "publish": "Publish version",
+      "published": "Catalog {{id}} published.",
+      "needsCode": "No code",
+      "filterNeedsCode": "Missing product code",
+      "searchMeals": "Search code, name…",
+      "searchCombos": "Search name, description…",
+      "searchAmenity": "Search code, name…",
+      "col": {
+        "code": "Product code",
+        "name": "Name",
+        "category": "Category",
+        "unit": "Unit",
+        "status": "Status",
+        "active": "Active",
+        "kind": "Type",
+        "description": "Description"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "category": {
+        "all": "All categories",
+        "eco_main": "ECO mains",
+        "sbb_main": "SBB mains",
+        "appetizer": "Appetizers",
+        "dessert": "Desserts",
+        "bread": "Bread & pastry",
+        "drink": "Drinks",
+        "snack": "Snacks",
+        "condiment": "Condiments"
+      },
+      "comboKind": {
+        "all": "All types",
+        "charter": "Charter",
+        "happy_meal": "Happy meal",
+        "prebook_combo": "Prebook combo",
+        "set": "Set",
+        "meal_box": "Meal box"
+      },
+      "meals": {
+        "badge": "Catalog · Meals",
+        "title": "Meal catalog",
+        "desc": "Overview of meal items across the catalog."
+      },
+      "combos": {
+        "badge": "Catalog · Combos",
+        "title": "Combo catalog",
+        "desc": "Overview of combos and meal packages."
+      },
+      "amenity": {
+        "badge": "Catalog · Amenity",
+        "title": "Amenity catalog",
+        "desc": "Overview of amenity and supply items."
       }
     },
     "grouping": {

@@ -11,6 +11,7 @@ import {
 } from '@/modules/equipment/repairRequest'
 import type { RepairRequest, RepairRequestStatus } from '@/modules/equipment/types'
 import { KpiCard } from '../patterns/KpiCard'
+import { DataTableShell } from '../patterns/DataTableShell'
 import { RepairRequestBadge } from '../primitives/Badge'
 import { DaysBadge } from '../primitives/DaysBadge'
 import { useEquipmentLabels } from '@/i18n/hooks/useEquipmentLabels'
@@ -211,20 +212,22 @@ export function TrolleyRepairHistoryDrawer({
           />
         </div>
 
-        <Table<RepairRequest>
-          rowKey="id"
-          size="small"
-          columns={columns}
-          dataSource={filtered}
-          pagination={{
-            pageSize: 15,
-            showTotal: (total) => t('equipment.repairDrawer.paginationTotal', { total }),
-          }}
-          onRow={(record) => ({
-            onClick: () => setSelectedRequest(record),
-            className: 'cursor-pointer',
-          })}
-        />
+        <DataTableShell>
+          <Table<RepairRequest>
+            rowKey="id"
+            size="small"
+            columns={columns}
+            dataSource={filtered}
+            pagination={{
+              pageSize: 15,
+              showTotal: (total) => t('equipment.repairDrawer.paginationTotal', { total }),
+            }}
+            onRow={(record) => ({
+              onClick: () => setSelectedRequest(record),
+              className: 'cursor-pointer',
+            })}
+          />
+        </DataTableShell>
       </Drawer>
 
       <Drawer

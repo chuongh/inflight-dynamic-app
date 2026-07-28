@@ -20,7 +20,10 @@
     "selected": "đã chọn",
     "information": "Thông tin",
     "back": "Quay lại",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "save": "Lưu",
+    "yes": "Có",
+    "no": "Không"
   },
   "nav": {
     "dashboard": "Bảng điều khiển",
@@ -46,7 +49,11 @@
     "cateringConfig": "Cấu hình định mức",
     "cateringGrouping": "Phân nhóm chuyến bay",
     "cateringOrders": "Đơn đặt hàng",
-    "cateringMeals": "Danh mục suất ăn"
+    "cateringMeals": "Danh mục suất ăn",
+    "catalog": "Danh mục",
+    "catalogMeals": "Danh mục món",
+    "catalogCombos": "Danh mục combo",
+    "catalogAmenity": "Danh mục amenity"
   },
   "airports": {
     "badge": "WP-B · Sân bay",
@@ -166,7 +173,9 @@
     "passwordRequired": "Nhập mật khẩu",
     "invalidCredentials": "Mã nhân viên hoặc mật khẩu không đúng.",
     "demoAdmin": "Demo — Quản trị",
-    "demoPassword": "mật khẩu"
+    "demoPassword": "mật khẩu",
+    "demoRoles": "Vai trò demo nhanh",
+    "demoHint": "Chọn vai trò để điền Mã NV · mật khẩu {{password}}"
   },
   "dashboard": {
     "badge": "Trung tâm điều hành",
@@ -503,15 +512,15 @@
     "meals": {
       "badge": "Danh mục · PBML",
       "title": "Danh mục suất ăn",
-      "desc": "Metadata các món suất ăn (premeal) kèm mã PBML. Tên món khớp với chi tiết suất ăn trong màn Phân nhóm chuyến bay.",
+      "desc": "Metadata các món suất ăn (premeal) kèm mã sản phẩm. Tên món khớp với chi tiết suất ăn trong màn Phân nhóm chuyến bay.",
       "dishes": "món",
-      "pbmlCodes": "mã PBML",
-      "searchPlaceholder": "Tìm tên món, mô tả, mã PBML…",
+      "productCodes": "mã sản phẩm",
+      "searchPlaceholder": "Tìm tên món, mô tả, mã sản phẩm…",
       "col": {
         "kind": "Loại",
         "name": "Tên món",
         "description": "Mô tả",
-        "codes": "Mã PBML"
+        "codes": "Mã sản phẩm"
       },
       "kind": {
         "all": "Tất cả",
@@ -519,6 +528,65 @@
         "veg": "Chay",
         "business": "Business",
         "snack": "Snack & Đồ uống"
+      }
+    },
+    "catalog": {
+      "items": "mục",
+      "edit": "Chỉnh danh mục",
+      "publish": "Phát hành version",
+      "published": "Đã phát hành danh mục {{id}}.",
+      "needsCode": "Thiếu mã",
+      "filterNeedsCode": "Thiếu mã sản phẩm",
+      "searchMeals": "Tìm mã, tên…",
+      "searchCombos": "Tìm tên, mô tả…",
+      "searchAmenity": "Tìm mã, tên…",
+      "col": {
+        "code": "Mã sản phẩm",
+        "name": "Tên",
+        "category": "Nhóm",
+        "unit": "Đơn vị",
+        "status": "Trạng thái",
+        "active": "Đang dùng",
+        "kind": "Loại",
+        "description": "Mô tả"
+      },
+      "status": {
+        "active": "Đang dùng",
+        "inactive": "Ngưng dùng"
+      },
+      "category": {
+        "all": "Tất cả nhóm",
+        "eco_main": "Món chính ECO",
+        "sbb_main": "Món chính SBB",
+        "appetizer": "Khai vị",
+        "dessert": "Tráng miệng",
+        "bread": "Bánh mì / bánh ngọt",
+        "drink": "Đồ uống",
+        "snack": "Đồ ăn nhẹ",
+        "condiment": "Gia vị"
+      },
+      "comboKind": {
+        "all": "Tất cả loại",
+        "charter": "Charter",
+        "happy_meal": "Happy meal",
+        "prebook_combo": "Combo prebook",
+        "set": "Set",
+        "meal_box": "Meal box"
+      },
+      "meals": {
+        "badge": "Danh mục · Món",
+        "title": "Danh mục món",
+        "desc": "Tổng quan các món trong danh mục."
+      },
+      "combos": {
+        "badge": "Danh mục · Combo",
+        "title": "Danh mục combo",
+        "desc": "Tổng quan các combo và gói suất ăn."
+      },
+      "amenity": {
+        "badge": "Danh mục · Amenity",
+        "title": "Danh mục amenity",
+        "desc": "Tổng quan vật dụng và đồ dùng."
       }
     },
     "grouping": {

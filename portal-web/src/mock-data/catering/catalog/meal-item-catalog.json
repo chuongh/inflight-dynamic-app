@@ -1,0 +1,1164 @@
+{
+  "seedVersion": "2026-07-28-catalog-v3",
+  "versions": [
+    {
+      "id": "m1",
+      "version": 1,
+      "status": "active",
+      "effectiveFrom": "28/07/2026",
+      "updatedBy": "System",
+      "updatedAt": "28/07/2026",
+      "note": "Seeded from Master_Data + approved display names",
+      "items": [
+        {
+          "id": "sku-40000403",
+          "productCode": "40000403",
+          "name": {
+            "vi": "Thịt bò+ Rau tươi"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-40000450",
+          "productCode": "40000450",
+          "name": {
+            "vi": "Thịt Bò + Rau (SGN-ADL)"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm1",
+          "productCode": "HM1",
+          "name": {
+            "vi": "Xôi khúc chả chiên"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm2",
+          "productCode": "HM2",
+          "name": {
+            "vi": "Xôi mặn"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm3",
+          "productCode": "HM3",
+          "name": {
+            "vi": "Cơm dừa Malaysia"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm4",
+          "productCode": "HM4",
+          "name": {
+            "vi": "Cơm bò"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm5",
+          "productCode": "HM5",
+          "name": {
+            "vi": "Miến xào tôm cua"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm6",
+          "productCode": "HM6",
+          "name": {
+            "vi": "Bún xào Singapore"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm7",
+          "productCode": "HM7",
+          "name": {
+            "vi": "Cơm chiên Thái"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm8",
+          "productCode": "HM8",
+          "name": {
+            "vi": "Bánh chưng chà bông"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm9",
+          "productCode": "HM9",
+          "name": {
+            "vi": "Mì Ý"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm11",
+          "productCode": "HM11",
+          "name": {
+            "vi": "Cơm chiên dương châu chay"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm12",
+          "productCode": "HM12",
+          "name": {
+            "vi": "Cơm cà ri gà"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm13",
+          "productCode": "HM13",
+          "name": {
+            "vi": "Cơm basmati cà ri chay Business"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm14",
+          "productCode": "HM14",
+          "name": {
+            "vi": "Khoai viên chay vị Ấn và bánh Paratha"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm15",
+          "productCode": "HM15",
+          "name": {
+            "vi": "Cơm cà ri cá"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm22",
+          "productCode": "HM22",
+          "name": {
+            "vi": "Rau ăn mỳ, phở (Úc)"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-hm23",
+          "productCode": "HM23",
+          "name": {
+            "vi": "Rau ăn bánh mỳ (Úc)"
+          },
+          "unit": null,
+          "category": "eco_main",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb5",
+          "productCode": "SBB5",
+          "name": {
+            "vi": "Miến gà"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb7",
+          "productCode": "SBB7",
+          "name": {
+            "vi": "Phở bò"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb11",
+          "productCode": "SBB11",
+          "name": {
+            "vi": "Xôi mặn"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb23",
+          "productCode": "SBB23",
+          "name": {
+            "vi": "Cá Basa"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb24",
+          "productCode": "SBB24",
+          "name": {
+            "vi": "Gà Gravy"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb25",
+          "productCode": "SBB25",
+          "name": {
+            "vi": "Bún xào chay Business"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb37",
+          "productCode": "SBB37",
+          "name": {
+            "vi": "Bún bò Huế"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb40",
+          "productCode": "SBB40",
+          "name": {
+            "vi": "Cơm chiên dương châu chay"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb41",
+          "productCode": "SBB41",
+          "name": {
+            "vi": "Cơm cari gà SBB"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb42",
+          "productCode": "SBB42",
+          "name": {
+            "vi": "Cơm cà ri Ấn chay (chay Ấn)"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb43",
+          "productCode": "SBB43",
+          "name": {
+            "vi": "Khoai viên chay vị Ấn và bánh paratha SBB"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "meal-burger",
+          "productCode": null,
+          "name": {
+            "vi": "Burger"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-sandwich-pho-mai",
+          "productCode": null,
+          "name": {
+            "vi": "Sandwich phô mai"
+          },
+          "unit": null,
+          "category": "sbb_main",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "sku-sbb1",
+          "productCode": "SBB1",
+          "name": {
+            "vi": "Díp Cuốn"
+          },
+          "unit": null,
+          "category": "appetizer",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb27",
+          "productCode": "SBB27",
+          "name": {
+            "vi": "Salad rau củ tôm"
+          },
+          "unit": null,
+          "category": "appetizer",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb33",
+          "productCode": "SBB33",
+          "name": {
+            "vi": "Fingers food (khay)"
+          },
+          "unit": null,
+          "category": "appetizer",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb44",
+          "productCode": "SBB44",
+          "name": {
+            "vi": "Díp Cuốn chay (chay thường)"
+          },
+          "unit": null,
+          "category": "appetizer",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb45",
+          "productCode": "SBB45",
+          "name": {
+            "vi": "Salad chay"
+          },
+          "unit": null,
+          "category": "appetizer",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb46",
+          "productCode": "SBB46",
+          "name": {
+            "vi": "Salad đậu kiểu Ấn (chay Ấn)"
+          },
+          "unit": null,
+          "category": "appetizer",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-40000261",
+          "productCode": "40000261",
+          "name": {
+            "vi": "Trứng luộc"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb10",
+          "productCode": "SBB10",
+          "name": {
+            "vi": "Rau câu dừa"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb18",
+          "productCode": "SBB18",
+          "name": {
+            "vi": "Ngũ cốc"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb21",
+          "productCode": "SBB21",
+          "name": {
+            "vi": "Trứng cuốn"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb28",
+          "productCode": "SBB28",
+          "name": {
+            "vi": "Bánh mochi"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb29",
+          "productCode": "SBB29",
+          "name": {
+            "vi": "Yogurt (quốc tế / Sky Úc)"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb30",
+          "productCode": "SBB30",
+          "name": {
+            "vi": "Trái cây (600gr-khay)"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb31",
+          "productCode": "SBB31",
+          "name": {
+            "vi": "Quýt trái (kg)"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb32",
+          "productCode": "SBB32",
+          "name": {
+            "vi": "Nho Xanh Úc (kg)"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb49",
+          "productCode": "SBB49",
+          "name": {
+            "vi": "Bánh mouse dừa"
+          },
+          "unit": null,
+          "category": "dessert",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb9",
+          "productCode": "SBB9",
+          "name": {
+            "vi": "Bánh mì tròn & bơ (truyền thống)"
+          },
+          "unit": null,
+          "category": "bread",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb12",
+          "productCode": "SBB12",
+          "name": {
+            "vi": "Bánh mì Việt Nam"
+          },
+          "unit": null,
+          "category": "bread",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb22",
+          "productCode": "SBB22",
+          "name": {
+            "vi": "Bánh sừng bò (quốc tế)"
+          },
+          "unit": null,
+          "category": "bread",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb39",
+          "productCode": "SBB39",
+          "name": {
+            "vi": "Bánh chưng chà bông SBB"
+          },
+          "unit": null,
+          "category": "bread",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "meal-banh-sung-bo-thanh-long",
+          "productCode": null,
+          "name": {
+            "vi": "Bánh sừng bò thanh long"
+          },
+          "unit": null,
+          "category": "bread",
+          "cabinScopes": [
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "sku-30000100",
+          "productCode": "30000100",
+          "name": {
+            "vi": "Nước suối 1.5L (Dasani / Suối TV)"
+          },
+          "unit": "chai",
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb2",
+          "productCode": "SBB2",
+          "name": {
+            "vi": "Cà rốt"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb3",
+          "productCode": "SBB3",
+          "name": {
+            "vi": "Dưa hấu"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb4",
+          "productCode": "SBB4",
+          "name": {
+            "vi": "nước mía"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb14",
+          "productCode": "SBB14",
+          "name": {
+            "vi": "Cafe đen (bình 480ml)"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-sbb34",
+          "productCode": "SBB34",
+          "name": {
+            "vi": "Trang trí Cocktail (chanh xanh + lá húng lũi)"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "meal-bia",
+          "productCode": null,
+          "name": {
+            "vi": "Bia"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-cocktail",
+          "productCode": null,
+          "name": {
+            "vi": "Cocktail"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-nuoc-khoang-mineral-water",
+          "productCode": null,
+          "name": {
+            "vi": "Nước khoáng (Mineral water)"
+          },
+          "unit": "chai",
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-ruou-vang",
+          "productCode": null,
+          "name": {
+            "vi": "Rượu vang"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-soda-dau",
+          "productCode": null,
+          "name": {
+            "vi": "Soda Dâu"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-suoi-350ml-sboss-prebook",
+          "productCode": null,
+          "name": {
+            "vi": "Suối 350ml (sboss+prebook)"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-tra",
+          "productCode": null,
+          "name": {
+            "vi": "Trà"
+          },
+          "unit": null,
+          "category": "drink",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-hat-macca-den",
+          "productCode": null,
+          "name": {
+            "vi": "Hạt Macca đen"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-hat-dieu-prebook",
+          "productCode": null,
+          "name": {
+            "vi": "Hạt điều (prebook)"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-kho-ga",
+          "productCode": null,
+          "name": {
+            "vi": "Khô gà"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-macca-muoi-kaz",
+          "productCode": null,
+          "name": {
+            "vi": "Macca muối KAZ"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-macca-nho-kho-sboss",
+          "productCode": null,
+          "name": {
+            "vi": "Macca nho khô (sboss)"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-macca-thuong",
+          "productCode": null,
+          "name": {
+            "vi": "Macca thường"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-pocky",
+          "productCode": null,
+          "name": {
+            "vi": "Pocky"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-trai-cay-say",
+          "productCode": null,
+          "name": {
+            "vi": "Trái cây sấy"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-xoai-muoi-ot-gds-deluxe",
+          "productCode": null,
+          "name": {
+            "vi": "Xoài muối ớt GDS/DELUXE"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-snack-cha-gio",
+          "productCode": null,
+          "name": {
+            "vi": "snack chả giò"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "sku-30000123",
+          "productCode": "30000123",
+          "name": {
+            "vi": "Đường"
+          },
+          "unit": "que",
+          "category": "condiment",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-dc06",
+          "productCode": "DC06",
+          "name": {
+            "vi": "Tương ớt (để riêng)"
+          },
+          "unit": null,
+          "category": "condiment",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-dc07",
+          "productCode": "DC07",
+          "name": {
+            "vi": "Tương cà (để riêng)"
+          },
+          "unit": null,
+          "category": "condiment",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-dc08",
+          "productCode": "DC08",
+          "name": {
+            "vi": "xì dầu (để riêng)"
+          },
+          "unit": null,
+          "category": "condiment",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "sku-dc10",
+          "productCode": "DC10",
+          "name": {
+            "vi": "Muối tiêu (cho đường Ấn)"
+          },
+          "unit": null,
+          "category": "condiment",
+          "cabinScopes": [
+            "ECO",
+            "SBB"
+          ],
+          "active": true,
+          "needsCode": false
+        }
+      ]
+    }
+  ]
+}

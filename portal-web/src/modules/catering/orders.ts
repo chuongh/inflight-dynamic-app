@@ -24,10 +24,13 @@ export function normalizeName(s: string): string {
     .trim()
 }
 
-/** Build a dish-name → PBML-codes lookup from the meal catalog. */
+/**
+ * Build a dish-name → PBML-codes lookup from the meal catalog.
+ * Catalog items store `productCodes`; those stamp onto order lines as `pbmlCodes`.
+ */
 export function makeCodeOf(catalog: MealCatalog | undefined): (name: string) => string[] {
   const m = new Map<string, string[]>()
-  ;(catalog?.meals ?? []).forEach((x) => m.set(normalizeName(x.name), x.pbmlCodes))
+  ;(catalog?.meals ?? []).forEach((x) => m.set(normalizeName(x.name), x.productCodes))
   return (name: string) => m.get(normalizeName(name)) ?? []
 }
 

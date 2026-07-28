@@ -1,13 +1,12 @@
 /**
  * Catering meal master data (menu catalog). Each dish maps to one or more
- * PBML booking codes used by the pre-book (premeal) system; these dish names
- * are what the flight-grouping premeal breakdown references.
+ * product codes; dish names match the flight-grouping premeal breakdown.
  */
 export interface MealItem {
   name: string
   description: string
-  /** PBML codes this dish is sold under (booking channel / cabin variants). */
-  pbmlCodes: string[]
+  /** Product / SKU code(s) stamped onto prebook order lines. */
+  productCodes: string[]
 }
 
 export interface MealCatalog {

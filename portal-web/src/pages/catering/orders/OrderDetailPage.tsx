@@ -208,7 +208,7 @@ export function OrderDetailPage() {
                     <div className="min-w-0 flex-1">
                       <span className="flex items-center gap-2">
                         <span className="truncate text-[13px] font-bold">{lineLabel(l)}</span>
-                        {l.pbmlCodes.slice(0, 3).map((c) => (
+                        {(l.pbmlCodes ?? []).slice(0, 3).map((c) => (
                           <span key={c} className="border-border text-vj-red-dark hidden shrink-0 rounded border bg-white px-1.5 text-[10px] font-bold tnum sm:inline">
                             {c}
                           </span>

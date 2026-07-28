@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table'
 import { Search, UtensilsCrossed } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { FilterBar } from '@/components/patterns/FilterBar'
 import { PageHeader } from '@/components/patterns/PageHeader'
 import { dishKind, type DishKind } from '@/modules/catering/grouping'
@@ -26,7 +27,7 @@ export function MealListPage() {
 
   const meals = useMemo(() => data?.meals ?? [], [data])
   const totalCodes = useMemo(
-    () => meals.reduce((sum, m) => sum + m.pbmlCodes.length, 0),
+    () => meals.reduce((sum, m) => sum + m.productCodes.length, 0),
     [meals],
   )
 
@@ -38,7 +39,7 @@ export function MealListPage() {
       return (
         m.name.toLowerCase().includes(q) ||
         m.description.toLowerCase().includes(q) ||
-        m.pbmlCodes.some((c) => c.toLowerCase().includes(q))
+        m.productCodes.some((c) => c.toLowerCase().includes(q))
       )
     })
   }, [meals, search, kind])
@@ -72,7 +73,7 @@ export function MealListPage() {
     },
     {
       title: t('catering.meals.col.codes'),
-      dataIndex: 'pbmlCodes',
+      dataIndex: 'productCodes',
       width: 300,
       render: (codes: string[]) => (
         <span className="flex flex-wrap gap-1">
@@ -116,7 +117,7 @@ export function MealListPage() {
             <span className="bg-border h-1 w-1 rounded-full" />
             <span>
               <span className="text-foreground font-extrabold">{totalCodes}</span>{' '}
-              {t('catering.meals.pbmlCodes')}
+              {t('catering.meals.productCodes')}
             </span>
           </div>
 
@@ -141,7 +142,7 @@ export function MealListPage() {
             />
           </FilterBar>
 
-          <div className="data-table-wrap data-table-wrap--ops">
+          <DataTableShell>
             <Table
               rowKey="name"
               size="middle"
@@ -150,7 +151,7 @@ export function MealListPage() {
               pagination={false}
               scroll={{ x: 'max-content' }}
             />
-          </div>
+          </DataTableShell>
         </div>
       </div>
     </div>
