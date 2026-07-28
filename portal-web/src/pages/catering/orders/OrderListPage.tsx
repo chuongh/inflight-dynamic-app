@@ -4,9 +4,8 @@ import { CheckCheck, ChevronRight, Pencil, Search, ShoppingBag, TrendingUp } fro
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { FilterBar } from '@/components/patterns/FilterBar'
 import { KpiCard } from '@/components/patterns/KpiCard'
-import { PageHeader } from '@/components/patterns/PageHeader'
+import { ListPageLayout } from '@/components/patterns/ListPageLayout'
 import { useOrders } from '@/modules/catering/hooks/useOrders'
 import { categoryTotal, groupOrderFiles, lineTotal, type OrderFile } from '@/modules/catering/orders'
 import { paths } from '@/routes/paths'
@@ -126,15 +125,34 @@ export function OrderListPage() {
   ]
 
   return (
-    <div className="page-shell page-shell--list">
-      <div className="thin-scroll page-shell__body">
-        <PageHeader
-          badge={t('catering.orders.badge')}
-          title={t('catering.orders.title')}
-          description={t('catering.orders.desc')}
-        />
-
-        <div className="kpi-grid kpi-grid--4 mb-4">
+    <ListPageLayout
+      badge={t('catering.orders.badge')}
+      title={t('catering.orders.title')}
+      description={t('catering.orders.desc')}
+      filterBarClassName="grid grid-cols-1 gap-2 lg:grid-cols-[auto_1fr]"
+      filterBar={
+        <>
+          <Segmented
+            value={status}
+            onChange={(v) => setStatus(v as StatusFilter)}
+            options={[
+              { value: 'all', label: t('catering.orders.filterAll', { n: files.length }) },
+              { value: 'draft', label: t('catering.orders.filterDraft', { n: draftCount }) },
+              { value: 'sent', label: t('catering.orders.filterSent', { n: sentCount }) },
+            ]}
+          />
+          <Input
+            allowClear
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            prefix={<Search size={15} className="text-text-muted" />}
+            placeholder={t('catering.orders.searchPlaceholder')}
+            style={{ maxWidth: 360 }}
+          />
+        </>
+      }
+      lead={
+        <div className="kpi-grid kpi-grid--4">
           <KpiCard
             icon={ShoppingBag}
             tone="brand"
@@ -160,49 +178,32 @@ export function OrderListPage() {
             label={t('catering.orders.kpiPortions')}
           />
         </div>
-
-        <FilterBar className="grid grid-cols-1 gap-2 lg:grid-cols-[auto_1fr]">
-          <Segmented
-            value={status}
-            onChange={(v) => setStatus(v as StatusFilter)}
-            options={[
-              { value: 'all', label: t('catering.orders.filterAll', { n: files.length }) },
-              { value: 'draft', label: t('catering.orders.filterDraft', { n: draftCount }) },
-              { value: 'sent', label: t('catering.orders.filterSent', { n: sentCount }) },
-            ]}
-          />
-          <Input
-            allowClear
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            prefix={<Search size={15} className="text-text-muted" />}
-            placeholder={t('catering.orders.searchPlaceholder')}
-            style={{ maxWidth: 360 }}
-          />
-        </FilterBar>
-
-        <div className="data-table-wrap data-table-wrap--ops">
-          {visible.length === 0 ? (
-            <div className="py-16">
-              <Empty description={t('catering.orders.empty')} />
-            </div>
-          ) : (
-            <Table
-              rowKey="fileId"
-              size="middle"
-              columns={columns}
-              dataSource={visible}
-              pagination={false}
-              scroll={{ x: 'max-content' }}
-              onRow={(file) => ({
-                onClick: () => navigate(paths.catering.orders.detail(file.fileId)),
-                style: { cursor: 'pointer' },
-              })}
-            />
-          )}
+      }
+      footer={
+        <span className="text-text-secondary text-[12.5px] font-semibold tnum">
+          {visible.length}/{files.length} {t('catering.orders.title')}
+        </span>
+      }
+    >
+      {visible.length === 0 ? (
+        <div className="py-16">
+          <Empty description={t('catering.orders.empty')} />
         </div>
-      </div>
-    </div>
+      ) : (
+        <Table
+          rowKey="fileId"
+          size="middle"
+          columns={columns}
+          dataSource={visible}
+          pagination={false}
+          scroll={{ x: 'max-content' }}
+          onRow={(file) => ({
+            onClick: () => navigate(paths.catering.orders.detail(file.fileId)),
+            style: { cursor: 'pointer' },
+          })}
+        />
+      )}
+    </ListPageLayout>
   )
 }
 

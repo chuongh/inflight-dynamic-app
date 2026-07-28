@@ -1,0 +1,545 @@
+{
+  "seedVersion": "2026-07-28-catalog-v2",
+  "versions": [
+    {
+      "id": "a1",
+      "version": 1,
+      "status": "active",
+      "effectiveFrom": "28/07/2026",
+      "updatedBy": "System",
+      "updatedAt": "28/07/2026",
+      "items": [
+        {
+          "id": "amn-30000099",
+          "productCode": "30000099",
+          "name": {
+            "vi": "Găng tay nilon"
+          },
+          "unit": "Hộp",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000178",
+          "productCode": "30000178",
+          "name": {
+            "vi": "Túi nilon VJA - PE lớn"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000256",
+          "productCode": "30000256",
+          "name": {
+            "vi": "Bình xịt Fresh&clear"
+          },
+          "unit": "chai",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000267",
+          "productCode": "30000267",
+          "name": {
+            "vi": "Bình xịt côn trùng top of decent"
+          },
+          "unit": "Chai",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000289",
+          "productCode": "30000289",
+          "name": {
+            "vi": "Túi nilon VJA - PE nhỏ"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000290",
+          "productCode": "30000290",
+          "name": {
+            "vi": "Túi đựng rác xanh to"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000301",
+          "productCode": "30000301",
+          "name": {
+            "vi": "Túi đựng rác xanh nhỏ"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000312",
+          "productCode": "30000312",
+          "name": {
+            "vi": "Khăn giấy ướt Nuna"
+          },
+          "unit": "bịch",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000424",
+          "productCode": "30000424",
+          "name": {
+            "vi": "Seal"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000435",
+          "productCode": "30000435",
+          "name": {
+            "vi": "Bình đựng sữa rửa tay"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000589",
+          "productCode": "30000589",
+          "name": {
+            "vi": "Ống hút"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000590",
+          "productCode": "30000590",
+          "name": {
+            "vi": "Cây khuấy"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000591",
+          "productCode": "30000591",
+          "name": {
+            "vi": "Túi nôn"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000628",
+          "productCode": "30000628",
+          "name": {
+            "vi": "Bình xịt côn trùng Pre-spray"
+          },
+          "unit": "Chai",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000630",
+          "productCode": "30000630",
+          "name": {
+            "vi": "Khăn giấy ăn in logo Vietjet"
+          },
+          "unit": "bịch",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000641",
+          "productCode": "30000641",
+          "name": {
+            "vi": "Khăn giấy bịch (lau tay)"
+          },
+          "unit": "hộp",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000642",
+          "productCode": "30000642",
+          "name": {
+            "vi": "Túi rác xanh Cockpit"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000648",
+          "productCode": "30000648",
+          "name": {
+            "vi": "Sáp thơm"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000651",
+          "productCode": "30000651",
+          "name": {
+            "vi": "Hoa lavatory"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30000879",
+          "productCode": "30000879",
+          "name": {
+            "vi": "Túi rác dây rút trung"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30001055",
+          "productCode": "30001055",
+          "name": {
+            "vi": "Tinh dầu lav Business"
+          },
+          "unit": "bộ",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30001141",
+          "productCode": "30001141",
+          "name": {
+            "vi": "Bình đựng xà phòng Skyboss"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30001144",
+          "productCode": "30001144",
+          "name": {
+            "vi": "Giấy vệ sinh An An"
+          },
+          "unit": "cuộn",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30001231",
+          "productCode": "30001231",
+          "name": {
+            "vi": "Ống hút trà sữa Oolong trân châu"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30001233",
+          "productCode": "30001233",
+          "name": {
+            "vi": "Bình xịt khử mùi"
+          },
+          "unit": "chai",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30001237",
+          "productCode": "30001237",
+          "name": {
+            "vi": "Ly trà sữa"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30001241",
+          "productCode": "30001241",
+          "name": {
+            "vi": "Nắp trà sữa"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30003142",
+          "productCode": "30003142",
+          "name": {
+            "vi": "Bảng hướng dẫn khu vực Skyboss"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30003143",
+          "productCode": "30003143",
+          "name": {
+            "vi": "Bảng hướng dẫn khu vực Business"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30005621",
+          "productCode": "30005621",
+          "name": {
+            "vi": "Ly giấy VJ-Vikkafe"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-30005963",
+          "productCode": "30005963",
+          "name": {
+            "vi": "Đế bình xà phòng"
+          },
+          "unit": "cái",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-40000280",
+          "productCode": "40000280",
+          "name": {
+            "vi": "Đá viên"
+          },
+          "unit": "kg",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-am001",
+          "productCode": "AM001",
+          "name": {
+            "vi": "Chai xà phòng chiết"
+          },
+          "unit": "chai",
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-dc01",
+          "productCode": "DC01",
+          "name": {
+            "vi": "Thùng xốp lớn"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-dc02",
+          "productCode": "DC02",
+          "name": {
+            "vi": "Thùng xốp nhỏ"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-dc03",
+          "productCode": "DC03",
+          "name": {
+            "vi": "Đá khô (kg)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-dc04",
+          "productCode": "DC04",
+          "name": {
+            "vi": "Bộ thìa, dĩa, tăm (tổng)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-dc09",
+          "productCode": "DC09",
+          "name": {
+            "vi": "Đá ướt (kg)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-sbb36",
+          "productCode": "SBB36",
+          "name": {
+            "vi": "Táo rockit (ống)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-sbb47",
+          "productCode": "SBB47",
+          "name": {
+            "vi": "Lá chuối (túi) (5 lá/túi) 18x18cm"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-sbb48",
+          "productCode": "SBB48",
+          "name": {
+            "vi": "Lá chuối (túi) (5 lá/túi) 9x9cm"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-hl",
+          "productCode": "HL",
+          "name": {
+            "vi": "Xe highlift"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-to",
+          "productCode": "TO",
+          "name": {
+            "vi": "Xe tải nhỏ"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-tol",
+          "productCode": "TOL",
+          "name": {
+            "vi": "Toup giờ chót"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": false
+        },
+        {
+          "id": "amn-bo-kit-sbb-tui-kit-dep-tat",
+          "productCode": null,
+          "name": {
+            "vi": "Bộ Kit SBB (túi kit, dép, tất)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-bo-dung-cu-an-sbb-muong-nia-dao-quan-khan",
+          "productCode": null,
+          "name": {
+            "vi": "Bộ dụng cụ ăn SBB (muỗng, nĩa, dao quấn khăn)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-bo-thia-dia-tam-cap-du-phong",
+          "productCode": null,
+          "name": {
+            "vi": "Bộ thìa, dĩa, tăm cấp dư phòng"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-bo-thia-dia-tam-theo-hotmeal-de-vao-tui-nilong-t",
+          "productCode": null,
+          "name": {
+            "vi": "Bộ thìa, dĩa, tăm theo hotmeal (để vào túi nilong trong)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-chan-3in1-prebook",
+          "productCode": null,
+          "name": {
+            "vi": "Chăn 3in1 Prebook"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-chan-c-skyboss",
+          "productCode": null,
+          "name": {
+            "vi": "Chăn C (Skyboss)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-chan-sbb-bh-4h",
+          "productCode": null,
+          "name": {
+            "vi": "Chăn SBB (BH>=4H)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-goi-tua-dau-sbb-bh-4h",
+          "productCode": null,
+          "name": {
+            "vi": "Gối tựa đầu SBB (BH>=4H)"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-tam-trai-nem-ghe",
+          "productCode": null,
+          "name": {
+            "vi": "Tấm trải nệm ghế"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        }
+      ]
+    }
+  ]
+}

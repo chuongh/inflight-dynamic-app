@@ -24,10 +24,10 @@ export function normalizeName(s: string): string {
     .trim()
 }
 
-/** Build a dish-name → PBML-codes lookup from the meal catalog. */
+/** Build a dish-name → product-codes lookup from the meal catalog. */
 export function makeCodeOf(catalog: MealCatalog | undefined): (name: string) => string[] {
   const m = new Map<string, string[]>()
-  ;(catalog?.meals ?? []).forEach((x) => m.set(normalizeName(x.name), x.pbmlCodes))
+  ;(catalog?.meals ?? []).forEach((x) => m.set(normalizeName(x.name), x.productCodes))
   return (name: string) => m.get(normalizeName(name)) ?? []
 }
 
@@ -56,7 +56,7 @@ export function suggestedTotal(lines: CateringOrderLine[]): number {
 
 /**
  * Build the merged order lines from confirmed groups. `codeOf` maps a dish name
- * to its PBML codes (from the meal catalog); `profile` is the active cockpit
+ * to its product codes (from the meal catalog); `profile` is the active cockpit
  * crew-meal profile (crew line omitted when absent).
  */
 export function buildOrderLines(

@@ -213,7 +213,7 @@ export function OrderDetailPage() {
   const createVersionFromBreakdown = (nextBreakdown: OrderSourceCell[]) => {
     const v = latest!.version + 1
     const codeOf = (name: string) =>
-      current!.lines.find((l) => l.category === 'prebook' && l.name === name)?.pbmlCodes ?? []
+      current!.lines.find((l) => l.category === 'prebook' && l.name === name)?.productCodes ?? []
     const rec: CateringOrder = {
       ...latest!,
       id: `${file.fileId}-v${v}`,

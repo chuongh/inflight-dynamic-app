@@ -21,7 +21,7 @@ export function RuleCard({ rule, editing, onToggle, onEdit, onRemove }: Props) {
 
   return (
     <div
-      className={`border-border bg-surface flex items-start gap-3 rounded-xl border px-3.5 py-3 transition-opacity ${
+      className={`border-border bg-surface flex w-full min-w-0 items-start gap-3 rounded-xl border px-3.5 py-3 transition-opacity ${
         muted ? 'opacity-55' : ''
       }`}
     >

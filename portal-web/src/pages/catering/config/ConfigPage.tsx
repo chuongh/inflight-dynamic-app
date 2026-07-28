@@ -162,7 +162,7 @@ export function ConfigPage() {
           description={t('catering.config.desc')}
         />
 
-        <div className="mt-1 mb-4">
+        <div className="config-tab-scroll mt-1 mb-4">
           <Segmented<ConfigTab>
             value={tab}
             onChange={(v) => setTab(v)}
@@ -170,7 +170,8 @@ export function ConfigPage() {
             options={[
               { value: 'commercial', label: t('catering.config.tab.commercial') },
               { value: 'grouping', label: t('catering.config.tab.grouping') },
-              { value: 'supplier', label: t('catering.config.tab.supplier') },
+              // TEMP: hide Supplier Rules until the dynamic-rules work is ready to ship
+              // { value: 'supplier', label: t('catering.config.tab.supplier') },
               { value: 'crew', label: t('catering.config.tab.crew') },
             ]}
           />
@@ -179,10 +180,11 @@ export function ConfigPage() {
         {tab === 'crew' ? (
           <CrewMealTab />
         ) : tab === 'supplier' ? (
+          // Keep branch reachable for local work; tab is hidden from the Segmented above.
           <SupplierRulesTab />
         ) : (
           <>
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full min-w-0 flex-col gap-4">
           {/* Version context bar */}
           <div className="border-border bg-surface flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border px-4 py-3">
             <Select

@@ -7,6 +7,7 @@ import { computeVendorScorecard, type VendorScore } from '@/modules/equipment/li
 import { computeVendorOnTime } from '@/modules/equipment/lib/vendorOnTime'
 import { useTrolleys } from '@/modules/equipment/hooks/useEquipment'
 import { PageHeader } from '@/components/patterns/PageHeader'
+import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { SurfaceCard } from '@/components/patterns/SurfaceCard'
 import { Text } from '@/components/primitives/Text'
 
@@ -173,13 +174,15 @@ export function VendorScorecardPage() {
               title={t('equipment.scorecard.rankingTitle')}
               description={t('equipment.scorecard.rankingDesc')}
             >
-              <Table
-                rowKey="vendor"
-                size="middle"
-                columns={columns}
-                dataSource={rows}
-                pagination={false}
-              />
+              <DataTableShell>
+                <Table
+                  rowKey="vendor"
+                  size="middle"
+                  columns={columns}
+                  dataSource={rows}
+                  pagination={false}
+                />
+              </DataTableShell>
             </SurfaceCard>
 
             <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">

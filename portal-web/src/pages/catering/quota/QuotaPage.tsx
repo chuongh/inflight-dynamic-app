@@ -1,5 +1,4 @@
 import { App as AntApp, Segmented, Spin } from 'antd'
-import { History, ListChecks, Upload } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '@/components/patterns/PageHeader'
@@ -85,41 +84,41 @@ export function QuotaPage() {
           description={t('catering.quota.desc')}
         />
 
-        <div className="quota-page flex flex-col gap-4">
+        <div className="config-tab-scroll mt-1 mb-4">
           <Segmented<ViewKey>
             value={view}
             onChange={setView}
-            className="self-start"
+            size="large"
             options={[
-              { value: 'table', label: t('catering.quota.tabTable'), icon: <ListChecks size={15} /> },
-              { value: 'import', label: t('catering.quota.tabImport'), icon: <Upload size={15} /> },
-              { value: 'history', label: t('catering.quota.tabHistory'), icon: <History size={15} /> },
+              { value: 'table', label: t('catering.quota.tabTable') },
+              { value: 'import', label: t('catering.quota.tabImport') },
+              { value: 'history', label: t('catering.quota.tabHistory') },
             ]}
           />
-
-          {view === 'table' ? (
-            <QuotaTableView
-              version={viewing}
-              versions={versions}
-              isActive={viewing.id === active?.id}
-              onSelectVersion={setViewingId}
-              onGotoImport={() => setView('import')}
-              onCreateVersion={createVersion}
-            />
-          ) : null}
-
-          {view === 'import' ? (
-            <QuotaImportView
-              pending={data.pendingImport}
-              activeVersion={active}
-              onCreateVersion={createVersion}
-            />
-          ) : null}
-
-          {view === 'history' ? (
-            <QuotaHistoryView versions={versions} highlightId={viewingId} />
-          ) : null}
         </div>
+
+        {view === 'table' ? (
+          <QuotaTableView
+            version={viewing}
+            versions={versions}
+            isActive={viewing.id === active?.id}
+            onSelectVersion={setViewingId}
+            onGotoImport={() => setView('import')}
+            onCreateVersion={createVersion}
+          />
+        ) : null}
+
+        {view === 'import' ? (
+          <QuotaImportView
+            pending={data.pendingImport}
+            activeVersion={active}
+            onCreateVersion={createVersion}
+          />
+        ) : null}
+
+        {view === 'history' ? (
+          <QuotaHistoryView versions={versions} highlightId={viewingId} />
+        ) : null}
       </div>
     </div>
   )

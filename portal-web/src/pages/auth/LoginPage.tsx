@@ -5,7 +5,6 @@ import {
   Boxes,
   Fingerprint,
   Lock,
-  ShieldCheck,
   Users,
   UtensilsCrossed,
 } from 'lucide-react'
@@ -13,8 +12,10 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/core/auth/useAuth'
-import { loadDemoUsers } from '@/mock-data/loaders/loadAuth'
+import { ROLES } from '@/core/permissions'
+import { loadDemoUsers, type DemoUserRecord } from '@/mock-data/loaders/loadAuth'
 import { VietJetLogo } from '@/components/brand/VietJetLogo'
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 import { Text } from '@/components/primitives/Text'
 import { paths } from '@/routes/paths'
 
@@ -26,13 +27,20 @@ const heroModules = [
 ]
 
 export function LoginPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { login } = useAuth()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const demoUsers = loadDemoUsers()
   const primaryDemo = demoUsers[0]
+
+  const fillDemo = (user: DemoUserRecord) => {
+    form.setFieldsValue({
+      staffId: user.employeeCode,
+      password: user.password,
+    })
+  }
 
   const handleSubmit = async (values: { staffId: string; password: string }) => {
     setLoading(true)
@@ -75,18 +83,29 @@ export function LoginPage() {
           </ul>
         </div>
 
-        <div className="login-page__hero-content login-page__enter login-page__enter--3 text-xs font-medium text-white/60">
+        <div className="login-page__hero-content login-page__enter login-page__enter--3 login-page__hero-footer">
           {t('auth.footer')}
         </div>
       </div>
 
       <div className="login-page__form-panel">
+        {/* Mobile / tablet brand header — desktop uses the full-bleed hero instead */}
+        <div className="login-page__mobile-brand login-page__enter login-page__enter--1">
+          <div className="login-page__mobile-brand-inner">
+            <VietJetLogo size="md" variant="white" />
+            <p className="login-page__mobile-brand-name">{t('auth.appName')}</p>
+          </div>
+        </div>
+
         <div className="login-page__card login-page__enter login-page__enter--form">
-          <div className="login-page__card-brand">
-            <VietJetLogo size="md" />
-            <Text variant="bodySm" tone="secondary" className="font-vja-subhead">
-              {t('auth.appName')}
-            </Text>
+          <div className="login-page__card-header">
+            <div className="login-page__card-brand">
+              <VietJetLogo size="md" />
+              <Text variant="bodySm" tone="secondary" className="font-vja-subhead">
+                {t('auth.appName')}
+              </Text>
+            </div>
+            <LanguageSwitcher />
           </div>
 
           <h2 className="login-page__title font-vja-heading">{t('auth.welcomeBack')}</h2>
@@ -133,39 +152,39 @@ export function LoginPage() {
             </Button>
           </Form>
 
-          <button
-            type="button"
-            className="login-page__demo-chip"
-            onClick={() =>
-              form.setFieldsValue({
-                staffId: primaryDemo.employeeCode,
-                password: primaryDemo.password,
-              })
-            }
-          >
-            <ShieldCheck className="h-4 w-4 flex-none text-vj-green" aria-hidden />
-            <span className="flex-1 text-xs">
-              <span className="font-bold text-vj-dark">{t('auth.demoAdmin')}</span>
-              <Text as="span" variant="caption" tone="secondary" className="block">
-                {primaryDemo.employeeCode} · {t('auth.demoPassword')} {primaryDemo.password}
-              </Text>
-            </span>
-          </button>
-
-          <div className="login-page__demo-users">
-            {demoUsers.slice(1).map((user) => (
-              <button
-                key={user.employeeCode}
-                type="button"
-                className="login-page__demo-user"
-                onClick={() =>
-                  form.setFieldsValue({ staffId: user.employeeCode, password: user.password })
-                }
-              >
-                {user.roleId}: {user.employeeCode} / {user.password}
-              </button>
-            ))}
+          <div className="login-page__demo">
+            <div className="login-page__demo-head">
+              <p className="login-page__demo-label">{t('auth.demoRoles')}</p>
+              <p className="login-page__demo-hint">
+                {t('auth.demoHint', { password: primaryDemo.password })}
+              </p>
+            </div>
+            <div className="login-page__demo-grid" role="list">
+              {demoUsers.map((user) => {
+                const role = ROLES[user.roleId]
+                const label = i18n.language.startsWith('vi') ? role.labelVi : role.label
+                return (
+                  <button
+                    key={user.employeeCode}
+                    type="button"
+                    role="listitem"
+                    className="login-page__demo-role"
+                    onClick={() => fillDemo(user)}
+                    title={`${label} · ${t('auth.staffId')} ${user.employeeCode}`}
+                  >
+                    <span className="login-page__demo-role-name">{label}</span>
+                    <span className="login-page__demo-role-id">
+                      <Fingerprint className="login-page__demo-role-id-icon" aria-hidden />
+                      <span className="login-page__demo-role-id-label">{t('auth.staffId')}</span>
+                      <span className="login-page__demo-role-code tnum">{user.employeeCode}</span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
+
+          <p className="login-page__mobile-footer">{t('auth.footer')}</p>
         </div>
       </div>
     </div>

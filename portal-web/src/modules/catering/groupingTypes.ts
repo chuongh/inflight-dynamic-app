@@ -35,6 +35,10 @@ export interface SupplierLegExtension extends EcoAmenityOpsInput {
   sbbPillow?: number | null
   sbbMattress?: number | null
   sbbMealType?: 'standard' | 'vegetarian'
+  aircraftType?: string | null
+  upliftType?: string | null
+  flightKind?: 'ferry_cargo' | 'charter_china' | 'normal' | null
+  amenityOverride?: string | null
   sourceRefs?: SupplierSourceRefs
 }
 

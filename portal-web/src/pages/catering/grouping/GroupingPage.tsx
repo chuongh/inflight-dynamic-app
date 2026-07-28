@@ -349,6 +349,7 @@ export function GroupingPage() {
     <div className="page-shell page-shell--list">
       <div className="thin-scroll page-shell__body">
         <PageHeader
+          badge={t('nav.cateringGrouping')}
           title={t('catering.grouping.title')}
           actions={
             isGrouped ? (

@@ -26,7 +26,7 @@ describe('buildOrderSnapshot', () => {
     const com = lines.find((l) => l.name === 'Cơm')!
     expect(com.qty).toBe(98)
     expect(com.suggested).toBe(98)
-    expect(com.pbmlCodes).toEqual(['X'])
+    expect(com.productCodes).toEqual(['X'])
   })
 
   it('emits a per-flight sales cell from leg salesQuota', () => {

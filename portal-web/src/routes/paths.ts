@@ -28,6 +28,11 @@ export const paths = {
     meals: {
       list: '/catering/meals',
     },
+    catalog: {
+      meals: '/catering/catalog/meals',
+      combos: '/catering/catalog/combos',
+      amenity: '/catering/catalog/amenity',
+    },
   },
   equipment: {
     trolley: {

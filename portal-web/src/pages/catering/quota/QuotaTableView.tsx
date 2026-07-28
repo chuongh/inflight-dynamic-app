@@ -4,6 +4,7 @@ import { Info, Pencil, Search, SlidersHorizontal, UploadCloud, X } from 'lucide-
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { FilterBar } from '@/components/patterns/FilterBar'
 import { distinctTypes } from '@/modules/catering/quota'
 import { paths } from '@/routes/paths'
@@ -221,7 +222,7 @@ export function QuotaTableView({
         </label>
       </FilterBar>
 
-      <div className="data-table-wrap data-table-wrap--ops">
+      <DataTableShell>
         <Table
           rowKey="flightNo"
           size="middle"
@@ -235,7 +236,7 @@ export function QuotaTableView({
             showTotal: (total) => t('catering.quota.total', { count: total }),
           }}
         />
-      </div>
+      </DataTableShell>
     </>
   )
 }

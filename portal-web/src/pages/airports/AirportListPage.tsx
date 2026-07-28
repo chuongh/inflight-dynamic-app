@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { FilterBar } from '@/components/patterns/FilterBar'
 import { KpiCard } from '@/components/patterns/KpiCard'
 import { PageHeader } from '@/components/patterns/PageHeader'
@@ -311,7 +312,7 @@ export function AirportListPage() {
           />
         </FilterBar>
 
-        <div className="data-table-wrap data-table-wrap--ops">
+        <DataTableShell>
           <Table
             rowKey="code"
             size="middle"
@@ -325,7 +326,7 @@ export function AirportListPage() {
               showTotal: (total) => t('airports.total', { count: total }),
             }}
           />
-        </div>
+        </DataTableShell>
       </div>
 
       <AirportFormModal

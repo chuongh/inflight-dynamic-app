@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table'
 import { FileSpreadsheet, Mail, Pencil } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { DIFF_COLOR, VERSION_STATUS_COLOR } from '@/modules/catering/constants'
 import { diffVersions } from '@/modules/catering/quota'
 import type { DiffRow, QuotaVersion, SourceKind, VersionStatus } from '@/modules/catering/types'
@@ -154,7 +155,7 @@ export function QuotaHistoryView({ versions, highlightId }: Props) {
                     <Stat color="#2563eb" value={diff.added} label={t('catering.quota.diffNew')} />
                     <Stat color="#6b7280" value={diff.removed} label={t('catering.quota.diffRemoved')} />
                   </div>
-                  <div className="data-table-wrap data-table-wrap--ops">
+                  <DataTableShell>
                     <Table
                       rowKey={(r) => `${r.flightNo}-${r.kind}`}
                       size="middle"
@@ -163,7 +164,7 @@ export function QuotaHistoryView({ versions, highlightId }: Props) {
                       pagination={false}
                       scroll={{ x: 'max-content' }}
                     />
-                  </div>
+                  </DataTableShell>
                 </>
               ) : (
                 <Empty description={t('catering.quota.histNoChange')} />

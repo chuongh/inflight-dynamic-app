@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { SurfaceCard } from '@/components/patterns/SurfaceCard'
 import { FLAG_COLOR, TIME_RE } from '@/modules/catering/constants'
 import { distinctTypes } from '@/modules/catering/quota'
@@ -579,7 +580,7 @@ export function QuotaImportView({ pending, activeVersion, onCreateVersion }: Pro
             {t('catering.quota.onlyReview', { n: reviewCount })}
           </label>
         </div>
-        <div className="data-table-wrap data-table-wrap--ops">
+        <DataTableShell>
           <Table
             rowKey="flightNo"
             size="middle"
@@ -588,7 +589,7 @@ export function QuotaImportView({ pending, activeVersion, onCreateVersion }: Pro
             scroll={{ x: 'max-content' }}
             pagination={false}
           />
-        </div>
+        </DataTableShell>
       </SurfaceCard>
 
       {/* Publish */}

@@ -24,6 +24,7 @@ import {
 } from '@/modules/equipment/lib/analytics'
 import { useSendTrolleysToRepair } from '@/modules/equipment/hooks/useEquipment'
 import { DetailHero } from '@/components/patterns/DetailHero'
+import { DataTableShell } from '@/components/patterns/DataTableShell'
 import { SurfaceCard } from '@/components/patterns/SurfaceCard'
 import { Button as VjButton } from '@/components/primitives/Button'
 import { Text } from '@/components/primitives/Text'
@@ -425,18 +426,20 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
                     />
                   </div>
 
-                  <Table
-                    rowKey="id"
-                    size="small"
-                    columns={repairColumns}
-                    dataSource={filteredHistory}
-                    pagination={false}
-                    locale={{ emptyText: historyEmptyText }}
-                    scroll={{ x: 'max-content' }}
-                    rowClassName={(record) =>
-                      record.completedAt ? '' : 'bg-[var(--color-vj-yellow-muted)]/40'
-                    }
-                  />
+                  <DataTableShell>
+                    <Table
+                      rowKey="id"
+                      size="small"
+                      columns={repairColumns}
+                      dataSource={filteredHistory}
+                      pagination={false}
+                      locale={{ emptyText: historyEmptyText }}
+                      scroll={{ x: 'max-content' }}
+                      rowClassName={(record) =>
+                        record.completedAt ? '' : 'bg-[var(--color-vj-yellow-muted)]/40'
+                      }
+                    />
+                  </DataTableShell>
                 </div>
               ),
             },
@@ -444,7 +447,8 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
               key: 'movement',
               label: t('equipment.trolley.movementHistory'),
               children: (
-                <Table<MovementEvent>
+                <DataTableShell>
+                  <Table<MovementEvent>
                   rowKey="id"
                   size="small"
                   dataSource={trolley.movements}
@@ -526,6 +530,7 @@ export function TrolleyDetailPage({ trolleys, onTrolleysChange }: TrolleyDetailP
                     },
                   ]}
                 />
+                </DataTableShell>
               ),
             },
             {

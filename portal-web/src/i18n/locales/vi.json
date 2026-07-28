@@ -20,7 +20,10 @@
     "selected": "đã chọn",
     "information": "Thông tin",
     "back": "Quay lại",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "save": "Lưu",
+    "yes": "Có",
+    "no": "Không"
   },
   "nav": {
     "dashboard": "Bảng điều khiển",
@@ -46,7 +49,11 @@
     "cateringConfig": "Cấu hình định mức",
     "cateringGrouping": "Phân nhóm chuyến bay",
     "cateringOrders": "Đơn đặt hàng",
-    "cateringMeals": "Danh mục suất ăn"
+    "cateringMeals": "Danh mục suất ăn",
+    "catalog": "Danh mục",
+    "catalogMeals": "Danh mục món",
+    "catalogCombos": "Danh mục combo",
+    "catalogAmenity": "Danh mục amenity"
   },
   "airports": {
     "badge": "WP-B · Sân bay",
@@ -166,7 +173,9 @@
     "passwordRequired": "Nhập mật khẩu",
     "invalidCredentials": "Mã nhân viên hoặc mật khẩu không đúng.",
     "demoAdmin": "Demo — Quản trị",
-    "demoPassword": "mật khẩu"
+    "demoPassword": "mật khẩu",
+    "demoRoles": "Vai trò demo nhanh",
+    "demoHint": "Chọn vai trò để điền Mã NV · mật khẩu {{password}}"
   },
   "dashboard": {
     "badge": "Trung tâm điều hành",
@@ -503,15 +512,15 @@
     "meals": {
       "badge": "Danh mục · PBML",
       "title": "Danh mục suất ăn",
-      "desc": "Metadata các món suất ăn (premeal) kèm mã PBML. Tên món khớp với chi tiết suất ăn trong màn Phân nhóm chuyến bay.",
+      "desc": "Metadata các món suất ăn (premeal) kèm mã sản phẩm. Tên món khớp với chi tiết suất ăn trong màn Phân nhóm chuyến bay.",
       "dishes": "món",
-      "pbmlCodes": "mã PBML",
-      "searchPlaceholder": "Tìm tên món, mô tả, mã PBML…",
+      "productCodes": "mã sản phẩm",
+      "searchPlaceholder": "Tìm tên món, mô tả, mã sản phẩm…",
       "col": {
         "kind": "Loại",
         "name": "Tên món",
         "description": "Mô tả",
-        "codes": "Mã PBML"
+        "codes": "Mã sản phẩm"
       },
       "kind": {
         "all": "Tất cả",
@@ -519,6 +528,65 @@
         "veg": "Chay",
         "business": "Business",
         "snack": "Snack & Đồ uống"
+      }
+    },
+    "catalog": {
+      "items": "mục",
+      "edit": "Chỉnh danh mục",
+      "publish": "Phát hành version",
+      "published": "Đã phát hành danh mục {{id}}.",
+      "needsCode": "Thiếu mã",
+      "filterNeedsCode": "Thiếu mã sản phẩm",
+      "searchMeals": "Tìm mã, tên…",
+      "searchCombos": "Tìm tên, mô tả…",
+      "searchAmenity": "Tìm mã, tên…",
+      "col": {
+        "code": "Mã sản phẩm",
+        "name": "Tên",
+        "category": "Nhóm",
+        "unit": "Đơn vị",
+        "status": "Trạng thái",
+        "active": "Đang dùng",
+        "kind": "Loại",
+        "description": "Mô tả"
+      },
+      "status": {
+        "active": "Đang dùng",
+        "inactive": "Ngưng dùng"
+      },
+      "category": {
+        "all": "Tất cả nhóm",
+        "eco_main": "Món chính ECO",
+        "sbb_main": "Món chính SBB",
+        "appetizer": "Khai vị",
+        "dessert": "Tráng miệng",
+        "bread": "Bánh mì / bánh ngọt",
+        "drink": "Đồ uống",
+        "snack": "Đồ ăn nhẹ",
+        "condiment": "Gia vị"
+      },
+      "comboKind": {
+        "all": "Tất cả loại",
+        "charter": "Charter",
+        "happy_meal": "Happy meal",
+        "prebook_combo": "Combo prebook",
+        "set": "Set",
+        "meal_box": "Meal box"
+      },
+      "meals": {
+        "badge": "Danh mục · Món",
+        "title": "Danh mục món",
+        "desc": "Tổng quan các món trong danh mục."
+      },
+      "combos": {
+        "badge": "Danh mục · Combo",
+        "title": "Danh mục combo",
+        "desc": "Tổng quan các combo và gói suất ăn."
+      },
+      "amenity": {
+        "badge": "Danh mục · Amenity",
+        "title": "Danh mục amenity",
+        "desc": "Tổng quan vật dụng và đồ dùng."
       }
     },
     "grouping": {
@@ -929,7 +997,7 @@
       "tab": {
         "commercial": "Định mức hotmeal",
         "grouping": "Phân nhóm chuyến bay",
-        "supplier": "Quy tắc ECO / SkyBoss",
+        "supplier": "Quy tắc nhà cung cấp",
         "crew": "Suất ăn tổ bay"
       },
       "supplier": {
@@ -938,7 +1006,7 @@
         "edit": "Chỉnh quy tắc nhà cung cấp",
         "editBanner": "Chỉnh sửa sẽ tạo phiên bản mới khi phát hành. Route không khớp sẽ dùng số liệu từ chuyến bay.",
         "created": "Đã phát hành quy tắc {{id}} — hiệu lực {{date}}.",
-        "ecoTitle": "Công thức ECO theo đường bay",
+        "ecoTitle": "Công thức ECO theo đường bay (legacy Úc)",
         "ecoDesc": "Áp dụng khi chuyến bay chạm một trong các sân bay Úc được liệt kê.",
         "airports": "Sân bay (cách nhau bằng dấu phẩy)",
         "noodleVeg": "Rau mỳ Úc (số cố định)",
@@ -947,9 +1015,31 @@
         "roundBread": "Bánh tròn Úc = số khách SkyBoss ECO",
         "sbbTitle": "Bảng lookup SkyBoss Business",
         "sbbDesc": "Dòng khớp đúng businessPax theo từng sheet. Không có dòng thì ô để trống.",
+        "sbbRouteTitle": "Kết nối STD/ARR → sheet lookup",
+        "sbbRouteDesc": "Mỗi sheet gắn danh sách sân bay. Chuyến bay khớp DEP hoặc ARR sẽ dùng bảng lookup tương ứng.",
+        "sbbAirports": "Sân bay áp dụng (DEP hoặc ARR)",
+        "sbbAirportsHint": "Cách nhau bằng dấu phẩy. Sửa để đổi rule chọn sheet theo STD/ARR.",
+        "sbbChayNote": "Sheet chay chọn theo mealType = vegetarian, không theo STD/ARR.",
+        "sbbFallbackNote": "Sheet mặc định khi không khớp Ấn / Úc&KAZ.",
+        "trialDep": "Thử DEP (STD)",
+        "trialArr": "Thử ARR",
+        "trialMeal": "Loại meal",
+        "trialResult": "Sheet khớp:",
         "addRow": "Thêm dòng businessPax",
         "removeRow": "Xóa dòng",
         "emptySheet": "Sheet này chưa có dòng lookup.",
+        "sectionEco": "ECO số lượng",
+        "sectionAmenity": "Amenity + LIST",
+        "sectionSbb": "Lookup SBB",
+        "baseByItem": "1 · Theo món",
+        "baseByHotmeal": "2 · Theo tổng hotmeal",
+        "baseByStdArr": "3 · Theo STD/ARR",
+        "amenityTitle": "Gói Amenity (A321 / A330)",
+        "amenityDesc": "Chọn gói theo A/C + LIST đường bay theo giờ + nhóm sân bay đặc biệt. ĐẦU NGÀY = gói tàu + gói route.",
+        "listTitle": "LIST đường bay theo giờ",
+        "routeGroupsTitle": "Nhóm sân bay (Úc / KAZ / Ấn / …)",
+        "rulesTitle": "Quy tắc định lượng ECO",
+        "rulesDesc": "Hotmeal đã ổn. Các rule dưới điền cột còn lại (gia vị, dụng cụ, muối Ấn…).",
         "item": {
           "bread": "Bánh mì",
           "basa": "Cá basa",

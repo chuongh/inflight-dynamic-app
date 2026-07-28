@@ -12,7 +12,9 @@ import { AirportListPage } from '@/pages/airports/AirportListPage'
 import { QuotaPage } from '@/pages/catering/quota/QuotaPage'
 import { ConfigPage } from '@/pages/catering/config/ConfigPage'
 import { GroupingPage } from '@/pages/catering/grouping/GroupingPage'
-import { MealListPage } from '@/pages/catering/meals/MealListPage'
+import { AmenityCatalogPage } from '@/pages/catering/catalog/AmenityCatalogPage'
+import { ComboCatalogPage } from '@/pages/catering/catalog/ComboCatalogPage'
+import { MealCatalogPage } from '@/pages/catering/catalog/MealCatalogPage'
 import { OrderListPage } from '@/pages/catering/orders/OrderListPage'
 import { OrderDetailPage } from '@/pages/catering/orders/OrderDetailPage'
 import { PermissionMatrixPage } from '@/pages/admin/PermissionMatrixPage'
@@ -115,7 +117,10 @@ export function AppRoutes() {
         <Route path={paths.catering.grouping.list} element={<GroupingPage />} />
         <Route path={paths.catering.orders.list} element={<OrderListPage />} />
         <Route path={`${paths.catering.orders.list}/:fileId`} element={<OrderDetailPage />} />
-        <Route path={paths.catering.meals.list} element={<MealListPage />} />
+        <Route path={paths.catering.meals.list} element={<Navigate to={paths.catering.catalog.meals} replace />} />
+        <Route path={paths.catering.catalog.meals} element={<MealCatalogPage />} />
+        <Route path={paths.catering.catalog.combos} element={<ComboCatalogPage />} />
+        <Route path={paths.catering.catalog.amenity} element={<AmenityCatalogPage />} />
         <Route path={paths.catering.quota.list} element={<QuotaPage />} />
         <Route path={paths.catering.config.list} element={<ConfigPage />} />
         <Route path={paths.admin.users} element={<UsersPage />} />

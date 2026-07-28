@@ -13,7 +13,7 @@ export interface CateringOrderLine {
    */
   name: string
   category: OrderCategory
-  pbmlCodes: string[]
+  productCodes: string[]
   /** System-suggested quantity (aggregated from the flight grouping). */
   suggested: number
   /** Final quantity after manual adjustment. */
