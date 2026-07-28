@@ -23,20 +23,28 @@ export const uiUxMotion = {
 } as const
 
 /**
- * Semantic colors from ui-ux-pro-max, overridden with official VJA brand palette.
- * Primary: Đỏ VJA #F02823 — not navy/blue from generic B2B palette.
+ * Semantic colors from ui-ux-pro-max (ops navy/sky), with VietJet red reserved
+ * for primary CTAs and destructive — not surface/chrome fill.
+ * @see design-system/vietjet/MASTER.md
  */
 export const uiUxSemantic = {
   background: '#F8FAFC',
   foreground: '#231F20',
   muted: '#E8ECF1',
   border: '#E2E8F0',
-  ring: vjBrand.colors.primary,
+  ring: '#0F172A',
   primary: vjBrand.colors.primary,
   onPrimary: '#FFFFFF',
   secondary: '#334155',
-  accent: vjBrand.colors.accent,
+  accent: '#0369A1',
   destructive: vjBrand.colors.primaryActive,
+} as const
+
+/** Ops chrome tokens — data-dense dashboard (ui-ux-pro-max). */
+export const uiUxOpsChrome = {
+  ink: '#0F172A',
+  accent: '#0369A1',
+  accentSoft: '#E8F1F8',
 } as const
 
 export const VJ_MASTER_PATH = 'design-system/vietjet/MASTER.md'

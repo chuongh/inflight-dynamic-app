@@ -2,8 +2,6 @@ import { Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
 import {
   Building2,
-  ChevronLeft,
-  ChevronRight,
   ClipboardList,
   CreditCard,
   SlidersHorizontal,
@@ -75,11 +73,13 @@ export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const { session, logout } = useAuth()
-  const [collapsed, setCollapsed] = useState(false)
+  /** Icon rail by default; expands to full labels on hover / keyboard focus. */
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const userPermissions = session?.user.permissions
   const { selectedKey, sectionTitleKey, moduleLabelKey } = resolveSelection(location.pathname)
   const sectionTitle = t(sectionTitleKey)
   const moduleLabel = moduleLabelKey ? t(moduleLabelKey) : ''
+  const compact = !sidebarOpen
 
   const visibleModules = useMemo(
     () => PORTAL_MODULES.filter((module) => moduleVisible(module, userPermissions ?? [])),
@@ -135,79 +135,80 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="admin-shell">
-      <aside className={`admin-sidebar ${collapsed ? 'admin-sidebar--collapsed' : ''}`}>
-      <div className="admin-sidebar__brand">
-          <VietJetLogo size="lg" variant="white" />
-        </div>
+      <div className="admin-sidebar-slot">
+        <aside
+          className={`admin-sidebar ${compact ? 'admin-sidebar--compact' : 'admin-sidebar--expanded'}`}
+          onMouseEnter={() => setSidebarOpen(true)}
+          onMouseLeave={() => setSidebarOpen(false)}
+          onFocusCapture={() => setSidebarOpen(true)}
+          onBlurCapture={(event) => {
+            const next = event.relatedTarget
+            if (next instanceof Node && event.currentTarget.contains(next)) return
+            setSidebarOpen(false)
+          }}
+        >
+          <div className="admin-sidebar__brand">
+            <VietJetLogo size="lg" variant="white" />
+          </div>
 
-        <nav className="admin-sidebar__nav thin-scroll">
-          {visibleModules.map((module) => {
-            const moduleLabelText = t(module.labelKey)
-            if (module.children) {
-              const children = module.children.filter((child) =>
-                userPermissions?.includes(child.permission),
-              )
-              const parentOpen = isChildOfModule(module.id)
+          <nav className="admin-sidebar__nav thin-scroll">
+            {visibleModules.map((module) => {
+              const moduleLabelText = t(module.labelKey)
+              if (module.children) {
+                const children = module.children.filter((child) =>
+                  userPermissions?.includes(child.permission),
+                )
+                const parentOpen = isChildOfModule(module.id)
+                return (
+                  <div key={module.id} className="admin-nav-group">
+                    <button
+                      type="button"
+                      className={`admin-nav-item ${parentOpen ? 'admin-nav-item--open' : ''}`}
+                      onClick={() => navigateToKey(module.id)}
+                      title={compact ? moduleLabelText : undefined}
+                    >
+                      <span className="admin-nav-item__icon">{ICONS[module.id]}</span>
+                      <span className="admin-nav-item__label">{moduleLabelText}</span>
+                    </button>
+                    {!compact
+                      ? children.map((child) => (
+                          <button
+                            key={child.id}
+                            type="button"
+                            className={`admin-nav-item admin-nav-item--child ${
+                              selectedKey === child.id ? 'admin-nav-item--active' : ''
+                            }`}
+                            onClick={() => navigateToKey(child.id)}
+                          >
+                            <span className="admin-nav-item__icon">{ICONS[child.id]}</span>
+                            <span className="admin-nav-item__label">{t(child.labelKey)}</span>
+                          </button>
+                        ))
+                      : null}
+                  </div>
+                )
+              }
+
               return (
                 <div key={module.id} className="admin-nav-group">
                   <button
                     type="button"
-                    className={`admin-nav-item ${parentOpen ? 'admin-nav-item--open' : ''}`}
-                    onClick={() => navigateToKey(module.id)}
-                    title={collapsed ? moduleLabelText : undefined}
+                    className={`admin-nav-item ${
+                      selectedKey === module.id ? 'admin-nav-item--active' : ''
+                    }`}
+                    disabled={module.disabled}
+                    onClick={() => !module.disabled && navigateToKey(module.id)}
+                    title={compact ? moduleLabelText : undefined}
                   >
                     <span className="admin-nav-item__icon">{ICONS[module.id]}</span>
                     <span className="admin-nav-item__label">{moduleLabelText}</span>
                   </button>
-                  {!collapsed
-                    ? children.map((child) => (
-                        <button
-                          key={child.id}
-                          type="button"
-                          className={`admin-nav-item admin-nav-item--child ${
-                            selectedKey === child.id ? 'admin-nav-item--active' : ''
-                          }`}
-                          onClick={() => navigateToKey(child.id)}
-                        >
-                          <span className="admin-nav-item__icon">{ICONS[child.id]}</span>
-                          <span className="admin-nav-item__label">{t(child.labelKey)}</span>
-                        </button>
-                      ))
-                    : null}
                 </div>
               )
-            }
-
-            return (
-              <div key={module.id} className="admin-nav-group">
-                <button
-                  type="button"
-                  className={`admin-nav-item ${
-                    selectedKey === module.id ? 'admin-nav-item--active' : ''
-                  }`}
-                  disabled={module.disabled}
-                  onClick={() => !module.disabled && navigateToKey(module.id)}
-                  title={collapsed ? moduleLabelText : undefined}
-                >
-                  <span className="admin-nav-item__icon">{ICONS[module.id]}</span>
-                  <span className="admin-nav-item__label">{moduleLabelText}</span>
-                </button>
-              </div>
-            )
-          })}
-        </nav>
-
-        <div className="admin-sidebar__footer">
-          <button
-            type="button"
-            className="admin-sidebar__collapse-btn"
-            onClick={() => setCollapsed((prev) => !prev)}
-            aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-          >
-            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </button>
-        </div>
-      </aside>
+            })}
+          </nav>
+        </aside>
+      </div>
 
       <div className="admin-main">
         <header className="admin-topbar">

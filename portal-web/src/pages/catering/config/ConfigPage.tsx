@@ -161,7 +161,7 @@ export function ConfigPage() {
           description={t('catering.config.desc')}
         />
 
-        <div className="mt-1 mb-4">
+        <div className="config-tab-scroll mt-1 mb-4">
           <Segmented<ConfigTab>
             value={tab}
             onChange={(v) => setTab(v)}
@@ -178,7 +178,7 @@ export function ConfigPage() {
           <CrewMealTab />
         ) : (
           <>
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full min-w-0 flex-col gap-4">
           {/* Version context bar */}
           <div className="border-border bg-surface flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border px-4 py-3">
             <Select
