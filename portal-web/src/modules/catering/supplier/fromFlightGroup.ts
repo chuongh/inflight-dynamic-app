@@ -7,6 +7,7 @@ function mapLegToInput(
   operatingDate: string,
   leg: FlightLeg,
   aircraftType?: string,
+  groupId?: string,
 ): SupplierFlightInput {
   const s: SupplierLegExtension = leg.supplier ?? {}
   const hotmealFromMeals: HotmealInput | undefined = (() => {
@@ -24,6 +25,7 @@ function mapLegToInput(
 
   return {
     operatingDate,
+    groupId,
     flightNo: leg.flightNo,
     dep: leg.dep,
     arr: leg.arr,
@@ -92,7 +94,7 @@ export function flightGroupsToSupplierInputs(
     if (groupOrigin(group) !== station) continue
     if (group.confirmed) {
       for (const leg of group.legs) {
-        inputs.push(mapLegToInput(day.serviceDate, leg, group.aircraftType))
+        inputs.push(mapLegToInput(day.serviceDate, leg, group.aircraftType, group.id))
       }
     } else {
       pendingCount += group.legs.length

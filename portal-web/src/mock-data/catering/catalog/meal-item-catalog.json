@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-28-catalog-v4",
+  "seedVersion": "2026-07-30-catalog-v17",
   "versions": [
     {
       "id": "m1",
@@ -11,6 +11,18 @@
       "note": "Seeded from Master_Data + approved display names",
       "items": [
         {
+          "id": "sku-40000294",
+          "productCode": "40000294",
+          "name": {
+            "vi": "Bánh mì"
+          },
+          "unit": null,
+          "category": "main",
+          "cabinScopes": ["ECO"],
+          "active": true,
+          "needsCode": false
+        },
+        {
           "id": "sku-40000403",
           "productCode": "40000403",
           "name": {
@@ -18,9 +30,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -32,9 +42,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -46,9 +54,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -60,9 +66,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -74,9 +78,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -88,9 +90,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -102,9 +102,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -116,9 +114,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -130,9 +126,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -144,9 +138,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -158,9 +150,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -172,9 +162,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -186,9 +174,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -200,9 +186,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -214,9 +198,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -228,9 +210,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -242,9 +222,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -256,9 +234,7 @@
           },
           "unit": null,
           "category": "eco_main",
-          "cabinScopes": [
-            "ECO"
-          ],
+          "cabinScopes": ["ECO"],
           "active": true,
           "needsCode": false
         },
@@ -270,9 +246,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -284,9 +258,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -298,9 +270,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -312,9 +282,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -326,9 +294,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -340,9 +306,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -354,9 +318,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -368,9 +330,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -382,9 +342,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -396,9 +354,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -410,9 +366,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -424,9 +378,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": true
         },
@@ -438,9 +390,7 @@
           },
           "unit": null,
           "category": "sbb_main",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": true
         },
@@ -452,9 +402,7 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -466,9 +414,7 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -480,9 +426,7 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -494,9 +438,7 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -508,9 +450,7 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -522,9 +462,7 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -536,9 +474,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -550,9 +486,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -564,9 +498,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -578,9 +510,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -592,9 +522,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -606,9 +534,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -620,9 +546,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -634,9 +558,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -648,9 +570,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -662,9 +582,7 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -676,9 +594,7 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -690,9 +606,7 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -704,9 +618,7 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -718,9 +630,7 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": false
         },
@@ -732,9 +642,7 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": [
-            "SBB"
-          ],
+          "cabinScopes": ["SBB"],
           "active": true,
           "needsCode": true
         },
@@ -746,10 +654,7 @@
           },
           "unit": "chai",
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -761,10 +666,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -776,10 +678,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -791,10 +690,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -806,10 +702,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -821,10 +714,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -836,10 +726,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -851,10 +738,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -866,10 +750,7 @@
           },
           "unit": "chai",
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -881,10 +762,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -896,10 +774,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -911,10 +786,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -926,10 +798,7 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -941,10 +810,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -956,10 +822,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -971,10 +834,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -986,10 +846,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -1001,10 +858,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -1016,10 +870,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -1031,10 +882,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -1046,10 +894,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -1061,10 +906,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -1076,10 +918,7 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": true
         },
@@ -1091,10 +930,7 @@
           },
           "unit": "que",
           "category": "condiment",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -1106,10 +942,7 @@
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -1121,10 +954,7 @@
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -1136,10 +966,7 @@
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         },
@@ -1151,10 +978,7 @@
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": [
-            "ECO",
-            "SBB"
-          ],
+          "cabinScopes": ["ECO", "SBB"],
           "active": true,
           "needsCode": false
         }

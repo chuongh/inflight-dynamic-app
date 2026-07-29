@@ -87,6 +87,8 @@ export interface SupplierFlightInput
   extends FlightIdentity,
     EcoAmenityOpsInput,
     EcoSnackOpsInput {
+  /** Owning FlightGroup (rotation) id — lets downstream builders merge legs of the same group. */
+  groupId?: string
   quotaCommercial?: number | null
   totalPrebook?: number | null
   skybossEco?: number | null

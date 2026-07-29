@@ -18,13 +18,13 @@ export function UngroupedView({ flights, running, hideHeader = false }: Props) {
   const { t } = useTranslation()
   const { data: airports } = useAirports()
   const cateringSet = cateringStationSet(airports ?? [])
-  const [open, setOpen] = useState<Set<number>>(new Set())
+  const [open, setOpen] = useState<Set<string>>(new Set())
 
-  const toggle = (i: number) =>
+  const toggle = (key: string) =>
     setOpen((prev) => {
       const next = new Set(prev)
-      if (next.has(i)) next.delete(i)
-      else next.add(i)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
       return next
     })
 
@@ -39,15 +39,18 @@ export function UngroupedView({ flights, running, hideHeader = false }: Props) {
           </div>
         )}
         <div className={`flex flex-col gap-2 ${running ? 'pointer-events-none opacity-50' : ''}`}>
-          {flights.map((f, i) => (
-            <FlightCard
-              key={i}
-              flight={f}
-              cateringSet={cateringSet}
-              open={open.has(i)}
-              onToggleOpen={() => toggle(i)}
-            />
-          ))}
+          {flights.map((f) => {
+            const key = `${f.flightNo}-${f.std}`
+            return (
+              <FlightCard
+                key={key}
+                flight={f}
+                cateringSet={cateringSet}
+                open={open.has(key)}
+                onToggleOpen={() => toggle(key)}
+              />
+            )
+          })}
         </div>
       </div>
     </div>
@@ -77,6 +80,7 @@ function FlightCard({ flight: f, cateringSet, open, onToggleOpen }: CardProps) {
       <div
         role="button"
         tabIndex={0}
+        aria-expanded={open}
         onClick={onToggleOpen}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {

@@ -572,8 +572,8 @@ export function GroupingPage() {
         </div>
       </div>
 
-      {/* Sticky footer — only when grouped */}
-      {isGrouped ? (
+      {/* Sticky footer — only when grouped and there's at least one group to show */}
+      {isGrouped && stationGroups.length > 0 ? (
         <div className="page-shell__footer">
           <div className="flex items-center gap-3">
             <div className="bg-muted h-[7px] w-[120px] overflow-hidden rounded-full">
@@ -602,6 +602,7 @@ export function GroupingPage() {
               size="large"
               icon={<Package size={17} />}
               loading={saveOrders.isPending}
+              disabled={confirmedCount === 0}
               onClick={handleCreateOrder}
             >
               {t('catering.grouping.createOrder')}

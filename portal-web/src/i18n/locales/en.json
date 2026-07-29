@@ -646,7 +646,12 @@
       "crewDuty": "Duty span",
       "crewHead": "Counted head-count",
       "crewWindows": "Meal windows hit ({{count}})",
-      "crewSlot": { "morning": "Morning", "noon": "Noon", "evening": "Evening", "night": "Night" },
+      "crewSlot": {
+        "morning": "Morning",
+        "noon": "Noon",
+        "evening": "Evening",
+        "night": "Night"
+      },
       "crewNoWindow": "no window hit",
       "crewFormula": "{{people}} crew × {{windows}} windows",
       "crewPilots": "{{n}} pilots",
@@ -756,7 +761,15 @@
       "colUpdatedBy": "Updated by",
       "colUpdated": "Updated",
       "status": { "draft": "Draft", "sent": "Sent" },
-      "weekday": { "0": "Sunday", "1": "Monday", "2": "Tuesday", "3": "Wednesday", "4": "Thursday", "5": "Friday", "6": "Saturday" },
+      "weekday": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      },
       "serviceDate": "Service date",
       "print": "Print / PDF",
       "viewingOld": "Viewing v{{v}} (read-only)",
@@ -769,7 +782,11 @@
       "crewShort": "Crew",
       "salesShort": "Sales",
       "deltaVsSuggested": "Δ vs suggested",
-      "cat": { "prebook": "Pre-book · pre-ordered", "crew": "Crew · cockpit meals", "sales": "Sales · onboard buy-on-board" },
+      "cat": {
+        "prebook": "Pre-book · pre-ordered",
+        "crew": "Crew · cockpit meals",
+        "sales": "Sales · onboard buy-on-board"
+      },
       "portionsN": "{{n}} portions",
       "suggestedShort": "sugg. {{n}}",
       "resetSuggested": "Reset to suggested",
@@ -782,7 +799,12 @@
       "createdAt": "Created at",
       "station": "Station",
       "dishTypes": "Line items",
-      "line": { "crewCockpit": "Cockpit crew meal", "hotmeal": "Hotmeal", "banhMi": "Bánh mì", "traSua": "Milk tea" },
+      "line": {
+        "crewCockpit": "Cockpit crew meal",
+        "hotmeal": "Hotmeal",
+        "banhMi": "Bánh mì",
+        "traSua": "Milk tea"
+      },
       "reconcile": {
         "open": "Reconcile",
         "title": "Version reconciliation",
@@ -811,13 +833,27 @@
         "create": "Create new version",
         "created": "New version v{{v}} created"
       },
+      "byFlight": {
+        "title": "By group flight",
+        "empty": "No per-flight breakdown yet.",
+        "noMatches": "No flights or items match your search.",
+        "prebookTotal": "Prebook",
+        "skyboss": "SkyBoss",
+        "commercial": "Commercial",
+        "groupSkuCount": "{{n}} items",
+        "groupQty": "{{n}} pcs",
+        "groupCount": "{{n}} flight groups",
+        "searchPlaceholder": "Search item or flight number",
+        "noDetailItems": "No detail items on this flight."
+      },
       "savedV": "Draft v{{v}} saved",
       "sentV": "Sent to supplier · v{{v}}",
       "revisionCreated": "New version v{{v}} created for editing",
+      "createRevision": "Create new version to edit",
       "needConfirmed": "No confirmed groups to build an order from.",
       "supplier": {
         "title": "ECO / SkyBoss Business",
-        "flightsN": "{{n}} flights",
+        "flightsN": "{{n}} group flights",
         "pendingBanner": "{{n}} flights still pending confirmation — review grouping before send.",
         "openGrouping": "Open flight grouping",
         "exportFailed": "Could not export supplier workbooks. Please try again.",
@@ -1145,7 +1181,12 @@
           "cabin": "Cabin crew."
         },
         "disabledNote": "{{groups}}: not applied at Vietjet — the profile is kept ready; enable it for airlines that serve meals to this group.",
-        "slot": { "morning": "Morning", "noon": "Noon", "evening": "Evening", "night": "Night" },
+        "slot": {
+          "morning": "Morning",
+          "noon": "Noon",
+          "evening": "Evening",
+          "night": "Night"
+        },
         "minutes": "min",
         "windows": {
           "title": "Four meal windows",

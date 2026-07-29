@@ -93,7 +93,9 @@ export function GroupCard({
       : 'bg-[#F1F5F9] text-text-secondary'
 
   const mergeTargets = allGroups.filter((g) => g.id !== group.id && g.aircraft === group.aircraft)
-  const moveTargets = allGroups.filter((g) => g.id !== group.id)
+  // Moving a leg to a group flown by a different tail would silently reassign
+  // it to the wrong aircraft's rotation — restrict to the same tail, like merge.
+  const moveTargets = allGroups.filter((g) => g.id !== group.id && g.aircraft === group.aircraft)
 
   return (
     <article
@@ -103,6 +105,7 @@ export function GroupCard({
       <div
         role="button"
         tabIndex={0}
+        aria-expanded={open}
         onClick={onToggleOpen}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -159,43 +162,43 @@ export function GroupCard({
           ) : null}
         </div>
 
-        <div className="flex items-center gap-2 justify-self-end" onClick={(e) => e.stopPropagation()}>
-          <Tooltip title={editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}>
-            <button
-              type="button"
-              onClick={onToggleEdit}
-              aria-label={editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}
-              className={`grid h-9 w-9 cursor-pointer place-items-center rounded-lg border transition-colors ${
-                editing
-                  ? 'bg-vj-red border-vj-red text-white'
-                  : 'border-border text-text-muted hover:border-vj-red hover:text-vj-red hover:bg-vj-red-50'
-              }`}
-            >
-              <Pencil size={16} />
-            </button>
-          </Tooltip>
-          <Tooltip title={group.confirmed ? t('catering.grouping.unconfirm') : t('catering.grouping.confirm')}>
-            <button
-              type="button"
-              onClick={onConfirm}
-              aria-label={group.confirmed ? t('catering.grouping.unconfirm') : t('catering.grouping.confirm')}
-              className={`grid h-9 w-9 cursor-pointer place-items-center rounded-lg border transition-colors ${
-                group.confirmed
-                  ? 'bg-vj-green-dark border-vj-green-dark text-white'
-                  : 'border-border text-text-muted hover:border-vj-green-dark hover:text-vj-green-dark hover:bg-vj-green-muted'
-              }`}
-            >
-              {group.confirmed ? <Check size={18} strokeWidth={3} /> : <Circle size={18} />}
-            </button>
-          </Tooltip>
-          <button
-            type="button"
-            onClick={onToggleOpen}
-            aria-label={t('catering.grouping.toggleDetail')}
-            className={`text-text-muted grid h-9 w-[30px] cursor-pointer place-items-center transition-transform ${open ? 'rotate-180' : ''}`}
+        <div className="flex items-center gap-2 justify-self-end">
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <Tooltip title={editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}>
+              <button
+                type="button"
+                onClick={onToggleEdit}
+                aria-label={editing ? t('catering.grouping.doneEditing') : t('catering.grouping.editGrouping')}
+                className={`grid h-9 w-9 cursor-pointer place-items-center rounded-lg border transition-colors ${
+                  editing
+                    ? 'bg-vj-red border-vj-red text-white'
+                    : 'border-border text-text-muted hover:border-vj-red hover:text-vj-red hover:bg-vj-red-50'
+                }`}
+              >
+                <Pencil size={16} />
+              </button>
+            </Tooltip>
+            <Tooltip title={group.confirmed ? t('catering.grouping.unconfirm') : t('catering.grouping.confirm')}>
+              <button
+                type="button"
+                onClick={onConfirm}
+                aria-label={group.confirmed ? t('catering.grouping.unconfirm') : t('catering.grouping.confirm')}
+                className={`grid h-9 w-9 cursor-pointer place-items-center rounded-lg border transition-colors ${
+                  group.confirmed
+                    ? 'bg-vj-green-dark border-vj-green-dark text-white'
+                    : 'border-border text-text-muted hover:border-vj-green-dark hover:text-vj-green-dark hover:bg-vj-green-muted'
+                }`}
+              >
+                {group.confirmed ? <Check size={18} strokeWidth={3} /> : <Circle size={18} />}
+              </button>
+            </Tooltip>
+          </div>
+          <span
+            aria-hidden="true"
+            className={`text-text-muted grid h-9 w-[30px] place-items-center transition-transform ${open ? 'rotate-180' : ''}`}
           >
             <ChevronDown size={19} />
-          </button>
+          </span>
         </div>
       </div>
 

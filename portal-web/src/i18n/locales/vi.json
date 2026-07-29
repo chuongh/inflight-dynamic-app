@@ -646,7 +646,12 @@
       "crewDuty": "Ca trực (duty)",
       "crewHead": "Đầu người tính suất",
       "crewWindows": "Khung giờ ăn trúng ({{count}} lần)",
-      "crewSlot": { "morning": "Sáng", "noon": "Trưa", "evening": "Chiều", "night": "Đêm" },
+      "crewSlot": {
+        "morning": "Sáng",
+        "noon": "Trưa",
+        "evening": "Chiều",
+        "night": "Đêm"
+      },
       "crewNoWindow": "không trúng khung nào",
       "crewFormula": "{{people}} người × {{windows}} khung giờ",
       "crewPilots": "{{n}} phi công",
@@ -756,7 +761,15 @@
       "colUpdatedBy": "Người cập nhật",
       "colUpdated": "Cập nhật",
       "status": { "draft": "Nháp", "sent": "Đã gửi NCC" },
-      "weekday": { "0": "Chủ Nhật", "1": "Thứ Hai", "2": "Thứ Ba", "3": "Thứ Tư", "4": "Thứ Năm", "5": "Thứ Sáu", "6": "Thứ Bảy" },
+      "weekday": {
+        "0": "Chủ Nhật",
+        "1": "Thứ Hai",
+        "2": "Thứ Ba",
+        "3": "Thứ Tư",
+        "4": "Thứ Năm",
+        "5": "Thứ Sáu",
+        "6": "Thứ Bảy"
+      },
       "serviceDate": "Ngày phục vụ",
       "print": "In / Xuất PDF",
       "viewingOld": "Đang xem v{{v}} (chỉ đọc)",
@@ -769,7 +782,11 @@
       "crewShort": "Crew",
       "salesShort": "Sales",
       "deltaVsSuggested": "Δ vs gợi ý",
-      "cat": { "prebook": "Pre-book · món đặt trước", "crew": "Crew · suất tổ lái", "sales": "Sales · bán thêm onboard" },
+      "cat": {
+        "prebook": "Pre-book · món đặt trước",
+        "crew": "Crew · suất tổ lái",
+        "sales": "Sales · bán thêm onboard"
+      },
       "portionsN": "{{n}} suất",
       "suggestedShort": "gợi ý {{n}}",
       "resetSuggested": "Về gợi ý gốc",
@@ -782,7 +799,12 @@
       "createdAt": "Tạo lúc",
       "station": "Trạm",
       "dishTypes": "Số dòng hàng",
-      "line": { "crewCockpit": "Suất tổ lái — buồng lái (cockpit)", "hotmeal": "Hotmeal", "banhMi": "Bánh mì", "traSua": "Trà sữa" },
+      "line": {
+        "crewCockpit": "Suất tổ lái — buồng lái (cockpit)",
+        "hotmeal": "Hotmeal",
+        "banhMi": "Bánh mì",
+        "traSua": "Trà sữa"
+      },
       "reconcile": {
         "open": "Đối soát",
         "title": "Đối soát phiên bản",
@@ -811,13 +833,27 @@
         "create": "Tạo phiên bản mới",
         "created": "Đã tạo phiên bản v{{v}}"
       },
+      "byFlight": {
+        "title": "Theo nhóm chuyến bay",
+        "empty": "Chưa có breakdown theo chuyến.",
+        "noMatches": "Không tìm thấy chuyến bay hoặc món phù hợp.",
+        "prebookTotal": "Prebook",
+        "skyboss": "SkyBoss",
+        "commercial": "Thương mại",
+        "groupSkuCount": "{{n}} món",
+        "groupQty": "{{n}} suất",
+        "groupCount": "{{n}} nhóm chuyến bay",
+        "searchPlaceholder": "Tìm món hoặc số hiệu chuyến bay",
+        "noDetailItems": "Không có món chi tiết trên chuyến này."
+      },
       "savedV": "Đã lưu nháp v{{v}}",
       "sentV": "Đã gửi nhà cung cấp · v{{v}}",
       "revisionCreated": "Đã tạo version mới v{{v}} để chỉnh sửa",
+      "createRevision": "Tạo version mới để chỉnh sửa",
       "needConfirmed": "Chưa có nhóm nào được xác nhận để lên order.",
       "supplier": {
         "title": "ECO / SkyBoss Business",
-        "flightsN": "{{n}} chuyến",
+        "flightsN": "{{n}} nhóm chuyến bay",
         "pendingBanner": "Còn {{n}} chuyến chưa xác nhận nhóm — xem lại phân nhóm trước khi gửi.",
         "openGrouping": "Mở phân nhóm chuyến bay",
         "exportFailed": "Không thể xuất file nhà cung cấp. Vui lòng thử lại.",
@@ -1145,7 +1181,12 @@
           "cabin": "Tiếp viên khoang khách."
         },
         "disabledNote": "{{groups}}: chưa áp dụng tại Vietjet — profile được giữ sẵn, bật khi hãng có chính sách suất ăn cho nhóm này.",
-        "slot": { "morning": "Sáng", "noon": "Trưa", "evening": "Chiều", "night": "Đêm" },
+        "slot": {
+          "morning": "Sáng",
+          "noon": "Trưa",
+          "evening": "Chiều",
+          "night": "Đêm"
+        },
         "minutes": "phút",
         "windows": {
           "title": "4 khung giờ ăn",
