@@ -64,6 +64,7 @@ function resolveSelection(pathname: string) {
   if (pathname.startsWith(paths.equipment.trolley.list)) return { selectedKey: 'trolley-carts', ...NAV_SECTION_KEYS['trolley-carts'] }
   if (pathname.startsWith(paths.catering.catalog.amenity)) return { selectedKey: 'catalog-amenity', ...NAV_SECTION_KEYS['catalog-amenity'] }
   if (pathname.startsWith(paths.catering.catalog.combos)) return { selectedKey: 'catalog-combos', ...NAV_SECTION_KEYS['catalog-combos'] }
+  if (pathname.startsWith(paths.catering.catalog.mealsSbb)) return { selectedKey: 'catalog-meals-sbb', ...NAV_SECTION_KEYS['catalog-meals-sbb'] }
   if (pathname.startsWith(paths.catering.catalog.meals)) return { selectedKey: 'catalog-meals', ...NAV_SECTION_KEYS['catalog-meals'] }
   if (pathname.startsWith(paths.catering.config.list)) return { selectedKey: 'catering-config', ...NAV_SECTION_KEYS['catering-config'] }
   if (pathname.startsWith(paths.catering.quota.list)) return { selectedKey: 'catering-quota', ...NAV_SECTION_KEYS['catering-quota'] }

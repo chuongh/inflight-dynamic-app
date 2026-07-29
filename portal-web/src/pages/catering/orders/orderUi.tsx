@@ -82,10 +82,20 @@ export function VerTag({ v }: { v: number }) {
   return <span className="bg-muted text-foreground rounded-md px-1.5 py-0.5 text-[11.5px] font-extrabold tnum">v{v}</span>
 }
 
-/** Mini stacked bar of the three category totals. */
-export function CatSplit({ pre, crew, sales }: { pre: number; crew: number; sales: number }) {
-  const total = pre + crew + sales || 1
-  const seg = (n: number, c: string) => (n > 0 ? <span style={{ width: `${(n / total) * 100}%`, background: c }} /> : null)
+/** Mini stacked bar: prebook vs hotmeal (main + vegetarian + bread) from ecoSupplyLines. */
+export function CatSplit({
+  prebook,
+  hotmeal,
+}: {
+  prebook: number | null
+  hotmeal: number | null
+}) {
+  if (prebook == null || hotmeal == null) {
+    return <span className="text-text-muted text-[12px] font-semibold">—</span>
+  }
+  const total = prebook + hotmeal || 1
+  const seg = (n: number, c: string) =>
+    n > 0 ? <span style={{ width: `${(n / total) * 100}%`, background: c }} /> : null
   const dot = (c: string, n: number) => (
     <span className="text-text-secondary inline-flex items-center gap-1 text-[10.5px] font-bold">
       <span className="h-2 w-2 rounded-[2px]" style={{ background: c }} />
@@ -95,14 +105,12 @@ export function CatSplit({ pre, crew, sales }: { pre: number; crew: number; sale
   return (
     <div>
       <div className="bg-muted flex h-2 w-[150px] overflow-hidden rounded-full">
-        {seg(pre, CAT_COLOR.prebook)}
-        {seg(crew, CAT_COLOR.crew)}
-        {seg(sales, CAT_COLOR.sales)}
+        {seg(prebook, CAT_COLOR.prebook)}
+        {seg(hotmeal, CAT_COLOR.sales)}
       </div>
       <div className="mt-1.5 flex gap-2.5">
-        {dot(CAT_COLOR.prebook, pre)}
-        {dot(CAT_COLOR.crew, crew)}
-        {dot(CAT_COLOR.sales, sales)}
+        {dot(CAT_COLOR.prebook, prebook)}
+        {dot(CAT_COLOR.sales, hotmeal)}
       </div>
     </div>
   )

@@ -1,12 +1,12 @@
 import { Empty, Input, Segmented, Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { ChevronRight, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ListPageLayout } from '@/components/patterns/ListPageLayout'
 import { useOrders } from '@/modules/catering/hooks/useOrders'
-import { categoryTotal, groupOrderFiles, lineTotal, orderGroupCount, type OrderFile } from '@/modules/catering/orders'
+import { groupOrderFiles, lineTotal, orderGroupCount, type OrderFile } from '@/modules/catering/orders'
 import { paths } from '@/routes/paths'
 import { CatSplit, OrderStatStrip, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
 
@@ -77,12 +77,6 @@ export function OrderListPage() {
       },
     },
     {
-      title: t('catering.orders.colVersion'),
-      key: 'version',
-      width: 80,
-      render: (_v, file) => <VerTag v={file.latest.version} />,
-    },
-    {
       title: t('catering.orders.colTotal'),
       key: 'total',
       width: 100,
@@ -96,15 +90,31 @@ export function OrderListPage() {
       key: 'breakdown',
       width: 180,
       render: (_v, file) => {
-        const o = file.latest
-        return (
-          <CatSplit
-            pre={categoryTotal(o.lines, 'prebook')}
-            crew={categoryTotal(o.lines, 'crew')}
-            sales={categoryTotal(o.lines, 'sales')}
-          />
-        )
+        const lines = file.latest.ecoSupplyLines
+        if (!lines?.length) {
+          return <CatSplit prebook={null} hotmeal={null} />
+        }
+        const prebook = lines.find((l) => l.field === 'prebook')?.qty ?? 0
+        const hotmeal = lines
+          .filter((l) => l.group === 'main' || l.group === 'vegetarian' || l.group === 'bread')
+          .reduce((s, l) => s + l.qty, 0)
+        return <CatSplit prebook={prebook} hotmeal={hotmeal} />
       },
+    },
+    {
+      title: t('catering.orders.colUpdated'),
+      key: 'updated',
+      width: 110,
+      align: 'right',
+      render: (_v, file) => (
+        <span className="text-text-secondary text-[12px] font-semibold tnum">{fmtStamp(file.latest.createdAt)}</span>
+      ),
+    },
+    {
+      title: t('catering.orders.colVersion'),
+      key: 'version',
+      width: 80,
+      render: (_v, file) => <VerTag v={file.latest.version} />,
     },
     {
       title: t('catering.orders.colUpdatedBy'),
@@ -118,22 +128,6 @@ export function OrderListPage() {
           <span className="font-semibold">{file.latest.createdBy}</span>
         </div>
       ),
-    },
-    {
-      title: t('catering.orders.colUpdated'),
-      key: 'updated',
-      width: 110,
-      align: 'right',
-      render: (_v, file) => (
-        <span className="text-text-secondary text-[12px] font-semibold tnum">{fmtStamp(file.latest.createdAt)}</span>
-      ),
-    },
-    {
-      title: '',
-      key: 'go',
-      width: 40,
-      align: 'right',
-      render: () => <ChevronRight size={16} className="text-text-muted" aria-hidden />,
     },
   ]
 

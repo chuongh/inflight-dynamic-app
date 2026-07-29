@@ -1,3 +1,4 @@
+import type { AmenityCatalogItem, MealCatalogItem } from '@/modules/catering/catalogTypes'
 import { buildEcoSupplierRow } from '@/modules/catering/supplier/ecoBuilder'
 import { buildSbbSupplierRow } from '@/modules/catering/supplier/sbbBuilder'
 import {
@@ -16,6 +17,7 @@ import type {
   SupplierCell,
   SupplierFlightInput,
 } from '@/modules/catering/supplier/types'
+import { displayNameFor, supplyFieldDef } from '@/pages/catering/config/ecoQuantityRuleMeta'
 
 export type PlannerProduct = 'eco' | 'sbb'
 export type PlannerFlightStatus = 'ready' | 'warning' | 'blocked'
@@ -92,50 +94,10 @@ export const SBB_FIELD_GROUPS: readonly PlannerFieldGroup<keyof SbbCells>[] = [
   },
 ] as const
 
-export const FIELD_LABELS: Record<keyof EcoCells | keyof SbbCells, string> = {
-  spaghetti: 'Mỳ Ý',
-  glassNoodles: 'Miến',
-  banhChung: 'Bánh chưng',
-  stirFriedNoodles: 'Mỳ xào',
-  thaiFriedRice: 'Cơm chiên Thái',
-  savoryStickyRice: 'Xôi mặn',
-  khucStickyRice: 'Xôi khúc',
-  beefRice: 'Cơm bò',
-  coconutRice: 'Cơm dừa',
-  indianPotatoParatha: 'Paratha khoai tây',
-  chickenCurry: 'Cà ri gà',
-  fishCurry: 'Cà ri cá',
-  vegetarianYangzhouRice: 'Cơm Dương Châu chay',
-  vegetarianBasmatiCurry: 'Basmati cà ri chay',
-  hotmealTotal: 'Tổng suất nóng',
-  bread: 'Bánh mì',
-  boiledEggs: 'Trứng luộc',
-  skybossEggs: 'Trứng SkyBoss',
-  totalEggs: 'Tổng trứng',
-  australiaNoodleVegetables: 'Rau mỳ Úc',
-  australiaSkybossYogurt: 'Sữa chua SkyBoss Úc',
-  australiaRoundBread: 'Bánh tròn Úc',
-  australiaBeefFreshVegetables: 'Rau tươi bò Úc',
-  australiaBreadVegetables: 'Rau bánh mì Úc',
-  ketchup: 'Tương cà',
-  chiliSauce: 'Tương ớt',
-  soySauce: 'Nước tương',
-  hotmealUtensils: 'Dụng cụ suất nóng',
-  reserveUtensils: 'Dụng cụ dự phòng',
-  totalUtensils: 'Tổng dụng cụ',
-  skyboss: 'SkyBoss ECO',
-  prebook: 'Prebook',
-  prebookCashews: 'Hạt điều prebook',
-  reserveCrewWater: 'Nước tổ bay dự phòng',
-  smallIceBox: 'Thùng đá nhỏ',
-  largeIceBox: 'Thùng đá lớn',
-  wetIceKg: 'Đá ướt (kg)',
-  dryIceKg: 'Đá khô (kg)',
-  dutyFree: 'Duty free',
-  highlift: 'Highlift',
-  smallTruck: 'Xe tải nhỏ',
-  lastMinuteTopUp: 'Bổ sung phút chót',
+/** SBB-only labels (not covered by ECO supply / meal catalog). */
+const SBB_FIELD_LABELS: Record<keyof SbbCells, string> = {
   businessPax: 'Khách Business',
+  bread: 'Bánh mì',
   basa: 'Cá basa',
   pho: 'Phở',
   bunBo: 'Bún bò',
@@ -148,6 +110,18 @@ export const FIELD_LABELS: Record<keyof EcoCells | keyof SbbCells, string> = {
   pillow: 'Gối',
   mattress: 'Nệm',
   blanket: 'Chăn',
+}
+
+/** Display name: catalog-backed ECO fields via `displayNameFor`, else SBB labels. */
+export function plannerFieldLabel(
+  field: string,
+  mealCatalog: MealCatalogItem[] = [],
+  amenityCatalog: AmenityCatalogItem[] = [],
+): string {
+  if (supplyFieldDef(field)) {
+    return displayNameFor(field, mealCatalog, amenityCatalog)
+  }
+  return SBB_FIELD_LABELS[field as keyof SbbCells] ?? field
 }
 
 /** Direct numeric patches keyed by flightKey → product → field → number */
@@ -236,6 +210,7 @@ function toEcoInput(input: SupplierFlightInput): EcoSupplierInput {
     boiledEggs: input.boiledEggs ?? null,
     reserveUtensils: input.reserveUtensils ?? null,
     workbookReferenceBread: input.workbookReferenceBread,
+    breadPrebook: input.breadPrebook,
     hotmealItems: input.hotmealItems ?? {},
     australiaBeefFreshVegetables: input.australiaBeefFreshVegetables,
     australiaBreadVegetables: input.australiaBreadVegetables,
@@ -526,7 +501,7 @@ export function rollupDishOverview(flights: readonly PlannerFlight[]): DishRollu
       if (qty === 0) continue
       lines.push({
         key: `eco:${field}`,
-        label: FIELD_LABELS[field],
+        label: plannerFieldLabel(field),
         product: 'eco',
         field,
         qty,
@@ -551,7 +526,7 @@ export function rollupDishOverview(flights: readonly PlannerFlight[]): DishRollu
       if (qty === 0) continue
       lines.push({
         key: `sbb:${field}`,
-        label: FIELD_LABELS[field],
+        label: plannerFieldLabel(field),
         product: 'sbb',
         field,
         qty,

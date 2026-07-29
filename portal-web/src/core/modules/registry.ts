@@ -108,6 +108,12 @@ export const PORTAL_MODULES: PortalModule[] = [
         permission: 'catering.read',
       },
       {
+        id: 'catalog-meals-sbb',
+        labelKey: 'nav.catalogMealsSbb',
+        path: paths.catering.catalog.mealsSbb,
+        permission: 'catering.read',
+      },
+      {
         id: 'catalog-combos',
         labelKey: 'nav.catalogCombos',
         path: paths.catering.catalog.combos,
@@ -191,6 +197,7 @@ export const NAV_SECTION_KEYS: Record<
   'catering-config': { sectionTitleKey: 'nav.cateringConfig', moduleLabelKey: 'nav.catering' },
   catalog: { sectionTitleKey: 'nav.catalog' },
   'catalog-meals': { sectionTitleKey: 'nav.catalogMeals', moduleLabelKey: 'nav.catalog' },
+  'catalog-meals-sbb': { sectionTitleKey: 'nav.catalogMealsSbb', moduleLabelKey: 'nav.catalog' },
   'catalog-combos': { sectionTitleKey: 'nav.catalogCombos', moduleLabelKey: 'nav.catalog' },
   'catalog-amenity': { sectionTitleKey: 'nav.catalogAmenity', moduleLabelKey: 'nav.catalog' },
   airports: { sectionTitleKey: 'nav.airports' },

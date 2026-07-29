@@ -1,18 +1,19 @@
 import { Alert, App as AntApp, Button, Empty } from 'antd'
-import { ArrowRightLeft, Printer, Send } from 'lucide-react'
+import { ArrowRightLeft, PlaneTakeoff, Printer, Send } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { DetailHero } from '@/components/patterns/DetailHero'
 import { SurfaceCard } from '@/components/patterns/SurfaceCard'
 import { useAuth } from '@/core/auth/useAuth'
+import { activeCrewMealVersion, profileFor } from '@/modules/catering/crewMeal'
 import { useAmenityCatalogData, useMealCatalogData } from '@/modules/catering/hooks/useCatalog'
+import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
 import { useFlightGroups } from '@/modules/catering/hooks/useFlightGroups'
 import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
 import { useSupplierRuleConfigData } from '@/modules/catering/hooks/useSupplierRuleConfig'
-import type { CateringOrder, OrderSourceCell } from '@/modules/catering/orderTypes'
-import { categoryTotal, groupOrderFiles } from '@/modules/catering/orders'
-import { deriveLines } from '@/modules/catering/orderSnapshot'
+import type { CateringOrder } from '@/modules/catering/orderTypes'
+import { groupOrderFiles } from '@/modules/catering/orders'
 import { DEFAULT_ECO_AMENITY_CONFIG } from '@/modules/catering/supplier/amenityDefaults'
 import { buildEcoSupplySnapshot } from '@/modules/catering/supplier/buildEcoSupplySnapshot'
 import { DEFAULT_ECO_QUANTITY_RULES } from '@/modules/catering/supplier/ecoQuantityEval'
@@ -25,7 +26,7 @@ import {
 } from '../planner/plannerModel'
 import { OrderStatStrip, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
 import { EcoSupplyPanel } from './EcoSupplyPanel'
-import { FlightMealEditorDrawer } from './FlightMealEditorDrawer'
+import { FlightBreakdownDrawer } from './FlightBreakdownDrawer'
 import { ReconcileDrawer } from './ReconcileDrawer'
 import './eco-supply.css'
 
@@ -55,6 +56,7 @@ export function OrderDetailPage() {
   const { data: supplierRuleData } = useSupplierRuleConfigData()
   const { data: mealCatalog } = useMealCatalogData()
   const { data: amenityCatalog } = useAmenityCatalogData()
+  const { data: crewCfg } = useCrewMealConfigData()
 
   const files = useMemo(() => groupOrderFiles(data?.orders ?? []), [data])
   const file = files.find((f) => f.fileId === fileId)
@@ -62,7 +64,7 @@ export function OrderDetailPage() {
 
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null)
   const [reconcileOpen, setReconcileOpen] = useState(false)
-  const [flightEditOpen, setFlightEditOpen] = useState(false)
+  const [byFlightOpen, setByFlightOpen] = useState(false)
   const [sending, setSending] = useState(false)
 
   const current: CateringOrder | undefined = file
@@ -80,6 +82,11 @@ export function OrderDetailPage() {
     () => activeSupplierRuleVersion(supplierRuleData?.versions ?? []),
     [supplierRuleData],
   )
+  const crewMealProfile = useMemo(() => {
+    const version = activeCrewMealVersion(crewCfg?.versions ?? [])
+    const profile = version ? profileFor(version, 'cockpit') : undefined
+    return profile?.enabled ? profile : null
+  }, [crewCfg])
 
   const { inputs, pendingCount } = useMemo(() => {
     if (!day || !current) return { inputs: [], pendingCount: 0 }
@@ -97,7 +104,11 @@ export function OrderDetailPage() {
   }, [inputs, activeRules, current?.supplierEdits])
 
   const computedEcoSupply = useMemo(() => {
-    if (current?.ecoSupplyLines?.length || !day || !current) return null
+    if (!day || !current) return null
+    const saved = current.ecoSupplyLines
+    const hasCrew =
+      !crewMealProfile || !!saved?.some((l) => l.field === 'crewCockpit')
+    if (saved?.length && current.ecoSupplyByFlight?.length && hasCrew) return null
     return buildEcoSupplySnapshot({
       day,
       station: current.station,
@@ -108,22 +119,36 @@ export function OrderDetailPage() {
         amenity: activeRules?.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG,
         quantityRules: activeRules?.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
       },
+      crewMealProfile,
     })
-  }, [current, day, mealCatalog, amenityCatalog, activeRules])
+  }, [current, day, mealCatalog, amenityCatalog, activeRules, crewMealProfile])
 
-  const ecoSupplyLines = current?.ecoSupplyLines ?? computedEcoSupply ?? []
+  const ecoSupplyLines = useMemo(() => {
+    const saved = current?.ecoSupplyLines
+    const computed = computedEcoSupply?.lines
+    if (!saved?.length) return computed ?? []
+    if (!crewMealProfile || saved.some((l) => l.field === 'crewCockpit')) return saved
+    const crewLine = computed?.find((l) => l.field === 'crewCockpit')
+    return crewLine ? [...saved, crewLine] : saved
+  }, [current?.ecoSupplyLines, computedEcoSupply, crewMealProfile])
+
+  const ecoSupplyByFlight = current?.ecoSupplyByFlight ?? computedEcoSupply?.byFlight ?? []
   const showEcoSupply = ecoSupplyLines.length > 0
 
   const mealStats = useMemo(() => {
-    const lines = current?.lines ?? []
-    const prebook = categoryTotal(lines, 'prebook')
-    const crew = categoryTotal(lines, 'crew')
-    const quotaCommercial = lines
-      .filter((l) => l.category === 'sales' && l.name === 'hotmeal')
+    const hotmealBread = ecoSupplyLines
+      .filter((l) => l.group === 'main' || l.group === 'vegetarian' || l.group === 'bread')
       .reduce((s, l) => s + l.qty, 0)
-    const totalMeals = prebook + crew + quotaCommercial
-    return { prebook, crew, quotaCommercial, totalMeals }
-  }, [current?.lines])
+    const prebook = ecoSupplyLines.find((l) => l.field === 'prebook')?.qty ?? 0
+    const skyboss = ecoSupplyLines.find((l) => l.field === 'skyboss')?.qty ?? 0
+    const skybossBusiness = inputs.reduce((s, i) => s + (i.businessPax ?? 0), 0)
+    const crew = ecoSupplyLines.find((l) => l.field === 'crewCockpit')?.qty ?? 0
+    const quotaCommercial =
+      inputs.reduce((s, i) => s + (i.quotaCommercial ?? 0), 0) ||
+      (ecoSupplyLines.find((l) => l.field === 'quotaCommercial')?.qty ?? 0)
+    const totalMeals = hotmealBread + crew
+    return { totalMeals, prebook, skyboss, skybossBusiness, crew, quotaCommercial }
+  }, [ecoSupplyLines, inputs])
 
   if (!file || !current) {
     return (
@@ -202,26 +227,6 @@ export function OrderDetailPage() {
     }
   }
 
-  const createVersionFromBreakdown = (nextBreakdown: OrderSourceCell[]) => {
-    const v = latest!.version + 1
-    const codeOf = (name: string) =>
-      current!.lines.find((l) => l.category === 'prebook' && l.name === name)?.productCodes ?? []
-    const rec: CateringOrder = {
-      ...latest!,
-      id: `${file.fileId}-v${v}`,
-      version: v,
-      status: 'draft',
-      createdAt: Date.now(),
-      createdBy: userName(),
-      breakdown: nextBreakdown,
-      lines: deriveLines(nextBreakdown, codeOf),
-    }
-    saveOrders.mutate({ orders: [...(data?.orders ?? []), rec] })
-    setSelectedVersion(v)
-    setFlightEditOpen(false)
-    message.success(t('catering.orders.editByFlight.created', { v }))
-  }
-
   function userName() {
     return session?.user.name ?? 'Catering Ops'
   }
@@ -254,6 +259,11 @@ export function OrderDetailPage() {
         }
         actions={
           <>
+            {showEcoSupply ? (
+              <Button icon={<PlaneTakeoff size={15} />} onClick={() => setByFlightOpen(true)}>
+                {t('catering.orders.byFlight.openCta')}
+              </Button>
+            ) : null}
             <Button icon={<Printer size={15} />} onClick={() => window.print()}>
               {t('catering.orders.print')}
             </Button>
@@ -309,8 +319,10 @@ export function OrderDetailPage() {
 
       {showEcoSupply ? (
         <>
+          <p className="order-section-label mb-2">{t('catering.orders.supply.sectionOverview')}</p>
           <OrderStatStrip
-            className="mb-4"
+            className="mb-5"
+            columns={3}
             items={[
               {
                 label: t('catering.orders.supply.kpiTotalMeals'),
@@ -327,6 +339,14 @@ export function OrderDetailPage() {
                 value: mealStats.crew.toLocaleString(),
               },
               {
+                label: t('catering.orders.supply.kpiSkyboss'),
+                value: mealStats.skyboss.toLocaleString(),
+              },
+              {
+                label: t('catering.orders.supply.kpiSkybossBusiness'),
+                value: mealStats.skybossBusiness.toLocaleString(),
+              },
+              {
                 label: t('catering.orders.supply.kpiQuota'),
                 value: mealStats.quotaCommercial.toLocaleString(),
                 hint: t('catering.orders.supply.kpiQuotaHint'),
@@ -336,6 +356,7 @@ export function OrderDetailPage() {
 
           <div className="order-supply-layout">
             <div className="order-supply-layout__main">
+              <p className="order-section-label">{t('catering.orders.supply.sectionBreakdown')}</p>
               <EcoSupplyPanel
                 lines={ecoSupplyLines}
                 editable={editable}
@@ -346,6 +367,7 @@ export function OrderDetailPage() {
             </div>
 
             <aside className="order-supply-layout__side">
+              <p className="order-section-label">{t('catering.orders.supply.sectionMeta')}</p>
               <SurfaceCard title={t('catering.orders.versionHistory')}>
                 <div className="-mt-1 mb-3 flex justify-end">
                   <button
@@ -421,12 +443,10 @@ export function OrderDetailPage() {
         current={current}
         base={reconcileBase}
       />
-      <FlightMealEditorDrawer
-        open={flightEditOpen}
-        onClose={() => setFlightEditOpen(false)}
-        current={current}
-        onCreateVersion={createVersionFromBreakdown}
-        pending={saveOrders.isPending}
+      <FlightBreakdownDrawer
+        open={byFlightOpen}
+        onClose={() => setByFlightOpen(false)}
+        byFlight={ecoSupplyByFlight}
       />
     </div>
   )

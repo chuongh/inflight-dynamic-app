@@ -138,7 +138,8 @@ export function AppRoutes() {
         <Route path={paths.catering.orders.list} element={<OrderListPage />} />
         <Route path={`${paths.catering.orders.list}/:fileId`} element={<OrderDetailPage />} />
         <Route path={paths.catering.meals.list} element={<Navigate to={paths.catering.catalog.meals} replace />} />
-        <Route path={paths.catering.catalog.meals} element={<MealCatalogPage />} />
+        <Route path={paths.catering.catalog.meals} element={<MealCatalogPage scope="ECO" />} />
+        <Route path={paths.catering.catalog.mealsSbb} element={<MealCatalogPage scope="SBB" />} />
         <Route path={paths.catering.catalog.combos} element={<ComboCatalogPage />} />
         <Route path={paths.catering.catalog.amenity} element={<AmenityCatalogPage />} />
         <Route path={paths.catering.quota.list} element={<QuotaPage />} />

@@ -3,7 +3,7 @@ import configJson from '../catering/supplier-rule-configs.json'
 
 const DEMO_STORAGE_KEY = 'vj-mock-catering-supplier-rule-config-cache'
 const SEED_VERSION_KEY = `${DEMO_STORAGE_KEY}-seed-version`
-const SEED_VERSION = 3
+const SEED_VERSION = 6
 
 function readCache(): SupplierRuleConfigDataset | null {
   try {

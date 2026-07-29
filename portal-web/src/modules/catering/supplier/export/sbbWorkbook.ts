@@ -115,7 +115,13 @@ export async function buildSbbWorkbook(
         if (column.identity === 'operatingDate') {
           return parseIsoExcelDate(supplierRow.operatingDate)
         }
-        if (column.identity) return supplierRow[column.identity]
+        if (column.identity === 'amenityLabel') {
+          // Shared ExportColumn identity union includes amenityLabel (ECO-only).
+          return ''
+        }
+        if (column.identity === 'flightNo') return supplierRow.flightNo
+        if (column.identity === 'dep') return supplierRow.dep
+        if (column.identity === 'arr') return supplierRow.arr
         if (column.field) return effectiveValue(supplierRow.cells[column.field])
         return ''
       }))

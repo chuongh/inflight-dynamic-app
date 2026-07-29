@@ -3,8 +3,6 @@
  * Seeded from GC-SGN ECO sheets A321 / A330 / LIST ĐƯỜNG BAY THEO GIỜ.
  */
 
-export type EcoRuleBase = 'by_item' | 'by_hotmeal_total' | 'by_std_arr'
-
 export type EcoUpliftType = 'DAU_NGAY' | 'DOI_TO' | 'NIGHTSTOP'
 
 export type RouteHourClassId =
@@ -13,7 +11,7 @@ export type RouteHourClassId =
   | 'INT_LT_4H'
   | 'INT_GE_4H'
 
-export type AircraftFamily = 'A320_A321' | 'A330'
+export type AircraftFamily = 'A321' | 'A330'
 
 export type AmenitySpecialKind =
   | 'aircraft_day_start'
@@ -53,14 +51,6 @@ export type EcoQuantityValue =
   | { kind: 'column'; columnId: string; coef?: number }
   | { kind: 'hotmeal_total'; coef?: number }
   | { kind: 'sum'; parts: EcoQuantityValue[] }
-  | { kind: 'manual' }
-
-export interface EcoQuantityExpr {
-  source: 'column' | 'hotmeal_total' | 'metric'
-  id?: string
-  coef: number
-  round?: 'ceil' | 'none'
-}
 
 export interface EcoQuantityWhen {
   routeGroups?: string[]
@@ -81,16 +71,16 @@ export interface EcoQuantityBranch {
 
 export interface EcoQuantityRule {
   id: string
-  base: EcoRuleBase
   /** Target EcoCells key or logical column id */
   targetColumn: string
   enabled: boolean
   docRef?: string
-  /** Base 1–2 */
-  expr?: EcoQuantityExpr
-  /** Base 3 */
-  branches?: EcoQuantityBranch[]
-  fallback?: EcoQuantityValue
+  round?: 'ceil'
+  branches: EcoQuantityBranch[]
+  /** Always present — default `{ kind: 'const', value: 0 }` for new rules. */
+  fallback: EcoQuantityValue
+  /** false = công thức tạm/chưa chốt với nghiệp vụ. Mặc định true khi không có field này (rule cũ). */
+  confirmed?: boolean
 }
 
 export interface EcoAmenityConfig {

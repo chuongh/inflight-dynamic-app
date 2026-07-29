@@ -7,7 +7,7 @@ import { ListPageLayout } from '@/components/patterns/ListPageLayout'
 import { EquipmentBadge } from '@/components/primitives/Badge'
 import { useAuth } from '@/core/auth/useAuth'
 import { activeCatalogVersion, replaceActiveCatalogItems } from '@/modules/catering/catalog'
-import type { MealCatalogItem, MealItemCategory } from '@/modules/catering/catalogTypes'
+import type { CabinScope, MealCatalogItem, MealItemCategory } from '@/modules/catering/catalogTypes'
 import {
   MEAL_CATEGORIES,
   MEAL_CATEGORY_STYLE,
@@ -15,20 +15,25 @@ import {
 import { useMealCatalogData, useSaveMealCatalogData } from '@/modules/catering/hooks/useCatalog'
 import { formatDateDMY } from '@/shared/utils/format'
 
-function blankMeal(): MealCatalogItem {
+function blankMeal(scope: CabinScope): MealCatalogItem {
   return {
     id: `meal-${Date.now()}`,
     productCode: null,
     name: { vi: '' },
     unit: null,
-    category: 'eco_main',
-    cabinScopes: ['ECO'],
+    category: 'main',
+    cabinScopes: [scope],
     active: true,
     needsCode: true,
   }
 }
 
-export function MealCatalogPage() {
+interface MealCatalogPageProps {
+  /** Which cabin's meal catalog this page shows — filters items by cabinScopes. */
+  scope: CabinScope
+}
+
+export function MealCatalogPage({ scope }: MealCatalogPageProps) {
   const { t } = useTranslation()
   const { message } = AntApp.useApp()
   const { session } = useAuth()
@@ -42,7 +47,11 @@ export function MealCatalogPage() {
   const [drawerMode, setDrawerMode] = useState<'add' | 'edit'>('edit')
 
   const active = useMemo(() => activeCatalogVersion(data?.versions ?? []), [data])
-  const items = active?.items ?? []
+  const scopedItems = useMemo(
+    () => (active?.items ?? []).filter((it) => it.cabinScopes.includes(scope)),
+    [active, scope],
+  )
+  const items = scopedItems
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return items.filter((it) => {
@@ -66,7 +75,7 @@ export function MealCatalogPage() {
 
   const openAdd = () => {
     setDrawerMode('add')
-    setDrawerItem(blankMeal())
+    setDrawerItem(blankMeal(scope))
   }
 
   const openEdit = (item: MealCatalogItem) => {
@@ -79,7 +88,15 @@ export function MealCatalogPage() {
       message.warning(t('catering.catalog.nameRequired'))
       return
     }
-    const nextItems = drawerMode === 'add' ? [...items, item] : items.map((x) => (x.id === item.id ? item : x))
+    const normalized: MealCatalogItem = {
+      ...item,
+      note: item.note?.trim() || undefined,
+    }
+    const allItems = active.items
+    const nextItems =
+      drawerMode === 'add'
+        ? [...allItems, normalized]
+        : allItems.map((x) => (x.id === normalized.id ? normalized : x))
     const today = formatDateDMY(Date.now())
     save.mutate(
       {
@@ -114,10 +131,16 @@ export function MealCatalogPage() {
     {
       title: t('catering.catalog.col.name'),
       key: 'name',
-      width: 260,
-      ellipsis: true,
+      width: 280,
       sorter: (a, b) => a.name.vi.localeCompare(b.name.vi),
-      render: (_v, r) => <span className="font-semibold">{r.name.vi}</span>,
+      render: (_v, r) => (
+        <div className="min-w-0">
+          <span className="font-semibold">{r.name.vi}</span>
+          {r.note ? (
+            <p className="text-text-muted mb-0 mt-0.5 text-[11.5px] leading-snug">{r.note}</p>
+          ) : null}
+        </div>
+      ),
     },
     {
       title: t('catering.catalog.col.category'),
@@ -170,11 +193,13 @@ export function MealCatalogPage() {
     },
   ]
 
+  const scopeKey = scope === 'SBB' ? 'sbb' : 'eco'
+
   return (
     <ListPageLayout
-      badge={t('catering.catalog.meals.badge')}
-      title={t('catering.catalog.meals.title')}
-      description={t('catering.catalog.meals.desc')}
+      badge={t(`catering.catalog.meals.${scopeKey}.badge`)}
+      title={t(`catering.catalog.meals.${scopeKey}.title`)}
+      description={t(`catering.catalog.meals.${scopeKey}.desc`)}
       actions={
         <Button type="primary" icon={<Plus size={15} />} onClick={openAdd}>
           {t('catering.catalog.addItem')}
@@ -273,6 +298,24 @@ export function MealCatalogPage() {
                   value={drawerItem.unit ?? ''}
                   onChange={(e) => setDrawerItem({ ...drawerItem, unit: e.target.value.trim() || null })}
                 />
+              </div>
+              <div>
+                <label htmlFor="meal-note">{t('catering.catalog.col.formulaNote')}</label>
+                <Input.TextArea
+                  id="meal-note"
+                  rows={3}
+                  value={drawerItem.note ?? ''}
+                  placeholder={t('catering.catalog.formulaNoteHint')}
+                  onChange={(e) =>
+                    setDrawerItem({
+                      ...drawerItem,
+                      note: e.target.value,
+                    })
+                  }
+                />
+                <p className="text-text-muted mb-0 mt-1 text-[11.5px]">
+                  {t('catering.catalog.formulaNoteHint')}
+                </p>
               </div>
               <label className="catalog-drawer-form__switch">
                 <Switch

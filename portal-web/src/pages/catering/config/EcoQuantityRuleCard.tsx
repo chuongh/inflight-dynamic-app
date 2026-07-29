@@ -40,7 +40,7 @@ export function EcoQuantityRuleCard({
   const muted = !rule.enabled
   const badge = fieldBadge(rule.targetColumn)
   const title = displayNameFor(rule.targetColumn, mealCatalog, amenityCatalog)
-  const category = ruleCategoryOf(rule, mealCatalog, amenityCatalog)
+  const category = ruleCategoryOf(rule, mealCatalog)
   const style = RULE_CATEGORY_STYLE[category]
   const branchPreview = summarizeBranchesPreview(
     rule,

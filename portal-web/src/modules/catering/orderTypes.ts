@@ -22,8 +22,8 @@ export interface CateringOrderLine {
 
 /** ECO supply line rolled up across confirmed flights (catalog-backed). */
 export type EcoSupplyGroupId =
-  | 'eco_main'
-  | 'sbb_main'
+  | 'main'
+  | 'vegetarian'
   | 'appetizer'
   | 'dessert'
   | 'bread'
@@ -46,6 +46,25 @@ export interface EcoSupplyLine {
   qty: number
   source: string
   overridden: boolean
+  /** false when computed from a rule with confirmed=false; undefined when no rule applies. */
+  confirmed?: boolean
+  /** true when the field has no quantity rule — always show even at qty 0. */
+  noRuleConfigured?: boolean
+  /**
+   * Which cabin catalog(s) this item belongs to — an item shared by both
+   * catalogs (e.g. Bánh mì tròn & bơ) carries both and shows under each
+   * cabin's section. Empty/undefined for cross-cabin lines (amenity/crew/other).
+   */
+  cabinScopes?: Array<'ECO' | 'SBB'>
+}
+
+/** Per-flight slice of ECO supply quantities (snapshot at build time). */
+export interface EcoSupplyFlightBreakdown {
+  flightNo: string
+  dep: string
+  arr: string
+  /** field key → qty for that single flight (0 omitted) */
+  cells: Record<string, number>
 }
 
 /**
@@ -83,6 +102,8 @@ export interface CateringOrder {
   breakdown?: OrderSourceCell[]
   /** ECO supply lines (catalog items) computed at create-order time. */
   ecoSupplyLines?: EcoSupplyLine[]
+  /** Per-flight ECO supply breakdown (same snapshot as `ecoSupplyLines`). */
+  ecoSupplyByFlight?: EcoSupplyFlightBreakdown[]
   /** Direct numeric patches keyed by flightKey → product → field → number */
   supplierEdits?: Record<string, {
     eco?: Partial<Record<string, number>>

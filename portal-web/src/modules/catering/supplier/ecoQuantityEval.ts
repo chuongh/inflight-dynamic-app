@@ -1,6 +1,5 @@
 import { normalizeAirport } from './normalize'
 import type {
-  EcoQuantityExpr,
   EcoQuantityRule,
   EcoQuantityValue,
   EcoQuantityWhen,
@@ -31,7 +30,7 @@ function applyCoef(value: number | null, coef = 1): number | null {
 
 function applyRound(
   value: number | null,
-  round: 'ceil' | 'none' | undefined,
+  round: 'ceil' | undefined,
 ): number | null {
   if (value == null) return null
   if (round === 'ceil') return Math.ceil(value)
@@ -43,8 +42,6 @@ export function evalQuantityValue(
   ctx: EcoQuantityEvalContext,
 ): number | null {
   switch (value.kind) {
-    case 'manual':
-      return null
     case 'const':
       return value.value
     case 'hotmeal_total':
@@ -67,17 +64,6 @@ export function evalQuantityValue(
     default:
       return null
   }
-}
-
-export function evalQuantityExpr(
-  expr: EcoQuantityExpr,
-  ctx: EcoQuantityEvalContext,
-): number | null {
-  let raw: number | null = null
-  if (expr.source === 'hotmeal_total') raw = ctx.hotmealTotal
-  else if (expr.source === 'metric') raw = ctx.metrics[expr.id ?? ''] ?? null
-  else if (expr.source === 'column') raw = ctx.columns[expr.id ?? ''] ?? null
-  return applyRound(applyCoef(raw, expr.coef), expr.round)
 }
 
 function matchesWhen(
@@ -135,74 +121,150 @@ export function evalQuantityRule(
     return { value: null, source: `${rule.id} disabled` }
   }
 
-  if (rule.base === 'by_item' || rule.base === 'by_hotmeal_total') {
-    if (!rule.expr) {
-      return { value: null, source: `${rule.id} missing expr` }
-    }
-    return {
-      value: evalQuantityExpr(rule.expr, ctx),
-      source: `${rule.id}; ${rule.base}`,
-    }
-  }
-
-  for (const branch of rule.branches ?? []) {
+  for (const branch of rule.branches) {
     if (matchesWhen(branch.when, ctx)) {
+      const raw = evalQuantityValue(branch.value, ctx)
       return {
-        value: evalQuantityValue(branch.value, ctx),
+        value: applyRound(raw, rule.round),
         source: `${rule.id}; branch ${branch.id}${branch.note ? `; ${branch.note}` : ''}`,
       }
     }
   }
 
-  if (rule.fallback) {
+  const raw = evalQuantityValue(rule.fallback, ctx)
+  return {
+    value: applyRound(raw, rule.round),
+    source: `${rule.id}; fallback`,
+  }
+}
+
+function migrateValue(value: unknown): EcoQuantityValue {
+  if (!value || typeof value !== 'object') return { kind: 'const', value: 0 }
+  const v = value as { kind?: string; parts?: unknown[]; [key: string]: unknown }
+  if (v.kind === 'manual') return { kind: 'const', value: 0 }
+  if (v.kind === 'sum' && Array.isArray(v.parts)) {
     return {
-      value: evalQuantityValue(rule.fallback, ctx),
-      source: `${rule.id}; fallback`,
+      kind: 'sum',
+      parts: v.parts.map(migrateValue),
+    }
+  }
+  if (
+    v.kind === 'const' ||
+    v.kind === 'metric' ||
+    v.kind === 'column' ||
+    v.kind === 'hotmeal_total'
+  ) {
+    return v as EcoQuantityValue
+  }
+  return { kind: 'const', value: 0 }
+}
+
+/**
+ * Normalize persisted / legacy rules (base/expr/manual) into the unified shape.
+ * Safe to call on already-migrated rules.
+ */
+export function migrateEcoQuantityRule(raw: unknown): EcoQuantityRule {
+  const rule = raw as EcoQuantityRule & {
+    base?: string
+    expr?: {
+      source: 'column' | 'hotmeal_total' | 'metric'
+      id?: string
+      coef: number
+      round?: 'ceil' | 'none'
+    }
+    branches?: EcoQuantityRule['branches']
+    fallback?: unknown
+  }
+
+  if (rule.expr) {
+    const expr = rule.expr
+    let fallback: EcoQuantityValue
+    if (expr.source === 'hotmeal_total') {
+      fallback = { kind: 'hotmeal_total', coef: expr.coef }
+    } else if (expr.source === 'metric') {
+      fallback = { kind: 'metric', metricId: expr.id ?? '', coef: expr.coef }
+    } else {
+      fallback = { kind: 'column', columnId: expr.id ?? '', coef: expr.coef }
+    }
+    return {
+      id: rule.id,
+      targetColumn: rule.targetColumn,
+      enabled: rule.enabled,
+      docRef: rule.docRef,
+      round: expr.round === 'ceil' ? 'ceil' : undefined,
+      branches: (rule.branches ?? []).map((b) => ({
+        ...b,
+        value: migrateValue(b.value),
+      })),
+      fallback,
+      confirmed: typeof rule.confirmed === 'boolean' ? rule.confirmed : true,
     }
   }
 
-  return { value: null, source: `${rule.id}; no match` }
+  return {
+    id: rule.id,
+    targetColumn: rule.targetColumn,
+    enabled: rule.enabled,
+    docRef: rule.docRef,
+    round: rule.round,
+    branches: (rule.branches ?? []).map((b) => ({
+      ...b,
+      value: migrateValue(b.value),
+    })),
+    fallback: migrateValue(rule.fallback ?? { kind: 'const', value: 0 }),
+    confirmed: typeof rule.confirmed === 'boolean' ? rule.confirmed : true,
+  }
+}
+
+export function migrateEcoQuantityRules(rules: unknown[]): EcoQuantityRule[] {
+  return rules.map(migrateEcoQuantityRule)
 }
 
 /** Default ECO remaining-quantity rules (confirmed formulas from the policy doc). */
 export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
   {
     id: 'ECO.AI.ketchup',
-    base: 'by_item',
     targetColumn: 'ketchup',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.4 AI',
-    expr: { source: 'column', id: 'spaghetti', coef: 1, round: 'none' },
+    branches: [],
+    fallback: { kind: 'column', columnId: 'spaghetti', coef: 1 },
   },
   {
     id: 'ECO.AJ.chili',
-    base: 'by_hotmeal_total',
     targetColumn: 'chiliSauce',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.4 AJ',
-    expr: { source: 'hotmeal_total', coef: 0.5, round: 'ceil' },
+    round: 'ceil',
+    branches: [],
+    fallback: { kind: 'hotmeal_total', coef: 0.5 },
   },
   {
     id: 'ECO.AK.soy',
-    base: 'by_hotmeal_total',
     targetColumn: 'soySauce',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.4 AK',
-    expr: { source: 'hotmeal_total', coef: 0.5, round: 'ceil' },
+    round: 'ceil',
+    branches: [],
+    fallback: { kind: 'hotmeal_total', coef: 0.5 },
   },
   {
     id: 'ECO.AM.hotmealUtensils',
-    base: 'by_hotmeal_total',
     targetColumn: 'hotmealUtensils',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.4 AM',
-    expr: { source: 'hotmeal_total', coef: 1, round: 'none' },
+    branches: [],
+    fallback: { kind: 'hotmeal_total', coef: 1 },
   },
   {
     id: 'ECO.AL.indianSalt',
-    base: 'by_std_arr',
     targetColumn: 'indianSaltPepper',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.4 AL',
     branches: [
       {
@@ -216,9 +278,9 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
   },
   {
     id: 'ECO.AN.reserveUtensils',
-    base: 'by_std_arr',
     targetColumn: 'reserveUtensils',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.4 AN',
     branches: [
       {
@@ -249,44 +311,47 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
         note: 'Đổi tổ = 12',
       },
     ],
-    fallback: { kind: 'manual' },
+    fallback: { kind: 'const', value: 0 },
   },
   {
     id: 'ECO.S.bread',
-    base: 'by_std_arr',
     targetColumn: 'bread',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.3 S',
     branches: [],
     fallback: {
       kind: 'sum',
       parts: [
         { kind: 'metric', metricId: 'quotaCommercial', coef: 1 },
-        { kind: 'metric', metricId: 'totalPrebook', coef: 1 },
+        // Bánh mì's own prebook from the ungrouped flight file — not totalPrebook (all dishes).
+        { kind: 'metric', metricId: 'breadPrebook', coef: 1 },
       ],
     },
   },
   {
     id: 'ECO.AZ.prebookCashews',
-    base: 'by_item',
     targetColumn: 'prebookCashews',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.5 AZ',
-    expr: { source: 'metric', id: 'totalPrebook', coef: 1, round: 'none' },
+    branches: [],
+    fallback: { kind: 'metric', metricId: 'totalPrebook', coef: 1 },
   },
   {
     id: 'ECO.AY.freshWater',
-    base: 'by_item',
     targetColumn: 'freshWater',
-    enabled: true,
+    enabled: true,
+    confirmed: true,
     docRef: '§1.5 AY',
-    expr: { source: 'metric', id: 'totalPrebook', coef: 1, round: 'none' },
+    branches: [],
+    fallback: { kind: 'metric', metricId: 'totalPrebook', coef: 1 },
   },
   {
     id: 'ECO.Z.auNoodleVeg',
-    base: 'by_std_arr',
     targetColumn: 'australiaNoodleVegetables',
-    enabled: true,
+    enabled: true,
+    confirmed: false,
     docRef: '§1.3 Z',
     branches: [
       {
@@ -296,13 +361,13 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
         note: 'DEP/ARR Úc = 25',
       },
     ],
-    fallback: { kind: 'manual' },
+    fallback: { kind: 'const', value: 0 },
   },
   {
     id: 'ECO.AE.skybossEggs',
-    base: 'by_std_arr',
     targetColumn: 'skybossEggs',
-    enabled: true,
+    enabled: true,
+    confirmed: false,
     docRef: '§1.3 AE',
     branches: [
       {
@@ -312,13 +377,13 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
         note: 'DEP/ARR Úc = SkyBoss ECO',
       },
     ],
-    fallback: { kind: 'manual' },
+    fallback: { kind: 'const', value: 0 },
   },
   {
     id: 'ECO.AG.auSkybossYogurt',
-    base: 'by_std_arr',
     targetColumn: 'australiaSkybossYogurt',
-    enabled: true,
+    enabled: true,
+    confirmed: false,
     docRef: '§1.3 AG',
     branches: [
       {
@@ -328,13 +393,13 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
         note: 'DEP/ARR Úc = SkyBoss ECO',
       },
     ],
-    fallback: { kind: 'manual' },
+    fallback: { kind: 'const', value: 0 },
   },
   {
     id: 'ECO.AW.auRoundBread',
-    base: 'by_std_arr',
     targetColumn: 'australiaRoundBread',
-    enabled: true,
+    enabled: true,
+    confirmed: false,
     docRef: '§1.3 AW',
     branches: [
       {
@@ -344,6 +409,38 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
         note: 'DEP/ARR Úc = SkyBoss ECO',
       },
     ],
-    fallback: { kind: 'manual' },
+    fallback: { kind: 'const', value: 0 },
+  },
+  {
+    id: 'ECO.AS.maccaKazSalted',
+    targetColumn: 'maccaKazSalted',
+    enabled: true,
+    confirmed: true,
+    branches: [
+      {
+        id: 'kaz',
+        when: { routeGroups: ['KAZ'] },
+        value: { kind: 'metric', metricId: 'skybossEco', coef: 1 },
+        note: 'Nhóm KAZ = Số khách SkyBoss',
+      },
+    ],
+    fallback: { kind: 'const', value: 0 },
+  },
+  {
+    id: 'ECO.AR.maccaSkybossRaisins',
+    targetColumn: 'maccaSkybossRaisins',
+    enabled: true,
+    confirmed: true,
+    branches: [],
+    fallback: { kind: 'metric', metricId: 'skybossEco', coef: 1 },
+  },
+  {
+    id: 'ECO.AX.blanket3in1Prebook',
+    targetColumn: 'blanket3in1Prebook',
+    enabled: true,
+    confirmed: false,
+    branches: [],
+    fallback: { kind: 'metric', metricId: 'totalPrebook', coef: 1 },
+    docRef: '§1.5 AX — xấp xỉ tạm bằng Tổng Prebook, xem note trong catalog',
   },
 ]

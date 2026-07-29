@@ -52,7 +52,7 @@ const ecoDefinitions: readonly ColumnDefinition<keyof EcoCells>[] = [
   { productCode: 'HM1', header: 'Xôi khúc', field: 'khucStickyRice' },
   { productCode: 'HM4', header: 'Cơm bò', field: 'beefRice' },
   { productCode: 'HM3', header: 'Cơm dừa Malaysia', field: 'coconutRice' },
-  { productCode: '', header: 'Bánh mì', field: 'bread' },
+  { productCode: '40000294', header: 'Bánh mì', field: 'bread' },
   {
     productCode: 'HM14',
     header: 'Khoai viên chay Ấn + Paratha',

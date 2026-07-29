@@ -71,7 +71,14 @@ export function AmenityCatalogPage() {
       message.warning(t('catering.catalog.nameRequired'))
       return
     }
-    const nextItems = drawerMode === 'add' ? [...items, item] : items.map((x) => (x.id === item.id ? item : x))
+    const normalized: AmenityCatalogItem = {
+      ...item,
+      note: item.note?.trim() || undefined,
+    }
+    const nextItems =
+      drawerMode === 'add'
+        ? [...items, normalized]
+        : items.map((x) => (x.id === normalized.id ? normalized : x))
     const today = formatDateDMY(Date.now())
     save.mutate(
       {
@@ -106,10 +113,16 @@ export function AmenityCatalogPage() {
     {
       title: t('catering.catalog.col.name'),
       key: 'name',
-      width: 260,
-      ellipsis: true,
+      width: 280,
       sorter: (a, b) => a.name.vi.localeCompare(b.name.vi),
-      render: (_v, r) => <span className="font-semibold">{r.name.vi}</span>,
+      render: (_v, r) => (
+        <div className="min-w-0">
+          <span className="font-semibold">{r.name.vi}</span>
+          {r.note ? (
+            <p className="text-text-muted mb-0 mt-0.5 text-[11.5px] leading-snug">{r.note}</p>
+          ) : null}
+        </div>
+      ),
     },
     {
       title: t('catering.catalog.col.unit'),
@@ -228,6 +241,24 @@ export function AmenityCatalogPage() {
                   value={drawerItem.unit ?? ''}
                   onChange={(e) => setDrawerItem({ ...drawerItem, unit: e.target.value.trim() || null })}
                 />
+              </div>
+              <div>
+                <label htmlFor="amn-note">{t('catering.catalog.col.formulaNote')}</label>
+                <Input.TextArea
+                  id="amn-note"
+                  rows={3}
+                  value={drawerItem.note ?? ''}
+                  placeholder={t('catering.catalog.formulaNoteHint')}
+                  onChange={(e) =>
+                    setDrawerItem({
+                      ...drawerItem,
+                      note: e.target.value,
+                    })
+                  }
+                />
+                <p className="text-text-muted mb-0 mt-1 text-[11.5px]">
+                  {t('catering.catalog.formulaNoteHint')}
+                </p>
               </div>
               <label className="catalog-drawer-form__switch">
                 <Switch

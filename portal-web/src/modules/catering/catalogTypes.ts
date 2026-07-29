@@ -4,9 +4,13 @@
  */
 import type { VersionStatus } from './types'
 
+/**
+ * Cross-cabin dish taxonomy — decoupled from cabin. Which cabin an item
+ * belongs to is `cabinScopes`, not the category (see MealCatalogItem below).
+ */
 export type MealItemCategory =
-  | 'eco_main'
-  | 'sbb_main'
+  | 'main'
+  | 'vegetarian'
   | 'appetizer'
   | 'dessert'
   | 'bread'
@@ -27,6 +31,8 @@ export interface MealCatalogItem {
   cabinScopes: CabinScope[]
   active: boolean
   needsCode: boolean
+  /** Ghi chú công thức/nguồn số liệu — hiện ở Catalog và tham chiếu khi tạo rule. */
+  note?: string
 }
 
 export interface ComboCatalogItem {
@@ -45,6 +51,8 @@ export interface AmenityCatalogItem {
   unit: string | null
   active: boolean
   needsCode: boolean
+  /** Ghi chú công thức/nguồn số liệu — hiện ở Catalog và tham chiếu khi tạo rule. */
+  note?: string
 }
 
 interface CatalogVersionBase {

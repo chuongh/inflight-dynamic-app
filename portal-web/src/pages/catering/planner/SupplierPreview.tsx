@@ -1,12 +1,15 @@
 import { FileSpreadsheet } from 'lucide-react'
 import { InputNumber, Segmented } from 'antd'
 import { useMemo, useState, type RefObject } from 'react'
+import { activeCatalogVersion } from '@/modules/catering/catalog'
+import type { AmenityCatalogItem, MealCatalogItem } from '@/modules/catering/catalogTypes'
+import { useAmenityCatalogData, useMealCatalogData } from '@/modules/catering/hooks/useCatalog'
 import type { EcoCells, SbbCells, SbbRouteSheet, SupplierCell } from '@/modules/catering/supplier/types'
 import {
   ECO_FIELD_GROUPS,
-  FIELD_LABELS,
   getPlannerCellAccessibleName,
   groupFlightsBySbbRouteSheet,
+  plannerFieldLabel,
   SBB_FIELD_GROUPS,
   type PlannerFlight,
   type PlannerProduct,
@@ -30,6 +33,10 @@ export function SupplierPreview({
   onSelectFlight?: (key: string) => void
 }) {
   const [product, setProduct] = useState<'eco' | 'sbb'>('eco')
+  const { data: mealCatalogData } = useMealCatalogData()
+  const { data: amenityCatalogData } = useAmenityCatalogData()
+  const mealCatalog = activeCatalogVersion(mealCatalogData?.versions ?? [])?.items ?? []
+  const amenityCatalog = activeCatalogVersion(amenityCatalogData?.versions ?? [])?.items ?? []
 
   return (
     <section className="planner-preview planner-preview--matrix" aria-label="Xem trước dữ liệu nhà cung cấp">
@@ -64,6 +71,8 @@ export function SupplierPreview({
           onCellChange={onCellChange}
           selectedFlightKey={selectedFlightKey}
           onSelectFlight={onSelectFlight}
+          mealCatalog={mealCatalog}
+          amenityCatalog={amenityCatalog}
         />
       ) : (
         <SbbMatrix
@@ -72,6 +81,8 @@ export function SupplierPreview({
           onCellChange={onCellChange}
           selectedFlightKey={selectedFlightKey}
           onSelectFlight={onSelectFlight}
+          mealCatalog={mealCatalog}
+          amenityCatalog={amenityCatalog}
         />
       )}
     </section>
@@ -84,12 +95,16 @@ function EcoMatrix({
   onCellChange,
   selectedFlightKey,
   onSelectFlight,
+  mealCatalog,
+  amenityCatalog,
 }: {
   flights: PlannerFlight[]
   editable: boolean
   onCellChange?: (change: PlannerCellChange) => void
   selectedFlightKey?: string
   onSelectFlight?: (key: string) => void
+  mealCatalog: MealCatalogItem[]
+  amenityCatalog: AmenityCatalogItem[]
 }) {
   const [groupKey, setGroupKey] = useState(ECO_FIELD_GROUPS[0].key)
   const group = ECO_FIELD_GROUPS.find((g) => g.key === groupKey) ?? ECO_FIELD_GROUPS[0]
@@ -114,6 +129,8 @@ function EcoMatrix({
         selectedFlightKey={selectedFlightKey}
         onSelectFlight={onSelectFlight}
         groupLabel={group.label}
+        mealCatalog={mealCatalog}
+        amenityCatalog={amenityCatalog}
       />
     </div>
   )
@@ -125,12 +142,16 @@ function SbbMatrix({
   onCellChange,
   selectedFlightKey,
   onSelectFlight,
+  mealCatalog,
+  amenityCatalog,
 }: {
   flights: PlannerFlight[]
   editable: boolean
   onCellChange?: (change: PlannerCellChange) => void
   selectedFlightKey?: string
   onSelectFlight?: (key: string) => void
+  mealCatalog: MealCatalogItem[]
+  amenityCatalog: AmenityCatalogItem[]
 }) {
   const routeGroups = useMemo(() => groupFlightsBySbbRouteSheet(flights), [flights])
   const [sheet, setSheet] = useState<SbbRouteSheet | ''>(routeGroups[0]?.sheet ?? '')
@@ -178,6 +199,8 @@ function SbbMatrix({
         selectedFlightKey={selectedFlightKey}
         onSelectFlight={onSelectFlight}
         groupLabel={group.label}
+        mealCatalog={mealCatalog}
+        amenityCatalog={amenityCatalog}
       />
     </div>
   )
@@ -192,6 +215,8 @@ function PreviewTable({
   selectedFlightKey,
   onSelectFlight,
   groupLabel,
+  mealCatalog,
+  amenityCatalog,
 }: {
   flights: PlannerFlight[]
   fields: readonly (keyof EcoCells | keyof SbbCells)[]
@@ -201,7 +226,10 @@ function PreviewTable({
   selectedFlightKey?: string
   onSelectFlight?: (key: string) => void
   groupLabel: string
+  mealCatalog: MealCatalogItem[]
+  amenityCatalog: AmenityCatalogItem[]
 }) {
+  const labelOf = (field: string) => plannerFieldLabel(field, mealCatalog, amenityCatalog)
   return (
     <div className="planner-preview-table-wrap thin-scroll">
       <table className="planner-preview-table" aria-label={`${product.toUpperCase()} · ${groupLabel}`}>
@@ -215,7 +243,7 @@ function PreviewTable({
             </th>
             {fields.map((field) => (
               <th scope="col" key={field}>
-                {FIELD_LABELS[field]}
+                {labelOf(field)}
               </th>
             ))}
           </tr>
@@ -252,6 +280,7 @@ function PreviewTable({
                           cell={cell}
                           editable={editable}
                           onCellChange={onCellChange}
+                          label={labelOf(field)}
                         />
                       ) : (
                         '—'
@@ -276,6 +305,7 @@ function PreviewCell({
   cell,
   editable,
   onCellChange,
+  label,
 }: {
   flightKey: string
   flightNo: string
@@ -284,8 +314,8 @@ function PreviewCell({
   cell: SupplierCell<number>
   editable: boolean
   onCellChange?: (change: PlannerCellChange) => void
+  label: string
 }) {
-  const label = FIELD_LABELS[field]
   if (editable && onCellChange) {
     return (
       <InputNumber
