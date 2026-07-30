@@ -52,7 +52,14 @@ describe('supplier runtime guards', () => {
     const duplicate = structuredClone(sbbLookupJson)
     duplicate.sheets['ÚC&KAZ'].push({
       businessPax: 11,
-      items: {},
+      items: {
+        bread: 0,
+        basa: 0,
+        pho: 0,
+        bunBo: 0,
+        stickyRice: 0,
+        chickenGravy: 0,
+      },
     })
 
     expect(parseSbbLookupDataset(missingSheet).ok).toBe(false)

@@ -30,6 +30,7 @@ export const paths = {
     },
     catalog: {
       meals: '/catering/catalog/meals',
+      mealsSbb: '/catering/catalog/meals-sbb',
       combos: '/catering/catalog/combos',
       amenity: '/catering/catalog/amenity',
     },

@@ -1,121 +1,133 @@
 /**
  * Build order-level ECO supply lines (catalog-backed) from confirmed flight groups.
  */
-import { activeCatalogVersion } from "../catalog";
+import { activeCatalogVersion } from '../catalog'
 import type {
   AmenityCatalogDataset,
   AmenityCatalogItem,
   MealCatalogDataset,
   MealCatalogItem,
-} from "../catalogTypes";
-import type { DayGrouping } from "../groupingTypes";
-import { computeGroupCrewMeals } from "../groupCrewMeal";
-import type {
-  EcoSupplyFlightBreakdown,
-  EcoSupplyFlightLeg,
-  EcoSupplyLine,
-} from "../orderTypes";
-import { DEFAULT_ECO_AMENITY_CONFIG } from "./amenityDefaults";
-import { buildEcoSupplierRow } from "./ecoBuilder";
-import type { EcoQuantityConfig } from "./ecoQuantityTypes";
+} from '../catalogTypes'
+import type { CrewMealProfile } from '../crewMealTypes'
+import { groupOrigin } from '../grouping'
+import type { DayGrouping } from '../groupingTypes'
+import { computeGroupCrewMeals } from '../groupCrewMeal'
+import type { EcoSupplyFlightBreakdown, EcoSupplyLine } from '../orderTypes'
+import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
+import { buildEcoSupplierRow } from './ecoBuilder'
 import {
+  DEFAULT_ECO_QUANTITY_RULES,
+  migrateEcoQuantityRules,
+} from './ecoQuantityEval'
+import type { EcoQuantityConfig } from './ecoQuantityTypes'
+import {
+  ALWAYS_MANUAL_FIELDS,
+  ECO_QUANTITY_TARGET_COLUMNS,
   ECO_SUPPLY_FIELDS,
   ECO_SUPPLY_GROUP_ORDER,
   type EcoSupplyFieldKey,
   type EcoSupplyGroupId,
-} from "./ecoSupplyRegistry";
-import { flightGroupsToSupplierInputs } from "./fromFlightGroup";
+} from './ecoSupplyRegistry'
+import { flightGroupsToSupplierInputs } from './fromFlightGroup'
 
 export interface BuildEcoSupplyArgs {
-  day: DayGrouping;
-  station: string;
-  mealCatalog: MealCatalogDataset | null | undefined;
-  amenityCatalog: AmenityCatalogDataset | null | undefined;
-  ecoRouteRules: unknown;
-  quantityConfig?: EcoQuantityConfig | null;
+  day: DayGrouping
+  station: string
+  mealCatalog: MealCatalogDataset | null | undefined
+  amenityCatalog: AmenityCatalogDataset | null | undefined
+  ecoRouteRules: unknown
+  quantityConfig?: EcoQuantityConfig | null
+  /** Active cockpit crew-meal profile; omit/null to skip crew line. */
+  crewMealProfile?: CrewMealProfile | null
+}
+
+export interface EcoSupplySnapshot {
+  lines: EcoSupplyLine[]
+  byFlight: EcoSupplyFlightBreakdown[]
+}
+
+/**
+ * Which cabin catalog(s) an item belongs to. Items shared across cabins
+ * (e.g. Bánh mì tròn & bơ, Yogurt, Muối tiêu) carry both — Order Details
+ * shows them under each cabin's section, matching the Meal Catalog pages.
+ */
+function mealCabinScopes(item: MealCatalogItem): Array<'ECO' | 'SBB'> {
+  return item.cabinScopes.filter((s): s is 'ECO' | 'SBB' => s === 'ECO' || s === 'SBB')
 }
 
 function lookupCatalog(
   def: {
-    productCode: string | null;
-    catalogItemId?: string | null;
-    catalog: "meal" | "amenity" | "none";
+    productCode: string | null
+    catalogItemId?: string | null
+    catalog: 'meal' | 'amenity' | 'none'
   },
   meals: MealCatalogItem[],
   amenities: AmenityCatalogItem[],
 ): {
-  catalogItemId: string | null;
-  name: string;
-  unit: string | null;
-  productCode: string | null;
-  group: EcoSupplyGroupId | null;
+  catalogItemId: string | null
+  name: string
+  unit: string | null
+  productCode: string | null
+  group: EcoSupplyGroupId | null
+  /** ECO/SBB catalog(s) this item belongs to; empty for amenity items (cross-cabin). */
+  cabinScopes: Array<'ECO' | 'SBB'>
 } {
-  const { productCode, catalogItemId, catalog } = def;
-  if (catalog === "none") {
-    return {
-      catalogItemId: null,
-      name: "",
-      unit: null,
-      productCode,
-      group: null,
-    };
+  const { productCode, catalogItemId, catalog } = def
+  if (catalog === 'none') {
+    return { catalogItemId: null, name: '', unit: null, productCode, group: null, cabinScopes: [] }
   }
 
-  const mealFirst = catalog === "meal";
-  const pools = mealFirst ? [meals, amenities] : [amenities, meals];
+  const mealFirst = catalog === 'meal'
+  const pools = mealFirst ? [meals, amenities] : [amenities, meals]
 
   if (catalogItemId) {
     for (let i = 0; i < pools.length; i++) {
-      const hit = pools[i].find(
-        (item) => item.id === catalogItemId && item.active !== false,
-      );
-      if (!hit) continue;
-      const fromMeal = mealFirst ? i === 0 : i === 1;
+      const hit = pools[i].find((item) => item.id === catalogItemId && item.active !== false)
+      if (!hit) continue
+      const fromMeal = mealFirst ? i === 0 : i === 1
       return {
         catalogItemId: hit.id,
         name: hit.name.vi,
         unit: hit.unit,
         productCode: hit.productCode ?? productCode,
-        group:
-          fromMeal && "category" in hit
-            ? (hit as MealCatalogItem).category
-            : "amenity",
-      };
+        group: fromMeal && 'category' in hit ? (hit as MealCatalogItem).category : 'amenity',
+        cabinScopes: fromMeal ? mealCabinScopes(hit as MealCatalogItem) : [],
+      }
     }
   }
 
   if (productCode) {
     for (let i = 0; i < pools.length; i++) {
-      const hit = pools[i].find(
-        (item) => item.productCode === productCode && item.active !== false,
-      );
-      if (!hit) continue;
-      const fromMeal = mealFirst ? i === 0 : i === 1;
+      const hit = pools[i].find((item) => item.productCode === productCode && item.active !== false)
+      if (!hit) continue
+      const fromMeal = mealFirst ? i === 0 : i === 1
       return {
         catalogItemId: hit.id,
         name: hit.name.vi,
         unit: hit.unit,
         productCode: hit.productCode,
-        group:
-          fromMeal && "category" in hit
-            ? (hit as MealCatalogItem).category
-            : "amenity",
-      };
+        group: fromMeal && 'category' in hit ? (hit as MealCatalogItem).category : 'amenity',
+        cabinScopes: fromMeal ? mealCabinScopes(hit as MealCatalogItem) : [],
+      }
     }
   }
 
-  return {
-    catalogItemId: null,
-    name: "",
-    unit: null,
-    productCode,
-    group: null,
-  };
+  return { catalogItemId: null, name: '', unit: null, productCode, group: null, cabinScopes: [] }
 }
 
-export function buildEcoSupplySnapshot(
-  args: BuildEcoSupplyArgs,
-): EcoSupplyLine[] {
+function flightCellsFromRow(
+  row: ReturnType<typeof buildEcoSupplierRow>,
+): Record<string, number> {
+  const cells: Record<string, number> = {}
+  for (const def of ECO_SUPPLY_FIELDS) {
+    const value = row.cells[def.field]?.value
+    if (value == null || !Number.isFinite(value) || value === 0) continue
+    cells[def.field] = Math.round(value)
+  }
+  return cells
+}
+
+export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnapshot {
   const {
     day,
     station,
@@ -123,37 +135,26 @@ export function buildEcoSupplySnapshot(
     amenityCatalog,
     ecoRouteRules,
     quantityConfig,
-  } = args;
-  const { inputs } = flightGroupsToSupplierInputs(day, station);
-  if (inputs.length === 0) return [];
+    crewMealProfile,
+  } = args
+  const { inputs } = flightGroupsToSupplierInputs(day, station)
+  if (inputs.length === 0) return { lines: [], byFlight: [] }
 
-  const meals = activeCatalogVersion(mealCatalog?.versions ?? [])?.items ?? [];
-  const amenities =
-    activeCatalogVersion(amenityCatalog?.versions ?? [])?.items ?? [];
+  const meals = activeCatalogVersion(mealCatalog?.versions ?? [])?.items ?? []
+  const amenities = activeCatalogVersion(amenityCatalog?.versions ?? [])?.items ?? []
+  const quantityRules = migrateEcoQuantityRules(
+    quantityConfig?.quantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
+  )
+  const alwaysManual = new Set<string>(ALWAYS_MANUAL_FIELDS)
+  const ruleTargetColumns = new Set<string>(ECO_QUANTITY_TARGET_COLUMNS)
 
   const totals = new Map<
     EcoSupplyFieldKey,
     { qty: number; sources: string[]; def: (typeof ECO_SUPPLY_FIELDS)[number] }
-  >();
+  >()
 
-  const amenityConfig = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG;
-  const packageDefs = new Map(amenityConfig.packages.map((p) => [p.id, p]));
-  const packageLabel = (packageId: number): string => {
-    const def = packageDefs.get(packageId);
-    const idLabel = String(packageId).padStart(2, "0");
-    return def ? `Gói ${idLabel} · ${def.label}` : `Gói ${idLabel}`;
-  };
-
-  const packageTotals = new Map<number, number>();
-
-  /** Legs of the same confirmed FlightGroup (e.g. VJ240 + VJ243) merge into one bucket. */
-  interface GroupBucket {
-    legs: EcoSupplyFlightLeg[];
-    cells: Record<string, number>;
-    quotaCommercial: number;
-    packageCounts: Map<number, number>;
-  }
-  const groupBuckets = new Map<string, GroupBucket>();
+  const packageTotals = new Map<number, number>()
+  const byFlight: EcoSupplyFlightBreakdown[] = []
 
   for (const input of inputs) {
     const row = buildEcoSupplierRow(
@@ -168,81 +169,67 @@ export function buildEcoSupplySnapshot(
       },
       ecoRouteRules,
       quantityConfig,
-    );
+    )
 
-    const groupId = input.groupId ?? row.flightNo;
-    const bucket: GroupBucket = groupBuckets.get(groupId) ?? {
-      legs: [],
-      cells: {},
-      quotaCommercial: 0,
-      packageCounts: new Map(),
-    };
-    bucket.legs.push({ flightNo: row.flightNo, dep: row.dep, arr: row.arr });
-    for (const [field, qty] of Object.entries(flightCellsFromRow(row))) {
-      bucket.cells[field] = (bucket.cells[field] ?? 0) + qty;
-    }
-    bucket.quotaCommercial += input.quotaCommercial ?? 0;
-    for (const packageId of row.amenityPackageIds) {
-      bucket.packageCounts.set(
-        packageId,
-        (bucket.packageCounts.get(packageId) ?? 0) + 1,
-      );
-    }
-    groupBuckets.set(groupId, bucket);
+    byFlight.push({
+      flightNo: row.flightNo,
+      dep: row.dep,
+      arr: row.arr,
+      cells: flightCellsFromRow(row),
+    })
 
     for (const def of ECO_SUPPLY_FIELDS) {
-      const cell = row.cells[def.field];
-      const value = cell?.value;
-      if (value == null || !Number.isFinite(value) || value === 0) continue;
-      const prev = totals.get(def.field);
+      const cell = row.cells[def.field]
+      const value = cell?.value
+      if (value == null || !Number.isFinite(value) || value === 0) continue
+      const prev = totals.get(def.field)
       if (prev) {
-        prev.qty += value;
+        prev.qty += value
         if (cell.source && !prev.sources.includes(cell.source)) {
-          prev.sources.push(cell.source);
+          prev.sources.push(cell.source)
         }
       } else {
         totals.set(def.field, {
           qty: value,
           sources: cell.source ? [cell.source] : [],
           def,
-        });
+        })
       }
     }
 
     // TODO: odd-sector short round-trip needs sectorCount/isLastLeg on FlightLeg
-    const composition = resolveAmenityComposition(row.amenityPackageIds);
-    for (const item of composition) {
-      amenityTotals.set(
-        item.productCode,
-        (amenityTotals.get(item.productCode) ?? 0) + item.quantity,
-      );
+    for (const packageId of row.amenityPackageIds) {
+      packageTotals.set(packageId, (packageTotals.get(packageId) ?? 0) + 1)
     }
   }
 
-  const byFlight: EcoSupplyFlightBreakdown[] = [...groupBuckets].map(
-    ([groupId, bucket]) => ({
-      groupId,
-      legs: bucket.legs,
-      cells: bucket.cells,
-      quotaCommercial: bucket.quotaCommercial,
-      amenityPackages: [...bucket.packageCounts].map(([id, count]) => ({
-        id,
-        label: packageLabel(id),
-        count,
-      })),
-    }),
-  );
+  const amenityConfig = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG
+  const packageDefs = new Map(amenityConfig.packages.map((p) => [p.id, p]))
 
-  const lines: EcoSupplyLine[] = [];
+  const lines: EcoSupplyLine[] = []
   for (const def of ECO_SUPPLY_FIELDS) {
-    const agg = totals.get(def.field);
-    if (!agg && !def.includeZero) continue;
-    const cat = lookupCatalog(def, meals, amenities);
-    const qty = Math.round(agg?.qty ?? 0);
+    const rule = quantityRules.find((r) => r.targetColumn === def.field)
+    const noRuleConfigured =
+      !rule && ruleTargetColumns.has(def.field) && !alwaysManual.has(def.field)
+    const confirmed = rule ? rule.confirmed !== false : undefined
+    const agg = totals.get(def.field)
+    // Always emit unconfirmed / no-rule / always-manual lines (even at qty 0) —
+    // manual fields have no formula, so ops need the row visible to enter a value at all.
+    if (
+      !agg &&
+      !def.includeZero &&
+      !noRuleConfigured &&
+      confirmed !== false &&
+      !alwaysManual.has(def.field)
+    ) {
+      continue
+    }
+    const cat = lookupCatalog(def, meals, amenities)
+    const qty = Math.round(agg?.qty ?? 0)
     lines.push({
       id: `eco-${def.field}`,
       field: def.field,
-      group: cat.group ?? def.group,
+      group: def.group === 'other' ? def.group : (cat.group ?? def.group),
       catalogItemId: cat.catalogItemId,
       productCode: cat.productCode ?? def.productCode,
       name: cat.name || def.fallbackNameVi,
@@ -251,59 +238,63 @@ export function buildEcoSupplySnapshot(
       qty,
       source:
         agg?.sources[0] ??
-        (def.includeZero ? "Manual/operational input" : "ECO rules"),
+        (def.includeZero || noRuleConfigured || alwaysManual.has(def.field)
+          ? 'Manual/operational input'
+          : 'ECO rules'),
       overridden: false,
       cabinScopes: cat.cabinScopes,
       ...(confirmed === undefined ? {} : { confirmed }),
       ...(noRuleConfigured ? { noRuleConfigured: true } : {}),
-    });
+    })
   }
 
   for (const [packageId, count] of packageTotals) {
-    if (!Number.isFinite(count) || count <= 0) continue;
+    if (!Number.isFinite(count) || count <= 0) continue
+    const def = packageDefs.get(packageId)
+    const idLabel = String(packageId).padStart(2, '0')
     lines.push({
-      id: `amenity-${productCode}`,
-      field: productCode,
-      group: "amenity_composition",
+      id: `amenity-package-${packageId}`,
+      field: `amenityPackage${packageId}`,
+      group: 'amenity_composition',
       catalogItemId: null,
       productCode: null,
-      name: packageLabel(packageId),
-      unit: "gói",
+      name: def ? `Gói ${idLabel} · ${def.label}` : `Gói ${idLabel}`,
+      unit: 'gói',
       suggested: count,
       qty: count,
-      source: "Amenity package selection",
+      source: 'Amenity package selection',
       overridden: false,
-    });
+    })
   }
 
   // Crew meals are per rotation (FlightGroup), not per leg — same filter as supplier inputs.
   if (crewMealProfile) {
-    let crewTotal = 0;
+    let crewTotal = 0
     for (const group of day.groups) {
-      if (groupOrigin(group) !== station || !group.confirmed) continue;
-      crewTotal += computeGroupCrewMeals(group, crewMealProfile).meals;
+      if (groupOrigin(group) !== station || !group.confirmed) continue
+      crewTotal += computeGroupCrewMeals(group, crewMealProfile).meals
     }
     lines.push({
-      id: "eco-crewCockpit",
-      field: "crewCockpit",
-      group: "other",
+      id: 'eco-crewCockpit',
+      field: 'crewCockpit',
+      group: 'other',
       catalogItemId: null,
       productCode: null,
-      name: "Suất ăn tổ bay",
+      name: 'Suất ăn tổ bay',
       unit: null,
       suggested: crewTotal,
       qty: crewTotal,
-      source: "computeGroupCrewMeals (BRule-04/26-29)",
+      source: 'computeGroupCrewMeals (BRule-04/26-29)',
       overridden: false,
-    });
+    })
   }
 
   const rank = (g: EcoSupplyGroupId) => {
-    const i = ECO_SUPPLY_GROUP_ORDER.indexOf(g);
-    return i < 0 ? 999 : i;
-  };
-  return lines.sort(
-    (a, b) =>
-      rank(a.group) - rank(b.group) || a.name.localeCompare(b.name, "vi"),
-  );
+    const i = ECO_SUPPLY_GROUP_ORDER.indexOf(g)
+    return i < 0 ? 999 : i
+  }
+  return {
+    lines: lines.sort((a, b) => rank(a.group) - rank(b.group) || a.name.localeCompare(b.name, 'vi')),
+    byFlight,
+  }
 }

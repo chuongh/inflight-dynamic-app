@@ -38,6 +38,8 @@ function exportableEcoRow() {
     ...vj81,
     workbookReferenceBread: null,
     quotaCommercial: 1,
+    // Bánh mì's own prebook (ungrouped flight file), not the flight-wide totalPrebook.
+    breadPrebook: vj81.totalPrebook ?? null,
     hotmealItems: vj81.hotmealItems ?? {},
     boiledEggs: vj81.boiledEggs ?? null,
     reserveUtensils: vj81.reserveUtensils ?? null,
@@ -110,7 +112,7 @@ describe('ECO XLSX workbook', () => {
       .getRows(2, provenance.rowCount - 1)
       ?.find((row) => row.getCell(3).value === 'bread')
     expect(breadRow?.getCell(5).value).toBe(283)
-    expect(String(breadRow?.getCell(6).value)).toContain('quotaCommercial + totalPrebook')
+    expect(String(breadRow?.getCell(6).value)).toContain('ECO.S.bread')
   })
 })
 

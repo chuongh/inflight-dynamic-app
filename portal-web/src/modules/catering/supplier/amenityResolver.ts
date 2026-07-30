@@ -36,7 +36,7 @@ export function resolveAircraftFamily(
   if (!aircraftType) return null
   const t = aircraftType.toUpperCase().replace(/\s+/g, '')
   if (t.includes('A330')) return 'A330'
-  if (t.includes('A320') || t.includes('A321')) return 'A320_A321'
+  if (t.includes('A321')) return 'A321'
   return null
 }
 
@@ -139,8 +139,8 @@ function resolveRoutePackage(
   if (touchesRouteGroup(config, 'AU', input.dep, input.arr)) {
     const au = findPackage(packages, family, 'australia')
     if (au) return au
-    // A320/A321 has no dedicated Australia package — use QT >=4h (gói 5)
-    if (family === 'A320_A321') {
+    // A321 has no dedicated Australia package — use QT >=4h (gói 5)
+    if (family === 'A321') {
       return findPackage(packages, family, 'route_hour', 'INT_GE_4H')
     }
   }

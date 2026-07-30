@@ -4,13 +4,12 @@ import type {
   MealItemCategory,
 } from '@/modules/catering/catalogTypes'
 import type { RuleCatalogCategory } from '@/modules/catering/mealCategoryMeta'
-import { ECO_SUPPLY_FIELDS } from '@/modules/catering/supplier/ecoSupplyRegistry'
+import { ECO_QUANTITY_TARGET_COLUMNS, ECO_SUPPLY_FIELDS } from '@/modules/catering/supplier/ecoSupplyRegistry'
 import type {
   EcoAmenityConfig,
   EcoQuantityRule,
   EcoQuantityValue,
   EcoQuantityWhen,
-  EcoRuleBase,
   EcoUpliftType,
 } from '@/modules/catering/supplier/ecoQuantityTypes'
 
@@ -66,7 +65,6 @@ export function fieldBadge(targetColumn: string): string {
 export function ruleCategoryOf(
   rule: EcoQuantityRule,
   mealCatalog: MealCatalogItem[],
-  amenityCatalog: AmenityCatalogItem[],
 ): RuleCatalogCategory {
   const def = supplyFieldDef(rule.targetColumn)
   if (!def || def.catalog === 'none') return 'other'
@@ -86,49 +84,13 @@ export function ruleCategoryOf(
   return 'other'
 }
 
-/** EcoCells keys commonly targeted by quantity rules. */
-export const ECO_QUANTITY_TARGET_COLUMNS = [
-  'ketchup',
-  'chiliSauce',
-  'soySauce',
-  'hotmealUtensils',
-  'indianSaltPepper',
-  'reserveUtensils',
-  'bread',
-  'prebookCashews',
-  'freshWater',
-  'australiaNoodleVegetables',
-  'skybossEggs',
-  'australiaSkybossYogurt',
-  'australiaRoundBread',
-  'maccaSkybossRaisins',
-  'maccaKazSalted',
-  'charterSnack',
-  'wine',
-  'blanketCSkyboss',
-  'blanket3in1Prebook',
-  'maccaRegular',
-  'mangoChiliSaltGdsDeluxe',
-  'beerSnackComboBC',
-  'sodaMaccaComboBD',
-  'boiledEggs',
-  'totalEggs',
-  'reserveCrewWater',
-  'smallIceBox',
-  'largeIceBox',
-  'wetIceKg',
-  'dryIceKg',
-  'dutyFree',
-  'highlift',
-  'smallTruck',
-  'lastMinuteTopUp',
-] as const
+export { ECO_QUANTITY_TARGET_COLUMNS }
 
 const METRIC_LABELS: Record<string, string> = {
-  totalPrebook: 'Tổng prebook',
-  quotaCommercial: 'Quota commercial',
-  skybossEco: 'SkyBoss ECO',
-  hotmeal_total: 'Tổng hotmeal',
+  totalPrebook: 'Tổng Prebook',
+  quotaCommercial: 'Quota thương mại',
+  skybossEco: 'Số khách SkyBoss',
+  breadPrebook: 'Prebook Bánh mì',
 }
 
 const UPLIFT_LABELS: Record<EcoUpliftType, string> = {
@@ -145,6 +107,68 @@ const FLIGHT_KIND_LABELS: Record<string, string> = {
 
 function metricLabel(id: string): string {
   return METRIC_LABELS[id] ?? id
+}
+
+export type ValueSourceGroup = {
+  label: string
+  options: Array<{ value: string; label: string }>
+}
+
+/** Grouped options for the unified "Tính theo" dropdown. */
+export function buildValueSourceGroups(
+  mealCatalog: MealCatalogItem[],
+  amenityCatalog: AmenityCatalogItem[],
+): ValueSourceGroup[] {
+  return [
+    {
+      label: 'Số liệu chuyến bay',
+      options: [
+        { value: 'metric:quotaCommercial', label: 'Quota thương mại' },
+        { value: 'metric:totalPrebook', label: 'Tổng Prebook' },
+        { value: 'metric:breadPrebook', label: 'Prebook Bánh mì' },
+        { value: 'metric:skybossEco', label: 'Số khách SkyBoss' },
+        { value: 'hotmeal_total', label: 'Tổng suất ăn nóng' },
+      ],
+    },
+    {
+      label: 'Sản phẩm khác',
+      options: ECO_QUANTITY_TARGET_COLUMNS.map((c) => ({
+        value: `column:${c}`,
+        label: displayNameFor(c, mealCatalog, amenityCatalog),
+      })),
+    },
+  ]
+}
+
+export function encodeValueSource(value: EcoQuantityValue): string | null {
+  switch (value.kind) {
+    case 'metric':
+      return `metric:${value.metricId}`
+    case 'column':
+      return `column:${value.columnId}`
+    case 'hotmeal_total':
+      return 'hotmeal_total'
+    default:
+      return null
+  }
+}
+
+export function decodeValueSource(encoded: string, coef = 1): EcoQuantityValue {
+  if (encoded === 'hotmeal_total') return { kind: 'hotmeal_total', coef }
+  if (encoded.startsWith('metric:')) {
+    return { kind: 'metric', metricId: encoded.slice('metric:'.length), coef }
+  }
+  if (encoded.startsWith('column:')) {
+    return { kind: 'column', columnId: encoded.slice('column:'.length), coef }
+  }
+  return { kind: 'const', value: 0 }
+}
+
+export function sourceCoef(value: EcoQuantityValue): number {
+  if (value.kind === 'metric' || value.kind === 'column' || value.kind === 'hotmeal_total') {
+    return value.coef ?? 1
+  }
+  return 1
 }
 
 function summarizeValueNatural(
@@ -168,20 +192,18 @@ function summarizeValueNatural(
     }
     case 'hotmeal_total': {
       const coef = value.coef != null && value.coef !== 1 ? ` × ${value.coef}` : ''
-      return `Tổng hotmeal${coef}`
+      return `Tổng suất ăn nóng${coef}`
     }
     case 'sum':
       return value.parts
         .map((p) => summarizeValueNatural(p, mealCatalog, amenityCatalog))
         .join(' + ')
-    case 'manual':
-      return 'Nhập tay'
     default:
       return '—'
   }
 }
 
-function whenNatural(
+export function whenNatural(
   when: EcoQuantityWhen,
   amenityConfig: EcoAmenityConfig,
 ): string {
@@ -195,7 +217,7 @@ function whenNatural(
     parts.push(label)
   }
   for (const fam of when.aircraftFamilies ?? []) {
-    parts.push(fam === 'A330' ? 'A330' : 'A320/A321')
+    parts.push(fam === 'A330' ? 'A330' : 'A321')
   }
   for (const u of when.upliftTypes ?? []) {
     parts.push(UPLIFT_LABELS[u] ?? u)
@@ -210,7 +232,43 @@ function whenNatural(
     const label = amenityConfig.packages.find((p) => p.id === pkg)?.label
     parts.push(label ? `Gói ${label}` : `Gói ${pkg}`)
   }
-  return parts.length > 0 ? parts.join(', ') : 'Mọi trường hợp'
+  return parts.length > 0 ? parts.join(', ') : 'Tất cả'
+}
+
+/** Chip labels for active when-conditions (progressive disclosure UI). */
+export function whenConditionChips(
+  when: EcoQuantityWhen,
+  amenityConfig: EcoAmenityConfig,
+): Array<{ key: keyof EcoQuantityWhen; label: string }> {
+  const chips: Array<{ key: keyof EcoQuantityWhen; label: string }> = []
+  if (when.routeGroups?.length) {
+    const labels = when.routeGroups.map(
+      (id) => amenityConfig.routeGroups.find((g) => g.id === id)?.label ?? id,
+    )
+    chips.push({ key: 'routeGroups', label: `Nhóm: ${labels.join(', ')}` })
+  }
+  if (when.hourClasses?.length) {
+    const labels = when.hourClasses.map(
+      (id) => amenityConfig.routeHourClasses.find((c) => c.id === id)?.label ?? id,
+    )
+    chips.push({ key: 'hourClasses', label: `Giờ: ${labels.join(', ')}` })
+  }
+  if (when.aircraftFamilies?.length) {
+    const labels = when.aircraftFamilies.map((f) => (f === 'A330' ? 'A330' : 'A321'))
+    chips.push({ key: 'aircraftFamilies', label: `Tàu: ${labels.join(', ')}` })
+  }
+  if (when.upliftTypes?.length) {
+    const labels = when.upliftTypes.map((u) => UPLIFT_LABELS[u] ?? u)
+    chips.push({ key: 'upliftTypes', label: `Uplift: ${labels.join(', ')}` })
+  }
+  if (when.flightKinds?.length) {
+    const labels = when.flightKinds.map((k) => FLIGHT_KIND_LABELS[k] ?? k)
+    chips.push({ key: 'flightKinds', label: `Chuyến: ${labels.join(', ')}` })
+  }
+  if (when.routePairs?.length) {
+    chips.push({ key: 'routePairs', label: `Route: ${when.routePairs.join(', ')}` })
+  }
+  return chips
 }
 
 export function summarizeRule(
@@ -218,79 +276,44 @@ export function summarizeRule(
   mealCatalog: MealCatalogItem[] = [],
   amenityCatalog: AmenityCatalogItem[] = [],
 ): string {
-  if (rule.expr) {
-    const src =
-      rule.expr.source === 'hotmeal_total'
-        ? 'Tổng hotmeal'
-        : rule.expr.source === 'column'
-          ? displayNameFor(rule.expr.id ?? 'column', mealCatalog, amenityCatalog)
-          : metricLabel(rule.expr.id ?? 'metric')
-    const body = `= ${src} × ${rule.expr.coef}`
-    return rule.expr.round === 'ceil' ? `${body}, làm tròn lên` : body
+  const roundSuffix = rule.round === 'ceil' ? ', làm tròn lên' : ''
+  if (rule.branches.length === 0) {
+    return `= ${summarizeValueNatural(rule.fallback, mealCatalog, amenityCatalog)}${roundSuffix}`
   }
-  if (rule.fallback?.kind === 'sum') {
+  if (rule.fallback.kind === 'sum') {
     const sumText = summarizeValueNatural(rule.fallback, mealCatalog, amenityCatalog)
-    const branchCount = rule.branches?.length ?? 0
-    return branchCount > 0
-      ? `${branchCount} nhánh; trường hợp khác: = ${sumText}`
-      : `= ${sumText}`
+    return `${rule.branches.length} nhánh; còn lại: = ${sumText}${roundSuffix}`
   }
-  const branchCount = rule.branches?.length ?? 0
-  if (branchCount === 0 && rule.fallback) {
-    return `= ${summarizeValueNatural(rule.fallback, mealCatalog, amenityCatalog)}`
-  }
-  return branchCount > 0
-    ? `${branchCount} nhánh điều kiện`
-    : 'Chưa có công thức'
+  return `${rule.branches.length} nhánh${roundSuffix}`
 }
 
-/** Natural-language lines for by_std_arr branch preview. */
+/** Natural-language lines for branch preview. */
 export function summarizeBranchesPreview(
   rule: EcoQuantityRule,
   amenityConfig: EcoAmenityConfig,
   mealCatalog: MealCatalogItem[],
   amenityCatalog: AmenityCatalogItem[],
 ): string[] | null {
-  if (!rule.branches?.length && !rule.fallback) return null
+  if (rule.branches.length === 0) return null
   const lines: string[] = []
-  for (const branch of rule.branches ?? []) {
+  for (const branch of rule.branches) {
     const when = whenNatural(branch.when, amenityConfig)
     const value = summarizeValueNatural(branch.value, mealCatalog, amenityCatalog)
     lines.push(`${when}: = ${value}`)
   }
-  if (rule.fallback) {
-    lines.push(
-      `Trường hợp khác: = ${summarizeValueNatural(rule.fallback, mealCatalog, amenityCatalog)}`,
-    )
-  }
-  return lines.length > 0 ? lines : null
+  lines.push(
+    `Còn lại: = ${summarizeValueNatural(rule.fallback, mealCatalog, amenityCatalog)}`,
+  )
+  return lines
 }
 
-export function newEcoQuantityRule(
-  base: EcoRuleBase,
-  targetColumn: string,
-): EcoQuantityRule {
-  const id = `ECO.custom.${targetColumn}.${Date.now().toString(36)}`
-  if (base === 'by_std_arr') {
-    return {
-      id,
-      base,
-      targetColumn,
-      enabled: true,
-      branches: [],
-      fallback: { kind: 'manual' },
-    }
-  }
+export function newEcoQuantityRule(targetColumn: string): EcoQuantityRule {
   return {
-    id,
-    base,
+    id: `ECO.custom.${targetColumn}.${Date.now().toString(36)}`,
     targetColumn,
     enabled: true,
-    expr: {
-      source: base === 'by_hotmeal_total' ? 'hotmeal_total' : 'column',
-      id: base === 'by_item' ? 'spaghetti' : undefined,
-      coef: 1,
-      round: 'none',
-    },
+    confirmed: true,
+    branches: [],
+    fallback: { kind: 'const', value: 0 },
   }
 }

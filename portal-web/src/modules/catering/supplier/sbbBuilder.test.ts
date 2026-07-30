@@ -20,7 +20,7 @@ describe('SBB route selection', () => {
     const bindings = {
       ẤN: { airports: ['DEL'], priority: 10 },
       'ÚC&KAZ': { airports: ['ICN'], priority: 20 },
-    } as const
+    }
     expect(selectSbbRouteSheet('SGN', 'DEL', 'standard', bindings)).toBe('ẤN')
     expect(selectSbbRouteSheet('SGN', 'ICN', 'standard', bindings)).toBe('ÚC&KAZ')
     expect(selectSbbRouteSheet('SGN', 'MEL', 'standard', bindings)).toBe('VIET-HAN-NHAT')

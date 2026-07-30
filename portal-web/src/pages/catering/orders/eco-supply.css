@@ -1,7 +1,7 @@
 .order-supply-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 1rem;
+  gap: var(--space-xl);
   align-items: start;
 }
 
@@ -11,30 +11,41 @@
   }
 }
 
+.order-supply-layout__main,
 .order-supply-layout__side {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: var(--space-md);
 }
 
 @media (min-width: 1100px) {
   .order-supply-layout__side {
     position: sticky;
-    top: 0.75rem;
+    top: var(--space-sm);
   }
+}
+
+/** Small uppercase eyebrow above a page zone — names the zone before its content. */
+.order-section-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 .eco-supply {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: var(--space-xl);
 }
 
 .eco-supply__toolbar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: var(--space-lg);
   min-height: 1.5rem;
 }
 
@@ -45,21 +56,100 @@
   margin-right: auto;
 }
 
-.eco-supply__show-zero {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--color-text-secondary, #667085);
-  cursor: pointer;
-  user-select: none;
+/* ── Cabin bucket (ECO / SBB / Other) — the primary visual grouping ── */
+.eco-supply__bucket {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
+.eco-supply__bucket-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bucket-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.eco-supply__bucket-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bucket-icon-bg);
+  color: #fff;
+}
+
+.eco-supply__bucket-titles {
+  min-width: 0;
+}
+
+.eco-supply__bucket-head h2 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: var(--color-foreground);
+  line-height: 1.25;
+}
+
+.eco-supply__bucket-hint {
+  margin: 1px 0 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.eco-supply__bucket-total {
+  margin-left: auto;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.eco-supply__bucket-total b {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--color-foreground);
+}
+
+.eco-supply__bucket-total span {
+  display: block;
+  margin-top: 1px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.eco-supply__bucket--eco {
+  --bucket-bg: var(--color-vj-green-muted);
+  --bucket-icon-bg: var(--color-vj-green-dark);
+}
+
+.eco-supply__bucket--sbb {
+  --bucket-bg: var(--color-vj-yellow-muted);
+  --bucket-icon-bg: var(--color-vj-yellow-dark);
+}
+
+.eco-supply__bucket--other {
+  --bucket-bg: #eef2ff;
+  --bucket-icon-bg: #4338ca;
+}
+
+/* ── Category sections inside a bucket — subordinate to the bucket header ── */
 .eco-supply__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.85rem;
+  gap: var(--space-md);
+  padding: var(--space-lg);
 }
 
 @media (min-width: 900px) {
@@ -69,66 +159,39 @@
 }
 
 .eco-supply__section {
-  border: 1px solid var(--color-border, #e8e8e8);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   overflow: hidden;
-  background: #fff;
+  background: var(--color-vj-canvas);
   break-inside: avoid;
-}
-
-/** Amenity theo gói — full-width section; items 1→2 cols responsive */
-.eco-supply__section--full {
-  grid-column: 1 / -1;
-}
-
-.eco-supply__section--full .eco-supply__list {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.eco-supply__section--full .eco-supply__row:last-child {
-  border-bottom: 1px solid #f0f1f3;
-}
-
-@media (min-width: 640px) {
-  .eco-supply__section--full .eco-supply__list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .eco-supply__section--full .eco-supply__row:nth-child(odd) {
-    border-right: 1px solid #f0f1f3;
-  }
-
-  .eco-supply__section--full .eco-supply__row:nth-last-child(1),
-  .eco-supply__section--full .eco-supply__row:nth-last-child(2):nth-child(odd) {
-    border-bottom: none;
-  }
-
-  .eco-supply__section--full .eco-supply__row:nth-last-child(2):nth-child(even) {
-    border-bottom: none;
-  }
-}
-
-@media (max-width: 639px) {
-  .eco-supply__section--full .eco-supply__row:last-child {
-    border-bottom: none;
-  }
 }
 
 .eco-supply__section-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.55rem 0.85rem;
-  background: #f6f7f9;
-  border-bottom: 1px solid var(--color-border, #e8e8e8);
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--section-bg, var(--color-muted));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.eco-supply__section-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--section-dot, var(--color-text-muted));
 }
 
 .eco-supply__section-head h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
+  color: var(--section-color, var(--color-foreground));
+}
+
+.eco-supply__section-head .eco-supply__section-total {
+  margin-left: auto;
 }
 
 .eco-supply__list {
@@ -143,7 +206,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.55rem 0.85rem;
-  border-bottom: 1px solid #f0f1f3;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .eco-supply__row:last-child {
@@ -192,5 +255,5 @@
 .eco-supply__suggested {
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-text-muted, #98a2b3);
+  color: var(--color-text-muted);
 }

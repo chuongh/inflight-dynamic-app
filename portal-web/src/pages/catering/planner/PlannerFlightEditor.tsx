@@ -10,12 +10,14 @@ import {
 } from 'lucide-react'
 import { InputNumber } from 'antd'
 import type { ReactNode } from 'react'
+import { activeCatalogVersion } from '@/modules/catering/catalog'
+import { useAmenityCatalogData, useMealCatalogData } from '@/modules/catering/hooks/useCatalog'
 import type { EcoCells, SbbCells, SupplierCell } from '@/modules/catering/supplier/types'
 import {
   derivePlannerContext,
   ECO_FIELD_GROUPS,
-  FIELD_LABELS,
   getPlannerCellAccessibleName,
+  plannerFieldLabel,
   SBB_FIELD_GROUPS,
   type PlannerContext,
   type PlannerFlight,
@@ -71,6 +73,11 @@ export function PlannerFlightEditor({
   editable = false,
   onCellChange,
 }: PlannerFlightEditorProps) {
+  const { data: mealCatalogData } = useMealCatalogData()
+  const { data: amenityCatalogData } = useAmenityCatalogData()
+  const mealCatalog = activeCatalogVersion(mealCatalogData?.versions ?? [])?.items ?? []
+  const amenityCatalog = activeCatalogVersion(amenityCatalogData?.versions ?? [])?.items ?? []
+  const fieldLabel = (field: string) => plannerFieldLabel(field, mealCatalog, amenityCatalog)
   const flightDate = derivePlannerContext([flight]).dateLabel
 
   const change = (product: PlannerProduct, field: string, value: number | null) => {
@@ -123,7 +130,7 @@ export function PlannerFlightEditor({
             return (
               <CellField
                 key={field}
-                label={FIELD_LABELS[field]}
+                label={fieldLabel(field)}
                 product="eco"
                 field={field}
                 cell={flight.eco.cells[field]}
@@ -147,7 +154,7 @@ export function PlannerFlightEditor({
             {group.fields.map((field) => (
               <CellField
                 key={field}
-                label={FIELD_LABELS[field]}
+                label={fieldLabel(field)}
                 product="sbb"
                 field={field}
                 cell={flight.sbb!.cells[field]}

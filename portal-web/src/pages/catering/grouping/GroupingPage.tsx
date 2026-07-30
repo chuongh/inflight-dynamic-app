@@ -87,9 +87,17 @@ export function GroupingPage() {
   const [stationOverride, setStationOverride] = useState<string | null>(null)
 
   const days = useMemo(() => data?.days ?? [], [data])
+  /** Prefer the newest service day — grouping demo always opens on latest crew-list seed. */
+  const latestServiceDate = useMemo(
+    () => (days.length ? days[days.length - 1]!.serviceDate : ''),
+    [days],
+  )
   const day = useMemo(
-    () => days.find((d) => d.serviceDate === selectedDate) ?? days[0],
-    [days, selectedDate],
+    () =>
+      days.find((d) => d.serviceDate === selectedDate) ??
+      days.find((d) => d.serviceDate === latestServiceDate) ??
+      days[days.length - 1],
+    [days, selectedDate, latestServiceDate],
   )
   const dayIndex = day ? days.findIndex((d) => d.serviceDate === day.serviceDate) : -1
 
@@ -318,7 +326,7 @@ export function GroupingPage() {
     const profile = crewVersion ? profileFor(crewVersion, 'cockpit') : undefined
     const { lines, breakdown } = buildOrderSnapshot(confirmed, profile, makeCodeOf(catalog))
     const supplierRules = activeSupplierRuleVersion(supplierRuleData?.versions ?? [])
-    const ecoSupplyLines = buildEcoSupplySnapshot({
+    const { lines: ecoSupplyLines, byFlight: ecoSupplyByFlight } = buildEcoSupplySnapshot({
       day,
       station,
       mealCatalog,
@@ -328,6 +336,7 @@ export function GroupingPage() {
         amenity: supplierRules?.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG,
         quantityRules: supplierRules?.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
       },
+      crewMealProfile: profile?.enabled ? profile : null,
     })
 
     // A draft already open for this day → refresh ECO supply snapshot then go edit.
@@ -336,7 +345,7 @@ export function GroupingPage() {
       saveOrders.mutate(
         {
           orders: (ordersData?.orders ?? []).map((o) =>
-            o.id === draft.id ? { ...o, ecoSupplyLines } : o,
+            o.id === draft.id ? { ...o, ecoSupplyLines, ecoSupplyByFlight } : o,
           ),
         },
         { onSuccess: () => navigate(paths.catering.orders.detail(fileId)) },
@@ -360,6 +369,7 @@ export function GroupingPage() {
             lines,
             breakdown,
             ecoSupplyLines,
+            ecoSupplyByFlight,
           },
         ],
       },

@@ -41,6 +41,7 @@ export interface SupplierSourceRefs {
   boiledEggs?: string
   reserveUtensils?: string
   workbookReferenceBread?: string
+  breadPrebook?: string
   reserveCrewWater?: string
   smallIceBox?: string
   largeIceBox?: string
@@ -93,9 +94,12 @@ export interface SupplierFlightInput
   totalPrebook?: number | null
   skybossEco?: number | null
   businessPax?: number | null
+  deluxePax?: number | null
   boiledEggs?: number | null
   reserveUtensils?: number | null
   workbookReferenceBread?: number | null
+  /** Bánh mì's own prebook count from the per-dish premeal breakdown. */
+  breadPrebook?: number | null
   hotmealItems?: HotmealInput
   australiaBeefFreshVegetables?: number | null
   australiaBreadVegetables?: number | null
@@ -126,6 +130,7 @@ export interface EcoSupplierInput
   boiledEggs: number | null
   reserveUtensils: number | null
   workbookReferenceBread?: number | null
+  breadPrebook?: number | null
   hotmealItems: HotmealInput
   australiaBeefFreshVegetables?: number | null
   australiaBreadVegetables?: number | null
@@ -190,6 +195,8 @@ export interface EcoCells {
   totalUtensils: SupplierCell<number>
   skyboss: SupplierCell<number>
   prebook: SupplierCell<number>
+  /** Commercial hotmeal quota (input metric; also exposed for KPI / supply lines). */
+  quotaCommercial: SupplierCell<number>
   prebookCashews: SupplierCell<number>
   freshWater: SupplierCell<number>
   maccaSkybossRaisins: SupplierCell<number>

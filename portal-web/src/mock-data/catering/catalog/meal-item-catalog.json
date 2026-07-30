@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-30-catalog-v17",
+  "seedVersion": "2026-07-29-catalog-v16",
   "versions": [
     {
       "id": "m1",
@@ -18,7 +18,9 @@
           },
           "unit": null,
           "category": "main",
-          "cabinScopes": ["ECO"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -29,8 +31,10 @@
             "vi": "Thịt bò+ Rau tươi"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -41,8 +45,10 @@
             "vi": "Thịt Bò + Rau (SGN-ADL)"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -53,8 +59,10 @@
             "vi": "Xôi khúc chả chiên"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -65,8 +73,10 @@
             "vi": "Xôi mặn"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -77,8 +87,10 @@
             "vi": "Cơm dừa Malaysia"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -89,8 +101,10 @@
             "vi": "Cơm bò"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -101,8 +115,10 @@
             "vi": "Miến xào tôm cua"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -113,8 +129,10 @@
             "vi": "Bún xào Singapore"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -125,8 +143,10 @@
             "vi": "Cơm chiên Thái"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -137,8 +157,10 @@
             "vi": "Bánh chưng chà bông"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -149,8 +171,10 @@
             "vi": "Mì Ý"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -161,8 +185,10 @@
             "vi": "Cơm chiên dương châu chay"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "vegetarian",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -173,8 +199,10 @@
             "vi": "Cơm cà ri gà"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -185,8 +213,10 @@
             "vi": "Cơm basmati cà ri chay Business"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "vegetarian",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -197,8 +227,10 @@
             "vi": "Khoai viên chay vị Ấn và bánh Paratha"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "vegetarian",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -209,8 +241,10 @@
             "vi": "Cơm cà ri cá"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -221,8 +255,10 @@
             "vi": "Rau ăn mỳ, phở (Úc)"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -233,8 +269,10 @@
             "vi": "Rau ăn bánh mỳ (Úc)"
           },
           "unit": null,
-          "category": "eco_main",
-          "cabinScopes": ["ECO"],
+          "category": "main",
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -245,8 +283,10 @@
             "vi": "Miến gà"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -257,8 +297,10 @@
             "vi": "Phở bò"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -269,8 +311,10 @@
             "vi": "Xôi mặn"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -281,8 +325,10 @@
             "vi": "Cá Basa"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -293,8 +339,10 @@
             "vi": "Gà Gravy"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -305,8 +353,10 @@
             "vi": "Bún xào chay Business"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "vegetarian",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -317,8 +367,10 @@
             "vi": "Bún bò Huế"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -329,8 +381,10 @@
             "vi": "Cơm chiên dương châu chay"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "vegetarian",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -341,8 +395,10 @@
             "vi": "Cơm cari gà SBB"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -353,8 +409,10 @@
             "vi": "Cơm cà ri Ấn chay (chay Ấn)"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "vegetarian",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -365,8 +423,10 @@
             "vi": "Khoai viên chay vị Ấn và bánh paratha SBB"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "vegetarian",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -377,8 +437,10 @@
             "vi": "Burger"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -389,8 +451,10 @@
             "vi": "Sandwich phô mai"
           },
           "unit": null,
-          "category": "sbb_main",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -402,7 +466,9 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -414,7 +480,9 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -426,7 +494,9 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -438,7 +508,9 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -450,7 +522,9 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -462,7 +536,9 @@
           },
           "unit": null,
           "category": "appetizer",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -474,7 +550,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -486,7 +564,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -498,7 +578,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -510,7 +592,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -522,7 +606,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -534,7 +620,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -546,7 +634,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -558,7 +648,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -570,7 +662,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -582,7 +676,9 @@
           },
           "unit": null,
           "category": "dessert",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -594,7 +690,9 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -606,7 +704,9 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -618,7 +718,9 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -629,8 +731,10 @@
             "vi": "Bánh chưng chà bông SBB"
           },
           "unit": null,
-          "category": "bread",
-          "cabinScopes": ["SBB"],
+          "category": "main",
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -642,7 +746,9 @@
           },
           "unit": null,
           "category": "bread",
-          "cabinScopes": ["SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -654,7 +760,9 @@
           },
           "unit": "chai",
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -666,7 +774,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -678,7 +788,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -690,7 +802,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -702,7 +816,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -714,7 +830,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -726,7 +844,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -738,7 +858,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -750,7 +872,9 @@
           },
           "unit": "chai",
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -762,7 +886,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -774,7 +900,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -786,7 +914,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -798,7 +928,9 @@
           },
           "unit": null,
           "category": "drink",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -810,7 +942,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -822,7 +956,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -834,7 +970,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -846,9 +984,12 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
-          "needsCode": true
+          "needsCode": true,
+          "note": "Nhóm KAZ: = Số khách SkyBoss · Ngoài ra: = 0"
         },
         {
           "id": "meal-macca-nho-kho-sboss",
@@ -858,9 +999,12 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
-          "needsCode": true
+          "needsCode": true,
+          "note": "= Tổng khách SkyBoss"
         },
         {
           "id": "meal-macca-thuong",
@@ -870,7 +1014,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -882,7 +1028,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -894,7 +1042,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -906,7 +1056,9 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": true
         },
@@ -918,31 +1070,23 @@
           },
           "unit": null,
           "category": "snack",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "SBB"
+          ],
           "active": true,
           "needsCode": true
-        },
-        {
-          "id": "sku-30000123",
-          "productCode": "30000123",
-          "name": {
-            "vi": "Đường"
-          },
-          "unit": "que",
-          "category": "condiment",
-          "cabinScopes": ["ECO", "SBB"],
-          "active": true,
-          "needsCode": false
         },
         {
           "id": "sku-dc06",
           "productCode": "DC06",
           "name": {
-            "vi": "Tương ớt (để riêng)"
+            "vi": "Tương ớt"
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -950,11 +1094,13 @@
           "id": "sku-dc07",
           "productCode": "DC07",
           "name": {
-            "vi": "Tương cà (để riêng)"
+            "vi": "Tương cà"
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -962,11 +1108,13 @@
           "id": "sku-dc08",
           "productCode": "DC08",
           "name": {
-            "vi": "xì dầu (để riêng)"
+            "vi": "Xì dầu"
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
         },
@@ -978,9 +1126,100 @@
           },
           "unit": null,
           "category": "condiment",
-          "cabinScopes": ["ECO", "SBB"],
+          "cabinScopes": [
+            "ECO"
+          ],
           "active": true,
           "needsCode": false
+        },
+        {
+          "id": "meal-prebook-total",
+          "productCode": null,
+          "name": {
+            "vi": "Prebook"
+          },
+          "unit": "suất",
+          "category": "snack",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": true,
+          "note": "Tổng suất Prebook (metric thương mại — hiện KPI / theo chuyến, không liệt kê trong danh sách món cấp phát)"
+        },
+        {
+          "id": "meal-trung-skyboss",
+          "productCode": null,
+          "name": {
+            "vi": "Trứng SkyBoss"
+          },
+          "unit": "cái",
+          "category": "snack",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": true,
+          "note": "§1.3 AE — DEP/ARR Úc = Số khách SkyBoss"
+        },
+        {
+          "id": "meal-total-eggs",
+          "productCode": null,
+          "name": {
+            "vi": "Tổng trứng"
+          },
+          "unit": "cái",
+          "category": "snack",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": true,
+          "note": "Trứng luộc + Trứng SkyBoss"
+        },
+        {
+          "id": "meal-snack-charter",
+          "productCode": null,
+          "name": {
+            "vi": "Snack khoai tây/trái cây sấy"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "meal-bia-kho-ga-snack-cha-gio",
+          "productCode": null,
+          "name": {
+            "vi": "Bia + Khô gà + snack chả giò"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": true,
+          "note": "Đồng bộ tên với Combo Catalog combo-bia-kho-ga-snack-cha-gio"
+        },
+        {
+          "id": "meal-soda-dau-macca",
+          "productCode": null,
+          "name": {
+            "vi": "Soda Dâu + Macca"
+          },
+          "unit": null,
+          "category": "snack",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": true,
+          "note": "Đồng bộ tên với Combo Catalog combo-soda-dau-macca"
         }
       ]
     }

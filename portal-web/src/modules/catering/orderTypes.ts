@@ -4,90 +4,67 @@
  * away from the AI-suggested amount before saving a version / sending.
  */
 /** Which demand stream a line belongs to (one order merges all three). */
-export type OrderCategory = "prebook" | "crew" | "sales";
+export type OrderCategory = 'prebook' | 'crew' | 'sales'
 
 export interface CateringOrderLine {
   /**
    * For `prebook` lines this is the dish name shown as-is. For `crew`/`sales`
    * system lines it is a stable key resolved via i18n (`catering.orders.line.*`).
    */
-  name: string;
-  category: OrderCategory;
-  productCodes: string[];
+  name: string
+  category: OrderCategory
+  productCodes: string[]
   /** System-suggested quantity (aggregated from the flight grouping). */
-  suggested: number;
+  suggested: number
   /** Final quantity after manual adjustment. */
-  qty: number;
+  qty: number
 }
 
 /** ECO supply line rolled up across confirmed flights (catalog-backed). */
 export type EcoSupplyGroupId =
-  | "eco_main"
-  | "sbb_main"
-  | "appetizer"
-  | "dessert"
-  | "bread"
-  | "drink"
-  | "snack"
-  | "condiment"
-  | "amenity"
-  | "amenity_composition"
-  | "other";
+  | 'main'
+  | 'vegetarian'
+  | 'appetizer'
+  | 'dessert'
+  | 'bread'
+  | 'drink'
+  | 'snack'
+  | 'condiment'
+  | 'amenity'
+  | 'amenity_composition'
+  | 'other'
 
 export interface EcoSupplyLine {
-  id: string;
-  field: string;
-  group: EcoSupplyGroupId;
-  catalogItemId: string | null;
-  productCode: string | null;
-  name: string;
-  unit: string | null;
-  suggested: number;
-  qty: number;
-  source: string;
-  overridden: boolean;
+  id: string
+  field: string
+  group: EcoSupplyGroupId
+  catalogItemId: string | null
+  productCode: string | null
+  name: string
+  unit: string | null
+  suggested: number
+  qty: number
+  source: string
+  overridden: boolean
   /** false when computed from a rule with confirmed=false; undefined when no rule applies. */
-  confirmed?: boolean;
+  confirmed?: boolean
   /** true when the field has no quantity rule — always show even at qty 0. */
-  noRuleConfigured?: boolean;
+  noRuleConfigured?: boolean
   /**
    * Which cabin catalog(s) this item belongs to — an item shared by both
    * catalogs (e.g. Bánh mì tròn & bơ) carries both and shows under each
    * cabin's section. Empty/undefined for cross-cabin lines (amenity/crew/other).
    */
-  cabinScopes?: Array<"ECO" | "SBB">;
+  cabinScopes?: Array<'ECO' | 'SBB'>
 }
 
-/** Amenity package(s) assigned to a single flight (e.g. "Gói 01 · Chặng ngắn"). */
-export interface EcoSupplyFlightAmenityPackage {
-  id: number;
-  label: string;
-  count: number;
-}
-
-/** One leg (single flight number) within a rotation's per-group breakdown. */
-export interface EcoSupplyFlightLeg {
-  flightNo: string;
-  dep: string;
-  arr: string;
-}
-
-/**
- * Per-FlightGroup (rotation) slice of ECO supply quantities (snapshot at build
- * time) — legs of the same confirmed group (e.g. VJ240 + VJ243) are merged
- * into one entry, matching how the Flight Grouping screen treats a rotation
- * as one unit.
- */
+/** Per-flight slice of ECO supply quantities (snapshot at build time). */
 export interface EcoSupplyFlightBreakdown {
-  groupId: string;
-  /** All legs of this rotation, in flight order. */
-  legs: EcoSupplyFlightLeg[];
-  /** field key → qty summed across the group's legs (0 omitted) */
-  cells: Record<string, number>;
-  /** Commercial (economy sales) quota summed across the group's legs — overview metric, not an ECO supply cell. */
-  quotaCommercial?: number;
-  /** Amenity packages assigned across the group's legs — mirrors the order-level "Amenity by package" lines. */
-  amenityPackages?: EcoSupplyFlightAmenityPackage[];
+  flightNo: string
+  dep: string
+  arr: string
+  /** field key → qty for that single flight (0 omitted) */
+  cells: Record<string, number>
 }
 
 /**
@@ -96,54 +73,44 @@ export interface EcoSupplyFlightBreakdown {
  * The sum of a line's cells === that line's qty at build time.
  */
 export interface OrderSourceCell {
-  category: OrderCategory;
-  name: string;
-  groupId: string;
-  flightNo?: string;
-  dep?: string;
-  arr?: string;
-  qty: number;
+  category: OrderCategory
+  name: string
+  groupId: string
+  flightNo?: string
+  dep?: string
+  arr?: string
+  qty: number
 }
 
-export type OrderStatus = "draft" | "sent";
+export type OrderStatus = 'draft' | 'sent'
 
 export interface CateringOrder {
-  id: string;
-  version: number;
-  serviceDate: string;
-  station: string;
+  id: string
+  version: number
+  serviceDate: string
+  station: string
   /** Creation timestamp (ms). */
-  createdAt: number;
-  createdBy: string;
-  status: OrderStatus;
-  lines: CateringOrderLine[];
+  createdAt: number
+  createdBy: string
+  status: OrderStatus
+  lines: CateringOrderLine[]
   /**
    * Immutable per-flight/per-group source snapshot the `lines` were derived from
    * — the reconciliation spine (enables per-flight trace and version deltas).
    * Optional: versions created before reconciliation have no breakdown.
    */
-  breakdown?: OrderSourceCell[];
+  breakdown?: OrderSourceCell[]
   /** ECO supply lines (catalog items) computed at create-order time. */
-  ecoSupplyLines?: EcoSupplyLine[];
+  ecoSupplyLines?: EcoSupplyLine[]
   /** Per-flight ECO supply breakdown (same snapshot as `ecoSupplyLines`). */
-  ecoSupplyByFlight?: EcoSupplyFlightBreakdown[];
-  /**
-   * Manual overrides on a single flight group's portion of a dish/amenity qty
-   * — keyed by groupId → field → qty. The order-wide `ecoSupplyLines` total
-   * for an edited field is recomputed as the sum of each group's effective
-   * value (this override, or the computed value where unedited).
-   */
-  ecoSupplyByFlightEdits?: Record<string, Record<string, number>>;
+  ecoSupplyByFlight?: EcoSupplyFlightBreakdown[]
   /** Direct numeric patches keyed by flightKey → product → field → number */
-  supplierEdits?: Record<
-    string,
-    {
-      eco?: Partial<Record<string, number>>;
-      sbb?: Partial<Record<string, number>>;
-    }
-  >;
+  supplierEdits?: Record<string, {
+    eco?: Partial<Record<string, number>>
+    sbb?: Partial<Record<string, number>>
+  }>
 }
 
 export interface CateringOrderDataset {
-  orders: CateringOrder[];
+  orders: CateringOrder[]
 }

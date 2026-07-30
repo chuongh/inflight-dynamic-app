@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-28-catalog-v2",
+  "seedVersion": "2026-07-29-catalog-v5",
   "versions": [
     {
       "id": "a1",
@@ -9,6 +9,17 @@
       "updatedBy": "System",
       "updatedAt": "28/07/2026",
       "items": [
+        {
+          "id": "amn-30000123",
+          "productCode": "30000123",
+          "name": {
+            "vi": "Đường"
+          },
+          "unit": "que",
+          "active": true,
+          "needsCode": false,
+          "note": "Đã có trong Amenity package composition — không còn thuộc Meal catalog (condiment)."
+        },
         {
           "id": "amn-30000099",
           "productCode": "30000099",
@@ -483,7 +494,7 @@
           "id": "amn-bo-thia-dia-tam-theo-hotmeal-de-vao-tui-nilong-t",
           "productCode": null,
           "name": {
-            "vi": "Bộ thìa, dĩa, tăm theo hotmeal (để vào túi nilong trong)"
+            "vi": "Bộ thìa, dĩa, tăm theo hotmeal"
           },
           "unit": null,
           "active": true,
@@ -497,7 +508,8 @@
           },
           "unit": null,
           "active": true,
-          "needsCode": true
+          "needsCode": true,
+          "note": "= Tổng Prebook (tạm dùng — tài liệu gốc ghi đúng ra phải theo số booking riêng sản phẩm này, hệ thống chưa có dữ liệu booking tách theo sản phẩm nên tạm xấp xỉ bằng Tổng Prebook)"
         },
         {
           "id": "amn-chan-c-skyboss",
@@ -534,6 +546,16 @@
           "productCode": null,
           "name": {
             "vi": "Tấm trải nệm ghế"
+          },
+          "unit": null,
+          "active": true,
+          "needsCode": true
+        },
+        {
+          "id": "amn-duty-free",
+          "productCode": null,
+          "name": {
+            "vi": "Duty Free"
           },
           "unit": null,
           "active": true,

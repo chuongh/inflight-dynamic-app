@@ -23,9 +23,13 @@ export interface SupplierLegExtension extends EcoAmenityOpsInput, EcoSnackOpsInp
   totalPrebook?: number | null
   skybossEco?: number | null
   businessPax?: number | null
+  /** Deluxe cabin passenger count (FlightView / commercial). */
+  deluxePax?: number | null
   boiledEggs?: number | null
   reserveUtensils?: number | null
   workbookReferenceBread?: number | null
+  /** Bánh mì's own prebook count, from the per-dish premeal breakdown (falls back to leg.meals when absent). */
+  breadPrebook?: number | null
   hotmealItems?: Partial<Record<HotmealItemKey, number | null>>
   australiaBeefFreshVegetables?: number | null
   australiaBreadVegetables?: number | null

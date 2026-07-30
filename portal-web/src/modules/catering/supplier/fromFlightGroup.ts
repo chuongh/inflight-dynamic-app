@@ -1,6 +1,6 @@
 import { groupOrigin } from '../grouping'
 import type { DayGrouping, FlightLeg, SupplierLegExtension } from '../groupingTypes'
-import { mapMealNameToHotmealField } from './ecoSupplyRegistry'
+import { isBreadMealName, mapMealNameToHotmealField } from './ecoSupplyRegistry'
 import type { HotmealInput, SupplierFlightInput } from './types'
 
 function mapLegToInput(
@@ -22,6 +22,16 @@ function mapLegToInput(
     }
     return Object.keys(hotmealItems).length > 0 ? hotmealItems : undefined
   })()
+  // Bánh mì's own prebook count from the ungrouped flight's per-dish premeal
+  // breakdown (kept at leg level through grouping) — not the flight's total
+  // prebook (that's every dish combined, not just bread).
+  const breadPrebookFromMeals: number | null = (() => {
+    if (!leg.meals?.length) return null
+    const total = leg.meals
+      .filter((m) => isBreadMealName(m.name))
+      .reduce((sum, m) => sum + m.count, 0)
+    return total > 0 ? total : null
+  })()
 
   return {
     operatingDate,
@@ -37,9 +47,11 @@ function mapLegToInput(
     totalPrebook: s.totalPrebook ?? leg.premeal ?? null,
     skybossEco: s.skybossEco,
     businessPax: s.businessPax,
+    deluxePax: s.deluxePax,
     boiledEggs: s.boiledEggs,
     reserveUtensils: s.reserveUtensils,
     workbookReferenceBread: s.workbookReferenceBread,
+    breadPrebook: s.breadPrebook ?? breadPrebookFromMeals,
     hotmealItems: hotmealFromMeals,
     australiaBeefFreshVegetables: s.australiaBeefFreshVegetables,
     australiaBreadVegetables: s.australiaBreadVegetables,

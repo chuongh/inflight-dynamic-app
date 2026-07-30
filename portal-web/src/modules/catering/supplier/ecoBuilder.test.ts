@@ -75,20 +75,23 @@ describe('buildEcoSupplierRow', () => {
     expect(row.cells.hotmealTotal.value).not.toBe(602)
   })
 
-  it('computes bread as quotaCommercial + totalPrebook when workbook bread is absent', () => {
+  it('computes bread as quotaCommercial + breadPrebook (not the flight-wide totalPrebook) when workbook bread is absent', () => {
     const withQuota = buildEco({
       ...vj81Input,
       workbookReferenceBread: null,
       quotaCommercial: 4,
+      breadPrebook: 6,
+      totalPrebook: 282,
     })
     const neither = buildEco({
       ...vj81Input,
       workbookReferenceBread: null,
       quotaCommercial: null,
-      totalPrebook: null,
+      breadPrebook: null,
     })
 
-    expect(withQuota.cells.bread.value).toBe(286)
+    // 4 + 6, not 4 + 282 — totalPrebook covers every dish, breadPrebook is Bánh mì only.
+    expect(withQuota.cells.bread.value).toBe(10)
     expect(withQuota.cells.bread.source).toContain('ECO.S.bread')
     expect(neither.cells.bread.value).toBeNull()
   })
@@ -185,10 +188,41 @@ describe('buildEcoSupplierRow', () => {
       arr: 'HAN',
     })
 
-    expect(unsupportedRoute.cells.australiaNoodleVegetables.value).toBeNull()
-    expect(unsupportedRoute.cells.skybossEggs.value).toBeNull()
-    expect(unsupportedRoute.cells.australiaSkybossYogurt.value).toBeNull()
-    expect(unsupportedRoute.cells.australiaRoundBread.value).toBeNull()
+    expect(unsupportedRoute.cells.australiaNoodleVegetables.value).toBe(0)
+    expect(unsupportedRoute.cells.skybossEggs.value).toBe(0)
+    expect(unsupportedRoute.cells.australiaSkybossYogurt.value).toBe(0)
+    expect(unsupportedRoute.cells.australiaRoundBread.value).toBe(0)
+  })
+
+  it('resolves maccaKazSalted for KAZ routes and zero elsewhere', () => {
+    const kaz = buildEco({
+      ...vj81Input,
+      dep: 'SGN',
+      arr: 'ALA',
+      skybossEco: 9,
+    })
+    const other = buildEco({
+      ...vj81Input,
+      dep: 'SGN',
+      arr: 'HAN',
+      skybossEco: 9,
+    })
+
+    expect(kaz.cells.maccaKazSalted.value).toBe(9)
+    expect(kaz.cells.maccaKazSalted.source).toContain('ECO.AS.maccaKazSalted')
+    expect(other.cells.maccaKazSalted.value).toBe(0)
+  })
+
+  it('resolves maccaSkybossRaisins as skybossEco', () => {
+    const row = buildEco(vj81Input)
+    expect(row.cells.maccaSkybossRaisins.value).toBe(13)
+    expect(row.cells.maccaSkybossRaisins.source).toContain('ECO.AR.maccaSkybossRaisins')
+  })
+
+  it('resolves blanket3in1Prebook as totalPrebook', () => {
+    const row = buildEco(vj81Input)
+    expect(row.cells.blanket3in1Prebook.value).toBe(282)
+    expect(row.cells.blanket3in1Prebook.source).toContain('ECO.AX.blanket3in1Prebook')
   })
 
   it('uses quantityConfig rules for AU noodle vegetables instead of legacy dataset', () => {
@@ -197,7 +231,6 @@ describe('buildEcoSupplierRow', () => {
       quantityRules: [
         {
           id: 'TEST.Z',
-          base: 'by_std_arr',
           targetColumn: 'australiaNoodleVegetables',
           enabled: true,
           branches: [
@@ -207,7 +240,7 @@ describe('buildEcoSupplierRow', () => {
               value: { kind: 'const', value: 99 },
             },
           ],
-          fallback: { kind: 'manual' },
+          fallback: { kind: 'const', value: 0 },
         },
       ],
     })

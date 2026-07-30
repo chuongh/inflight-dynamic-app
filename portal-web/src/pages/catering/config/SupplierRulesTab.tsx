@@ -32,7 +32,10 @@ import type {
   SbbRouteSheet,
 } from '@/modules/catering/supplier/types'
 import { DEFAULT_ECO_AMENITY_CONFIG } from '@/modules/catering/supplier/amenityDefaults'
-import { DEFAULT_ECO_QUANTITY_RULES } from '@/modules/catering/supplier/ecoQuantityEval'
+import {
+  DEFAULT_ECO_QUANTITY_RULES,
+  migrateEcoQuantityRules,
+} from '@/modules/catering/supplier/ecoQuantityEval'
 import type {
   EcoAmenityConfig,
   EcoQuantityRule,
@@ -173,17 +176,18 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
     editing && workingAmenityConfig
       ? workingAmenityConfig
       : (viewing?.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG)
-  const quantityRules =
+  const quantityRules = migrateEcoQuantityRules(
     editing && workingQuantityRules
       ? workingQuantityRules
-      : (viewing?.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES)
+      : (viewing?.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES),
+  )
 
   const categoryTabs = useMemo(() => {
     const present = new Set(
-      quantityRules.map((r) => ruleCategoryOf(r, mealCatalog, amenityCatalog)),
+      quantityRules.map((r) => ruleCategoryOf(r, mealCatalog)),
     )
     return RULE_CATEGORY_TAB_ORDER.filter((c) => present.has(c))
-  }, [quantityRules, mealCatalog, amenityCatalog])
+  }, [quantityRules, mealCatalog])
 
   const activeEcoCategory: RuleCatalogCategory =
     ecoCategory && categoryTabs.includes(ecoCategory)
@@ -191,7 +195,7 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
       : (categoryTabs[0] ?? 'other')
 
   const categoryRules = quantityRules.filter(
-    (r) => ruleCategoryOf(r, mealCatalog, amenityCatalog) === activeEcoCategory,
+    (r) => ruleCategoryOf(r, mealCatalog) === activeEcoCategory,
   )
   const filteredCategoryRules = useMemo(() => {
     const q = ruleQuery.trim().toLowerCase()
@@ -217,7 +221,9 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
     }
     setWorkingSbb(cloned)
     setWorkingQuantityRules(
-      structuredClone(viewing.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES),
+      migrateEcoQuantityRules(
+        structuredClone(viewing.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES),
+      ),
     )
     setWorkingAmenityConfig(
       structuredClone(viewing.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG),
@@ -334,7 +340,7 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
 
   const addQuantityRule = () => {
     if (!workingQuantityRules) return
-    const created = newEcoQuantityRule('by_std_arr', 'ketchup')
+    const created = newEcoQuantityRule('ketchup')
     setWorkingQuantityRules([...workingQuantityRules, created])
     setEditingQuantityRule(created)
   }
@@ -454,8 +460,9 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
         sbbLookups: workingSbb,
         ecoAmenity:
           workingAmenityConfig ?? viewing.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG,
-        ecoQuantityRules:
+        ecoQuantityRules: migrateEcoQuantityRules(
           workingQuantityRules ?? viewing.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
+        ),
       },
       {
         effectiveFrom: effDate,
@@ -592,7 +599,7 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
                               className="[&>td]:border-border [&>td]:border-b [&>td]:px-2 [&>td]:py-1.5"
                             >
                               <td className="font-mono font-bold">{pkg.id}</td>
-                              <td>{pkg.aircraftFamily === 'A330' ? 'A330' : 'A320/A321'}</td>
+                              <td>{pkg.aircraftFamily === 'A330' ? 'A330' : 'A321'}</td>
                               <td>{pkg.kind}</td>
                               <td>{pkg.label}</td>
                             </tr>
@@ -675,7 +682,12 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
               {
                 key: 'composition',
                 label: t('catering.config.supplier.compositionTitle'),
-                children: <AmenityCompositionSection amenityConfig={amenityConfig} />,
+                children: (
+                  <AmenityCompositionSection
+                    amenityConfig={amenityConfig}
+                    editing={editing}
+                  />
+                ),
               },
             ]}
           />
@@ -898,6 +910,8 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
         open={editingQuantityRule != null}
         rule={editingQuantityRule}
         amenityConfig={amenityConfig}
+        mealCatalog={mealCatalog}
+        amenityCatalog={amenityCatalog}
         onClose={() => setEditingQuantityRule(null)}
         onSave={saveQuantityRule}
       />

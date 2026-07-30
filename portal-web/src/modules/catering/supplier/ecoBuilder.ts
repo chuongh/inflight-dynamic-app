@@ -13,6 +13,7 @@ import { resolveAmenityPackages } from './amenityResolver'
 import {
   DEFAULT_ECO_QUANTITY_RULES,
   evalQuantityRule,
+  migrateEcoQuantityRules,
   type EcoQuantityEvalContext,
 } from './ecoQuantityEval'
 import type { EcoQuantityConfig, EcoUpliftType } from './ecoQuantityTypes'
@@ -77,8 +78,9 @@ export function buildEcoSupplierRow(
   const effectiveDate = parsedDate ?? input.operatingDate.trim()
   const sourceRefs = input.sourceRefs ?? {}
   const amenityConfig = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG
-  const quantityRules =
-    quantityConfig?.quantityRules ?? DEFAULT_ECO_QUANTITY_RULES
+  const quantityRules = migrateEcoQuantityRules(
+    quantityConfig?.quantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
+  )
   const upliftType = normalizeUpliftType(input.upliftType)
 
   const amenity = resolveAmenityPackages(
@@ -119,6 +121,10 @@ export function buildEcoSupplierRow(
     input.quotaCommercial,
     sourceRefs.quotaCommercial ?? 'Commercial quota source',
   )
+  const breadPrebook = inputCell(
+    input.breadPrebook,
+    sourceRefs.breadPrebook ?? 'Ungrouped flight premeal breakdown; Bánh mì',
+  )
 
   const hotmealValues = HOTMEAL_KEYS.map((key) => hotmealCells[key].value)
   const hotmealTotalValue = sumHotmealItems(hotmealValues)
@@ -139,6 +145,7 @@ export function buildEcoSupplierRow(
       quotaCommercial: quota.value,
       totalPrebook: prebook.value,
       skybossEco: skyboss.value,
+      breadPrebook: breadPrebook.value,
     },
     hotmealTotal: hotmealTotalValue,
     dep: identity.dep,
@@ -166,12 +173,13 @@ export function buildEcoSupplierRow(
 
   let bread: SupplierCell<number>
   if (input.workbookReferenceBread != null) {
+    // Confirmed final count straight from the finalized workbook — outranks the formula.
     bread = ecoCell(
       input.workbookReferenceBread,
       `${sourceRefs.workbookReferenceBread ?? 'Workbook bread column'}; workbookReferenceBread`,
     )
   } else {
-    bread = resolveRuleCell('bread', 'quotaCommercial + totalPrebook')
+    bread = resolveRuleCell('bread', 'quotaCommercial + breadPrebook')
   }
 
   const ketchup = resolveRuleCell('ketchup', 'J spaghetti quantity')
@@ -237,6 +245,16 @@ export function buildEcoSupplierRow(
     freshWater = resolveRuleCell('freshWater', 'AY = totalPrebook')
   }
 
+  const maccaSkybossRaisins = resolveRuleCell(
+    'maccaSkybossRaisins',
+    'AR = skybossEco',
+  )
+  const maccaKazSalted = resolveRuleCell('maccaKazSalted', 'AS Macca muối KAZ')
+  const blanket3in1Prebook = resolveRuleCell(
+    'blanket3in1Prebook',
+    'AX = totalPrebook (approx)',
+  )
+
   const manualSnack = (value: number | null | undefined, label: string) =>
     inputCell(value, `Manual/operational input; ${label}`)
 
@@ -279,14 +297,15 @@ export function buildEcoSupplierRow(
     ),
     skyboss,
     prebook,
+    quotaCommercial: quota,
     prebookCashews,
     freshWater,
-    maccaSkybossRaisins: manualSnack(input.maccaSkybossRaisins, 'AR Macca nho khô SkyBoss'),
-    maccaKazSalted: manualSnack(input.maccaKazSalted, 'AS Macca muối KAZ'),
+    maccaSkybossRaisins,
+    maccaKazSalted,
     charterSnack: manualSnack(input.charterSnack, 'AT Snack charter'),
     wine: manualSnack(input.wine, 'AU Rượu vang'),
     blanketCSkyboss: manualSnack(input.blanketCSkyboss, 'AV Chăn C SkyBoss'),
-    blanket3in1Prebook: manualSnack(input.blanket3in1Prebook, 'AX Chăn 3in1 Prebook'),
+    blanket3in1Prebook,
     maccaRegular: manualSnack(input.maccaRegular, 'BA Macca thường'),
     mangoChiliSaltGdsDeluxe: manualSnack(
       input.mangoChiliSaltGdsDeluxe,

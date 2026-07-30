@@ -78,6 +78,95 @@ describe('flightGroupsToSupplierInputs', () => {
     expect(inputs[0].totalPrebook).toBe(150)
   })
 
+  it('derives breadPrebook from the per-dish Bánh mì premeal count, not the flight total', () => {
+    const day = dayOf([
+      group({
+        id: 'g1',
+        confirmed: true,
+        legs: [
+          leg({
+            flightNo: 'VJ001',
+            dep: 'SGN',
+            arr: 'DAD',
+            premeal: 150,
+            meals: [
+              { name: 'Bánh mì Viêt Nam', count: 6 },
+              { name: 'Mì Ý', count: 40 },
+            ],
+            supplier: { totalPrebook: 150 },
+          }),
+        ],
+      }),
+    ])
+
+    const { inputs } = flightGroupsToSupplierInputs(day, 'SGN')
+    expect(inputs[0].breadPrebook).toBe(6)
+    expect(inputs[0].totalPrebook).toBe(150)
+  })
+
+  it('leaves breadPrebook unset when there is no per-dish meals breakdown', () => {
+    const day = dayOf([
+      group({
+        id: 'g1',
+        confirmed: true,
+        legs: [
+          leg({
+            flightNo: 'VJ001',
+            dep: 'SGN',
+            arr: 'DAD',
+            supplier: { totalPrebook: 150 },
+          }),
+        ],
+      }),
+    ])
+
+    const { inputs } = flightGroupsToSupplierInputs(day, 'SGN')
+    expect(inputs[0].breadPrebook).toBeNull()
+  })
+
+  it('prefers an explicit supplier.breadPrebook override over the derived premeal breakdown', () => {
+    const day = dayOf([
+      group({
+        id: 'g1',
+        confirmed: true,
+        legs: [
+          leg({
+            flightNo: 'VJ001',
+            dep: 'SGN',
+            arr: 'DAD',
+            meals: [{ name: 'Bánh mì Viêt Nam', count: 6 }],
+            supplier: { breadPrebook: 9 },
+          }),
+        ],
+      }),
+    ])
+
+    const { inputs } = flightGroupsToSupplierInputs(day, 'SGN')
+    expect(inputs[0].breadPrebook).toBe(9)
+  })
+
+  it('keeps workbookReferenceBread as a separate, unrelated field', () => {
+    const day = dayOf([
+      group({
+        id: 'g1',
+        confirmed: true,
+        legs: [
+          leg({
+            flightNo: 'VJ001',
+            dep: 'SGN',
+            arr: 'DAD',
+            meals: [{ name: 'Bánh mì Viêt Nam', count: 6 }],
+            supplier: { workbookReferenceBread: 1 },
+          }),
+        ],
+      }),
+    ])
+
+    const { inputs } = flightGroupsToSupplierInputs(day, 'SGN')
+    expect(inputs[0].workbookReferenceBread).toBe(1)
+    expect(inputs[0].breadPrebook).toBe(6)
+  })
+
   it('counts pending legs from unconfirmed groups at the station', () => {
     const day = dayOf([
       group({

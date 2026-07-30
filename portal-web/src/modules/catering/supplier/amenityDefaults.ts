@@ -9,7 +9,7 @@ import type {
 export const DEFAULT_ROUTE_HOUR_CLASSES: RouteHourClass[] = [
   {
     id: 'DOM_LE_1H15',
-    label: '1.DOM ≤1h15',
+    label: 'Quốc nội ≤ 1h15',
     routes: [
       'SGN-BMV-SGN',
       'SGN-CXR-SGN',
@@ -21,7 +21,7 @@ export const DEFAULT_ROUTE_HOUR_CLASSES: RouteHourClass[] = [
   },
   {
     id: 'DOM_GT_1H15',
-    label: '2.DOM >1h15',
+    label: 'Quốc nội > 1h15',
     routes: [
       'SGN-DAD-SGN',
       'SGN-HAN-SGN',
@@ -35,7 +35,7 @@ export const DEFAULT_ROUTE_HOUR_CLASSES: RouteHourClass[] = [
   },
   {
     id: 'INT_LT_4H',
-    label: '3.INT < 4h',
+    label: 'Quốc tế < 4h',
     routes: [
       'SGN-BKK-SGN',
       'SGN-CAN-SGN',
@@ -56,7 +56,7 @@ export const DEFAULT_ROUTE_HOUR_CLASSES: RouteHourClass[] = [
   },
   {
     id: 'INT_GE_4H',
-    label: '4.INT >=4h',
+    label: 'Quốc tế ≥ 4h',
     routes: [
       'SGN-AMD-SGN',
       'SGN-BLR-SGN',
@@ -85,21 +85,21 @@ export const DEFAULT_ROUTE_GROUPS: SupplierRouteGroup[] = [
 
 /** Package legend from sheets A321 / A330 */
 export const DEFAULT_AMENITY_PACKAGES: AmenityPackageDef[] = [
-  { id: 1, label: 'Vật tư theo tàu-cấp đầu ngày', aircraftFamily: 'A320_A321', kind: 'aircraft_day_start' },
-  { id: 2, label: 'Cặp chuyến bay QN ≤1h15', aircraftFamily: 'A320_A321', kind: 'route_hour', hourClassId: 'DOM_LE_1H15' },
-  { id: 3, label: 'Cặp chuyến bay QN >1h15', aircraftFamily: 'A320_A321', kind: 'route_hour', hourClassId: 'DOM_GT_1H15' },
-  { id: 4, label: 'QT < 4h', aircraftFamily: 'A320_A321', kind: 'route_hour', hourClassId: 'INT_LT_4H' },
-  { id: 5, label: 'QT >= 4h', aircraftFamily: 'A320_A321', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
-  { id: 6, label: 'Charter China full meal', aircraftFamily: 'A320_A321', kind: 'charter_china' },
-  { id: 7, label: 'Russia', aircraftFamily: 'A320_A321', kind: 'russia' },
-  { id: 8, label: 'Ferry/Cargo', aircraftFamily: 'A320_A321', kind: 'ferry_cargo' },
-  { id: 9, label: 'Nightstop', aircraftFamily: 'A320_A321', kind: 'nightstop' },
-  { id: 10, label: 'Vật tư theo tàu-cấp đầu ngày', aircraftFamily: 'A330', kind: 'aircraft_day_start' },
-  { id: 11, label: 'Chuyến bay QN', aircraftFamily: 'A330', kind: 'route_hour', hourClassId: 'DOM_LE_1H15' },
-  { id: 12, label: 'Chuyến bay QT (Hàn/Nhật/Ấn)', aircraftFamily: 'A330', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
+  { id: 1, label: 'Vật tư đầu ngày (theo tàu)', aircraftFamily: 'A321', kind: 'aircraft_day_start' },
+  { id: 2, label: 'Quốc nội ≤ 1h15', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'DOM_LE_1H15' },
+  { id: 3, label: 'Quốc nội > 1h15', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'DOM_GT_1H15' },
+  { id: 4, label: 'Quốc tế < 4h', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'INT_LT_4H' },
+  { id: 5, label: 'Quốc tế ≥ 4h', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
+  { id: 6, label: 'Charter Trung Quốc (full meal)', aircraftFamily: 'A321', kind: 'charter_china' },
+  { id: 7, label: 'Nga', aircraftFamily: 'A321', kind: 'russia' },
+  { id: 8, label: 'Ferry/Cargo', aircraftFamily: 'A321', kind: 'ferry_cargo' },
+  { id: 9, label: 'Nightstop', aircraftFamily: 'A321', kind: 'nightstop' },
+  { id: 10, label: 'Vật tư đầu ngày (theo tàu)', aircraftFamily: 'A330', kind: 'aircraft_day_start' },
+  { id: 11, label: 'Quốc nội', aircraftFamily: 'A330', kind: 'route_hour', hourClassId: 'DOM_LE_1H15' },
+  { id: 12, label: 'Quốc tế (Hàn/Nhật/Ấn)', aircraftFamily: 'A330', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
   { id: 13, label: 'Kazakhstan', aircraftFamily: 'A330', kind: 'kazakhstan' },
-  { id: 14, label: 'Russia', aircraftFamily: 'A330', kind: 'russia' },
-  { id: 15, label: 'Australia', aircraftFamily: 'A330', kind: 'australia' },
+  { id: 14, label: 'Nga', aircraftFamily: 'A330', kind: 'russia' },
+  { id: 15, label: 'Úc', aircraftFamily: 'A330', kind: 'australia' },
   { id: 16, label: 'Ferry/Cargo', aircraftFamily: 'A330', kind: 'ferry_cargo' },
   { id: 17, label: 'Nightstop', aircraftFamily: 'A330', kind: 'nightstop' },
 ]

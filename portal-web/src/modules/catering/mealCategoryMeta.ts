@@ -2,8 +2,8 @@ import type { TFunction } from 'i18next'
 import type { MealItemCategory } from './catalogTypes'
 
 export const MEAL_CATEGORIES: MealItemCategory[] = [
-  'eco_main',
-  'sbb_main',
+  'main',
+  'vegetarian',
   'appetizer',
   'dessert',
   'bread',
@@ -16,8 +16,8 @@ export const MEAL_CATEGORY_STYLE: Record<
   MealItemCategory,
   { bg: string; color: string; border: string }
 > = {
-  eco_main: { bg: '#EDF9E0', color: '#4A7A00', border: '#B8E67A' },
-  sbb_main: { bg: '#FFF4C4', color: '#C9A000', border: '#F0DC7A' },
+  main: { bg: '#EDF9E0', color: '#4A7A00', border: '#B8E67A' },
+  vegetarian: { bg: '#FFF4C4', color: '#C9A000', border: '#F0DC7A' },
   appetizer: { bg: '#FEEAE9', color: '#B91C1C', border: '#FECACA' },
   dessert: { bg: '#FCE7F3', color: '#BE185D', border: '#FBCFE8' },
   bread: { bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA' },
@@ -30,14 +30,14 @@ export type RuleCatalogCategory = MealItemCategory | 'amenity' | 'other'
 
 /** Display order for quantity-rule category tabs (only show tabs with ≥1 rule). */
 export const RULE_CATEGORY_TAB_ORDER: readonly RuleCatalogCategory[] = [
-  'eco_main',
+  'main',
+  'vegetarian',
   'bread',
   'condiment',
   'dessert',
   'snack',
   'drink',
   'appetizer',
-  'sbb_main',
   'amenity',
   'other',
 ]
