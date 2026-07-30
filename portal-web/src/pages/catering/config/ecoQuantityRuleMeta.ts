@@ -18,6 +18,14 @@ export function productCodeFor(targetColumn: string): string | null {
   return ECO_SUPPLY_FIELDS.find((f) => f.field === targetColumn)?.productCode ?? null
 }
 
+const CATALOG_TARGET_PREFIX = 'catalog:'
+
+function catalogItemIdForTarget(targetColumn: string): string | null {
+  return targetColumn.startsWith(CATALOG_TARGET_PREFIX)
+    ? targetColumn.slice(CATALOG_TARGET_PREFIX.length)
+    : null
+}
+
 export function supplyFieldDef(targetColumn: string) {
   return ECO_SUPPLY_FIELDS.find((f) => f.field === targetColumn)
 }
@@ -28,6 +36,14 @@ export function displayNameFor(
   mealCatalog: MealCatalogItem[],
   amenityCatalog: AmenityCatalogItem[],
 ): string {
+  const catalogItemId = catalogItemIdForTarget(targetColumn)
+  if (catalogItemId) {
+    return (
+      mealCatalog.find((item) => item.id === catalogItemId)?.name.vi ??
+      amenityCatalog.find((item) => item.id === catalogItemId)?.name.vi ??
+      targetColumn
+    )
+  }
   const def = supplyFieldDef(targetColumn)
   if (def?.catalogItemId) {
     const byId =
@@ -66,6 +82,10 @@ export function ruleCategoryOf(
   rule: EcoQuantityRule,
   mealCatalog: MealCatalogItem[],
 ): RuleCatalogCategory {
+  const catalogItemId = catalogItemIdForTarget(rule.targetColumn)
+  if (catalogItemId) {
+    return mealCatalog.find((item) => item.id === catalogItemId)?.category ?? 'other'
+  }
   const def = supplyFieldDef(rule.targetColumn)
   if (!def || def.catalog === 'none') return 'other'
   if (def.catalog === 'amenity') return 'amenity'
@@ -82,6 +102,42 @@ export function ruleCategoryOf(
     return def.group as MealItemCategory
   }
   return 'other'
+}
+
+/** Configurable supplier fields that belong to one catalog category. */
+export function targetColumnsForCategory(
+  category: RuleCatalogCategory,
+  mealCatalog: MealCatalogItem[],
+): string[] {
+  const registered = ECO_QUANTITY_TARGET_COLUMNS.filter((targetColumn) =>
+    ruleCategoryOf(
+      {
+        id: `category.${targetColumn}`,
+        targetColumn,
+        enabled: true,
+        branches: [],
+        fallback: { kind: 'const', value: 0 },
+      },
+      mealCatalog,
+    ) === category,
+  )
+  if (category === 'amenity' || category === 'other') return registered
+
+  const registeredCatalogIds = new Set(
+    registered
+      .map((targetColumn) => supplyFieldDef(targetColumn)?.catalogItemId)
+      .filter((id): id is string => !!id),
+  )
+  const extraCatalogItems = mealCatalog
+    .filter(
+      (item) =>
+        item.active !== false &&
+        item.category === category &&
+        item.cabinScopes.includes('ECO') &&
+        !registeredCatalogIds.has(item.id),
+    )
+    .map((item) => `${CATALOG_TARGET_PREFIX}${item.id}`)
+  return [...registered, ...extraCatalogItems]
 }
 
 export { ECO_QUANTITY_TARGET_COLUMNS }
@@ -114,6 +170,48 @@ export type ValueSourceGroup = {
   options: Array<{ value: string; label: string }>
 }
 
+/** Catalog-first source options; values retain the linked ECO cell key for evaluation. */
+function catalogColumnOptions(
+  mealCatalog: MealCatalogItem[],
+  amenityCatalog: AmenityCatalogItem[],
+): Array<{ value: string; label: string }> {
+  const byCatalogId = new Map(
+    ECO_SUPPLY_FIELDS.filter((field) => field.catalogItemId).map((field) => [
+      field.catalogItemId!,
+      field.field,
+    ]),
+  )
+  const byProductCode = new Map(
+    ECO_SUPPLY_FIELDS.filter((field) => field.productCode).map((field) => [
+      field.productCode!,
+      field.field,
+    ]),
+  )
+  const seen = new Set<string>()
+  const options = [...mealCatalog, ...amenityCatalog]
+    .filter((item) => item.active !== false)
+    .flatMap((item) => {
+      const field =
+        byCatalogId.get(item.id) ??
+        (item.productCode ? byProductCode.get(item.productCode) : undefined)
+      if (!field || seen.has(field)) return []
+      seen.add(field)
+      return [{
+        value: `column:${field}`,
+        label: item.productCode ? `${item.name.vi} · ${item.productCode}` : item.name.vi,
+      }]
+    })
+    .sort((a, b) => a.label.localeCompare(b.label, 'vi'))
+
+  // Keep unlinked legacy fields editable when their catalog record is absent.
+  for (const field of ECO_SUPPLY_FIELDS) {
+    if (!seen.has(field.field)) {
+      options.push({ value: `column:${field.field}`, label: field.fallbackNameVi })
+    }
+  }
+  return options
+}
+
 /** Grouped options for the unified "Tính theo" dropdown. */
 export function buildValueSourceGroups(
   mealCatalog: MealCatalogItem[],
@@ -132,10 +230,7 @@ export function buildValueSourceGroups(
     },
     {
       label: 'Sản phẩm khác',
-      options: ECO_QUANTITY_TARGET_COLUMNS.map((c) => ({
-        value: `column:${c}`,
-        label: displayNameFor(c, mealCatalog, amenityCatalog),
-      })),
+      options: catalogColumnOptions(mealCatalog, amenityCatalog),
     },
   ]
 }
@@ -217,7 +312,7 @@ export function whenNatural(
     parts.push(label)
   }
   for (const fam of when.aircraftFamilies ?? []) {
-    parts.push(fam === 'A330' ? 'A330' : 'A321')
+    parts.push(fam === 'A330' ? 'A330' : 'A320/A321')
   }
   for (const u of when.upliftTypes ?? []) {
     parts.push(UPLIFT_LABELS[u] ?? u)
@@ -254,7 +349,7 @@ export function whenConditionChips(
     chips.push({ key: 'hourClasses', label: `Giờ: ${labels.join(', ')}` })
   }
   if (when.aircraftFamilies?.length) {
-    const labels = when.aircraftFamilies.map((f) => (f === 'A330' ? 'A330' : 'A321'))
+    const labels = when.aircraftFamilies.map((f) => (f === 'A330' ? 'A330' : 'A320/A321'))
     chips.push({ key: 'aircraftFamilies', label: `Tàu: ${labels.join(', ')}` })
   }
   if (when.upliftTypes?.length) {
@@ -316,4 +411,116 @@ export function newEcoQuantityRule(targetColumn: string): EcoQuantityRule {
     branches: [],
     fallback: { kind: 'const', value: 0 },
   }
+}
+
+const METRIC_IDS = new Set(['totalPrebook', 'quotaCommercial', 'skybossEco', 'breadPrebook'])
+const WHEN_KEYS: Array<keyof EcoQuantityWhen> = [
+  'routeGroups',
+  'routePairs',
+  'aircraftFamilies',
+  'upliftTypes',
+  'hourClasses',
+  'amenityPackages',
+  'flightKinds',
+]
+
+function validateValue(value: EcoQuantityValue, path: string, errors: string[]): void {
+  if (value.kind === 'const') {
+    if (!Number.isFinite(value.value) || !Number.isInteger(value.value) || value.value < 0) {
+      errors.push(`${path}: số lượng phải là số nguyên không âm`)
+    }
+    return
+  }
+  if (value.kind === 'sum') {
+    if (value.parts.length === 0) errors.push(`${path}: tổng phải có ít nhất một nguồn`)
+    value.parts.forEach((part, index) => validateValue(part, `${path}, nguồn ${index + 1}`, errors))
+    return
+  }
+  const source = value.kind === 'metric' ? value.metricId : value.kind === 'column' ? value.columnId : null
+  if (value.kind === 'metric' && !METRIC_IDS.has(value.metricId)) errors.push(`${path}: nguồn dữ liệu không tồn tại`)
+  if (value.kind === 'column' && !ECO_QUANTITY_TARGET_COLUMNS.includes(value.columnId as never)) errors.push(`${path}: sản phẩm nguồn không tồn tại`)
+  if (!Number.isFinite(value.coef ?? 1) || (value.coef ?? 1) < 0) errors.push(`${path}: hệ số phải không âm`)
+  void source
+}
+
+function branchCovers(earlier: EcoQuantityWhen, later: EcoQuantityWhen): boolean {
+  return WHEN_KEYS.every((key) => {
+    const earlierValues = earlier[key]
+    if (!earlierValues?.length) return true
+    const laterValues = later[key]
+    return !!laterValues?.length && laterValues.every((value) => earlierValues.includes(value as never))
+  })
+}
+
+function valueColumnReferences(value: EcoQuantityValue): string[] {
+  if (value.kind === 'column') return [value.columnId]
+  if (value.kind === 'sum') return value.parts.flatMap(valueColumnReferences)
+  return []
+}
+
+/** Validation gate before a quantity-rule version may be published. */
+export function validateEcoQuantityRules(rules: EcoQuantityRule[]): string[] {
+  const errors: string[] = []
+  const seenTargets = new Set<string>()
+  for (const rule of rules) {
+    const label = displayNameFor(rule.targetColumn, [], [])
+    if (
+      !ECO_QUANTITY_TARGET_COLUMNS.includes(rule.targetColumn as never) &&
+      !catalogItemIdForTarget(rule.targetColumn)
+    ) {
+      errors.push(`${label}: sản phẩm không hợp lệ`)
+    }
+    if (seenTargets.has(rule.targetColumn)) errors.push(`${label}: có nhiều hơn một quy tắc`)
+    seenTargets.add(rule.targetColumn)
+    validateValue(rule.fallback, `${label}, mặc định`, errors)
+    const branchIds = new Set<string>()
+    rule.branches.forEach((branch, index) => {
+      const branchLabel = `${label}, nhánh ${index + 1}`
+      if (branchIds.has(branch.id)) errors.push(`${branchLabel}: mã nhánh bị trùng`)
+      branchIds.add(branch.id)
+      if (Object.values(branch.when).every((value) => !value?.length)) {
+        errors.push(`${branchLabel}: cần có ít nhất một điều kiện; dùng phần Mặc định cho trường hợp còn lại`)
+      }
+      for (const pair of branch.when.routePairs ?? []) {
+        if (!/^[A-Z]{3}-[A-Z]{3}$/.test(pair.trim().toUpperCase())) {
+          errors.push(`${branchLabel}: chặng bay phải theo dạng SGN-MEL`)
+        }
+      }
+      validateValue(branch.value, branchLabel, errors)
+      const shadowingIndex = rule.branches.findIndex(
+        (earlier, earlierIndex) =>
+          earlierIndex < index && branchCovers(earlier.when, branch.when),
+      )
+      if (shadowingIndex >= 0) {
+        errors.push(`${branchLabel}: không bao giờ được dùng vì bị nhánh ${shadowingIndex + 1} che phủ`)
+      }
+    })
+  }
+
+  const dependencies = new Map(
+    rules.map((rule) => [
+      rule.targetColumn,
+      new Set([
+        ...valueColumnReferences(rule.fallback),
+        ...rule.branches.flatMap((branch) => valueColumnReferences(branch.value)),
+      ]),
+    ]),
+  )
+  const visiting = new Set<string>()
+  const visited = new Set<string>()
+  const visit = (target: string, trail: string[]): void => {
+    if (visiting.has(target)) {
+      errors.push(`Vòng phụ thuộc công thức: ${[...trail, target].join(' → ')}`)
+      return
+    }
+    if (visited.has(target)) return
+    visiting.add(target)
+    for (const dependency of dependencies.get(target) ?? []) {
+      if (dependencies.has(dependency)) visit(dependency, [...trail, target])
+    }
+    visiting.delete(target)
+    visited.add(target)
+  }
+  for (const target of dependencies.keys()) visit(target, [])
+  return [...new Set(errors)]
 }

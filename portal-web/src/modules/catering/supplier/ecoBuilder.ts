@@ -105,10 +105,6 @@ export function buildEcoSupplierRow(
     ]),
   ) as Record<HotmealItemKey, SupplierCell<number>>
 
-  const boiledEggs = inputCell(
-    input.boiledEggs,
-    sourceRefs.boiledEggs ?? 'Operational input',
-  )
   const skyboss = inputCell(
     input.skybossEco,
     sourceRefs.skybossEco ?? 'FlightView SkyBoss ECO passenger count',
@@ -194,6 +190,17 @@ export function buildEcoSupplierRow(
   evalCtx.columns.hotmealUtensils = hotmealUtensils.value
   evalCtx.columns.bread = bread.value
 
+  const boiledEggsRule = ruleByTarget('boiledEggs')
+  let boiledEggs: SupplierCell<number>
+  if (input.boiledEggs != null) {
+    boiledEggs = inputCell(input.boiledEggs, sourceRefs.boiledEggs ?? 'Operational input')
+  } else if (boiledEggsRule) {
+    const resolved = evalQuantityRule(boiledEggsRule, evalCtx)
+    boiledEggs = ecoCell(resolved.value, resolved.source)
+  } else {
+    boiledEggs = inputCell(null, sourceRefs.boiledEggs ?? 'Operational input')
+  }
+
   const skybossEggs = resolveRuleCell('skybossEggs', 'SkyBoss ECO on AU routes')
   const australiaNoodleVegetables = resolveRuleCell(
     'australiaNoodleVegetables',
@@ -231,6 +238,20 @@ export function buildEcoSupplierRow(
       null,
       sourceRefs.reserveUtensils ?? 'Manual package/route reserve input',
     )
+  }
+
+  const reserveCrewWaterRule = ruleByTarget('reserveCrewWater')
+  let reserveCrewWater: SupplierCell<number>
+  if (input.reserveCrewWater != null) {
+    reserveCrewWater = inputCell(
+      input.reserveCrewWater,
+      sourceRefs.reserveCrewWater ?? EMPTY_OPS_SOURCE,
+    )
+  } else if (reserveCrewWaterRule) {
+    const resolved = evalQuantityRule(reserveCrewWaterRule, evalCtx)
+    reserveCrewWater = ecoCell(resolved.value, resolved.source)
+  } else {
+    reserveCrewWater = inputCell(null, sourceRefs.reserveCrewWater ?? EMPTY_OPS_SOURCE)
   }
 
   const prebookCashews = resolveRuleCell('prebookCashews', 'AQ total prebook')
@@ -313,10 +334,7 @@ export function buildEcoSupplierRow(
     ),
     beerSnackComboBC: manualSnack(input.beerSnackComboBC, 'BC Bia + khô gà + snack'),
     sodaMaccaComboBD: manualSnack(input.sodaMaccaComboBD, 'BD Soda dâu + Macca'),
-    reserveCrewWater: inputCell(
-      input.reserveCrewWater,
-      sourceRefs.reserveCrewWater ?? EMPTY_OPS_SOURCE,
-    ),
+    reserveCrewWater,
     smallIceBox: inputCell(
       input.smallIceBox,
       sourceRefs.smallIceBox ?? EMPTY_OPS_SOURCE,
@@ -351,11 +369,26 @@ export function buildEcoSupplierRow(
     ),
   }
 
+  // Catalog-only targets are evaluated after fixed cells so they can reference
+  // any regular ECO result while remaining independent from workbook columns.
+  Object.assign(
+    evalCtx.columns,
+    Object.fromEntries(Object.entries(cells).map(([key, cell]) => [key, cell.value])),
+  )
+  const dynamicCells: Record<string, SupplierCell<number>> = {}
+  for (const rule of quantityRules) {
+    if (!rule.enabled || !rule.targetColumn.startsWith('catalog:')) continue
+    const resolved = evalQuantityRule(rule, evalCtx)
+    dynamicCells[rule.targetColumn] = ecoCell(resolved.value, resolved.source)
+    evalCtx.columns[rule.targetColumn] = resolved.value
+  }
+
   return {
     ...identity,
     operatingDate: effectiveDate,
     key: createFlightJoinKey({ ...identity, operatingDate: effectiveDate }),
     cells,
+    dynamicCells,
     amenityLabel: amenity.label,
     amenityPackageIds: amenity.packageIds,
   }

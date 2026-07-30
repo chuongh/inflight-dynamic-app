@@ -11,9 +11,11 @@ interface Props {
   onToggle: (enabled: boolean) => void
   onEdit: () => void
   onRemove: () => void
+  /** Hide the category eyebrow — set false when a group header above already names it. */
+  showCategory?: boolean
 }
 
-export function RuleCard({ rule, editing, onToggle, onEdit, onRemove }: Props) {
+export function RuleCard({ rule, editing, onToggle, onEdit, onRemove, showCategory = true }: Props) {
   const { t } = useTranslation()
   const accent = accentForKind(rule.kind)
   const category = RULE_CATEGORY[rule.kind]
@@ -35,14 +37,17 @@ export function RuleCard({ rule, editing, onToggle, onEdit, onRemove }: Props) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span
-            className="text-[10.5px] font-bold tracking-wide uppercase"
-            style={{ color: accent.color }}
-          >
-            {t(`catering.config.cat.${category}`)}
-          </span>
+          {showCategory ? (
+            <span
+              className="text-[10.5px] font-bold tracking-wide uppercase"
+              style={{ color: accent.color }}
+            >
+              {t(`catering.config.cat.${category}`)}
+            </span>
+          ) : null}
           <span className="text-text-muted text-[11px] font-semibold">
-            · {t(`catering.config.kind.${rule.kind}.name`)}
+            {showCategory ? '· ' : ''}
+            {t(`catering.config.kind.${rule.kind}.name`)}
           </span>
         </div>
         <div className={`mt-0.5 text-[14.5px] font-semibold ${muted ? 'line-through' : ''}`}>

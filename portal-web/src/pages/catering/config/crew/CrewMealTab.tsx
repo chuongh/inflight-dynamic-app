@@ -5,14 +5,12 @@ import {
   Checkbox,
   InputNumber,
   Input,
-  Popover,
   Segmented,
-  Select,
   Space,
   Spin,
   Switch,
 } from 'antd'
-import { Info, Lock, Pencil, Plane, Users, X } from 'lucide-react'
+import { Lock, Pencil, Plane, Users } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -29,24 +27,17 @@ import type {
   CrewColumn,
   CrewGroup,
   CrewMealProfile,
-  CrewMealConfigVersion,
   MealWindow,
 } from '@/modules/catering/crewMealTypes'
 import {
   useCrewMealConfigData,
   useSaveCrewMealConfigData,
 } from '@/modules/catering/hooks/useCrewMealConfig'
-import type { VersionStatus } from '@/modules/catering/types'
 import { formatDateDMY } from '@/shared/utils/format'
+import { ConfigPublishBar } from '../ConfigPublishBar'
+import { ConfigVersionBar } from '../ConfigVersionBar'
 import { CrewMealSimulator } from './CrewMealSimulator'
 import { MealWindowTimeline, SLOT_META } from './MealWindowTimeline'
-
-const STATUS_DOT: Record<VersionStatus, string> = {
-  active: '#16a34a',
-  scheduled: '#2563eb',
-  superseded: '#9ca3af',
-  draft: '#c9a000',
-}
 
 const GROUPS: { value: CrewGroup; icon: ReactNode }[] = [
   { value: 'cockpit', icon: <Plane size={15} strokeWidth={2} /> },
@@ -60,22 +51,12 @@ function dmyToNum(dmy: string): number {
   return Number(`${y}${m?.padStart(2, '0')}${d?.padStart(2, '0')}`)
 }
 
-function Dot({ status }: { status: VersionStatus }) {
-  return (
-    <span
-      className="inline-block h-2 w-2 shrink-0 rounded-full"
-      style={{ background: STATUS_DOT[status] }}
-      aria-hidden
-    />
-  )
-}
-
 function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
-    <section className="border-border bg-surface rounded-xl border px-4 py-3.5">
+    <section className="config-section-surface border-border bg-surface rounded-xl border px-4 py-3.5">
       <div className="mb-3">
-        <h3 className="m-0 text-[13.5px] font-bold">{title}</h3>
-        {hint ? <p className="text-text-muted m-0 mt-0.5 text-[11.5px] leading-snug">{hint}</p> : null}
+        <h3 className="config-card-title m-0">{title}</h3>
+        {hint ? <p className="config-section-desc m-0 mt-0.5">{hint}</p> : null}
       </div>
       {children}
     </section>
@@ -83,11 +64,11 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
 }
 
 type Props = {
-  /** Push version / date / Edit CTA into the parent PageHeader. */
-  onHeaderActions?: (actions: ReactNode | null) => void
+  /** Push Edit CTA into the parent PageHeader (version chrome lives in-tab). */
+  onEditAction?: (actions: ReactNode | null) => void
 }
 
-export function CrewMealTab({ onHeaderActions }: Props) {
+export function CrewMealTab({ onEditAction }: Props) {
   const { t } = useTranslation()
   const { message } = AntApp.useApp()
   const { session } = useAuth()
@@ -109,81 +90,35 @@ export function CrewMealTab({ onHeaderActions }: Props) {
 
   const isActiveView = !!viewing && viewing.id === active?.id
 
-  useEffect(() => {
-    if (!onHeaderActions) return
-    if (!viewing) {
-      onHeaderActions(null)
-      return
-    }
-
-    const effRange = `${viewing.effectiveFrom} → ${viewing.effectiveTo ?? t('catering.quota.untilNextShort')}`
-    const renderVersion = (v: CrewMealConfigVersion) => (
-      <span className="inline-flex items-center gap-2">
-        <Dot status={v.status} /> {v.id} · {t(`catering.quota.status.${v.status}`)}
-      </span>
-    )
-
-    onHeaderActions(
-      <>
-        <Select
-          value={viewing.id}
-          onChange={(id) => {
-            setViewingId(id)
-            setEditing(false)
-            setWorkingProfiles([])
-          }}
-          style={{ minWidth: 150 }}
-          optionLabelProp="label"
-          options={versions.map((v) => ({ value: v.id, label: renderVersion(v) }))}
-        />
-        <span className="border-border bg-background tnum inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold">
-          {effRange}
-        </span>
-        <Popover
-          placement="bottomLeft"
-          trigger="click"
-          content={
-            <div className="max-w-xs space-y-1 text-[12.5px] leading-relaxed">
-              <div>
-                {t('catering.config.updatedMeta', { by: viewing.updatedBy, at: viewing.updatedAt })}
-              </div>
-              {viewing.note ? <div className="text-text-muted">{viewing.note}</div> : null}
-            </div>
-          }
-        >
-          <button
-            type="button"
-            className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
-            aria-label={t('catering.quota.detailsAria')}
-          >
-            <Info size={16} />
-          </button>
-        </Popover>
-        {isActiveView && !editing ? (
-          <Button
-            type="primary"
-            icon={<Pencil size={15} />}
-            onClick={() => {
-              setWorkingProfiles(structuredClone(viewing.profiles))
-              setEffDate(formatDateDMY(Date.now()))
-              setEditing(true)
-            }}
-          >
-            {t('catering.config.crew.editConfig')}
-          </Button>
-        ) : null}
-      </>,
-    )
-  }, [onHeaderActions, viewing, versions, isActiveView, editing, t])
-
-  useEffect(() => {
-    return () => onHeaderActions?.(null)
-  }, [onHeaderActions])
+  const startEdit = () => {
+    if (!viewing) return
+    setWorkingProfiles(structuredClone(viewing.profiles))
+    setEffDate(formatDateDMY(Date.now()))
+    setEditing(true)
+  }
 
   const cancelEdit = () => {
     setEditing(false)
     setWorkingProfiles([])
   }
+
+  useEffect(() => {
+    if (!onEditAction) return
+    if (!viewing || !isActiveView || editing) {
+      onEditAction(null)
+      return
+    }
+    onEditAction(
+      <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
+        {t('catering.config.crew.editConfig')}
+      </Button>,
+    )
+  }, [onEditAction, viewing, isActiveView, editing, t])
+
+  useEffect(() => {
+    return () => onEditAction?.(null)
+  }, [onEditAction])
+
   if (isLoading || !data || !viewing) {
     return (
       <div className="page-loading">
@@ -244,11 +179,20 @@ export function CrewMealTab({ onHeaderActions }: Props) {
   const disabled = !editing
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex w-full min-w-0 flex-col gap-4">
+      <ConfigVersionBar
+        versions={versions}
+        value={viewing.id}
+        onChange={(id) => {
+          setViewingId(id)
+          if (editing) cancelEdit()
+        }}
+      />
+
       {!isActiveView && !editing ? (
-        <Alert type="info" showIcon message={t('catering.config.readonlyHint')} />
+        <Alert type="info" showIcon title={t('catering.config.readonlyHint')} />
       ) : null}
-      {editing ? <Alert type="info" showIcon message={t('catering.config.editBanner')} /> : null}
+      {editing ? <Alert type="info" showIcon title={t('catering.config.editBanner')} /> : null}
 
       {/* Profile switcher */}
       <div className="flex flex-wrap items-center gap-3">
@@ -448,33 +392,14 @@ export function CrewMealTab({ onHeaderActions }: Props) {
       </div>
 
       {editing ? (
-        <div className="quota-sticky-bar">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-            <div>
-              <div className="text-text-muted mb-1 text-[11.5px] font-bold">
-                {t('catering.config.effectiveFrom')}
-              </div>
-              <Input value={effDate} onChange={(e) => setEffDate(e.target.value)} style={{ width: 150 }} />
-            </div>
-            <div className="text-text-muted max-w-[34ch] text-[12.5px] font-medium">
-              {t('catering.config.publishHint')}
-            </div>
-            <div className="ml-auto">
-              <Space>
-                <Button icon={<X size={14} />} onClick={cancelEdit}>
-                  {t('common.cancel')}
-                </Button>
-                <Button
-                  type="primary"
-                  disabled={!effDate.trim() || timeInvalid}
-                  onClick={publish}
-                >
-                  {t('catering.config.publish')}
-                </Button>
-              </Space>
-            </div>
-          </div>
-        </div>
+        <ConfigPublishBar
+          effDate={effDate}
+          onEffDateChange={setEffDate}
+          onCancel={cancelEdit}
+          onPublish={publish}
+          publishing={saveConfig.isPending}
+          publishDisabled={timeInvalid}
+        />
       ) : null}
     </div>
   )

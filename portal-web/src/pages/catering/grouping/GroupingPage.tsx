@@ -325,7 +325,7 @@ export function GroupingPage() {
     const crewVersion = activeCrewMealVersion(crewCfg?.versions ?? [])
     const profile = crewVersion ? profileFor(crewVersion, 'cockpit') : undefined
     const { lines, breakdown } = buildOrderSnapshot(confirmed, profile, makeCodeOf(catalog))
-    const supplierRules = activeSupplierRuleVersion(supplierRuleData?.versions ?? [])
+    const supplierRules = activeSupplierRuleVersion(supplierRuleData?.versions ?? [], day.serviceDate)
     const { lines: ecoSupplyLines, byFlight: ecoSupplyByFlight } = buildEcoSupplySnapshot({
       day,
       station,

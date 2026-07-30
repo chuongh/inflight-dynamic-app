@@ -3,18 +3,15 @@ import {
   App as AntApp,
   Button,
   Collapse,
-  DatePicker,
   Input,
   InputNumber,
-  Popover,
   Segmented,
   Select,
-  Space,
+  Spin,
+  Tabs,
   Tag,
 } from 'antd'
-import dayjs, { type Dayjs } from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { Info, Pencil, Plus, Search, Trash2, X } from 'lucide-react'
+import { Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -24,7 +21,6 @@ import {
   supplierRuleVersionsNewestFirst,
   withNewSupplierRuleVersion,
 } from '@/modules/catering/supplierRuleConfig'
-import type { SupplierRuleConfigVersion } from '@/modules/catering/supplierRuleConfigTypes'
 import type {
   SbbLookupDataset,
   SbbLookupItem,
@@ -60,9 +56,11 @@ import {
   ruleCategoryLabel,
   type RuleCatalogCategory,
 } from '@/modules/catering/mealCategoryMeta'
-import type { VersionStatus } from '@/modules/catering/types'
 import { formatDateDMY } from '@/shared/utils/format'
 import { AmenityCompositionSection } from './AmenityCompositionSection'
+import { ConfigEmptyState } from './ConfigEmptyState'
+import { ConfigPublishBar } from './ConfigPublishBar'
+import { ConfigVersionBar } from './ConfigVersionBar'
 import { EcoQuantityRuleCard } from './EcoQuantityRuleCard'
 import { EcoQuantityRuleEditorDrawer } from './EcoQuantityRuleEditorDrawer'
 import {
@@ -70,17 +68,9 @@ import {
   newEcoQuantityRule,
   productCodeFor,
   ruleCategoryOf,
+  targetColumnsForCategory,
+  validateEcoQuantityRules,
 } from './ecoQuantityRuleMeta'
-
-dayjs.extend(customParseFormat)
-
-const DMY = 'DD/MM/YYYY'
-
-function parseDmy(dmy: string): Dayjs | null {
-  if (!dmy.trim()) return null
-  const d = dayjs(dmy, DMY, true)
-  return d.isValid() ? d : null
-}
 
 const SBB_SHEETS: SbbRouteSheet[] = [
   'VIET-HAN-NHAT',
@@ -99,13 +89,6 @@ const SBB_ITEMS: SbbLookupItem[] = [
   'blanket',
 ]
 
-const STATUS_DOT: Record<VersionStatus, string> = {
-  active: '#16a34a',
-  scheduled: '#2563eb',
-  superseded: '#9ca3af',
-  draft: '#c9a000',
-}
-
 type ConfigSection = 'eco' | 'amenity' | 'routeHourList' | 'sbb'
 
 function dmyToNum(dmy: string): number {
@@ -117,22 +100,12 @@ function cloneSbb(lookups: SbbLookupDataset): SbbLookupDataset {
   return structuredClone(lookups)
 }
 
-function Dot({ status }: { status: VersionStatus }) {
-  return (
-    <span
-      className="inline-block h-2 w-2 shrink-0 rounded-full"
-      style={{ background: STATUS_DOT[status] }}
-      aria-hidden
-    />
-  )
-}
-
 type Props = {
-  /** Push version / date / Edit CTA into the parent PageHeader. */
-  onHeaderActions?: (actions: ReactNode | null) => void
+  /** Push Edit CTA into the parent PageHeader (version chrome stays in-tab). */
+  onEditAction?: (actions: ReactNode | null) => void
 }
 
-export function SupplierRulesTab({ onHeaderActions }: Props) {
+export function SupplierRulesTab({ onEditAction }: Props) {
   const { t } = useTranslation()
   const { message } = AntApp.useApp()
   const { session } = useAuth()
@@ -182,12 +155,13 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
       : (viewing?.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES),
   )
 
-  const categoryTabs = useMemo(() => {
-    const present = new Set(
-      quantityRules.map((r) => ruleCategoryOf(r, mealCatalog)),
-    )
-    return RULE_CATEGORY_TAB_ORDER.filter((c) => present.has(c))
-  }, [quantityRules, mealCatalog])
+  const categoryTabs = useMemo(
+    () =>
+      RULE_CATEGORY_TAB_ORDER.filter(
+        (category) => targetColumnsForCategory(category, mealCatalog).length > 0,
+      ),
+    [mealCatalog],
+  )
 
   const activeEcoCategory: RuleCatalogCategory =
     ecoCategory && categoryTabs.includes(ecoCategory)
@@ -196,6 +170,10 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
 
   const categoryRules = quantityRules.filter(
     (r) => ruleCategoryOf(r, mealCatalog) === activeEcoCategory,
+  )
+  const categoryTargetColumns = useMemo(
+    () => targetColumnsForCategory(activeEcoCategory, mealCatalog),
+    [activeEcoCategory, mealCatalog],
   )
   const filteredCategoryRules = useMemo(() => {
     const q = ruleQuery.trim().toLowerCase()
@@ -241,81 +219,26 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
   }
 
   useEffect(() => {
-    if (!onHeaderActions) return
-    if (!viewing) {
-      onHeaderActions(null)
+    if (!onEditAction) return
+    if (!viewing || !isActiveView || editing) {
+      onEditAction(null)
       return
     }
-
-    const effRange = `${viewing.effectiveFrom} → ${viewing.effectiveTo ?? t('catering.quota.untilNextShort')}`
-    const renderVersion = (v: SupplierRuleConfigVersion) => (
-      <span className="inline-flex items-center gap-2">
-        <Dot status={v.status} /> {v.id} · {t(`catering.quota.status.${v.status}`)}
-      </span>
+    onEditAction(
+      <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
+        {t('catering.config.supplier.edit')}
+      </Button>,
     )
-
-    onHeaderActions(
-      <>
-        <Select
-          value={viewing.id}
-          onChange={(id) => {
-            setViewingId(id)
-            if (editing) {
-              setEditing(false)
-              setWorkingSbb(null)
-              setWorkingQuantityRules(null)
-              setWorkingAmenityConfig(null)
-              setEditingQuantityRule(null)
-            }
-          }}
-          style={{ minWidth: 150 }}
-          optionLabelProp="label"
-          options={versions.map((v) => ({ value: v.id, label: renderVersion(v) }))}
-          aria-label={t('catering.config.supplier.versionSelect')}
-        />
-        <span className="border-border bg-background tnum inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold">
-          {effRange}
-        </span>
-        <Popover
-          placement="bottomLeft"
-          trigger="click"
-          content={
-            <div className="max-w-xs space-y-1 text-[12.5px] leading-relaxed">
-              <div>
-                {t('catering.config.updatedMeta', {
-                  by: viewing.updatedBy,
-                  at: viewing.updatedAt,
-                })}
-              </div>
-              {viewing.note ? <div className="text-text-muted">{viewing.note}</div> : null}
-            </div>
-          }
-        >
-          <button
-            type="button"
-            className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
-            aria-label={t('catering.quota.detailsAria')}
-          >
-            <Info size={16} />
-          </button>
-        </Popover>
-        {isActiveView && !editing ? (
-          <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
-            {t('catering.config.supplier.edit')}
-          </Button>
-        ) : null}
-      </>,
-    )
-  }, [onHeaderActions, viewing, versions, isActiveView, editing, t])
+  }, [onEditAction, viewing, isActiveView, editing, t])
 
   useEffect(() => {
-    return () => onHeaderActions?.(null)
-  }, [onHeaderActions])
+    return () => onEditAction?.(null)
+  }, [onEditAction])
 
   if (isLoading || !data || !viewing) {
     return (
-      <div className="border-border text-text-muted rounded-xl border border-dashed px-4 py-8 text-center text-[13px]">
-        {t('catering.config.supplier.loading')}
+      <div className="page-loading">
+        <Spin size="large" />
       </div>
     )
   }
@@ -340,13 +263,24 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
 
   const addQuantityRule = () => {
     if (!workingQuantityRules) return
-    const created = newEcoQuantityRule('ketchup')
+    const targetColumn = categoryTargetColumns.find(
+      (target) => !workingQuantityRules.some((rule) => rule.targetColumn === target),
+    )
+    if (!targetColumn) {
+      message.warning('Mỗi sản phẩm chỉ có thể có một quy tắc. Hãy thêm nhánh vào quy tắc hiện có.')
+      return
+    }
+    const created = newEcoQuantityRule(targetColumn)
     setWorkingQuantityRules([...workingQuantityRules, created])
     setEditingQuantityRule(created)
   }
 
   const saveQuantityRule = (rule: EcoQuantityRule) => {
     if (!workingQuantityRules) return
+    if (workingQuantityRules.some((item) => item.id !== rule.id && item.targetColumn === rule.targetColumn)) {
+      message.error('Mỗi sản phẩm chỉ có thể có một quy tắc. Hãy thêm nhánh vào quy tắc hiện có.')
+      return
+    }
     const exists = workingQuantityRules.some((r) => r.id === rule.id)
     setWorkingQuantityRules(
       exists
@@ -451,6 +385,14 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
 
   const publish = () => {
     if (!workingSbb) return
+    const nextQuantityRules = migrateEcoQuantityRules(
+      workingQuantityRules ?? viewing.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
+    )
+    const ruleErrors = validateEcoQuantityRules(nextQuantityRules)
+    if (ruleErrors.length > 0) {
+      message.error({ content: ruleErrors.join('\n'), duration: 8 })
+      return
+    }
     const today = formatDateDMY(Date.now())
     const startsInFuture = dmyToNum(effDate) > dmyToNum(today)
     const next = withNewSupplierRuleVersion(
@@ -460,9 +402,7 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
         sbbLookups: workingSbb,
         ecoAmenity:
           workingAmenityConfig ?? viewing.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG,
-        ecoQuantityRules: migrateEcoQuantityRules(
-          workingQuantityRules ?? viewing.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
-        ),
+        ecoQuantityRules: nextQuantityRules,
       },
       {
         effectiveFrom: effDate,
@@ -485,6 +425,22 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-4">
+      <ConfigVersionBar
+        versions={versions}
+        value={viewing.id}
+        selectAriaLabel={t('catering.config.supplier.versionSelect')}
+        onChange={(id) => {
+          setViewingId(id)
+          if (editing) {
+            setEditing(false)
+            setWorkingSbb(null)
+            setWorkingQuantityRules(null)
+            setWorkingAmenityConfig(null)
+            setEditingQuantityRule(null)
+          }
+        }}
+      />
+
       {!isActiveView && !editing ? (
         <Alert type="info" showIcon title={t('catering.config.readonlyHint')} />
       ) : null}
@@ -492,31 +448,24 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
         <Alert type="info" showIcon title={t('catering.config.supplier.editBanner')} />
       ) : null}
 
-      <div className="config-tab-scroll">
-        <Segmented<ConfigSection>
-          value={section}
-          onChange={setSection}
-          options={[
-            { value: 'eco', label: t('catering.config.supplier.sectionEco') },
-            { value: 'amenity', label: t('catering.config.supplier.sectionAmenity') },
-            {
-              value: 'routeHourList',
-              label: t('catering.config.supplier.sectionRouteHourList'),
-            },
-            { value: 'sbb', label: t('catering.config.supplier.sectionSbb') },
+      <div className="config-subnav">
+        <Tabs
+          activeKey={section}
+          onChange={(key) => setSection(key as ConfigSection)}
+          items={[
+            { key: 'eco', label: t('catering.config.supplier.sectionEco') },
+            { key: 'amenity', label: t('catering.config.supplier.sectionAmenity') },
+            { key: 'routeHourList', label: t('catering.config.supplier.sectionRouteHourList') },
+            { key: 'sbb', label: t('catering.config.supplier.sectionSbb') },
           ]}
         />
       </div>
 
       {section === 'eco' ? (
         <>
-          <section className="border-border bg-surface rounded-xl border p-4">
-            <h3 className="mb-1 text-[14px] font-extrabold">
-              {t('catering.config.supplier.rulesTitle')}
-            </h3>
-            <p className="text-text-muted mb-3 text-[12.5px]">
-              {t('catering.config.supplier.rulesDesc')}
-            </p>
+          <section className="config-section-surface">
+            <h3 className="config-section-title">{t('catering.config.supplier.rulesTitle')}</h3>
+            <p className="config-section-desc">{t('catering.config.supplier.rulesDesc')}</p>
             {categoryTabs.length > 0 ? (
               <div className="config-tab-scroll mb-3">
                 <Segmented<RuleCatalogCategory>
@@ -557,10 +506,18 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
                 />
               ))}
               {filteredCategoryRules.length === 0 ? (
-                <div className="text-text-muted text-center text-[12.5px]">—</div>
+                <ConfigEmptyState
+                  message={
+                    ruleQuery.trim()
+                      ? t('catering.config.supplier.noRuleMatches')
+                      : t('catering.config.supplier.noRulesInCategory')
+                  }
+                  actionLabel={editing ? t('catering.config.supplier.addQuantityRule') : undefined}
+                  onAction={editing ? addQuantityRule : undefined}
+                />
               ) : null}
-              {editing ? (
-                <Button type="dashed" icon={<Plus size={15} />} onClick={addQuantityRule}>
+              {editing && filteredCategoryRules.length > 0 ? (
+                <Button type="dashed" block icon={<Plus size={15} />} onClick={addQuantityRule}>
                   {t('catering.config.supplier.addQuantityRule')}
                 </Button>
               ) : null}
@@ -586,10 +543,9 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
                       <table className="w-full min-w-[560px] text-[13px]">
                         <thead>
                           <tr className="text-text-secondary [&>th]:border-border [&>th]:border-b [&>th]:px-2 [&>th]:py-2 [&>th]:text-left [&>th]:text-[11px] [&>th]:font-extrabold [&>th]:uppercase">
-                            <th>Gói</th>
-                            <th>Tàu</th>
-                            <th>Loại</th>
-                            <th>Tên</th>
+                            <th>{t('catering.config.supplier.pkgColId')}</th>
+                            <th>{t('catering.config.supplier.pkgColAircraft')}</th>
+                            <th>{t('catering.config.supplier.pkgColName')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -599,8 +555,7 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
                               className="[&>td]:border-border [&>td]:border-b [&>td]:px-2 [&>td]:py-1.5"
                             >
                               <td className="font-mono font-bold">{pkg.id}</td>
-                              <td>{pkg.aircraftFamily === 'A330' ? 'A330' : 'A321'}</td>
-                              <td>{pkg.kind}</td>
+                              <td>{pkg.aircraftFamily === 'A330' ? 'A330' : 'A320/A321'}</td>
                               <td>{pkg.label}</td>
                             </tr>
                           ))}
@@ -695,13 +650,9 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
       ) : null}
 
       {section === 'routeHourList' ? (
-        <section className="border-border bg-surface rounded-xl border p-4">
-          <h3 className="mb-1 text-[14px] font-extrabold">
-            {t('catering.config.supplier.listTitle')}
-          </h3>
-          <p className="text-text-muted mb-3 text-[12.5px]">
-            {t('catering.config.supplier.listDesc')}
-          </p>
+        <section className="config-section-surface">
+          <h3 className="config-section-title">{t('catering.config.supplier.listTitle')}</h3>
+          <p className="config-section-desc">{t('catering.config.supplier.listDesc')}</p>
           <div className="flex flex-col gap-3">
             {amenityConfig.routeHourClasses.map((cls) => (
               <div key={cls.id}>
@@ -721,13 +672,9 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
 
       {section === 'sbb' ? (
         <div className="flex flex-col gap-4">
-          <section className="border-border bg-surface rounded-xl border p-4">
-            <h3 className="mb-1 text-[14px] font-extrabold">
-              {t('catering.config.supplier.sbbRouteTitle')}
-            </h3>
-            <p className="text-text-muted mb-3 text-[12.5px]">
-              {t('catering.config.supplier.sbbRouteDesc')}
-            </p>
+          <section className="config-section-surface">
+            <h3 className="config-section-title">{t('catering.config.supplier.sbbRouteTitle')}</h3>
+            <p className="config-section-desc">{t('catering.config.supplier.sbbRouteDesc')}</p>
             <div className="grid gap-3 sm:grid-cols-3">
               <label className="flex flex-col gap-1 text-[12px] font-bold">
                 {t('catering.config.supplier.trialDep')}
@@ -751,8 +698,8 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
                   value={trialMeal}
                   onChange={setTrialMeal}
                   options={[
-                    { value: 'standard', label: 'Standard' },
-                    { value: 'vegetarian', label: 'Chay' },
+                    { value: 'standard', label: t('catering.config.supplier.mealStandard') },
+                    { value: 'vegetarian', label: t('catering.config.supplier.mealVegetarian') },
                   ]}
                 />
               </label>
@@ -767,13 +714,9 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
             </div>
           </section>
 
-          <section className="border-border bg-surface rounded-xl border p-4">
-            <h3 className="mb-1 text-[14px] font-extrabold">
-              {t('catering.config.supplier.sbbTitle')}
-            </h3>
-            <p className="text-text-muted mb-3 text-[12.5px]">
-              {t('catering.config.supplier.sbbDesc')}
-            </p>
+          <section className="config-section-surface">
+            <h3 className="config-section-title">{t('catering.config.supplier.sbbTitle')}</h3>
+            <p className="config-section-desc">{t('catering.config.supplier.sbbDesc')}</p>
             <div className="config-tab-scroll mb-3">
               <Segmented<SbbRouteSheet>
                 value={sheet}
@@ -876,34 +819,13 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
       ) : null}
 
       {editing ? (
-        <div className="quota-sticky-bar">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-            <div>
-              <div className="text-text-muted mb-1 text-[11.5px] font-bold">
-                {t('catering.config.effectiveFrom')}
-              </div>
-              <DatePicker
-                format={DMY}
-                value={parseDmy(effDate)}
-                onChange={(d) => setEffDate(d ? d.format(DMY) : '')}
-                style={{ width: 150 }}
-              />
-            </div>
-            <div className="text-text-muted max-w-[34ch] text-[12.5px] font-medium">
-              {t('catering.config.publishHint')}
-            </div>
-            <div className="ml-auto">
-              <Space>
-                <Button icon={<X size={14} />} onClick={cancelEdit}>
-                  {t('common.cancel')}
-                </Button>
-                <Button type="primary" disabled={!effDate.trim()} loading={saveConfig.isPending} onClick={publish}>
-                  {t('catering.config.publish')}
-                </Button>
-              </Space>
-            </div>
-          </div>
-        </div>
+        <ConfigPublishBar
+          effDate={effDate}
+          onEffDateChange={setEffDate}
+          onCancel={cancelEdit}
+          onPublish={publish}
+          publishing={saveConfig.isPending}
+        />
       ) : null}
 
       <EcoQuantityRuleEditorDrawer
@@ -912,21 +834,10 @@ export function SupplierRulesTab({ onHeaderActions }: Props) {
         amenityConfig={amenityConfig}
         mealCatalog={mealCatalog}
         amenityCatalog={amenityCatalog}
+        availableTargetColumns={categoryTargetColumns}
         onClose={() => setEditingQuantityRule(null)}
         onSave={saveQuantityRule}
       />
-
-      <VersionMeta viewing={viewing} />
     </div>
-  )
-}
-
-function VersionMeta({ viewing }: { viewing: SupplierRuleConfigVersion }) {
-  const { t } = useTranslation()
-  return (
-    <p className="text-text-muted text-[12px]">
-      {t('catering.config.updatedMeta', { by: viewing.updatedBy, at: viewing.updatedAt })}
-      {viewing.note ? ` · ${viewing.note}` : ''}
-    </p>
   )
 }

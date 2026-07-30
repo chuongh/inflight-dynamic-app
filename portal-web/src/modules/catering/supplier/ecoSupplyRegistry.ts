@@ -180,7 +180,9 @@ export const ECO_SUPPLY_FIELDS: readonly EcoSupplyFieldDef[] = [
     productCode: '40000294',
     catalogItemId: 'sku-40000294',
     fallbackNameVi: 'Bánh mì',
-    group: 'main',
+    // Bánh mì is a prebook hotmeal, but is displayed in the Bread & pastry
+    // catalog category. Its quantity rule remains commercial + bread prebook.
+    group: 'bread',
     catalog: 'meal',
   },
   {
@@ -480,6 +482,9 @@ export const ECO_QUANTITY_TARGET_COLUMNS = [
   'ketchup',
   'chiliSauce',
   'soySauce',
+  // Referenced as a formula input (ketchup = spaghetti count) — must be listed
+  // here too, or the rule editor's "Tính theo" dropdown can't display/reselect it.
+  'spaghetti',
   'hotmealUtensils',
   'indianSaltPepper',
   'reserveUtensils',

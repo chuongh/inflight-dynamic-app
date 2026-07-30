@@ -683,16 +683,6 @@ a[href],
   cursor: pointer;
 }
 
-.config-tab-scroll {
-  flex-shrink: 0;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  margin: 0 0 var(--space-md);
-}
-.config-tab-scroll .ant-segmented {
-  min-width: max-content;
-}
-
 .filter-bar {
   padding: var(--space-lg);
   border: 1px solid var(--color-border);
@@ -3381,6 +3371,104 @@ button.table-cell-code:hover {
 }
 .config-tab-scroll .ant-segmented-item-label {
   white-space: nowrap;
+}
+
+/* Version/date meta for the config page — deliberately quiet chrome (no
+   borders/pills) so it reads as secondary context under the header, not a
+   second row of buttons competing with the primary Edit action. */
+.config-version-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.config-version-bar .ant-select-selector {
+  padding-inline: 0 !important;
+}
+.config-version-bar__sep {
+  color: var(--color-border);
+}
+
+/* Typography hierarchy for config tabs (shared scale). */
+.config-eyebrow,
+.config-section-label {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.config-section-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--color-foreground);
+}
+.config-section-desc {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+.config-card-title {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-foreground);
+}
+.config-section-surface {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 16px;
+}
+/* Secondary nav under page tabs — quieter than primary Segmented. */
+.config-subnav .ant-tabs-nav {
+  margin-bottom: 12px !important;
+}
+.config-subnav .ant-tabs-tab {
+  padding: 6px 2px !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+}
+
+/* Category cluster (reduction / exclusion / grouping) inside the rules list. */
+.config-rule-group + .config-rule-group {
+  margin-top: 18px;
+}
+.config-rule-group__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.config-rule-group__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.config-rule-group__label {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.config-rule-group__count {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 @media (max-width: 1280px) {

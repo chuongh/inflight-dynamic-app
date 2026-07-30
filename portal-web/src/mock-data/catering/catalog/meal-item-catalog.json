@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-29-catalog-v17",
+  "seedVersion": "2026-07-30-catalog-v18",
   "versions": [
     {
       "id": "m1",
@@ -17,7 +17,7 @@
             "vi": "Bánh mì"
           },
           "unit": null,
-          "category": "snack",
+          "category": "bread",
           "cabinScopes": [
             "ECO"
           ],

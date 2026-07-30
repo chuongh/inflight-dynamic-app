@@ -2,7 +2,7 @@ import { Button, Switch, Tooltip } from 'antd'
 import { Calculator, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { AmenityCatalogItem, MealCatalogItem } from '@/modules/catering/catalogTypes'
-import { RULE_CATEGORY_STYLE } from '@/modules/catering/mealCategoryMeta'
+import { RULE_CATEGORY_STYLE, ruleCategoryLabel } from '@/modules/catering/mealCategoryMeta'
 import type {
   EcoAmenityConfig,
   EcoQuantityRule,
@@ -65,6 +65,12 @@ export function EcoQuantityRuleCard({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
+          <span
+            className="text-[10.5px] font-bold tracking-wide uppercase"
+            style={{ color: style.color }}
+          >
+            {ruleCategoryLabel(category, t)}
+          </span>
           <span className="bg-background border-border rounded-md border px-1.5 py-0.5 text-[10.5px] font-bold">
             {badge}
           </span>

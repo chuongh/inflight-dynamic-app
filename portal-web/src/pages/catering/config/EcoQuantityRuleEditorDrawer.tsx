@@ -29,7 +29,6 @@ import {
   columnOptionLabel,
   decodeValueSource,
   encodeValueSource,
-  ECO_QUANTITY_TARGET_COLUMNS,
   sourceCoef,
   summarizeBranchesPreview,
   whenConditionChips,
@@ -42,6 +41,8 @@ interface Props {
   amenityConfig: EcoAmenityConfig
   mealCatalog: MealCatalogItem[]
   amenityCatalog: AmenityCatalogItem[]
+  /** Products available in the category currently being configured. */
+  availableTargetColumns: string[]
   onClose: () => void
   onSave: (rule: EcoQuantityRule) => void
 }
@@ -74,7 +75,7 @@ function uiKindOf(value: EcoQuantityValue): ValueUiKind {
   return 'source'
 }
 
-function defaultValue(kind: ValueUiKind): EcoQuantityValue {
+function defaultValue(kind: ValueUiKind, targetColumn?: string): EcoQuantityValue {
   switch (kind) {
     case 'const':
       return { kind: 'const', value: 0 }
@@ -85,7 +86,11 @@ function defaultValue(kind: ValueUiKind): EcoQuantityValue {
         kind: 'sum',
         parts: [
           { kind: 'metric', metricId: 'quotaCommercial', coef: 1 },
-          { kind: 'metric', metricId: 'totalPrebook', coef: 1 },
+          {
+            kind: 'metric',
+            metricId: targetColumn === 'bread' ? 'breadPrebook' : 'totalPrebook',
+            coef: 1,
+          },
         ],
       }
   }
@@ -106,6 +111,7 @@ type ConditionKey =
   | 'upliftTypes'
   | 'flightKinds'
   | 'routePairs'
+  | 'amenityPackages'
 
 const CONDITION_KEYS: ConditionKey[] = [
   'routeGroups',
@@ -114,6 +120,7 @@ const CONDITION_KEYS: ConditionKey[] = [
   'upliftTypes',
   'flightKinds',
   'routePairs',
+  'amenityPackages',
 ]
 
 export function EcoQuantityValueEditor({
@@ -121,11 +128,14 @@ export function EcoQuantityValueEditor({
   onChange,
   mealCatalog,
   amenityCatalog,
+  targetColumn,
 }: {
   value: EcoQuantityValue
   onChange: (next: EcoQuantityValue) => void
   mealCatalog: MealCatalogItem[]
   amenityCatalog: AmenityCatalogItem[]
+  /** Used for target-specific formula templates, such as bread prebook. */
+  targetColumn?: string
 }) {
   const { t } = useTranslation()
   const uiKind = uiKindOf(value)
@@ -139,7 +149,7 @@ export function EcoQuantityValueEditor({
       <Select
         className="w-full"
         value={uiKind}
-        onChange={(kind) => onChange(defaultValue(kind))}
+        onChange={(kind) => onChange(defaultValue(kind, targetColumn))}
         options={[
           { value: 'const', label: t('catering.config.supplier.valueKind.const') },
           { value: 'source', label: t('catering.config.supplier.valueKind.source') },
@@ -159,6 +169,7 @@ export function EcoQuantityValueEditor({
             className="w-full"
             showSearch
             optionFilterProp="label"
+            optionLabelProp="label"
             value={encodeValueSource(value) ?? undefined}
             onChange={(encoded) => onChange(decodeValueSource(encoded, sourceCoef(value)))}
             options={sourceGroups.map((g) => ({
@@ -187,6 +198,7 @@ export function EcoQuantityValueEditor({
                   value={part}
                   mealCatalog={mealCatalog}
                   amenityCatalog={amenityCatalog}
+                  targetColumn={targetColumn}
                   onChange={(next) => {
                     const parts = [...value.parts]
                     parts[i] = next
@@ -214,7 +226,7 @@ export function EcoQuantityValueEditor({
             onClick={() =>
               onChange({
                 kind: 'sum',
-                parts: [...value.parts, defaultValue('const')],
+                parts: [...value.parts, defaultValue('const', targetColumn)],
               })
             }
           >
@@ -281,7 +293,7 @@ function ConditionPicker({
           <Space wrap>
             {AIRCRAFT_FAMILIES.map((f) => (
               <Checkbox key={f} value={f}>
-                {f === 'A330' ? 'A330' : 'A321'}
+                {f === 'A330' ? 'A330' : 'A320/A321'}
               </Checkbox>
             ))}
           </Space>
@@ -338,6 +350,20 @@ function ConditionPicker({
           placeholder="SGN-MEL"
         />
       )
+    case 'amenityPackages':
+      return (
+        <Select
+          mode="multiple"
+          className="w-full"
+          placeholder={t('catering.config.supplier.whenAmenityPackages', { defaultValue: 'Gói tiện ích' })}
+          value={when.amenityPackages ?? []}
+          onChange={(amenityPackages) => onChange({ ...when, amenityPackages })}
+          options={amenityConfig.packages.map((pkg) => ({
+            value: pkg.id,
+            label: `${String(pkg.id).padStart(2, '0')} · ${pkg.label}`,
+          }))}
+        />
+      )
   }
 }
 
@@ -346,6 +372,7 @@ function BranchEditor({
   amenityConfig,
   mealCatalog,
   amenityCatalog,
+  targetColumn,
   previewLine,
   onChange,
   onRemove,
@@ -356,6 +383,7 @@ function BranchEditor({
   amenityConfig: EcoAmenityConfig
   mealCatalog: MealCatalogItem[]
   amenityCatalog: AmenityCatalogItem[]
+  targetColumn: string
   previewLine: string
   onChange: (next: EcoQuantityBranch) => void
   onRemove: () => void
@@ -377,6 +405,7 @@ function BranchEditor({
     upliftTypes: t('catering.config.supplier.whenUplift'),
     flightKinds: t('catering.config.supplier.whenFlightKind'),
     routePairs: t('catering.config.supplier.whenRoutePairs'),
+    amenityPackages: t('catering.config.supplier.whenAmenityPackages', { defaultValue: 'Gói tiện ích' }),
   }
 
   const clearCondition = (key: ConditionKey) => {
@@ -461,7 +490,7 @@ function BranchEditor({
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-bold">{conditionLabels[editingCondition]}</span>
               <Button type="link" size="small" onClick={() => setEditingCondition(null)}>
-                {t('common.done', { defaultValue: 'Xong' })}
+                {t('common.done')}
               </Button>
             </div>
             <ConditionPicker
@@ -495,6 +524,7 @@ function BranchEditor({
           value={branch.value}
           mealCatalog={mealCatalog}
           amenityCatalog={amenityCatalog}
+          targetColumn={targetColumn}
           onChange={(next) => onChange({ ...branch, value: next })}
         />
       </Field>
@@ -514,6 +544,7 @@ export function EcoQuantityRuleEditorDrawer({
   amenityConfig,
   mealCatalog,
   amenityCatalog,
+  availableTargetColumns,
   onClose,
   onSave,
 }: Props) {
@@ -555,7 +586,7 @@ export function EcoQuantityRuleEditorDrawer({
             className="w-full"
             value={draft.targetColumn}
             onChange={(targetColumn) => patch({ targetColumn })}
-            options={ECO_QUANTITY_TARGET_COLUMNS.map((c) => ({
+            options={availableTargetColumns.map((c) => ({
               value: c,
               label: columnOptionLabel(c, mealCatalog, amenityCatalog),
             }))}
@@ -617,6 +648,7 @@ export function EcoQuantityRuleEditorDrawer({
               amenityConfig={amenityConfig}
               mealCatalog={mealCatalog}
               amenityCatalog={amenityCatalog}
+              targetColumn={draft.targetColumn}
               previewLine={
                 previewLines[index] ??
                 `${whenNatural(branch.when, amenityConfig)}: = …`
@@ -657,6 +689,7 @@ export function EcoQuantityRuleEditorDrawer({
             value={draft.fallback}
             mealCatalog={mealCatalog}
             amenityCatalog={amenityCatalog}
+            targetColumn={draft.targetColumn}
             onChange={(fallback) => patch({ fallback })}
           />
         </Field>

@@ -85,8 +85,8 @@ export function OrderDetailPage() {
     [flightGroupsData, current?.serviceDate],
   )
   const activeRules = useMemo(
-    () => activeSupplierRuleVersion(supplierRuleData?.versions ?? []),
-    [supplierRuleData],
+    () => activeSupplierRuleVersion(supplierRuleData?.versions ?? [], current?.serviceDate),
+    [supplierRuleData, current?.serviceDate],
   )
   const crewMealProfile = useMemo(() => {
     const version = activeCrewMealVersion(crewCfg?.versions ?? [])

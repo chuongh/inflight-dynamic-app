@@ -120,13 +120,18 @@ export function evalQuantityRule(
   if (!rule.enabled) {
     return { value: null, source: `${rule.id} disabled` }
   }
+  // Unconfirmed rules still compute a preview value from their branches/fallback
+  // — ops need to see what the formula WOULD produce to review it. The
+  // "Unconfirmed" flag on the resulting line (driven by rule.confirmed, not by
+  // this value) is what keeps them from trusting it blindly.
+  const unconfirmedTag = rule.confirmed === false ? ' (unconfirmed)' : ''
 
   for (const branch of rule.branches) {
     if (matchesWhen(branch.when, ctx)) {
       const raw = evalQuantityValue(branch.value, ctx)
       return {
         value: applyRound(raw, rule.round),
-        source: `${rule.id}; branch ${branch.id}${branch.note ? `; ${branch.note}` : ''}`,
+        source: `${rule.id}${unconfirmedTag}; branch ${branch.id}${branch.note ? `; ${branch.note}` : ''}`,
       }
     }
   }
@@ -134,7 +139,7 @@ export function evalQuantityRule(
   const raw = evalQuantityValue(rule.fallback, ctx)
   return {
     value: applyRound(raw, rule.round),
-    source: `${rule.id}; fallback`,
+    source: `${rule.id}${unconfirmedTag}; fallback`,
   }
 }
 
@@ -442,5 +447,65 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     branches: [],
     fallback: { kind: 'metric', metricId: 'totalPrebook', coef: 1 },
     docRef: '§1.5 AX — xấp xỉ tạm bằng Tổng Prebook, xem note trong catalog',
+  },
+  {
+    id: 'ECO.custom.boiledEggs',
+    targetColumn: 'boiledEggs',
+    enabled: true,
+    confirmed: false,
+    branches: [
+      {
+        id: 'a321-dau-ngay',
+        when: { aircraftFamilies: ['A321'], upliftTypes: ['DAU_NGAY'] },
+        value: { kind: 'const', value: 1 },
+        note: 'A321 đầu ngày = 1',
+      },
+      {
+        id: 'a330-au',
+        when: { aircraftFamilies: ['A330'], routeGroups: ['AU'] },
+        value: { kind: 'const', value: 2 },
+        note: 'A330 Úc = 2',
+      },
+    ],
+    fallback: { kind: 'const', value: 0 },
+  },
+  {
+    id: 'ECO.custom.reserveCrewWater',
+    targetColumn: 'reserveCrewWater',
+    enabled: true,
+    confirmed: false,
+    branches: [
+      {
+        id: 'a330-au',
+        when: { aircraftFamilies: ['A330'], routeGroups: ['AU'] },
+        value: { kind: 'const', value: 68 },
+        note: 'A330 Úc = 68',
+      },
+      {
+        id: 'kr-jp-ge-4h',
+        when: { routeGroups: ['KR_JP'], hourClasses: ['INT_GE_4H'] },
+        value: { kind: 'const', value: 24 },
+        note: 'Hàn/Nhật ≥4h = 24',
+      },
+      {
+        id: 'in',
+        when: { routeGroups: ['IN'] },
+        value: { kind: 'const', value: 40 },
+        note: 'Ấn = 40',
+      },
+      {
+        id: 'int-lt-4h',
+        when: { hourClasses: ['INT_LT_4H'] },
+        value: { kind: 'const', value: 14 },
+        note: 'QT ngắn = 14',
+      },
+      {
+        id: 'domestic',
+        when: { hourClasses: ['DOM_LE_1H15', 'DOM_GT_1H15'] },
+        value: { kind: 'const', value: 7 },
+        note: 'QN = 7',
+      },
+    ],
+    fallback: { kind: 'const', value: 0 },
   },
 ]

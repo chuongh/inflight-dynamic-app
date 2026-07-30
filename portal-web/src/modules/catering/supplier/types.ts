@@ -223,6 +223,8 @@ export interface EcoCells {
 export interface EcoSupplierRow extends FlightIdentity {
   key: string
   cells: EcoCells
+  /** Rules targeting catalog items that do not have a fixed workbook column. */
+  dynamicCells: Record<string, SupplierCell<number>>
   /** Amenity column D, e.g. "10+15" or "4" */
   amenityLabel: string | null
   amenityPackageIds: number[]

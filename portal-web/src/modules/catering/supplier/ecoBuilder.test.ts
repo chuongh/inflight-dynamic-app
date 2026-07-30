@@ -56,6 +56,7 @@ describe('buildEcoSupplierRow', () => {
     expect(row.cells.bread.source).toContain('workbookReferenceBread')
     expect(row.cells.prebook.value).toBe(282)
     expect(row.cells.skyboss.value).toBe(13)
+    // boiledEggs (manual input, 2) + skybossEggs (unconfirmed AU rule, previewed at skybossEco 13) = 15.
     expect(row.cells.totalEggs.value).toBe(15)
     expect(row.cells.ketchup.value).toBe(77)
     expect(row.cells.chiliSauce.value).toBe(158)
@@ -139,8 +140,10 @@ describe('buildEcoSupplierRow', () => {
       australiaBreadVegetables: 5,
     })
 
+    // Unconfirmed rules still preview their computed value (branch matched: AU) —
+    // only the "Unconfirmed" flag on the resulting line keeps ops from trusting it blindly.
     expect(row.cells.australiaNoodleVegetables.value).toBe(25)
-    expect(row.cells.australiaNoodleVegetables.source).toContain('ECO.Z.auNoodleVeg')
+    expect(row.cells.australiaNoodleVegetables.source).toContain('unconfirmed')
     expect(row.cells.australiaSkybossYogurt.value).toBe(13)
     expect(row.cells.australiaRoundBread.value).toBe(13)
     expect(row.cells.skybossEggs.value).toBe(13)
@@ -181,13 +184,14 @@ describe('buildEcoSupplierRow', () => {
     expect(row.cells.highlift.value).toBeNull()
   })
 
-  it('leaves Australia route fields null when route does not match AU group', () => {
+  it('falls back to zero for Australia route fields when route does not match AU group', () => {
     const unsupportedRoute = buildEco({
       ...vj81Input,
       dep: 'SGN',
       arr: 'HAN',
     })
 
+    // No branch matches a non-AU route, so each rule's fallback (const 0) applies.
     expect(unsupportedRoute.cells.australiaNoodleVegetables.value).toBe(0)
     expect(unsupportedRoute.cells.skybossEggs.value).toBe(0)
     expect(unsupportedRoute.cells.australiaSkybossYogurt.value).toBe(0)
@@ -219,10 +223,10 @@ describe('buildEcoSupplierRow', () => {
     expect(row.cells.maccaSkybossRaisins.source).toContain('ECO.AR.maccaSkybossRaisins')
   })
 
-  it('resolves blanket3in1Prebook as totalPrebook', () => {
+  it('previews unconfirmed blanket3in1Prebook from its fallback formula', () => {
     const row = buildEco(vj81Input)
     expect(row.cells.blanket3in1Prebook.value).toBe(282)
-    expect(row.cells.blanket3in1Prebook.source).toContain('ECO.AX.blanket3in1Prebook')
+    expect(row.cells.blanket3in1Prebook.source).toContain('unconfirmed')
   })
 
   it('uses quantityConfig rules for AU noodle vegetables instead of legacy dataset', () => {

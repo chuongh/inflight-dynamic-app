@@ -23,7 +23,8 @@
     "delete": "Xóa",
     "save": "Lưu",
     "yes": "Có",
-    "no": "Không"
+    "no": "Không",
+    "done": "Xong"
   },
   "nav": {
     "dashboard": "Bảng điều khiển",
@@ -882,14 +883,14 @@
         "suggested": "Tính {{n}}",
         "footerTotal": "Tổng {{n}} đơn vị",
         "group": {
-          "amenity": "Amenity & vật tư",
+          "amenity": "Vật dụng tiện ích",
           "amenity_composition": "Amenity theo gói",
           "other": "Khác"
         },
         "bucket": {
           "eco": "Danh mục món ECO",
           "sbb": "Danh mục món SBB",
-          "other": "Amenity & vận hành"
+          "other": "Vật phẩm phục vụ hành khách"
         },
         "bucketHint": {
           "eco": "Khoang phổ thông — món chính, bánh mì, trứng, gia vị",
@@ -903,7 +904,7 @@
         "kpiSkybossBusiness": "SkyBoss Business",
         "kpiCrew": "Suất crew",
         "kpiQuota": "Định mức commercial",
-        "kpiQuotaHint": "Quota hotmeal (sales)"
+        "kpiQuotaHint": "Suất ăn bán thêm"
       }
     },
     "quota": {
@@ -1103,7 +1104,7 @@
         "baseByItem": "1 · Theo món",
         "baseByHotmeal": "2 · Theo tổng hotmeal",
         "baseByStdArr": "3 · Theo STD/ARR",
-        "amenityTitle": "Gói Amenity (A321 / A330)",
+        "amenityTitle": "Gói Amenity (A320/A321 · A330)",
         "amenityDesc": "Theo tàu + khung giờ đường bay + nhóm sân bay. Đầu ngày = gói tàu + gói route.",
         "listTitle": "Khung giờ đường bay",
         "listDesc": "Khung giờ bay (nội địa / quốc tế) cho gói amenity và rule theo giờ.",
@@ -1173,6 +1174,18 @@
         "compositionUnit": "ĐVT",
         "compositionSpec": "Quy cách",
         "searchRules": "Tìm rule…",
+        "noRulesInCategory": "Chưa có rule trong nhóm này.",
+        "noRuleMatches": "Không có rule khớp tìm kiếm.",
+        "pkgColId": "Gói",
+        "pkgColAircraft": "Tàu",
+        "pkgColKind": "Loại",
+        "pkgColName": "Điều kiện",
+        "mealStandard": "Standard",
+        "mealVegetarian": "Chay",
+        "qtyDecrease": "Giảm số lượng",
+        "qtyIncrease": "Tăng số lượng",
+        "compositionEmptyPackages": "Không có gói khớp.",
+        "compositionEmptyProducts": "Không có sản phẩm khớp.",
         "periodicTitle": "Topup định kỳ",
         "periodicDesc": "Không theo chuyến — chỉ ghi chú cadence.",
         "item": {

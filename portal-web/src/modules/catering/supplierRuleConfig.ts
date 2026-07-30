@@ -16,10 +16,35 @@ import type {
 } from './supplierRuleConfigTypes'
 import type { VersionStatus } from './types'
 
+function dmyToNumber(dmy: string): number | null {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dmy)
+  if (!match) return null
+  const [, day, month, year] = match
+  const value = Number(`${year}${month}${day}`)
+  return Number.isFinite(value) ? value : null
+}
+
+function todayDmy(): string {
+  const now = new Date()
+  return `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`
+}
+
 export function activeSupplierRuleVersion(
   versions: SupplierRuleConfigVersion[],
+  effectiveOn = todayDmy(),
 ): SupplierRuleConfigVersion | null {
   if (versions.length === 0) return null
+  const date = dmyToNumber(effectiveOn)
+  if (date != null) {
+    const effective = versions
+      .filter((version) => {
+        const from = dmyToNumber(version.effectiveFrom)
+        const to = version.effectiveTo ? dmyToNumber(version.effectiveTo) : null
+        return from != null && from <= date && (to == null || date <= to)
+      })
+      .sort((a, b) => b.version - a.version)
+    if (effective.length > 0) return effective[0]
+  }
   return (
     versions.find((v) => v.status === 'active') ??
     [...versions].sort((a, b) => b.version - a.version)[0]

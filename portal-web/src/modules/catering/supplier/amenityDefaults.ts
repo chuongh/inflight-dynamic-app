@@ -83,23 +83,35 @@ export const DEFAULT_ROUTE_GROUPS: SupplierRouteGroup[] = [
   { id: 'RU', label: 'Nga', airports: ['SVO', 'VVO', 'OVB'] },
 ]
 
-/** Package legend from sheets A321 / A330 */
+/** Package legend from sheets A320/A321 / A330 (GC-SGN ECO). */
 export const DEFAULT_AMENITY_PACKAGES: AmenityPackageDef[] = [
-  { id: 1, label: 'Vật tư đầu ngày (theo tàu)', aircraftFamily: 'A321', kind: 'aircraft_day_start' },
-  { id: 2, label: 'Quốc nội ≤ 1h15', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'DOM_LE_1H15' },
-  { id: 3, label: 'Quốc nội > 1h15', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'DOM_GT_1H15' },
-  { id: 4, label: 'Quốc tế < 4h', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'INT_LT_4H' },
-  { id: 5, label: 'Quốc tế ≥ 4h', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
-  { id: 6, label: 'Charter Trung Quốc (full meal)', aircraftFamily: 'A321', kind: 'charter_china' },
-  { id: 7, label: 'Nga', aircraftFamily: 'A321', kind: 'russia' },
+  { id: 1, label: 'Vật tư theo tàu, cấp đầu ngày', aircraftFamily: 'A321', kind: 'aircraft_day_start' },
+  {
+    id: 2,
+    label: 'Cặp chuyến quốc nội, block ≤1h15',
+    aircraftFamily: 'A321',
+    kind: 'route_hour',
+    hourClassId: 'DOM_LE_1H15',
+  },
+  {
+    id: 3,
+    label: 'Cặp chuyến quốc nội, block >1h15',
+    aircraftFamily: 'A321',
+    kind: 'route_hour',
+    hourClassId: 'DOM_GT_1H15',
+  },
+  { id: 4, label: 'Quốc tế <4h', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'INT_LT_4H' },
+  { id: 5, label: 'Quốc tế ≥4h', aircraftFamily: 'A321', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
+  { id: 6, label: 'Charter China full meal', aircraftFamily: 'A321', kind: 'charter_china' },
+  { id: 7, label: 'Russia', aircraftFamily: 'A321', kind: 'russia' },
   { id: 8, label: 'Ferry/Cargo', aircraftFamily: 'A321', kind: 'ferry_cargo' },
   { id: 9, label: 'Nightstop', aircraftFamily: 'A321', kind: 'nightstop' },
-  { id: 10, label: 'Vật tư đầu ngày (theo tàu)', aircraftFamily: 'A330', kind: 'aircraft_day_start' },
+  { id: 10, label: 'Vật tư theo tàu, cấp đầu ngày', aircraftFamily: 'A330', kind: 'aircraft_day_start' },
   { id: 11, label: 'Quốc nội', aircraftFamily: 'A330', kind: 'route_hour', hourClassId: 'DOM_LE_1H15' },
-  { id: 12, label: 'Quốc tế (Hàn/Nhật/Ấn)', aircraftFamily: 'A330', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
+  { id: 12, label: 'Quốc tế Hàn/Nhật/Ấn', aircraftFamily: 'A330', kind: 'route_hour', hourClassId: 'INT_GE_4H' },
   { id: 13, label: 'Kazakhstan', aircraftFamily: 'A330', kind: 'kazakhstan' },
-  { id: 14, label: 'Nga', aircraftFamily: 'A330', kind: 'russia' },
-  { id: 15, label: 'Úc', aircraftFamily: 'A330', kind: 'australia' },
+  { id: 14, label: 'Russia', aircraftFamily: 'A330', kind: 'russia' },
+  { id: 15, label: 'Australia', aircraftFamily: 'A330', kind: 'australia' },
   { id: 16, label: 'Ferry/Cargo', aircraftFamily: 'A330', kind: 'ferry_cargo' },
   { id: 17, label: 'Nightstop', aircraftFamily: 'A330', kind: 'nightstop' },
 ]

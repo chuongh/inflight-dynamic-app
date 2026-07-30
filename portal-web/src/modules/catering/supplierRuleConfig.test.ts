@@ -47,16 +47,17 @@ function ver(
 }
 
 describe('supplierRuleConfig', () => {
-  it('picks the active version, falling back to newest', () => {
+  it('selects the newest version effective on the requested operating date', () => {
     const versions = [
-      ver({ id: 's2', version: 2, status: 'scheduled' }),
-      ver({ id: 's1', version: 1, status: 'active' }),
+      ver({ id: 's2', version: 2, status: 'scheduled', effectiveFrom: '01/08/2026' }),
+      ver({ id: 's1', version: 1, status: 'active', effectiveFrom: '08/07/2026' }),
     ]
-    expect(activeSupplierRuleVersion(versions)?.id).toBe('s1')
+    expect(activeSupplierRuleVersion(versions, '30/07/2026')?.id).toBe('s1')
+    expect(activeSupplierRuleVersion(versions, '01/08/2026')?.id).toBe('s2')
     expect(activeSupplierRuleVersion([
       ver({ id: 's3', version: 3, status: 'superseded' }),
       ver({ id: 's2', version: 2, status: 'superseded' }),
-    ])?.id).toBe('s3')
+    ], '01/01/2026')?.id).toBe('s3')
   })
 
   it('sorts newest first', () => {

@@ -7,6 +7,7 @@ type CatalogItem = {
   id: string
   productCode?: string | null
   name?: { vi?: string }
+  category?: string
 }
 
 function catalogItems(raw: {
@@ -66,6 +67,7 @@ describe('ECO_SUPPLY_FIELDS ↔ catalog master data', () => {
     const item = mealItems.find((i) => i.id === 'sku-40000294')
     expect(item?.name?.vi).toBe('Bánh mì')
     expect(item?.productCode).toBe('40000294')
+    expect(item?.category).toBe('bread')
   })
 
   it('prebook metric points at meal-prebook-total master item', () => {

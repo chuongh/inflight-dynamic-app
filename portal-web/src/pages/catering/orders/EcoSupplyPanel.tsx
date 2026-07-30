@@ -1,6 +1,5 @@
-import { Button, InputNumber, Tag } from 'antd'
+import { Button, InputNumber } from 'antd'
 import { Crown, PackageSearch, PlaneTakeoff, RotateCcw } from 'lucide-react'
-import type { CSSProperties } from 'react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
@@ -8,12 +7,24 @@ import { MEAL_CATEGORY_STYLE } from '@/modules/catering/mealCategoryMeta'
 import type { EcoSupplyGroupId, EcoSupplyLine } from '@/modules/catering/orderTypes'
 import { ECO_SUPPLY_GROUP_ORDER } from '@/modules/catering/supplier/ecoSupplyRegistry'
 
-/** Section header tint per category — reuses the Meal Catalog palette so the two screens read as one system. */
-export const GROUP_STYLE: Record<EcoSupplyGroupId, { bg: string; color: string; border: string }> = {
-  ...MEAL_CATEGORY_STYLE,
-  amenity: { bg: '#EEF2FF', color: '#4338CA', border: '#C7D2FE' },
-  amenity_composition: { bg: '#EEF2FF', color: '#4338CA', border: '#C7D2FE' },
-  other: { bg: '#F8FAFC', color: '#64748B', border: '#E2E8F0' },
+/**
+ * Category label accent — a color per category so the eyebrow/dot stay
+ * scannable, but NOT used for card background/border. Category cards render
+ * on a neutral surface (bg-slate-50/50) so they never blend into the colored
+ * cabin-bucket header above them (e.g. ECO's green matches "main"'s green).
+ */
+export const GROUP_STYLE: Record<EcoSupplyGroupId, { color: string }> = {
+  main: { color: MEAL_CATEGORY_STYLE.main.color },
+  vegetarian: { color: MEAL_CATEGORY_STYLE.vegetarian.color },
+  appetizer: { color: MEAL_CATEGORY_STYLE.appetizer.color },
+  dessert: { color: MEAL_CATEGORY_STYLE.dessert.color },
+  bread: { color: MEAL_CATEGORY_STYLE.bread.color },
+  drink: { color: MEAL_CATEGORY_STYLE.drink.color },
+  snack: { color: MEAL_CATEGORY_STYLE.snack.color },
+  condiment: { color: MEAL_CATEGORY_STYLE.condiment.color },
+  amenity: { color: '#4338CA' },
+  amenity_composition: { color: '#4338CA' },
+  other: { color: '#4338CA' },
 }
 
 export function groupLabel(t: TFunction, group: EcoSupplyGroupId | string): string {
@@ -79,7 +90,7 @@ export function DeltaChip({ value }: { value: number }) {
   const up = value > 0
   return (
     <span
-      className={`tnum ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10.5px] font-extrabold ${
+      className={`tnum inline-flex items-center rounded-full px-1.5 py-0.5 text-[10.5px] font-extrabold ${
         up ? 'bg-vj-green-muted text-vj-green-dark' : 'bg-vj-red-50 text-vj-red-dark'
       }`}
     >
@@ -89,35 +100,21 @@ export function DeltaChip({ value }: { value: number }) {
   )
 }
 
+/** Alert-only badges — everything else on a line stays badge-free. */
 function FormulaStatusTag({ line }: { line: EcoSupplyLine }) {
   const { t } = useTranslation()
   if (line.noRuleConfigured) {
     return (
-      <Tag
-        className="!ml-2 !text-[11px]"
-        style={{
-          background: 'transparent',
-          borderStyle: 'dashed',
-          borderColor: 'var(--color-border)',
-          color: 'var(--color-text-muted)',
-        }}
-      >
+      <span className="border-border text-text-muted rounded-full border border-dashed px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap">
         {t('catering.orders.supply.noFormula')}
-      </Tag>
+      </span>
     )
   }
   if (line.confirmed === false) {
     return (
-      <Tag
-        className="!ml-2 !text-[11px]"
-        style={{
-          background: 'var(--color-vj-yellow-muted)',
-          borderColor: 'var(--color-vj-yellow-border)',
-          color: 'var(--color-vj-yellow-dark)',
-        }}
-      >
+      <span className="border-vj-yellow-border bg-vj-yellow-muted text-vj-yellow-dark rounded-full border px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap">
         {t('catering.orders.supply.unconfirmed')}
-      </Tag>
+      </span>
     )
   }
   return null
@@ -189,6 +186,8 @@ export function EcoSupplyPanel({
         </div>
       ) : null}
 
+
+
       {CABIN_BUCKET_ORDER.map((bucket) => {
         const byGroup = byBucket.get(bucket)!
         const visibleGroups = ECO_SUPPLY_GROUP_ORDER.filter((g) => (byGroup.get(g)?.length ?? 0) > 0)
@@ -217,83 +216,87 @@ export function EcoSupplyPanel({
                 const groupTotal = groupLines.reduce((s, l) => s + l.qty, 0)
                 const style = GROUP_STYLE[group]
                 return (
-                  <section key={group} className="eco-supply__section">
-                    <header
-                      className="eco-supply__section-head"
-                      style={
-                        {
-                          '--section-bg': style.bg,
-                          '--section-color': style.color,
-                          '--section-dot': style.color,
-                        } as CSSProperties
-                      }
-                    >
-                      <span className="eco-supply__section-dot" />
-                      <h3>{groupLabel(t, group)}</h3>
-                      <span className="eco-supply__section-total text-text-secondary tnum text-[11.5px] font-bold">
+                  <section
+                    key={group}
+                    className="mb-3 break-inside-avoid overflow-hidden rounded-lg border border-slate-300 bg-slate-50/50"
+                  >
+                    <header className="flex items-center gap-2 border-b border-slate-200/70 px-3.5 py-2.5">
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{ background: style.color }}
+                        aria-hidden
+                      />
+                      <h3 className="text-[13px] font-bold" style={{ color: style.color }}>
+                        {groupLabel(t, group)}
+                      </h3>
+                      <span className="ml-auto shrink-0 text-[11px] font-semibold whitespace-nowrap text-slate-400 tabular-nums">
                         {t('catering.orders.supply.sectionSkuCount', { n: groupLines.length })} ·{' '}
                         {t('catering.orders.supply.sectionQty', { n: groupTotal.toLocaleString() })}
                       </span>
                     </header>
-                    <ul className="eco-supply__list">
+                    <ul className="divide-y divide-slate-100">
                       {groupLines.map((line) => {
                         const delta = prevQtyByField ? line.qty - (prevQtyByField[line.field] ?? 0) : null
+                        const isEmpty = line.qty === 0 && !line.overridden
                         return (
-                        <li key={line.id} className="eco-supply__row">
-                          <div className="eco-supply__meta">
-                            <div className="eco-supply__name">
-                              {line.name}
-                              <FormulaStatusTag line={line} />
-                              {line.overridden ? (
-                                <Tag color="warning" className="!ml-2 !text-[11px]">
-                                  {t('catering.orders.supply.edited')}
-                                </Tag>
-                              ) : null}
-                              {delta != null ? <DeltaChip value={delta} /> : null}
-                            </div>
-                            <div className="eco-supply__sub">
-                              {line.productCode ? (
-                                <span className="table-cell-code tnum">{line.productCode}</span>
-                              ) : (
-                                <span className="text-text-muted text-[12px]">—</span>
-                              )}
-                              {line.unit ? (
-                                <span className="text-text-muted text-[12px]">· {line.unit}</span>
-                              ) : null}
-                            </div>
-                          </div>
-                          <div className="eco-supply__qty">
-                            {editable ? (
-                              <div className="eco-supply__qty-edit">
-                                <InputNumber
-                                  min={0}
-                                  value={line.qty}
-                                  className="eco-supply__input"
-                                  onChange={(v) => {
-                                    if (v == null || !Number.isFinite(v)) return
-                                    onChangeQty?.(line.id, Math.max(0, Math.round(v)))
-                                  }}
-                                />
-                                {line.overridden ? (
-                                  <Button
-                                    type="text"
-                                    size="small"
-                                    icon={<RotateCcw size={14} />}
-                                    aria-label={t('catering.orders.supply.reset')}
-                                    onClick={() => onResetLine?.(line.id)}
-                                  />
+                          <li
+                            key={line.id}
+                            className={`flex items-center justify-between gap-3 px-3.5 py-2.5 ${isEmpty ? 'opacity-50' : ''}`}
+                          >
+                            <div className="min-w-0 flex-1 text-left">
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] font-semibold text-slate-900">
+                                {line.name}
+                                <FormulaStatusTag line={line} />
+                              </div>
+                              <div className="mt-0.5 flex items-center gap-1.5">
+                                {line.productCode ? (
+                                  <span className="table-cell-code tnum">{line.productCode}</span>
+                                ) : (
+                                  <span className="text-[12px] text-slate-400">—</span>
+                                )}
+                                {line.unit ? (
+                                  <span className="text-[12px] text-slate-400">· {line.unit}</span>
                                 ) : null}
                               </div>
-                            ) : (
-                              <span className="eco-supply__qty-value tnum">{line.qty}</span>
-                            )}
-                            {line.overridden && line.qty !== line.suggested ? (
-                              <span className="eco-supply__suggested tnum">
-                                {t('catering.orders.supply.suggested', { n: line.suggested })}
-                              </span>
-                            ) : null}
-                          </div>
-                        </li>
+                            </div>
+                            <div className="flex shrink-0 flex-col items-end gap-0.5 text-right">
+                              <div className="flex items-center gap-2">
+                                {delta != null && delta !== 0 ? <DeltaChip value={delta} /> : null}
+                                {editable ? (
+                                  <>
+                                    <InputNumber
+                                      min={0}
+                                      value={line.qty}
+                                      className="!w-16 [&_input]:!font-mono [&_input]:!tabular-nums"
+                                      aria-label={line.name}
+                                      onChange={(v) => {
+                                        if (v == null || !Number.isFinite(v)) return
+                                        onChangeQty?.(line.id, Math.max(0, Math.round(v)))
+                                      }}
+                                    />
+                                    {line.overridden ? (
+                                      <Button
+                                        type="text"
+                                        size="small"
+                                        icon={<RotateCcw size={14} />}
+                                        aria-label={t('catering.orders.supply.reset')}
+                                        onClick={() => onResetLine?.(line.id)}
+                                      />
+                                    ) : null}
+                                  </>
+                                ) : (
+                                  <span className="font-mono text-[15px] font-extrabold tabular-nums text-slate-900">
+                                    {line.qty.toLocaleString()}
+                                  </span>
+                                )}
+                              </div>
+                              {line.overridden && line.qty !== line.suggested ? (
+                                <span className="font-mono text-[11px] font-semibold tabular-nums text-slate-400">
+                                  {t('catering.orders.supply.suggested', { n: line.suggested })}
+                                </span>
+                              ) : null}
+                            </div>
+                          </li>
                         )
                       })}
                     </ul>

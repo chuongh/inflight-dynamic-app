@@ -13,10 +13,14 @@ export const KIND_ICON: Record<RuleKind, ReactNode> = {
   group_by_flight_hour: <Timer size={18} strokeWidth={2} />,
 }
 
-/** Accent colours per category — brand-only tokens. */
+/**
+ * Accent colours per category — each on a distinct hue so the eyebrow/icon
+ * actually help scanning (reduction and exclusion used to share the same red,
+ * making every commercial-tab rule card look identical at a glance).
+ */
 export const CATEGORY_ACCENT: Record<RuleCategory, { color: string; bg: string }> = {
   reduction: { color: 'var(--color-vj-red)', bg: 'var(--color-vj-red-50)' },
-  exclusion: { color: 'var(--color-vj-red-dark)', bg: 'var(--color-vj-red-50)' },
+  exclusion: { color: 'var(--color-vj-yellow-dark)', bg: 'var(--color-vj-yellow-muted)' },
   grouping: { color: 'var(--color-text-secondary)', bg: '#f1f5f9' },
 }
 

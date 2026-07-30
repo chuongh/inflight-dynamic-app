@@ -173,6 +173,7 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
     quotaCommercial: number
     packageCounts: Map<number, number>
   }
+  const dynamicTotals = new Map<string, { qty: number; sources: string[] }>()
   const groupBuckets = new Map<string, GroupBucket>()
 
   for (const input of inputs) {
@@ -200,6 +201,18 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
     bucket.legs.push({ flightNo: row.flightNo, dep: row.dep, arr: row.arr })
     for (const [field, qty] of Object.entries(flightCellsFromRow(row))) {
       bucket.cells[field] = (bucket.cells[field] ?? 0) + qty
+    }
+    for (const [field, cell] of Object.entries(row.dynamicCells)) {
+      const value = cell.value
+      if (value == null || !Number.isFinite(value) || value === 0) continue
+      bucket.cells[field] = (bucket.cells[field] ?? 0) + Math.round(value)
+      const previous = dynamicTotals.get(field)
+      if (previous) {
+        previous.qty += value
+        if (cell.source && !previous.sources.includes(cell.source)) previous.sources.push(cell.source)
+      } else {
+        dynamicTotals.set(field, { qty: value, sources: cell.source ? [cell.source] : [] })
+      }
     }
     bucket.quotaCommercial += input.quotaCommercial ?? 0
     for (const packageId of row.amenityPackageIds) {
@@ -285,6 +298,28 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
       cabinScopes: cat.cabinScopes,
       ...(confirmed === undefined ? {} : { confirmed }),
       ...(noRuleConfigured ? { noRuleConfigured: true } : {}),
+    })
+  }
+
+  for (const [field, total] of dynamicTotals) {
+    const catalogItemId = field.slice('catalog:'.length)
+    const meal = meals.find((item) => item.id === catalogItemId && item.active !== false)
+    const amenity = amenities.find((item) => item.id === catalogItemId && item.active !== false)
+    const item = meal ?? amenity
+    if (!item) continue
+    lines.push({
+      id: `eco-${field}`,
+      field,
+      group: meal ? meal.category : 'amenity',
+      catalogItemId: item.id,
+      productCode: item.productCode,
+      name: item.name.vi,
+      unit: item.unit,
+      suggested: Math.round(total.qty),
+      qty: Math.round(total.qty),
+      source: total.sources[0] ?? 'ECO rules',
+      overridden: false,
+      cabinScopes: meal ? mealCabinScopes(meal) : [],
     })
   }
 

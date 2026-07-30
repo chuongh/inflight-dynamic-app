@@ -1,7 +1,5 @@
-import { Alert, App as AntApp, Button, DatePicker, Popover, Segmented, Select, Space, Spin } from 'antd'
-import dayjs, { type Dayjs } from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { Info, Pencil, Plus, X } from 'lucide-react'
+import { Alert, App as AntApp, Button, Segmented, Spin } from 'antd'
+import { Pencil, Plus } from 'lucide-react'
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '@/components/patterns/PageHeader'
@@ -13,54 +11,34 @@ import {
   defaultRule,
   GROUPING_RULE_KINDS,
   QUOTA_RULE_KINDS,
+  RULE_CATEGORY,
+  type RuleCategory,
   withNewConfigVersion,
 } from '@/modules/catering/config'
-import type { Rule, RuleConfigVersion, RuleKind } from '@/modules/catering/configTypes'
+import type { Rule, RuleKind } from '@/modules/catering/configTypes'
 import {
   useRuleConfigData,
   useSaveRuleConfigData,
 } from '@/modules/catering/hooks/useRuleConfig'
-import type { VersionStatus } from '@/modules/catering/types'
 import { formatDateDMY } from '@/shared/utils/format'
+import { CATEGORY_ACCENT } from './ruleMeta'
+import { ConfigEmptyState } from './ConfigEmptyState'
+import { ConfigPublishBar } from './ConfigPublishBar'
+import { ConfigVersionBar } from './ConfigVersionBar'
+import { CrewMealTab } from './crew/CrewMealTab'
 import { RuleCard } from './RuleCard'
 import { RuleEditorDrawer } from './RuleEditorDrawer'
 import { RulePickerModal } from './RulePickerModal'
-import { CrewMealTab } from './crew/CrewMealTab'
 import { SupplierRulesTab } from './SupplierRulesTab'
 
-dayjs.extend(customParseFormat)
-
-const DMY = 'DD/MM/YYYY'
-
-function parseDmy(dmy: string): Dayjs | null {
-  if (!dmy.trim()) return null
-  const d = dayjs(dmy, DMY, true)
-  return d.isValid() ? d : null
-}
+/** Fixed scan order — reduction (cuts) before exclusion (zeroes) before grouping. */
+const CATEGORY_ORDER: RuleCategory[] = ['reduction', 'exclusion', 'grouping']
 
 type ConfigTab = 'commercial' | 'grouping' | 'crew' | 'supplier'
 
-const STATUS_DOT: Record<VersionStatus, string> = {
-  active: '#16a34a',
-  scheduled: '#2563eb',
-  superseded: '#9ca3af',
-  draft: '#c9a000',
-}
-
-/** DD/MM/YYYY → comparable number YYYYMMDD. */
 function dmyToNum(dmy: string): number {
   const [d, m, y] = dmy.split('/')
   return Number(`${y}${m?.padStart(2, '0')}${d?.padStart(2, '0')}`)
-}
-
-function Dot({ status }: { status: VersionStatus }) {
-  return (
-    <span
-      className="inline-block h-2 w-2 shrink-0 rounded-full"
-      style={{ background: STATUS_DOT[status] }}
-      aria-hidden
-    />
-  )
 }
 
 export function ConfigPage() {
@@ -75,15 +53,15 @@ export function ConfigPage() {
   const [editing, setEditing] = useState(false)
   const [workingRules, setWorkingRules] = useState<Rule[]>([])
   const [effDate, setEffDate] = useState('')
-  const [crewHeaderActions, setCrewHeaderActions] = useState<ReactNode>(null)
-  const [supplierHeaderActions, setSupplierHeaderActions] = useState<ReactNode>(null)
+  const [crewEditAction, setCrewEditAction] = useState<ReactNode>(null)
+  const [supplierEditAction, setSupplierEditAction] = useState<ReactNode>(null)
 
-  const onCrewHeaderActions = useCallback((actions: ReactNode | null) => {
-    setCrewHeaderActions(actions)
+  const onCrewEditAction = useCallback((actions: ReactNode | null) => {
+    setCrewEditAction(actions)
   }, [])
 
-  const onSupplierHeaderActions = useCallback((actions: ReactNode | null) => {
-    setSupplierHeaderActions(actions)
+  const onSupplierEditAction = useCallback((actions: ReactNode | null) => {
+    setSupplierEditAction(actions)
   }, [])
 
   const [editorRule, setEditorRule] = useState<Rule | null>(null)
@@ -110,6 +88,9 @@ export function ConfigPage() {
   const visibleKinds = tab === 'grouping' ? GROUPING_RULE_KINDS : QUOTA_RULE_KINDS
   const displayRules = (editing ? workingRules : viewing.rules).filter((r) =>
     visibleKinds.includes(r.kind),
+  )
+  const categoriesPresent = CATEGORY_ORDER.filter((cat) =>
+    displayRules.some((r) => RULE_CATEGORY[r.kind] === cat),
   )
 
   const startEdit = () => {
@@ -165,15 +146,8 @@ export function ConfigPage() {
     )
   }
 
-  const effRange = `${viewing.effectiveFrom} → ${viewing.effectiveTo ?? t('catering.quota.untilNextShort')}`
-
   const summaryText = t('catering.config.summary', { count: activeRuleCount(displayRules) })
-
-  const renderVersion = (v: RuleConfigVersion) => (
-    <span className="inline-flex items-center gap-2">
-      <Dot status={v.status} /> {v.id} · {t(`catering.quota.status.${v.status}`)}
-    </span>
-  )
+  const showQuotaTabs = tab === 'commercial' || tab === 'grouping'
 
   return (
     <div className="page-shell page-shell--list">
@@ -184,61 +158,24 @@ export function ConfigPage() {
           description={t('catering.config.desc')}
           actions={
             tab === 'crew' ? (
-              crewHeaderActions
+              crewEditAction
             ) : tab === 'supplier' ? (
-              supplierHeaderActions
-            ) : (
-              <>
-                <Select
-                  value={viewing.id}
-                  onChange={(id) => {
-                    setViewingId(id)
-                    if (editing) cancelEdit()
-                  }}
-                  style={{ minWidth: 150 }}
-                  optionLabelProp="label"
-                  options={versions.map((v) => ({ value: v.id, label: renderVersion(v) }))}
-                />
-                <span className="border-border bg-background inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-semibold tnum">
-                  {effRange}
-                </span>
-                <Popover
-                  placement="bottomLeft"
-                  trigger="click"
-                  content={
-                    <div className="max-w-xs space-y-1 text-[12.5px] leading-relaxed">
-                      <div>
-                        {t('catering.config.updatedMeta', { by: viewing.updatedBy, at: viewing.updatedAt })}
-                      </div>
-                      {viewing.note ? <div className="text-text-muted">{viewing.note}</div> : null}
-                    </div>
-                  }
-                >
-                  <button
-                    type="button"
-                    className="text-text-muted hover:text-foreground hover:bg-background inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
-                    aria-label={t('catering.quota.detailsAria')}
-                  >
-                    <Info size={16} />
-                  </button>
-                </Popover>
-                {isActiveView && !editing ? (
-                  <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
-                    {t('catering.config.editConfig')}
-                  </Button>
-                ) : null}
-              </>
-            )
+              supplierEditAction
+            ) : isActiveView && !editing ? (
+              <Button type="primary" icon={<Pencil size={15} />} onClick={startEdit}>
+                {t('catering.config.editConfig')}
+              </Button>
+            ) : null
           }
         />
 
-        <div className="config-tab-scroll mt-1 mb-4">
+        <div className="config-tab-scroll mt-1 mb-3">
           <Segmented<ConfigTab>
             value={tab}
             onChange={(v) => {
               setTab(v)
-              if (v !== 'crew') setCrewHeaderActions(null)
-              if (v !== 'supplier') setSupplierHeaderActions(null)
+              if (v !== 'crew') setCrewEditAction(null)
+              if (v !== 'supplier') setSupplierEditAction(null)
             }}
             size="large"
             options={[
@@ -250,89 +187,106 @@ export function ConfigPage() {
           />
         </div>
 
+        {showQuotaTabs ? (
+          <ConfigVersionBar
+            versions={versions}
+            value={viewing.id}
+            onChange={(id) => {
+              setViewingId(id)
+              if (editing) cancelEdit()
+            }}
+          />
+        ) : null}
+
         {tab === 'crew' ? (
-          <CrewMealTab onHeaderActions={onCrewHeaderActions} />
+          <CrewMealTab onEditAction={onCrewEditAction} />
         ) : tab === 'supplier' ? (
-          <SupplierRulesTab onHeaderActions={onSupplierHeaderActions} />
+          <SupplierRulesTab onEditAction={onSupplierEditAction} />
         ) : (
           <>
-        <div className="flex w-full min-w-0 flex-col gap-4">
-          {!isActiveView && !editing ? (
-            <Alert type="info" showIcon title={t('catering.config.readonlyHint')} />
-          ) : null}
+            <div className="flex w-full min-w-0 flex-col gap-4">
+              {!isActiveView && !editing ? (
+                <Alert type="info" showIcon title={t('catering.config.readonlyHint')} />
+              ) : null}
 
-          {editing ? (
-            <Alert type="info" showIcon title={t('catering.config.editBanner')} />
-          ) : null}
+              {editing ? (
+                <Alert type="info" showIcon title={t('catering.config.editBanner')} />
+              ) : null}
 
-          {/* Summary line */}
-          <div className="border-border bg-surface flex items-center gap-2 rounded-xl border px-4 py-2.5">
-            <span className="text-[13px] font-semibold">{summaryText}</span>
-          </div>
+              <p className="config-eyebrow">{summaryText}</p>
 
-          {/* Rules list */}
-          <div className="flex flex-col gap-2">
-            {displayRules.map((rule) => (
-              <RuleCard
-                key={rule.id}
-                rule={rule}
-                editing={editing}
-                onToggle={(enabled) => toggleRule(rule.id, enabled)}
-                onEdit={() => openEdit(rule)}
-                onRemove={() => removeRule(rule.id)}
-              />
-            ))}
+              <div className="flex flex-col gap-2">
+                {categoriesPresent.length > 1
+                  ? categoriesPresent.map((cat) => {
+                      const rulesInCat = displayRules.filter((r) => RULE_CATEGORY[r.kind] === cat)
+                      const accent = CATEGORY_ACCENT[cat]
+                      return (
+                        <div key={cat} className="config-rule-group">
+                          <div className="config-rule-group__head">
+                            <span className="config-rule-group__dot" style={{ background: accent.color }} />
+                            <span className="config-rule-group__label" style={{ color: accent.color }}>
+                              {t(`catering.config.cat.${cat}`)}
+                            </span>
+                            <span className="config-rule-group__count">{rulesInCat.length}</span>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {rulesInCat.map((rule) => (
+                              <RuleCard
+                                key={rule.id}
+                                rule={rule}
+                                editing={editing}
+                                onToggle={(enabled) => toggleRule(rule.id, enabled)}
+                                onEdit={() => openEdit(rule)}
+                                onRemove={() => removeRule(rule.id)}
+                                showCategory={false}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })
+                  : displayRules.map((rule) => (
+                      <RuleCard
+                        key={rule.id}
+                        rule={rule}
+                        editing={editing}
+                        onToggle={(enabled) => toggleRule(rule.id, enabled)}
+                        onEdit={() => openEdit(rule)}
+                        onRemove={() => removeRule(rule.id)}
+                      />
+                    ))}
 
-            {displayRules.length === 0 ? (
-              <div className="border-border text-text-muted rounded-xl border border-dashed px-4 py-8 text-center text-[13px]">
-                {t('catering.config.noRules')}
-              </div>
-            ) : null}
+                {displayRules.length === 0 ? (
+                  <ConfigEmptyState
+                    message={t('catering.config.noRules')}
+                    actionLabel={editing ? t('catering.config.addRule') : undefined}
+                    onAction={editing ? () => setPickerOpen(true) : undefined}
+                  />
+                ) : null}
 
-            {editing ? (
-              <Button
-                type="dashed"
-                block
-                icon={<Plus size={15} />}
-                onClick={() => setPickerOpen(true)}
-                className="mt-1"
-              >
-                {t('catering.config.addRule')}
-              </Button>
-            ) : null}
-          </div>
-        </div>
-
-        {editing ? (
-          <div className="quota-sticky-bar">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-              <div>
-                <div className="text-text-muted mb-1 text-[11.5px] font-bold">
-                  {t('catering.config.effectiveFrom')}
-                </div>
-                <DatePicker
-                  format={DMY}
-                  value={parseDmy(effDate)}
-                  onChange={(d) => setEffDate(d ? d.format(DMY) : '')}
-                  style={{ width: 150 }}
-                />
-              </div>
-              <div className="text-text-muted max-w-[34ch] text-[12.5px] font-medium">
-                {t('catering.config.publishHint')}
-              </div>
-              <div className="ml-auto">
-                <Space>
-                  <Button icon={<X size={14} />} onClick={cancelEdit}>
-                    {t('common.cancel')}
+                {editing && displayRules.length > 0 ? (
+                  <Button
+                    type="dashed"
+                    block
+                    icon={<Plus size={15} />}
+                    onClick={() => setPickerOpen(true)}
+                    className="mt-1"
+                  >
+                    {t('catering.config.addRule')}
                   </Button>
-                  <Button type="primary" disabled={!effDate.trim()} onClick={publish}>
-                    {t('catering.config.publish')}
-                  </Button>
-                </Space>
+                ) : null}
               </div>
             </div>
-          </div>
-        ) : null}
+
+            {editing ? (
+              <ConfigPublishBar
+                effDate={effDate}
+                onEffDateChange={setEffDate}
+                onCancel={cancelEdit}
+                onPublish={publish}
+                publishing={saveConfig.isPending}
+              />
+            ) : null}
           </>
         )}
       </div>

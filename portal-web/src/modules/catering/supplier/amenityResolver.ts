@@ -36,7 +36,8 @@ export function resolveAircraftFamily(
   if (!aircraftType) return null
   const t = aircraftType.toUpperCase().replace(/\s+/g, '')
   if (t.includes('A330')) return 'A330'
-  if (t.includes('A321')) return 'A321'
+  // A320 shares the A321 package family (sheet A320/A321).
+  if (t.includes('A321') || t.includes('A320')) return 'A321'
   return null
 }
 

@@ -3,7 +3,6 @@ import { Button, Empty, Input, InputNumber } from 'antd'
 import { ChevronDown, PlaneTakeoff, RotateCcw, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { CSSProperties } from 'react'
 import type { EcoSupplyFlightBreakdown, EcoSupplyGroupId, EcoSupplyLine } from '@/modules/catering/orderTypes'
 import { ECO_SUPPLY_FIELDS, ECO_SUPPLY_GROUP_ORDER, ecoSupplyFieldDisplayName } from '@/modules/catering/supplier/ecoSupplyRegistry'
 import { DeltaChip, GROUP_STYLE, groupLabel } from './EcoSupplyPanel'
@@ -32,6 +31,10 @@ interface FlightItem {
   raw: number
   overridden: boolean
   group: EcoSupplyGroupId
+  /** Catalog product code from the matching order-level line (same source as Supply Breakdown). */
+  productCode: string | null
+  /** Catalog unit from the matching order-level line. */
+  unit: string | null
   /** Overrides the registry display name — used for synthetic fields (e.g. amenity packages) not in ECO_SUPPLY_FIELDS. */
   label?: string
   /** Change vs the comparison version's effective qty for this group+field — null when there's nothing to compare against. */
@@ -55,9 +58,20 @@ export function FlightBreakdownPanel({
   const [query, setQuery] = useState('')
   const [openCards, setOpenCards] = useState<Set<string>>(new Set())
 
-  const fieldGroupMap = useMemo(() => new Map(lines.map((l) => [l.field, l.group])), [lines])
+  const fieldMetaMap = useMemo(
+    () =>
+      new Map(
+        lines.map((l) => [
+          l.field,
+          { group: l.group, productCode: l.productCode, unit: l.unit } as const,
+        ]),
+      ),
+    [lines],
+  )
   const getGroup = (field: string): EcoSupplyGroupId =>
-    fieldGroupMap.get(field) ?? ECO_SUPPLY_FIELDS.find((f) => f.field === field)?.group ?? 'other'
+    fieldMetaMap.get(field)?.group ?? ECO_SUPPLY_FIELDS.find((f) => f.field === field)?.group ?? 'other'
+  const getProductCode = (field: string): string | null => fieldMetaMap.get(field)?.productCode ?? null
+  const getUnit = (field: string): string | null => fieldMetaMap.get(field)?.unit ?? null
 
   const flights = useMemo(
     () =>
@@ -75,7 +89,16 @@ export function FlightBreakdownPanel({
             .map(([field, raw]) => {
               const overridden = field in groupEdits
               const qty = overridden ? groupEdits[field] : raw
-              return { field, raw, qty, overridden, group: getGroup(field), delta: deltaOf(field, qty) }
+              return {
+                field,
+                raw,
+                qty,
+                overridden,
+                group: getGroup(field),
+                productCode: getProductCode(field),
+                unit: getUnit(field),
+                delta: deltaOf(field, qty),
+              }
             })
           const packageItems: FlightItem[] = (f.amenityPackages ?? [])
             .filter((p) => p.count > 0)
@@ -89,6 +112,8 @@ export function FlightBreakdownPanel({
                 qty,
                 overridden,
                 group: 'amenity_composition' as const,
+                productCode: getProductCode(field),
+                unit: getUnit(field),
                 label: p.label,
                 delta: deltaOf(field, qty),
               }
@@ -115,7 +140,11 @@ export function FlightBreakdownPanel({
             leg.arr.toLowerCase().includes(q),
         )
         if (flightMatches) return f
-        const items = f.items.filter((i) => itemDisplayName(i).toLowerCase().includes(q))
+        const items = f.items.filter(
+          (i) =>
+            itemDisplayName(i).toLowerCase().includes(q) ||
+            (i.productCode?.toLowerCase().includes(q) ?? false),
+        )
         return items.length > 0 ? { ...f, items } : null
       })
       .filter((f): f is (typeof flights)[number] => f !== null)
@@ -160,10 +189,7 @@ export function FlightBreakdownPanel({
             const stationChain = [f.legs[0]?.dep, ...f.legs.map((l) => l.arr)].filter(Boolean).join(' → ')
             const open = openCards.has(f.groupId)
             return (
-              <article
-                key={f.groupId}
-                className="bg-surface border-border overflow-hidden rounded-xl border shadow-[0_2px_8px_rgba(35,31,32,0.05)] transition-shadow"
-              >
+              <article key={f.groupId} className="eco-flight-card">
                 <div
                   role="button"
                   tabIndex={0}
@@ -175,10 +201,10 @@ export function FlightBreakdownPanel({
                       toggleCard(f.groupId)
                     }
                   }}
-                  className="grid cursor-pointer select-none grid-cols-[40px_minmax(160px,260px)_1fr_20px] items-center gap-3.5 px-4 py-3 hover:bg-[#FCFDFE]"
+                  className="eco-flight-card__head"
                 >
-                  <span className="bg-vj-red-50 text-vj-red-dark grid h-9 w-9 place-items-center rounded-lg">
-                    <PlaneTakeoff size={16} />
+                  <span className="eco-flight-card__icon">
+                    <PlaneTakeoff size={16} strokeWidth={2.25} />
                   </span>
 
                   <div className="min-w-0">
@@ -215,61 +241,81 @@ export function FlightBreakdownPanel({
                           const groupTotal = groupItems.reduce((s, i) => s + i.qty, 0)
                           const style = GROUP_STYLE[group]
                           return (
-                            <section key={group} className="eco-supply__section">
-                              <header
-                                className="eco-supply__section-head"
-                                style={
-                                  {
-                                    '--section-bg': style.bg,
-                                    '--section-color': style.color,
-                                    '--section-dot': style.color,
-                                  } as CSSProperties
-                                }
-                              >
-                                <span className="eco-supply__section-dot" />
-                                <h3>{groupLabel(t, group)}</h3>
-                                <span className="eco-supply__section-total text-text-secondary tnum text-[11px] font-bold">
+                            <section
+                              key={group}
+                              className="mb-3 break-inside-avoid overflow-hidden rounded-lg border border-slate-300 bg-slate-50/50"
+                            >
+                              <header className="flex items-center gap-2 border-b border-slate-200/70 px-3.5 py-2.5">
+                                <span
+                                  className="h-1.5 w-1.5 shrink-0 rounded-full"
+                                  style={{ background: style.color }}
+                                  aria-hidden
+                                />
+                                <h3 className="text-[13px] font-bold" style={{ color: style.color }}>
+                                  {groupLabel(t, group)}
+                                </h3>
+                                <span className="ml-auto shrink-0 text-[11px] font-semibold whitespace-nowrap text-slate-400 tabular-nums">
                                   {t('catering.orders.byFlight.groupSkuCount', { n: groupItems.length })} ·{' '}
                                   {t('catering.orders.byFlight.groupQty', { n: groupTotal.toLocaleString() })}
                                 </span>
                               </header>
-                              <ul className="eco-supply__list">
+                              <ul className="divide-y divide-slate-100">
                                 {groupItems.map((item) => (
-                                  <li key={item.field} className="eco-supply__row">
-                                    <div className="eco-supply__meta">
-                                      <div className="eco-supply__name">
+                                  <li
+                                    key={item.field}
+                                    className="flex items-center justify-between gap-3 px-3.5 py-2.5"
+                                  >
+                                    <div className="min-w-0 flex-1 text-left">
+                                      <div className="text-[13px] font-semibold text-slate-900">
                                         {itemDisplayName(item)}
-                                        {item.delta != null ? <DeltaChip value={item.delta} /> : null}
+                                      </div>
+                                      <div className="mt-0.5 flex items-center gap-1.5">
+                                        {item.productCode ? (
+                                          <span className="table-cell-code tnum">{item.productCode}</span>
+                                        ) : (
+                                          <span className="text-[12px] text-slate-400">—</span>
+                                        )}
+                                        {item.unit ? (
+                                          <span className="text-[12px] text-slate-400">· {item.unit}</span>
+                                        ) : null}
                                       </div>
                                     </div>
-                                    <div className="eco-supply__qty">
-                                      {editable ? (
-                                        <div className="eco-supply__qty-edit">
-                                          <InputNumber
-                                            min={0}
-                                            size="small"
-                                            value={item.qty}
-                                            className="!w-[76px]"
-                                            onChange={(v) => {
-                                              if (v == null || !Number.isFinite(v)) return
-                                              onChangeQty?.(f.groupId, item.field, Math.max(0, Math.round(v)))
-                                            }}
-                                          />
-                                          {item.overridden ? (
-                                            <Button
-                                              type="text"
+                                    <div className="flex shrink-0 flex-col items-end gap-0.5 text-right">
+                                      <div className="flex items-center gap-2">
+                                        {item.delta != null && item.delta !== 0 ? (
+                                          <DeltaChip value={item.delta} />
+                                        ) : null}
+                                        {editable ? (
+                                          <>
+                                            <InputNumber
+                                              min={0}
                                               size="small"
-                                              icon={<RotateCcw size={13} />}
-                                              aria-label={t('catering.orders.supply.reset')}
-                                              onClick={() => onResetField?.(f.groupId, item.field)}
+                                              value={item.qty}
+                                              className="!w-16 [&_input]:!font-mono [&_input]:!tabular-nums"
+                                              aria-label={itemDisplayName(item)}
+                                              onChange={(v) => {
+                                                if (v == null || !Number.isFinite(v)) return
+                                                onChangeQty?.(f.groupId, item.field, Math.max(0, Math.round(v)))
+                                              }}
                                             />
-                                          ) : null}
-                                        </div>
-                                      ) : (
-                                        <span className="eco-supply__qty-value tnum">{item.qty.toLocaleString()}</span>
-                                      )}
+                                            {item.overridden ? (
+                                              <Button
+                                                type="text"
+                                                size="small"
+                                                icon={<RotateCcw size={13} />}
+                                                aria-label={t('catering.orders.supply.reset')}
+                                                onClick={() => onResetField?.(f.groupId, item.field)}
+                                              />
+                                            ) : null}
+                                          </>
+                                        ) : (
+                                          <span className="font-mono text-[15px] font-extrabold tabular-nums text-slate-900">
+                                            {item.qty.toLocaleString()}
+                                          </span>
+                                        )}
+                                      </div>
                                       {item.overridden && item.qty !== item.raw ? (
-                                        <span className="eco-supply__suggested tnum">
+                                        <span className="font-mono text-[11px] font-semibold tabular-nums text-slate-400">
                                           {t('catering.orders.supply.suggested', { n: item.raw })}
                                         </span>
                                       ) : null}

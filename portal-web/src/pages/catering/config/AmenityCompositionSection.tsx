@@ -23,17 +23,21 @@ function Stepper({
   value,
   onChange,
   disabled,
+  decreaseLabel,
+  increaseLabel,
 }: {
   value: number
   onChange: (next: number) => void
   disabled?: boolean
+  decreaseLabel: string
+  increaseLabel: string
 }) {
   return (
     <div className="inline-flex items-center gap-1">
       <button
         type="button"
         disabled={disabled || value <= 0}
-        aria-label="−"
+        aria-label={decreaseLabel}
         onClick={() => onChange(Math.max(0, value - 1))}
         className="border-border bg-background text-foreground enabled:hover:bg-muted grid h-8 w-8 place-items-center rounded-lg border text-[15px] font-bold disabled:cursor-not-allowed disabled:opacity-40"
       >
@@ -43,7 +47,7 @@ function Stepper({
       <button
         type="button"
         disabled={disabled}
-        aria-label="+"
+        aria-label={increaseLabel}
         onClick={() => onChange(value + 1)}
         className="border-border bg-background text-foreground enabled:hover:bg-muted grid h-8 w-8 place-items-center rounded-lg border text-[15px] font-bold disabled:cursor-not-allowed disabled:opacity-40"
       >
@@ -270,7 +274,9 @@ export function AmenityCompositionSection({
               )
             })}
             {filteredPackages.length === 0 ? (
-              <p className="text-text-muted px-2 py-4 text-center text-[12px]">—</p>
+              <p className="text-text-muted px-2 py-4 text-center text-[12px]">
+                {t('catering.config.supplier.compositionEmptyPackages')}
+              </p>
             ) : null}
           </div>
         </div>
@@ -326,6 +332,8 @@ export function AmenityCompositionSection({
                       <Stepper
                         value={qty}
                         onChange={(next) => setQty(selectedPkgId, product.code, next)}
+                        decreaseLabel={t('catering.config.supplier.qtyDecrease')}
+                        increaseLabel={t('catering.config.supplier.qtyIncrease')}
                       />
                     ) : (
                       <span className="tnum shrink-0 text-[15px] font-extrabold">{qty}</span>
@@ -334,7 +342,9 @@ export function AmenityCompositionSection({
                 )
               })}
               {filteredProducts.length === 0 ? (
-                <p className="text-text-muted py-6 text-center text-[12.5px]">—</p>
+                <p className="text-text-muted py-6 text-center text-[12.5px]">
+                  {t('catering.config.supplier.compositionEmptyProducts')}
+                </p>
               ) : null}
             </div>
           </div>
