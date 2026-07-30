@@ -96,7 +96,10 @@ describe('buildEcoSupplySnapshot', () => {
     expect(macca?.source.toLowerCase()).toContain('manual')
 
     expect(byFlight).toHaveLength(1)
-    expect(byFlight[0]).toMatchObject({ flightNo: 'VJ1', dep: 'SGN', arr: 'DAD' })
+    expect(byFlight[0]).toMatchObject({
+      groupId: 'g1',
+      legs: [{ flightNo: 'VJ1', dep: 'SGN', arr: 'DAD' }],
+    })
     expect(byFlight[0].cells.prebook).toBe(20)
     expect(byFlight[0].cells.freshWater).toBe(20)
   })

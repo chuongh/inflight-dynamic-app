@@ -110,9 +110,6 @@ export function ReconcileDrawer({ open, onClose, current, base }: ReconcileDrawe
       ) : (
         <>
           <div className="border-border bg-[#f8fafc] flex items-center gap-3 border-b px-4 py-2.5 text-[12px]">
-            <span className={`tnum rounded-full px-2 py-0.5 text-[11.5px] font-extrabold ${netChipCls}`}>
-              Δ {net > 0 ? '+' : ''}{net}
-            </span>
             <span className="text-text-secondary font-semibold">
               {t('catering.orders.reconcile.linesChanged', { n: changed.length })}
             </span>

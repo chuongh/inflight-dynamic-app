@@ -822,10 +822,17 @@
         "created": "New version v{{v}} created"
       },
       "byFlight": {
-        "title": "By flight",
+        "title": "By group flight",
         "openCta": "View by flight",
         "empty": "No per-flight breakdown yet.",
+        "noMatches": "No flights or items match your search.",
         "prebookTotal": "Prebook",
+        "skyboss": "SkyBoss",
+        "commercial": "Commercial",
+        "groupSkuCount": "{{n}} items",
+        "groupQty": "{{n}} pcs",
+        "groupCount": "{{n}} flight groups",
+        "searchPlaceholder": "Search item or flight number",
         "noDetailItems": "No detail items on this flight."
       },
       "savedV": "Draft v{{v}} saved",
@@ -866,6 +873,8 @@
         "sectionMeta": "Order",
         "skuCount": "Items",
         "totalQty": "Total qty",
+        "sectionSkuCount": "{{n}} items",
+        "sectionQty": "{{n}} pcs",
         "overrides": "Edited",
         "edited": "Edited",
         "unconfirmed": "Unconfirmed",

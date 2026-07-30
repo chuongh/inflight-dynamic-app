@@ -59,12 +59,33 @@ export interface EcoSupplyLine {
 }
 
 /** Per-flight slice of ECO supply quantities (snapshot at build time). */
-export interface EcoSupplyFlightBreakdown {
+export interface EcoSupplyFlightAmenityPackage {
+  id: number
+  label: string
+  count: number
+}
+
+export interface EcoSupplyFlightLeg {
   flightNo: string
   dep: string
   arr: string
-  /** field key → qty for that single flight (0 omitted) */
+}
+
+/**
+ * Per-rotation ECO supply breakdown (snapshot at build time) — legs of the same
+ * confirmed group (e.g. VJ240 + VJ243) are merged into one entry, matching how
+ * the Flight Grouping screen treats a rotation as one unit.
+ */
+export interface EcoSupplyFlightBreakdown {
+  groupId: string
+  /** All legs of this rotation, in flight order. */
+  legs: EcoSupplyFlightLeg[]
+  /** field key → qty summed across the group's legs (0 omitted) */
   cells: Record<string, number>
+  /** Commercial (economy sales) quota summed across the group's legs. */
+  quotaCommercial?: number
+  /** Amenity packages assigned across the group's legs. */
+  amenityPackages?: EcoSupplyFlightAmenityPackage[]
 }
 
 /**
@@ -104,6 +125,12 @@ export interface CateringOrder {
   ecoSupplyLines?: EcoSupplyLine[]
   /** Per-flight ECO supply breakdown (same snapshot as `ecoSupplyLines`). */
   ecoSupplyByFlight?: EcoSupplyFlightBreakdown[]
+  /**
+   * Manual overrides on a single flight group's portion of a dish/amenity qty —
+   * keyed by groupId → field → qty. The order-wide `ecoSupplyLines` total for an
+   * edited field is recomputed as the sum of each group's effective value.
+   */
+  ecoSupplyByFlightEdits?: Record<string, Record<string, number>>
   /** Direct numeric patches keyed by flightKey → product → field → number */
   supplierEdits?: Record<string, {
     eco?: Partial<Record<string, number>>

@@ -1,5 +1,5 @@
-import { Alert, App as AntApp, Button, Empty } from 'antd'
-import { ArrowRightLeft, PlaneTakeoff, Printer, Send } from 'lucide-react'
+import { Alert, App as AntApp, Button, Empty, Tabs } from 'antd'
+import { ArrowRightLeft, Printer, RefreshCw, Send } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -7,26 +7,31 @@ import { DetailHero } from '@/components/patterns/DetailHero'
 import { SurfaceCard } from '@/components/patterns/SurfaceCard'
 import { useAuth } from '@/core/auth/useAuth'
 import { activeCrewMealVersion, profileFor } from '@/modules/catering/crewMeal'
+import { groupOrigin } from '@/modules/catering/grouping'
 import { useAmenityCatalogData, useMealCatalogData } from '@/modules/catering/hooks/useCatalog'
 import { useCrewMealConfigData } from '@/modules/catering/hooks/useCrewMealConfig'
 import { useFlightGroups } from '@/modules/catering/hooks/useFlightGroups'
+import { useMeals } from '@/modules/catering/hooks/useMeals'
 import { useOrders, useSaveOrders } from '@/modules/catering/hooks/useOrders'
 import { useSupplierRuleConfigData } from '@/modules/catering/hooks/useSupplierRuleConfig'
-import type { CateringOrder } from '@/modules/catering/orderTypes'
-import { groupOrderFiles } from '@/modules/catering/orders'
+import type {
+  CateringOrder,
+  EcoSupplyFlightBreakdown,
+  EcoSupplyLine,
+} from '@/modules/catering/orderTypes'
+import { groupOrderFiles, makeCodeOf } from '@/modules/catering/orders'
+import { buildOrderSnapshot } from '@/modules/catering/orderSnapshot'
 import { DEFAULT_ECO_AMENITY_CONFIG } from '@/modules/catering/supplier/amenityDefaults'
 import { buildEcoSupplySnapshot } from '@/modules/catering/supplier/buildEcoSupplySnapshot'
 import { DEFAULT_ECO_QUANTITY_RULES } from '@/modules/catering/supplier/ecoQuantityEval'
 import { flightGroupsToSupplierInputs } from '@/modules/catering/supplier/fromFlightGroup'
+import type { SupplierFlightInput } from '@/modules/catering/supplier/types'
 import { activeSupplierRuleVersion } from '@/modules/catering/supplierRuleConfig'
 import { paths } from '@/routes/paths'
-import {
-  applySupplierEdits,
-  buildPlannerWorkspace,
-} from '../planner/plannerModel'
-import { OrderStatStrip, OrderStatusBadge, VerTag, weekdayOf } from './orderUi'
+import { applySupplierEdits, buildPlannerWorkspace } from '../planner/plannerModel'
 import { EcoSupplyPanel } from './EcoSupplyPanel'
-import { FlightBreakdownDrawer } from './FlightBreakdownDrawer'
+import { FlightBreakdownPanel } from './FlightBreakdownPanel'
+import { OrderStatStrip, OrderStatusBadge, StatTrendValue, VerTag, weekdayOf } from './orderUi'
 import { ReconcileDrawer } from './ReconcileDrawer'
 import './eco-supply.css'
 
@@ -57,6 +62,7 @@ export function OrderDetailPage() {
   const { data: mealCatalog } = useMealCatalogData()
   const { data: amenityCatalog } = useAmenityCatalogData()
   const { data: crewCfg } = useCrewMealConfigData()
+  const { data: legacyMealCatalog } = useMeals()
 
   const files = useMemo(() => groupOrderFiles(data?.orders ?? []), [data])
   const file = files.find((f) => f.fileId === fileId)
@@ -64,8 +70,8 @@ export function OrderDetailPage() {
 
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null)
   const [reconcileOpen, setReconcileOpen] = useState(false)
-  const [byFlightOpen, setByFlightOpen] = useState(false)
   const [sending, setSending] = useState(false)
+  const [creatingVersion, setCreatingVersion] = useState(false)
 
   const current: CateringOrder | undefined = file
     ? (file.versions.find((v) => v.version === (selectedVersion ?? latest!.version)) ?? latest)
@@ -108,7 +114,7 @@ export function OrderDetailPage() {
     const saved = current.ecoSupplyLines
     const hasCrew =
       !crewMealProfile || !!saved?.some((l) => l.field === 'crewCockpit')
-    if (saved?.length && current.ecoSupplyByFlight?.length && hasCrew) return null
+    if (saved?.length && hasFreshByFlightShape(current.ecoSupplyByFlight) && hasCrew) return null
     return buildEcoSupplySnapshot({
       day,
       station: current.station,
@@ -123,32 +129,58 @@ export function OrderDetailPage() {
     })
   }, [current, day, mealCatalog, amenityCatalog, activeRules, crewMealProfile])
 
+  const ecoSupplyByFlight = hasFreshByFlightShape(current?.ecoSupplyByFlight)
+    ? current!.ecoSupplyByFlight!
+    : (computedEcoSupply?.byFlight ?? [])
+
   const ecoSupplyLines = useMemo(() => {
     const saved = current?.ecoSupplyLines
     const computed = computedEcoSupply?.lines
-    if (!saved?.length) return computed ?? []
-    if (!crewMealProfile || saved.some((l) => l.field === 'crewCockpit')) return saved
-    const crewLine = computed?.find((l) => l.field === 'crewCockpit')
-    return crewLine ? [...saved, crewLine] : saved
-  }, [current?.ecoSupplyLines, computedEcoSupply, crewMealProfile])
+    let base: EcoSupplyLine[]
+    if (!saved?.length) base = computed ?? []
+    else if (!crewMealProfile || saved.some((l) => l.field === 'crewCockpit')) base = saved
+    else {
+      const crewLine = computed?.find((l) => l.field === 'crewCockpit')
+      base = crewLine ? [...saved, crewLine] : saved
+    }
+    return applyByFlightEditsToLines(
+      base,
+      ecoSupplyByFlight,
+      current?.ecoSupplyByFlightEdits,
+    )
+  }, [
+    current?.ecoSupplyLines,
+    current?.ecoSupplyByFlightEdits,
+    computedEcoSupply,
+    crewMealProfile,
+    ecoSupplyByFlight,
+  ])
 
-  const ecoSupplyByFlight = current?.ecoSupplyByFlight ?? computedEcoSupply?.byFlight ?? []
   const showEcoSupply = ecoSupplyLines.length > 0
 
-  const mealStats = useMemo(() => {
-    const hotmealBread = ecoSupplyLines
-      .filter((l) => l.group === 'main' || l.group === 'vegetarian' || l.group === 'bread')
-      .reduce((s, l) => s + l.qty, 0)
-    const prebook = ecoSupplyLines.find((l) => l.field === 'prebook')?.qty ?? 0
-    const skyboss = ecoSupplyLines.find((l) => l.field === 'skyboss')?.qty ?? 0
-    const skybossBusiness = inputs.reduce((s, i) => s + (i.businessPax ?? 0), 0)
-    const crew = ecoSupplyLines.find((l) => l.field === 'crewCockpit')?.qty ?? 0
-    const quotaCommercial =
-      inputs.reduce((s, i) => s + (i.quotaCommercial ?? 0), 0) ||
-      (ecoSupplyLines.find((l) => l.field === 'quotaCommercial')?.qty ?? 0)
-    const totalMeals = hotmealBread + crew
-    return { totalMeals, prebook, skyboss, skybossBusiness, crew, quotaCommercial }
-  }, [ecoSupplyLines, inputs])
+  const shownIdx = file ? file.versions.findIndex((v) => v.version === current?.version) : -1
+  const reconcileBase = file && shownIdx > 0 ? file.versions[shownIdx - 1] : null
+
+  /** Effective (post-override) ECO supply lines/cells for the comparison version — null when there's nothing to compare against (first version). */
+  const prevQtyByField = useMemo(() => {
+    if (!reconcileBase) return null
+    const map: Record<string, number> = {}
+    for (const l of effectiveLinesFor(reconcileBase)) map[l.field] = l.qty
+    return map
+  }, [reconcileBase])
+
+  const prevByFlightCells = useMemo(() => {
+    if (!reconcileBase) return null
+    return effectiveByFlightCells(reconcileBase)
+  }, [reconcileBase])
+
+  const mealStats = useMemo(() => computeMealStats(ecoSupplyLines, inputs), [ecoSupplyLines, inputs])
+
+  /** Same KPIs for the comparison (previous) version — null when there's nothing to compare against. */
+  const prevMealStats = useMemo(
+    () => (reconcileBase ? computeMealStats(effectiveLinesFor(reconcileBase), inputs) : null),
+    [reconcileBase, inputs],
+  )
 
   if (!file || !current) {
     return (
@@ -160,9 +192,6 @@ export function OrderDetailPage() {
       </div>
     )
   }
-
-  const shownIdx = file.versions.findIndex((v) => v.version === current.version)
-  const reconcileBase = shownIdx > 0 ? file.versions[shownIdx - 1] : null
 
   const persist = (record: CateringOrder, extra: CateringOrder[] = []) => {
     const others = (data?.orders ?? []).filter(
@@ -193,6 +222,24 @@ export function OrderDetailPage() {
         line.id === lineId ? { ...line, qty: line.suggested, overridden: false } : line,
       ),
     })
+  }
+
+  const patchByFlightQty = (groupId: string, field: string, qty: number) => {
+    if (!editable) return
+    const edits = { ...current.ecoSupplyByFlightEdits }
+    edits[groupId] = { ...edits[groupId], [field]: qty }
+    persist({ ...current, ecoSupplyByFlightEdits: edits })
+  }
+
+  const resetByFlightQty = (groupId: string, field: string) => {
+    if (!editable) return
+    const edits = { ...current.ecoSupplyByFlightEdits }
+    if (!edits[groupId]) return
+    const groupEdits = { ...edits[groupId] }
+    delete groupEdits[field]
+    if (Object.keys(groupEdits).length === 0) delete edits[groupId]
+    else edits[groupId] = groupEdits
+    persist({ ...current, ecoSupplyByFlightEdits: edits })
   }
 
   const send = async () => {
@@ -231,6 +278,57 @@ export function OrderDetailPage() {
     return session?.user.name ?? 'Catering Ops'
   }
 
+  /** Re-snapshot the day's CONFIRMED groups into a fresh draft version, on top of a sent order. */
+  const createNewVersion = () => {
+    if (!isLatest || current.status !== 'sent' || !canFinalize || !day) return
+    const confirmed = day.groups.filter((g) => groupOrigin(g) === current.station && g.confirmed)
+    if (confirmed.length === 0) {
+      message.warning(t('catering.orders.needConfirmed'))
+      return
+    }
+    setCreatingVersion(true)
+    try {
+      const { lines, breakdown } = buildOrderSnapshot(confirmed, crewMealProfile ?? undefined, makeCodeOf(legacyMealCatalog))
+      const { lines: ecoSupplyLines, byFlight: ecoSupplyByFlight } = buildEcoSupplySnapshot({
+        day,
+        station: current.station,
+        mealCatalog,
+        amenityCatalog,
+        ecoRouteRules: activeRules?.ecoRouteRules ?? null,
+        quantityConfig: {
+          amenity: activeRules?.ecoAmenity ?? DEFAULT_ECO_AMENITY_CONFIG,
+          quantityRules: activeRules?.ecoQuantityRules ?? DEFAULT_ECO_QUANTITY_RULES,
+        },
+        crewMealProfile,
+      })
+      const version = current.version + 1
+      const record: CateringOrder = {
+        id: `${file.fileId}-v${version}`,
+        version,
+        serviceDate: current.serviceDate,
+        station: current.station,
+        createdAt: Date.now(),
+        createdBy: userName(),
+        status: 'draft',
+        lines,
+        breakdown,
+        ecoSupplyLines,
+        ecoSupplyByFlight,
+      }
+      saveOrders.mutate(
+        { orders: [...(data?.orders ?? []), record] },
+        {
+          onSuccess: () => {
+            setSelectedVersion(version)
+            message.success(t('catering.orders.revisionCreated', { v: version }))
+          },
+        },
+      )
+    } finally {
+      setCreatingVersion(false)
+    }
+  }
+
   return (
     <div className="thin-scroll h-full overflow-auto p-5">
       <DetailHero
@@ -259,14 +357,18 @@ export function OrderDetailPage() {
         }
         actions={
           <>
-            {showEcoSupply ? (
-              <Button icon={<PlaneTakeoff size={15} />} onClick={() => setByFlightOpen(true)}>
-                {t('catering.orders.byFlight.openCta')}
-              </Button>
-            ) : null}
             <Button icon={<Printer size={15} />} onClick={() => window.print()}>
               {t('catering.orders.print')}
             </Button>
+            {isLatest && current.status === 'sent' && canFinalize ? (
+              <Button
+                icon={<RefreshCw size={15} />}
+                loading={creatingVersion || saveOrders.isPending}
+                onClick={createNewVersion}
+              >
+                {t('catering.orders.newRevision')}
+              </Button>
+            ) : null}
             {editable && canFinalize && showEcoSupply ? (
               <Button
                 type="primary"
@@ -326,29 +428,59 @@ export function OrderDetailPage() {
             items={[
               {
                 label: t('catering.orders.supply.kpiTotalMeals'),
-                value: mealStats.totalMeals.toLocaleString(),
+                value: (
+                  <StatTrendValue
+                    value={mealStats.totalMeals}
+                    delta={prevMealStats ? mealStats.totalMeals - prevMealStats.totalMeals : null}
+                  />
+                ),
                 featured: true,
                 hint: t('catering.orders.supply.kpiTotalMealsHint'),
               },
               {
                 label: t('catering.orders.supply.kpiPrebook'),
-                value: mealStats.prebook.toLocaleString(),
+                value: (
+                  <StatTrendValue
+                    value={mealStats.prebook}
+                    delta={prevMealStats ? mealStats.prebook - prevMealStats.prebook : null}
+                  />
+                ),
               },
               {
                 label: t('catering.orders.supply.kpiCrew'),
-                value: mealStats.crew.toLocaleString(),
+                value: (
+                  <StatTrendValue
+                    value={mealStats.crew}
+                    delta={prevMealStats ? mealStats.crew - prevMealStats.crew : null}
+                  />
+                ),
               },
               {
                 label: t('catering.orders.supply.kpiSkyboss'),
-                value: mealStats.skyboss.toLocaleString(),
+                value: (
+                  <StatTrendValue
+                    value={mealStats.skyboss}
+                    delta={prevMealStats ? mealStats.skyboss - prevMealStats.skyboss : null}
+                  />
+                ),
               },
               {
                 label: t('catering.orders.supply.kpiSkybossBusiness'),
-                value: mealStats.skybossBusiness.toLocaleString(),
+                value: (
+                  <StatTrendValue
+                    value={mealStats.skybossBusiness}
+                    delta={prevMealStats ? mealStats.skybossBusiness - prevMealStats.skybossBusiness : null}
+                  />
+                ),
               },
               {
                 label: t('catering.orders.supply.kpiQuota'),
-                value: mealStats.quotaCommercial.toLocaleString(),
+                value: (
+                  <StatTrendValue
+                    value={mealStats.quotaCommercial}
+                    delta={prevMealStats ? mealStats.quotaCommercial - prevMealStats.quotaCommercial : null}
+                  />
+                ),
                 hint: t('catering.orders.supply.kpiQuotaHint'),
               },
             ]}
@@ -356,13 +488,38 @@ export function OrderDetailPage() {
 
           <div className="order-supply-layout">
             <div className="order-supply-layout__main">
-              <p className="order-section-label">{t('catering.orders.supply.sectionBreakdown')}</p>
-              <EcoSupplyPanel
-                lines={ecoSupplyLines}
-                editable={editable}
-                onChangeQty={patchEcoSupplyQty}
-                onResetLine={resetEcoSupplyLine}
-                compactSummary
+              <Tabs
+                items={[
+                  {
+                    key: 'supply',
+                    label: t('catering.orders.supply.sectionBreakdown'),
+                    children: (
+                      <EcoSupplyPanel
+                        lines={ecoSupplyLines}
+                        editable={editable}
+                        onChangeQty={patchEcoSupplyQty}
+                        onResetLine={resetEcoSupplyLine}
+                        compactSummary
+                        prevQtyByField={prevQtyByField}
+                      />
+                    ),
+                  },
+                  {
+                    key: 'byFlight',
+                    label: t('catering.orders.byFlight.title'),
+                    children: (
+                      <FlightBreakdownPanel
+                        byFlight={ecoSupplyByFlight}
+                        lines={ecoSupplyLines}
+                        editable={editable}
+                        edits={current.ecoSupplyByFlightEdits}
+                        onChangeQty={patchByFlightQty}
+                        onResetField={resetByFlightQty}
+                        prevByFlightCells={prevByFlightCells}
+                      />
+                    ),
+                  },
+                ]}
               />
             </div>
 
@@ -424,7 +581,10 @@ export function OrderDetailPage() {
                 <Meta k={t('catering.orders.createdBy')} v={file.versions[0].createdBy} />
                 <Meta k={t('catering.orders.createdAt')} v={fmtFull(file.versions[0].createdAt)} />
                 <Meta k={t('catering.orders.station')} v={current.station} />
-                <Meta k={t('catering.orders.supply.skuCount')} v={String(ecoSupplyLines.filter((l) => l.qty > 0 || l.overridden).length)} />
+                <Meta
+                  k={t('catering.orders.supply.skuCount')}
+                  v={String(ecoSupplyLines.filter((l) => l.qty > 0 || l.overridden).length)}
+                />
               </SurfaceCard>
             </aside>
           </div>
@@ -443,11 +603,6 @@ export function OrderDetailPage() {
         current={current}
         base={reconcileBase}
       />
-      <FlightBreakdownDrawer
-        open={byFlightOpen}
-        onClose={() => setByFlightOpen(false)}
-        byFlight={ecoSupplyByFlight}
-      />
     </div>
   )
 }
@@ -465,4 +620,79 @@ function fmtFull(ts: number): string {
   const d = new Date(ts)
   const p = (n: number) => String(n).padStart(2, '0')
   return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} · ${p(d.getHours())}:${p(d.getMinutes())}`
+}
+
+/**
+ * Older saved orders persisted a per-leg `ecoSupplyByFlight` shape (no `legs`
+ * array) — using that stale shape crashes `FlightBreakdownPanel`, which reads
+ * `f.legs`. Treat it as absent so the snapshot recomputes in the current shape.
+ */
+function hasFreshByFlightShape(
+  fb: CateringOrder['ecoSupplyByFlight'],
+): boolean {
+  return !!fb?.length && fb.every((f) => Array.isArray(f.legs) && f.legs.length > 0)
+}
+
+/**
+ * Per-flight-group edits always win for their group; the order-wide total for an
+ * edited field is recomputed as the sum of each group's effective value.
+ */
+function applyByFlightEditsToLines(
+  lines: EcoSupplyLine[],
+  byFlight: EcoSupplyFlightBreakdown[],
+  edits: CateringOrder['ecoSupplyByFlightEdits'],
+): EcoSupplyLine[] {
+  if (!edits) return lines
+  const editedFields = new Set(Object.values(edits).flatMap((e) => Object.keys(e)))
+  if (editedFields.size === 0) return lines
+  return lines.map((line) => {
+    if (!editedFields.has(line.field)) return line
+    const total = byFlight.reduce((sum, f) => {
+      const override = edits[f.groupId]?.[line.field]
+      if (override != null) return sum + override
+      if (line.field.startsWith('amenityPackage')) {
+        const pkg = f.amenityPackages?.find((p) => `amenityPackage${p.id}` === line.field)
+        return sum + (pkg?.count ?? 0)
+      }
+      return sum + (f.cells[line.field] ?? 0)
+    }, 0)
+    return { ...line, qty: total, overridden: true }
+  })
+}
+
+function computeMealStats(lines: EcoSupplyLine[], inputs: SupplierFlightInput[]) {
+  const hotmealBread = lines
+    .filter((l) => l.group === 'main' || l.group === 'vegetarian' || l.group === 'bread')
+    .reduce((s, l) => s + l.qty, 0)
+  const prebook = lines.find((l) => l.field === 'prebook')?.qty ?? 0
+  const skyboss = lines.find((l) => l.field === 'skyboss')?.qty ?? 0
+  const skybossBusiness = inputs.reduce((s, i) => s + (i.businessPax ?? 0), 0)
+  const crew = lines.find((l) => l.field === 'crewCockpit')?.qty ?? 0
+  const quotaCommercial =
+    inputs.reduce((s, i) => s + (i.quotaCommercial ?? 0), 0) ||
+    (lines.find((l) => l.field === 'quotaCommercial')?.qty ?? 0)
+  const totalMeals = hotmealBread + crew
+  return { totalMeals, prebook, skyboss, skybossBusiness, crew, quotaCommercial }
+}
+
+/** An order version's ECO supply lines with its own per-flight-group edits folded in — the same effective numbers that version showed at the time. */
+function effectiveLinesFor(order: CateringOrder | null): EcoSupplyLine[] {
+  if (!order?.ecoSupplyLines?.length) return []
+  const byFlight = hasFreshByFlightShape(order.ecoSupplyByFlight) ? order.ecoSupplyByFlight! : []
+  return applyByFlightEditsToLines(order.ecoSupplyLines, byFlight, order.ecoSupplyByFlightEdits)
+}
+
+/** An order version's per-flight-group cells with its own per-group edits folded in, keyed by groupId → field → qty. */
+function effectiveByFlightCells(order: CateringOrder | null): Record<string, Record<string, number>> {
+  const map: Record<string, Record<string, number>> = {}
+  if (!order || !hasFreshByFlightShape(order.ecoSupplyByFlight)) return map
+  const edits = order.ecoSupplyByFlightEdits ?? {}
+  for (const f of order.ecoSupplyByFlight!) {
+    const cells: Record<string, number> = { ...f.cells }
+    for (const p of f.amenityPackages ?? []) cells[`amenityPackage${p.id}`] = p.count
+    const groupEdits = edits[f.groupId]
+    if (groupEdits) for (const [field, qty] of Object.entries(groupEdits)) cells[field] = qty
+    map[f.groupId] = cells
+  }
+  return map
 }

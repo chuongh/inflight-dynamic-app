@@ -1,5 +1,6 @@
 /** Shared presentational bits for the order list + detail pages. */
 import type { TFunction } from 'i18next'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { StatStrip, type StatStripItem, type StatStripTone } from '@/components/patterns/StatStrip'
 import type { OrderCategory, OrderStatus } from '@/modules/catering/orderTypes'
@@ -60,6 +61,25 @@ export function OrderCatBar({
         ) : null}
       </div>
     </div>
+  )
+}
+
+/** Stat value with a green up / red down arrow showing the change vs the comparison version. */
+export function StatTrendValue({ value, delta }: { value: number; delta: number | null }) {
+  return (
+    <span className="inline-flex items-baseline gap-1.5">
+      {value.toLocaleString()}
+      {delta != null && delta !== 0 ? (
+        <span
+          className={`inline-flex items-center gap-0.5 text-[11px] font-extrabold tnum ${
+            delta > 0 ? 'text-vj-green-dark' : 'text-vj-red-dark'
+          }`}
+        >
+          {delta > 0 ? <ArrowUp size={12} strokeWidth={3} /> : <ArrowDown size={12} strokeWidth={3} />}
+          {Math.abs(delta).toLocaleString()}
+        </span>
+      ) : null}
+    </span>
   )
 }
 

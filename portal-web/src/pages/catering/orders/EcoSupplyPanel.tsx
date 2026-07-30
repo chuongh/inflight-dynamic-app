@@ -9,14 +9,14 @@ import type { EcoSupplyGroupId, EcoSupplyLine } from '@/modules/catering/orderTy
 import { ECO_SUPPLY_GROUP_ORDER } from '@/modules/catering/supplier/ecoSupplyRegistry'
 
 /** Section header tint per category — reuses the Meal Catalog palette so the two screens read as one system. */
-const GROUP_STYLE: Record<EcoSupplyGroupId, { bg: string; color: string; border: string }> = {
+export const GROUP_STYLE: Record<EcoSupplyGroupId, { bg: string; color: string; border: string }> = {
   ...MEAL_CATEGORY_STYLE,
   amenity: { bg: '#EEF2FF', color: '#4338CA', border: '#C7D2FE' },
   amenity_composition: { bg: '#EEF2FF', color: '#4338CA', border: '#C7D2FE' },
   other: { bg: '#F8FAFC', color: '#64748B', border: '#E2E8F0' },
 }
 
-function groupLabel(t: TFunction, group: EcoSupplyGroupId | string): string {
+export function groupLabel(t: TFunction, group: EcoSupplyGroupId | string): string {
   const normalized = normalizeGroup(group)
   if (normalized === 'amenity') return t('catering.orders.supply.group.amenity')
   if (normalized === 'amenity_composition') {
@@ -46,13 +46,13 @@ function normalizeGroup(group: string): EcoSupplyGroupId {
 /**
  * Mirror the ECO / SBB Meal Catalog split. Category (main, vegetarian, bread,
  * drink, …) is a cross-cabin dimension — which cabin an item belongs to comes
- * from the line's own `cabinScope`, resolved from the catalog item. Lines with
- * no cabin (amenity / crew / other cross-cabin metrics) land in "other".
+ * from the line's own `cabinScopes`, resolved from the catalog item. An item
+ * shared by both catalogs shows under both cabin sections. Lines with no cabin
+ * (amenity / crew / other cross-cabin metrics) land in "other".
  */
 type CabinBucketId = 'eco' | 'sbb' | 'other'
 const CABIN_BUCKET_ORDER: readonly CabinBucketId[] = ['eco', 'sbb', 'other']
 
-/** Items shared by both catalogs (e.g. Bánh mì tròn & bơ) land in both buckets. */
 function bucketsOf(line: EcoSupplyLine): CabinBucketId[] {
   const scopes = line.cabinScopes
   if (!scopes || scopes.length === 0) return ['other']
@@ -71,6 +71,22 @@ const BUCKET_ICON: Record<CabinBucketId, typeof PlaneTakeoff> = {
   eco: PlaneTakeoff,
   sbb: Crown,
   other: PackageSearch,
+}
+
+/** Small +/− pill showing the change vs the comparison version. Renders nothing when unchanged. */
+export function DeltaChip({ value }: { value: number }) {
+  if (value === 0) return null
+  const up = value > 0
+  return (
+    <span
+      className={`tnum ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10.5px] font-extrabold ${
+        up ? 'bg-vj-green-muted text-vj-green-dark' : 'bg-vj-red-50 text-vj-red-dark'
+      }`}
+    >
+      {up ? '+' : ''}
+      {value.toLocaleString()}
+    </span>
+  )
 }
 
 function FormulaStatusTag({ line }: { line: EcoSupplyLine }) {
@@ -114,6 +130,8 @@ interface EcoSupplyPanelProps {
   onResetLine?: (lineId: string) => void
   /** Hide inner summary when page already shows StatStrip */
   compactSummary?: boolean
+  /** Effective qty of the comparison (previous) version, by field — null when there's nothing to compare against. */
+  prevQtyByField?: Record<string, number> | null
 }
 
 export function EcoSupplyPanel({
@@ -122,6 +140,7 @@ export function EcoSupplyPanel({
   onChangeQty,
   onResetLine,
   compactSummary = false,
+  prevQtyByField = null,
 }: EcoSupplyPanelProps) {
   const { t } = useTranslation()
 
@@ -212,11 +231,14 @@ export function EcoSupplyPanel({
                       <span className="eco-supply__section-dot" />
                       <h3>{groupLabel(t, group)}</h3>
                       <span className="eco-supply__section-total text-text-secondary tnum text-[11.5px] font-bold">
-                        {groupLines.length} · {groupTotal}
+                        {t('catering.orders.supply.sectionSkuCount', { n: groupLines.length })} ·{' '}
+                        {t('catering.orders.supply.sectionQty', { n: groupTotal.toLocaleString() })}
                       </span>
                     </header>
                     <ul className="eco-supply__list">
-                      {groupLines.map((line) => (
+                      {groupLines.map((line) => {
+                        const delta = prevQtyByField ? line.qty - (prevQtyByField[line.field] ?? 0) : null
+                        return (
                         <li key={line.id} className="eco-supply__row">
                           <div className="eco-supply__meta">
                             <div className="eco-supply__name">
@@ -227,6 +249,7 @@ export function EcoSupplyPanel({
                                   {t('catering.orders.supply.edited')}
                                 </Tag>
                               ) : null}
+                              {delta != null ? <DeltaChip value={delta} /> : null}
                             </div>
                             <div className="eco-supply__sub">
                               {line.productCode ? (
@@ -271,7 +294,8 @@ export function EcoSupplyPanel({
                             ) : null}
                           </div>
                         </li>
-                      ))}
+                        )
+                      })}
                     </ul>
                   </section>
                 )

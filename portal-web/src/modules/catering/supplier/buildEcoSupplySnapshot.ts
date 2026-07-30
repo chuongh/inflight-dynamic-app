@@ -12,7 +12,11 @@ import type { CrewMealProfile } from '../crewMealTypes'
 import { groupOrigin } from '../grouping'
 import type { DayGrouping } from '../groupingTypes'
 import { computeGroupCrewMeals } from '../groupCrewMeal'
-import type { EcoSupplyFlightBreakdown, EcoSupplyLine } from '../orderTypes'
+import type {
+  EcoSupplyFlightBreakdown,
+  EcoSupplyFlightLeg,
+  EcoSupplyLine,
+} from '../orderTypes'
 import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
 import { buildEcoSupplierRow } from './ecoBuilder'
 import {
@@ -154,7 +158,22 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
   >()
 
   const packageTotals = new Map<number, number>()
-  const byFlight: EcoSupplyFlightBreakdown[] = []
+  const amenityConfigForPackages = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG
+  const packageDefsEarly = new Map(amenityConfigForPackages.packages.map((p) => [p.id, p]))
+  const packageLabel = (packageId: number): string => {
+    const def = packageDefsEarly.get(packageId)
+    const idLabel = String(packageId).padStart(2, '0')
+    return def ? `Gói ${idLabel} · ${def.label}` : `Gói ${idLabel}`
+  }
+
+  /** Legs of the same confirmed FlightGroup merge into one by-flight card. */
+  interface GroupBucket {
+    legs: EcoSupplyFlightLeg[]
+    cells: Record<string, number>
+    quotaCommercial: number
+    packageCounts: Map<number, number>
+  }
+  const groupBuckets = new Map<string, GroupBucket>()
 
   for (const input of inputs) {
     const row = buildEcoSupplierRow(
@@ -171,12 +190,22 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
       quantityConfig,
     )
 
-    byFlight.push({
-      flightNo: row.flightNo,
-      dep: row.dep,
-      arr: row.arr,
-      cells: flightCellsFromRow(row),
-    })
+    const groupId = input.groupId ?? row.flightNo
+    const bucket: GroupBucket = groupBuckets.get(groupId) ?? {
+      legs: [],
+      cells: {},
+      quotaCommercial: 0,
+      packageCounts: new Map(),
+    }
+    bucket.legs.push({ flightNo: row.flightNo, dep: row.dep, arr: row.arr })
+    for (const [field, qty] of Object.entries(flightCellsFromRow(row))) {
+      bucket.cells[field] = (bucket.cells[field] ?? 0) + qty
+    }
+    bucket.quotaCommercial += input.quotaCommercial ?? 0
+    for (const packageId of row.amenityPackageIds) {
+      bucket.packageCounts.set(packageId, (bucket.packageCounts.get(packageId) ?? 0) + 1)
+    }
+    groupBuckets.set(groupId, bucket)
 
     for (const def of ECO_SUPPLY_FIELDS) {
       const cell = row.cells[def.field]
@@ -203,8 +232,19 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
     }
   }
 
-  const amenityConfig = quantityConfig?.amenity ?? DEFAULT_ECO_AMENITY_CONFIG
-  const packageDefs = new Map(amenityConfig.packages.map((p) => [p.id, p]))
+  const byFlight: EcoSupplyFlightBreakdown[] = [...groupBuckets].map(([groupId, bucket]) => ({
+    groupId,
+    legs: bucket.legs,
+    cells: bucket.cells,
+    quotaCommercial: bucket.quotaCommercial,
+    amenityPackages: [...bucket.packageCounts].map(([id, count]) => ({
+      id,
+      label: packageLabel(id),
+      count,
+    })),
+  }))
+
+  const packageDefs = packageDefsEarly
 
   const lines: EcoSupplyLine[] = []
   for (const def of ECO_SUPPLY_FIELDS) {

@@ -3,9 +3,10 @@ import { Button, Empty, Input, InputNumber } from 'antd'
 import { ChevronDown, PlaneTakeoff, RotateCcw, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { CSSProperties } from 'react'
 import type { EcoSupplyFlightBreakdown, EcoSupplyGroupId, EcoSupplyLine } from '@/modules/catering/orderTypes'
 import { ECO_SUPPLY_FIELDS, ECO_SUPPLY_GROUP_ORDER, ecoSupplyFieldDisplayName } from '@/modules/catering/supplier/ecoSupplyRegistry'
-import { groupLabel } from './EcoSupplyPanel'
+import { DeltaChip, GROUP_STYLE, groupLabel } from './EcoSupplyPanel'
 
 /** Passenger-count metrics shown in the flight header — not repeated in the item list. */
 const HEADER_TOTAL_FIELDS = new Set(['prebook', 'skyboss'])
@@ -19,6 +20,8 @@ interface FlightBreakdownPanelProps {
   edits?: Record<string, Record<string, number>>
   onChangeQty?: (groupId: string, field: string, qty: number) => void
   onResetField?: (groupId: string, field: string) => void
+  /** Effective qty of the comparison (previous) version, by groupId → field — null when there's nothing to compare against. */
+  prevByFlightCells?: Record<string, Record<string, number>> | null
 }
 
 interface FlightItem {
@@ -31,6 +34,8 @@ interface FlightItem {
   group: EcoSupplyGroupId
   /** Overrides the registry display name — used for synthetic fields (e.g. amenity packages) not in ECO_SUPPLY_FIELDS. */
   label?: string
+  /** Change vs the comparison version's effective qty for this group+field — null when there's nothing to compare against. */
+  delta: number | null
 }
 
 function itemDisplayName(item: FlightItem): string {
@@ -44,6 +49,7 @@ export function FlightBreakdownPanel({
   edits,
   onChangeQty,
   onResetField,
+  prevByFlightCells = null,
 }: FlightBreakdownPanelProps) {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
@@ -61,24 +67,30 @@ export function FlightBreakdownPanel({
           const prebook = f.cells.prebook ?? 0
           const skyboss = f.cells.skyboss ?? 0
           const commercial = f.quotaCommercial ?? 0
+          const prevCells = prevByFlightCells?.[f.groupId]
+          const deltaOf = (field: string, qty: number): number | null =>
+            prevByFlightCells ? qty - (prevCells?.[field] ?? 0) : null
           const fieldItems: FlightItem[] = Object.entries(f.cells)
             .filter(([field, qty]) => qty > 0 && !HEADER_TOTAL_FIELDS.has(field))
             .map(([field, raw]) => {
               const overridden = field in groupEdits
-              return { field, raw, qty: overridden ? groupEdits[field] : raw, overridden, group: getGroup(field) }
+              const qty = overridden ? groupEdits[field] : raw
+              return { field, raw, qty, overridden, group: getGroup(field), delta: deltaOf(field, qty) }
             })
           const packageItems: FlightItem[] = (f.amenityPackages ?? [])
             .filter((p) => p.count > 0)
             .map((p) => {
               const field = `amenityPackage${p.id}`
               const overridden = field in groupEdits
+              const qty = overridden ? groupEdits[field] : p.count
               return {
                 field,
                 raw: p.count,
-                qty: overridden ? groupEdits[field] : p.count,
+                qty,
                 overridden,
                 group: 'amenity_composition' as const,
                 label: p.label,
+                delta: deltaOf(field, qty),
               }
             })
           const items = [...fieldItems, ...packageItems].sort((a, b) =>
@@ -88,7 +100,7 @@ export function FlightBreakdownPanel({
         })
         .filter((f) => f.items.length > 0 || f.prebook > 0 || f.skyboss > 0 || f.commercial > 0),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [byFlight, edits, lines],
+    [byFlight, edits, lines, prevByFlightCells],
   )
 
   const filtered = useMemo(() => {
@@ -191,63 +203,81 @@ export function FlightBreakdownPanel({
                 </div>
 
                 {open ? (
-                  <div className="border-border border-t bg-[#FCFDFE] px-4 py-3.5">
+                  <div className="border-border bg-vj-canvas border-t px-4 py-3.5">
                     {f.items.length === 0 ? (
                       <p className="text-text-muted m-0 text-[12px]">
                         {t('catering.orders.byFlight.noDetailItems')}
                       </p>
                     ) : (
-                      <div className="flex flex-col gap-3">
+                      <div className="eco-supply__grid !p-0">
                         {groups.map((group) => {
                           const groupItems = f.items.filter((i) => i.group === group)
                           const groupTotal = groupItems.reduce((s, i) => s + i.qty, 0)
+                          const style = GROUP_STYLE[group]
                           return (
-                            <div key={group}>
-                              <div className="mb-1 flex items-baseline justify-between gap-2">
-                                <h4 className="order-section-label">{groupLabel(t, group)}</h4>
-                                <span className="text-text-secondary tnum text-[11px] font-bold">
+                            <section key={group} className="eco-supply__section">
+                              <header
+                                className="eco-supply__section-head"
+                                style={
+                                  {
+                                    '--section-bg': style.bg,
+                                    '--section-color': style.color,
+                                    '--section-dot': style.color,
+                                  } as CSSProperties
+                                }
+                              >
+                                <span className="eco-supply__section-dot" />
+                                <h3>{groupLabel(t, group)}</h3>
+                                <span className="eco-supply__section-total text-text-secondary tnum text-[11px] font-bold">
                                   {t('catering.orders.byFlight.groupSkuCount', { n: groupItems.length })} ·{' '}
                                   {t('catering.orders.byFlight.groupQty', { n: groupTotal.toLocaleString() })}
                                 </span>
-                              </div>
-                              <ul className="m-0 list-none p-0">
+                              </header>
+                              <ul className="eco-supply__list">
                                 {groupItems.map((item) => (
-                                  <li
-                                    key={item.field}
-                                    className="border-border flex items-center justify-between gap-3 border-b border-dashed py-1.5 text-[13px] last:border-b-0"
-                                  >
-                                    <span className="text-text-secondary font-semibold">
-                                      {itemDisplayName(item)}
-                                    </span>
-                                    {editable ? (
-                                      <div className="flex items-center gap-1">
-                                        <InputNumber
-                                          min={0}
-                                          size="small"
-                                          value={item.qty}
-                                          className="!w-[76px]"
-                                          onChange={(v) => {
-                                            if (v == null || !Number.isFinite(v)) return
-                                            onChangeQty?.(f.groupId, item.field, Math.max(0, Math.round(v)))
-                                          }}
-                                        />
-                                        {item.overridden ? (
-                                          <Button
-                                            type="text"
-                                            size="small"
-                                            icon={<RotateCcw size={13} />}
-                                            aria-label={t('catering.orders.supply.reset')}
-                                            onClick={() => onResetField?.(f.groupId, item.field)}
-                                          />
-                                        ) : null}
+                                  <li key={item.field} className="eco-supply__row">
+                                    <div className="eco-supply__meta">
+                                      <div className="eco-supply__name">
+                                        {itemDisplayName(item)}
+                                        {item.delta != null ? <DeltaChip value={item.delta} /> : null}
                                       </div>
-                                    ) : (
-                                      <span className="font-extrabold tnum">{item.qty.toLocaleString()}</span>
-                                    )}
+                                    </div>
+                                    <div className="eco-supply__qty">
+                                      {editable ? (
+                                        <div className="eco-supply__qty-edit">
+                                          <InputNumber
+                                            min={0}
+                                            size="small"
+                                            value={item.qty}
+                                            className="!w-[76px]"
+                                            onChange={(v) => {
+                                              if (v == null || !Number.isFinite(v)) return
+                                              onChangeQty?.(f.groupId, item.field, Math.max(0, Math.round(v)))
+                                            }}
+                                          />
+                                          {item.overridden ? (
+                                            <Button
+                                              type="text"
+                                              size="small"
+                                              icon={<RotateCcw size={13} />}
+                                              aria-label={t('catering.orders.supply.reset')}
+                                              onClick={() => onResetField?.(f.groupId, item.field)}
+                                            />
+                                          ) : null}
+                                        </div>
+                                      ) : (
+                                        <span className="eco-supply__qty-value tnum">{item.qty.toLocaleString()}</span>
+                                      )}
+                                      {item.overridden && item.qty !== item.raw ? (
+                                        <span className="eco-supply__suggested tnum">
+                                          {t('catering.orders.supply.suggested', { n: item.raw })}
+                                        </span>
+                                      ) : null}
+                                    </div>
                                   </li>
                                 ))}
                               </ul>
-                            </div>
+                            </section>
                           )
                         })}
                       </div>

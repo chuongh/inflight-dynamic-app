@@ -26,6 +26,7 @@ const COMBO_EXCEL_NAMES = new Set([
 /** Approved display name → Excel product code. */
 const ALIAS_MAP = {
   'Bánh chưng chà bông': 'HM8',
+  'Bánh mì': '40000294',
   'Bánh mì Việt Nam': 'SBB12',
   'Bún xào Singapore': 'HM6',
   'Bún xào chay Business': 'SBB25',
