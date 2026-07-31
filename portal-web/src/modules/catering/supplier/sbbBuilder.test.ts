@@ -14,6 +14,8 @@ describe('SBB route selection', () => {
     expect(selectSbbRouteSheet('SGN', 'NRT', 'vegetarian')).toBe('CHAY(VIỆT-HÀN-NHẬT)')
     expect(selectSbbRouteSheet('SGN', 'DEL')).toBe('ẤN')
     expect(selectSbbRouteSheet('SGN', 'MEL')).toBe('ÚC&KAZ')
+    expect(selectSbbRouteSheet('SGN', 'PQC')).toBe('SGN-PQC')
+    expect(selectSbbRouteSheet('PQC', 'SGN')).toBe('SGN-PQC')
   })
 
   it('uses configurable STD/ARR bindings when provided', () => {
@@ -24,6 +26,26 @@ describe('SBB route selection', () => {
     expect(selectSbbRouteSheet('SGN', 'DEL', 'standard', bindings)).toBe('ẤN')
     expect(selectSbbRouteSheet('SGN', 'ICN', 'standard', bindings)).toBe('ÚC&KAZ')
     expect(selectSbbRouteSheet('SGN', 'MEL', 'standard', bindings)).toBe('VIET-HAN-NHAT')
+  })
+
+  it('resolves sheet from linked route groups', () => {
+    const bindings = {
+      ẤN: { routeGroupIds: ['IN'], priority: 10 },
+      'ÚC&KAZ': { routeGroupIds: ['AU', 'KAZ'], priority: 20 },
+      'VIET-HAN-NHAT': { routeGroupIds: ['KR_JP'], priority: 50 },
+    }
+    const routeGroups = [
+      { id: 'IN', label: 'Ấn', airports: ['DEL'] },
+      { id: 'AU', label: 'Úc', airports: ['MEL'] },
+      { id: 'KAZ', label: 'KAZ', airports: ['ALA'] },
+      { id: 'KR_JP', label: 'Hàn/Nhật', airports: ['ICN', 'KIX', 'NRT', 'PUS'] },
+    ]
+    expect(selectSbbRouteSheet('SGN', 'DEL', 'standard', bindings, routeGroups)).toBe('ẤN')
+    expect(selectSbbRouteSheet('SGN', 'MEL', 'standard', bindings, routeGroups)).toBe('ÚC&KAZ')
+    expect(selectSbbRouteSheet('SGN', 'ICN', 'standard', bindings, routeGroups)).toBe('VIET-HAN-NHAT')
+    expect(selectSbbRouteSheet('SGN', 'KIX', 'standard', bindings, routeGroups)).toBe('VIET-HAN-NHAT')
+    expect(selectSbbRouteSheet('SGN', 'PUS', 'standard', bindings, routeGroups)).toBe('VIET-HAN-NHAT')
+    expect(selectSbbRouteSheet('SGN', 'HAN', 'standard', bindings, routeGroups)).toBe('VIET-HAN-NHAT')
   })
 })
 

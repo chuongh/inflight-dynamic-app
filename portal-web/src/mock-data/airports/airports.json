@@ -1,32 +1,190 @@
 [
   {
-    "code": "SGN",
-    "icao": "VVTS",
-    "name": "Tân Sơn Nhất",
-    "city": "TP. Hồ Chí Minh",
+    "code": "ADL",
+    "icao": "YPAD",
+    "name": "Adelaide",
+    "city": "Adelaide",
+    "country": "Úc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "ALA",
+    "icao": "UAAA",
+    "name": "Almaty",
+    "city": "Almaty",
+    "country": "Kazakhstan",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "AMD",
+    "icao": "VAAH",
+    "name": "Sardar Vallabhbhai Patel",
+    "city": "Ahmedabad",
+    "country": "Ấn Độ",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "BKK",
+    "icao": "VTBS",
+    "name": "Suvarnabhumi",
+    "city": "Bangkok",
+    "country": "Thái Lan",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "BLR",
+    "icao": "VOBL",
+    "name": "Kempegowda",
+    "city": "Bengaluru",
+    "country": "Ấn Độ",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "BMV",
+    "icao": "VVBM",
+    "name": "Buôn Ma Thuột",
+    "city": "Đắk Lắk",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "BNE",
+    "icao": "YBBN",
+    "name": "Brisbane",
+    "city": "Brisbane",
+    "country": "Úc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "BOM",
+    "icao": "VABB",
+    "name": "Chhatrapati Shivaji Maharaj",
+    "city": "Mumbai",
+    "country": "Ấn Độ",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "CAN",
+    "icao": "ZGGG",
+    "name": "Baiyun",
+    "city": "Guangzhou",
+    "country": "Trung Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "CGK",
+    "icao": "WIII",
+    "name": "Soekarno-Hatta",
+    "city": "Jakarta",
+    "country": "Indonesia",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "COK",
+    "icao": "VOCI",
+    "name": "Cochin",
+    "city": "Kochi",
+    "country": "Ấn Độ",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "CXR",
+    "icao": "VVCR",
+    "name": "Cam Ranh",
+    "city": "Khánh Hòa",
     "country": "Việt Nam",
     "kind": "international",
     "hasCatering": true,
     "status": "active",
-    "note": "Sân bay pilot MVP.",
-    "map": {
-      "published": true,
-      "version": 3,
-      "points": [
-        { "id": "sgn-p1", "name": "Cổng A1", "type": "gate" },
-        { "id": "sgn-p2", "name": "Sân đỗ 12", "type": "apron" },
-        { "id": "sgn-p3", "name": "Crew Center", "type": "crew_center" },
-        { "id": "sgn-p4", "name": "Cargo Terminal", "type": "cargo" },
-        { "id": "sgn-p5", "name": "Hangar 2", "type": "hangar" }
-      ],
-      "zones": [
-        { "id": "sgn-z1", "name": "Zone Apron Bắc", "allowedVehicles": "Xe thang, xe suất ăn" },
-        { "id": "sgn-z2", "name": "Zone Cổng nội địa", "allowedVehicles": "Xe điện chở khách" },
-        { "id": "sgn-z3", "name": "Zone Kỹ thuật", "allowedVehicles": "Hạn chế an toàn" },
-        { "id": "sgn-z4", "name": "Zone Cargo", "allowedVehicles": "Xe tải hàng" }
-      ]
-    },
-    "updatedAt": 1751328000000
+    "updatedAt": 1751068800000
+  },
+  {
+    "code": "DAD",
+    "icao": "VVDN",
+    "name": "Đà Nẵng",
+    "city": "Đà Nẵng",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "updatedAt": 1751155200000
+  },
+  {
+    "code": "DEL",
+    "icao": "VIDP",
+    "name": "Indira Gandhi",
+    "city": "Delhi",
+    "country": "Ấn Độ",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "DLI",
+    "icao": "VVDL",
+    "name": "Liên Khương",
+    "city": "Lâm Đồng",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": true,
+    "status": "active",
+    "updatedAt": 1750723200000
+  },
+  {
+    "code": "DPS",
+    "icao": "WADD",
+    "name": "Ngurah Rai",
+    "city": "Denpasar",
+    "country": "Indonesia",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "ENH",
+    "icao": "ZHES",
+    "name": "Enshi",
+    "city": "Enshi",
+    "country": "Trung Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
   },
   {
     "code": "HAN",
@@ -41,72 +199,74 @@
       "published": true,
       "version": 2,
       "points": [
-        { "id": "han-p1", "name": "Cổng B4", "type": "gate" },
-        { "id": "han-p2", "name": "Sân đỗ 8", "type": "apron" },
-        { "id": "han-p3", "name": "Crew Center", "type": "crew_center" }
+        {
+          "id": "han-p1",
+          "name": "Cổng B4",
+          "type": "gate"
+        },
+        {
+          "id": "han-p2",
+          "name": "Sân đỗ 8",
+          "type": "apron"
+        },
+        {
+          "id": "han-p3",
+          "name": "Crew Center",
+          "type": "crew_center"
+        }
       ],
       "zones": [
-        { "id": "han-z1", "name": "Zone Apron", "allowedVehicles": "Xe thang, xe suất ăn" },
-        { "id": "han-z2", "name": "Zone Cổng quốc tế", "allowedVehicles": "Xe điện chở khách" },
-        { "id": "han-z3", "name": "Zone Kỹ thuật", "allowedVehicles": "Hạn chế an toàn" }
+        {
+          "id": "han-z1",
+          "name": "Zone Apron",
+          "allowedVehicles": "Xe thang, xe suất ăn"
+        },
+        {
+          "id": "han-z2",
+          "name": "Zone Cổng quốc tế",
+          "allowedVehicles": "Xe điện chở khách"
+        },
+        {
+          "id": "han-z3",
+          "name": "Zone Kỹ thuật",
+          "allowedVehicles": "Hạn chế an toàn"
+        }
       ]
     },
     "updatedAt": 1751241600000
   },
   {
-    "code": "DAD",
-    "icao": "VVDN",
-    "name": "Đà Nẵng",
-    "city": "Đà Nẵng",
-    "country": "Việt Nam",
+    "code": "HKG",
+    "icao": "VHHH",
+    "name": "Hong Kong",
+    "city": "Hong Kong",
+    "country": "Hồng Kông",
     "kind": "international",
-    "hasCatering": true,
+    "hasCatering": false,
     "status": "active",
-    "updatedAt": 1751155200000
+    "updatedAt": 1785473969936
   },
   {
-    "code": "CXR",
-    "icao": "VVCR",
-    "name": "Cam Ranh",
-    "city": "Khánh Hòa",
-    "country": "Việt Nam",
+    "code": "HKT",
+    "icao": "VTSP",
+    "name": "Phuket",
+    "city": "Phuket",
+    "country": "Thái Lan",
     "kind": "international",
-    "hasCatering": true,
+    "hasCatering": false,
     "status": "active",
-    "updatedAt": 1751068800000
+    "updatedAt": 1785473969936
   },
   {
-    "code": "PQC",
-    "icao": "VVPQ",
-    "name": "Phú Quốc",
-    "city": "Kiên Giang",
-    "country": "Việt Nam",
+    "code": "HND",
+    "icao": "RJTT",
+    "name": "Haneda",
+    "city": "Tokyo",
+    "country": "Nhật Bản",
     "kind": "international",
-    "hasCatering": true,
+    "hasCatering": false,
     "status": "active",
-    "updatedAt": 1750982400000
-  },
-  {
-    "code": "VCA",
-    "icao": "VVCT",
-    "name": "Cần Thơ",
-    "city": "Cần Thơ",
-    "country": "Việt Nam",
-    "kind": "international",
-    "hasCatering": true,
-    "status": "active",
-    "updatedAt": 1784112581000
-  },
-  {
-    "code": "VII",
-    "icao": "VVVH",
-    "name": "Vinh",
-    "city": "Nghệ An",
-    "country": "Việt Nam",
-    "kind": "domestic",
-    "hasCatering": true,
-    "status": "active",
-    "updatedAt": 1750896000000
+    "updatedAt": 1785473969936
   },
   {
     "code": "HPH",
@@ -120,15 +280,26 @@
     "updatedAt": 1750809600000
   },
   {
-    "code": "DLI",
-    "icao": "VVDL",
-    "name": "Liên Khương",
-    "city": "Lâm Đồng",
+    "code": "HUI",
+    "icao": "VVPB",
+    "name": "Phú Bài",
+    "city": "Huế",
     "country": "Việt Nam",
     "kind": "domestic",
-    "hasCatering": true,
+    "hasCatering": false,
     "status": "active",
-    "updatedAt": 1750723200000
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "HYD",
+    "icao": "VOHS",
+    "name": "Rajiv Gandhi",
+    "city": "Hyderabad",
+    "country": "Ấn Độ",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
   },
   {
     "code": "ICN",
@@ -142,6 +313,313 @@
     "updatedAt": 1750636800000
   },
   {
+    "code": "KHH",
+    "icao": "RCKH",
+    "name": "Kaohsiung",
+    "city": "Kaohsiung",
+    "country": "Đài Loan",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "KIX",
+    "icao": "RJBB",
+    "name": "Kansai",
+    "city": "Osaka",
+    "country": "Nhật Bản",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "KUL",
+    "icao": "WMKK",
+    "name": "Kuala Lumpur",
+    "city": "Kuala Lumpur",
+    "country": "Malaysia",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "KWL",
+    "icao": "ZGKL",
+    "name": "Liangjiang",
+    "city": "Guilin",
+    "country": "Trung Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "LJG",
+    "icao": "ZPLJ",
+    "name": "Sanyi",
+    "city": "Lijiang",
+    "country": "Trung Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "MEL",
+    "icao": "YMML",
+    "name": "Melbourne",
+    "city": "Melbourne",
+    "country": "Úc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "MNL",
+    "icao": "RPLL",
+    "name": "Ninoy Aquino",
+    "city": "Manila",
+    "country": "Philippines",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "NQZ",
+    "icao": "UACC",
+    "name": "Nursultan Nazarbayev",
+    "city": "Astana",
+    "country": "Kazakhstan",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "NRT",
+    "icao": "RJAA",
+    "name": "Narita",
+    "city": "Tokyo",
+    "country": "Nhật Bản",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "OVB",
+    "icao": "UNNT",
+    "name": "Tolmachevo",
+    "city": "Novosibirsk",
+    "country": "Nga",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "PER",
+    "icao": "YPPH",
+    "name": "Perth",
+    "city": "Perth",
+    "country": "Úc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "PKX",
+    "icao": "ZBAD",
+    "name": "Daxing",
+    "city": "Beijing",
+    "country": "Trung Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "PQC",
+    "icao": "VVPQ",
+    "name": "Phú Quốc",
+    "city": "Kiên Giang",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "updatedAt": 1750982400000
+  },
+  {
+    "code": "PUS",
+    "icao": "RKPK",
+    "name": "Gimhae",
+    "city": "Busan",
+    "country": "Hàn Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "PVG",
+    "icao": "ZSPD",
+    "name": "Pudong",
+    "city": "Shanghai",
+    "country": "Trung Quốc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "PXU",
+    "icao": "VVPK",
+    "name": "Pleiku",
+    "city": "Gia Lai",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "RMQ",
+    "icao": "RCMQ",
+    "name": "Taichung",
+    "city": "Taichung",
+    "country": "Đài Loan",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "SGN",
+    "icao": "VVTS",
+    "name": "Tân Sơn Nhất",
+    "city": "TP. Hồ Chí Minh",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "note": "Sân bay pilot MVP.",
+    "map": {
+      "published": true,
+      "version": 3,
+      "points": [
+        {
+          "id": "sgn-p1",
+          "name": "Cổng A1",
+          "type": "gate"
+        },
+        {
+          "id": "sgn-p2",
+          "name": "Sân đỗ 12",
+          "type": "apron"
+        },
+        {
+          "id": "sgn-p3",
+          "name": "Crew Center",
+          "type": "crew_center"
+        },
+        {
+          "id": "sgn-p4",
+          "name": "Cargo Terminal",
+          "type": "cargo"
+        },
+        {
+          "id": "sgn-p5",
+          "name": "Hangar 2",
+          "type": "hangar"
+        }
+      ],
+      "zones": [
+        {
+          "id": "sgn-z1",
+          "name": "Zone Apron Bắc",
+          "allowedVehicles": "Xe thang, xe suất ăn"
+        },
+        {
+          "id": "sgn-z2",
+          "name": "Zone Cổng nội địa",
+          "allowedVehicles": "Xe điện chở khách"
+        },
+        {
+          "id": "sgn-z3",
+          "name": "Zone Kỹ thuật",
+          "allowedVehicles": "Hạn chế an toàn"
+        },
+        {
+          "id": "sgn-z4",
+          "name": "Zone Cargo",
+          "allowedVehicles": "Xe tải hàng"
+        }
+      ]
+    },
+    "updatedAt": 1751328000000
+  },
+  {
+    "code": "SIN",
+    "icao": "WSSS",
+    "name": "Changi",
+    "city": "Singapore",
+    "country": "Singapore",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "SVO",
+    "icao": "UUEE",
+    "name": "Sheremetyevo",
+    "city": "Moscow",
+    "country": "Nga",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "SYD",
+    "icao": "YSSY",
+    "name": "Sydney",
+    "city": "Sydney",
+    "country": "Úc",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "THD",
+    "icao": "VVTX",
+    "name": "Thọ Xuân",
+    "city": "Thanh Hóa",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "TPE",
+    "icao": "RCTP",
+    "name": "Taoyuan",
+    "city": "Taipei",
+    "country": "Đài Loan",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
     "code": "UIH",
     "icao": "VVPC",
     "name": "Phù Cát",
@@ -151,5 +629,82 @@
     "hasCatering": false,
     "status": "draft",
     "updatedAt": 1750550400000
+  },
+  {
+    "code": "VCA",
+    "icao": "VVCT",
+    "name": "Cần Thơ",
+    "city": "Cần Thơ",
+    "country": "Việt Nam",
+    "kind": "international",
+    "hasCatering": true,
+    "status": "active",
+    "updatedAt": 1784112581000
+  },
+  {
+    "code": "VCL",
+    "icao": "VVCA",
+    "name": "Chu Lai",
+    "city": "Quảng Nam",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "VCS",
+    "icao": "VVCS",
+    "name": "Côn Đảo",
+    "city": "Bà Rịa-Vũng Tàu",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "VDH",
+    "icao": "VVDL",
+    "name": "Đồng Hới",
+    "city": "Quảng Bình",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "VII",
+    "icao": "VVVH",
+    "name": "Vinh",
+    "city": "Nghệ An",
+    "country": "Việt Nam",
+    "kind": "domestic",
+    "hasCatering": true,
+    "status": "active",
+    "updatedAt": 1750896000000
+  },
+  {
+    "code": "VTE",
+    "icao": "VLVT",
+    "name": "Wattay",
+    "city": "Vientiane",
+    "country": "Lào",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
+  },
+  {
+    "code": "VVO",
+    "icao": "UHWW",
+    "name": "Vladivostok",
+    "city": "Vladivostok",
+    "country": "Nga",
+    "kind": "international",
+    "hasCatering": false,
+    "status": "active",
+    "updatedAt": 1785473969936
   }
 ]

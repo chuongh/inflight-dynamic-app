@@ -35,14 +35,16 @@ interface FlightItem {
   productCode: string | null
   /** Catalog unit from the matching order-level line. */
   unit: string | null
-  /** Overrides the registry display name — used for synthetic fields (e.g. amenity packages) not in ECO_SUPPLY_FIELDS. */
+  /** Catalog-resolved display name from the matching order-level line (same source as Supply Breakdown). */
+  name: string
+  /** Overrides the catalog name — used for synthetic fields (e.g. amenity packages) not in ECO_SUPPLY_FIELDS. */
   label?: string
   /** Change vs the comparison version's effective qty for this group+field — null when there's nothing to compare against. */
   delta: number | null
 }
 
 function itemDisplayName(item: FlightItem): string {
-  return item.label ?? ecoSupplyFieldDisplayName(item.field)
+  return item.label ?? item.name
 }
 
 export function FlightBreakdownPanel({
@@ -63,7 +65,7 @@ export function FlightBreakdownPanel({
       new Map(
         lines.map((l) => [
           l.field,
-          { group: l.group, productCode: l.productCode, unit: l.unit } as const,
+          { group: l.group, productCode: l.productCode, unit: l.unit, name: l.name } as const,
         ]),
       ),
     [lines],
@@ -72,6 +74,10 @@ export function FlightBreakdownPanel({
     fieldMetaMap.get(field)?.group ?? ECO_SUPPLY_FIELDS.find((f) => f.field === field)?.group ?? 'other'
   const getProductCode = (field: string): string | null => fieldMetaMap.get(field)?.productCode ?? null
   const getUnit = (field: string): string | null => fieldMetaMap.get(field)?.unit ?? null
+  // Prefer the catalog-resolved name (same source as Supply Breakdown); the
+  // registry's fallbackNameVi only applies when this field isn't on any line yet.
+  const getName = (field: string): string =>
+    fieldMetaMap.get(field)?.name || ecoSupplyFieldDisplayName(field)
 
   const flights = useMemo(
     () =>
@@ -81,6 +87,10 @@ export function FlightBreakdownPanel({
           const prebook = f.cells.prebook ?? 0
           const skyboss = f.cells.skyboss ?? 0
           const commercial = f.quotaCommercial ?? 0
+          const commercialBanhMi = f.quotaBanhMi ?? f.cells.banhMiCommercial ?? 0
+          const commercialTraSua = f.quotaTraSua ?? f.cells.traSuaCommercial ?? 0
+          const hasCommercialMeal =
+            commercial > 0 || commercialBanhMi > 0 || commercialTraSua > 0
           const prevCells = prevByFlightCells?.[f.groupId]
           const deltaOf = (field: string, qty: number): number | null =>
             prevByFlightCells ? qty - (prevCells?.[field] ?? 0) : null
@@ -97,6 +107,7 @@ export function FlightBreakdownPanel({
                 group: getGroup(field),
                 productCode: getProductCode(field),
                 unit: getUnit(field),
+                name: getName(field),
                 delta: deltaOf(field, qty),
               }
             })
@@ -114,6 +125,7 @@ export function FlightBreakdownPanel({
                 group: 'amenity_composition' as const,
                 productCode: getProductCode(field),
                 unit: getUnit(field),
+                name: getName(field),
                 label: p.label,
                 delta: deltaOf(field, qty),
               }
@@ -121,9 +133,26 @@ export function FlightBreakdownPanel({
           const items = [...fieldItems, ...packageItems].sort((a, b) =>
             itemDisplayName(a).localeCompare(itemDisplayName(b), 'vi'),
           )
-          return { ...f, prebook, skyboss, commercial, items }
+          return {
+            ...f,
+            prebook,
+            skyboss,
+            commercial,
+            commercialBanhMi,
+            commercialTraSua,
+            hasCommercialMeal,
+            items,
+          }
         })
-        .filter((f) => f.items.length > 0 || f.prebook > 0 || f.skyboss > 0 || f.commercial > 0),
+        .filter(
+          (f) =>
+            f.items.length > 0 ||
+            f.prebook > 0 ||
+            f.skyboss > 0 ||
+            f.commercial > 0 ||
+            f.commercialBanhMi > 0 ||
+            f.commercialTraSua > 0,
+        ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [byFlight, edits, lines, prevByFlightCells],
   )
@@ -189,7 +218,10 @@ export function FlightBreakdownPanel({
             const stationChain = [f.legs[0]?.dep, ...f.legs.map((l) => l.arr)].filter(Boolean).join(' → ')
             const open = openCards.has(f.groupId)
             return (
-              <article key={f.groupId} className="eco-flight-card">
+              <article
+                key={f.groupId}
+                className={`eco-flight-card${f.hasCommercialMeal ? ' eco-flight-card--commercial' : ''}`}
+              >
                 <div
                   role="button"
                   tabIndex={0}
@@ -208,7 +240,14 @@ export function FlightBreakdownPanel({
                   </span>
 
                   <div className="min-w-0">
-                    <div className="truncate text-[15px] font-extrabold">{flightNos}</div>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <div className="truncate text-[15px] font-extrabold">{flightNos}</div>
+                      {f.hasCommercialMeal ? (
+                        <span className="eco-flight-card__commercial-badge">
+                          {t('catering.orders.byFlight.commercialBadge')}
+                        </span>
+                      ) : null}
+                    </div>
                     <div className="text-text-secondary truncate text-[12px] font-semibold">{stationChain}</div>
                   </div>
 
@@ -218,7 +257,7 @@ export function FlightBreakdownPanel({
                     <HeaderStat
                       label={t('catering.orders.byFlight.commercial')}
                       value={f.commercial}
-                      accent
+                      accent={f.hasCommercialMeal}
                     />
                   </div>
 

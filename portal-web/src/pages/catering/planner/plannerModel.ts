@@ -1,5 +1,6 @@
 import type { AmenityCatalogItem, MealCatalogItem } from '@/modules/catering/catalogTypes'
 import { buildEcoSupplierRow } from '@/modules/catering/supplier/ecoBuilder'
+import type { SupplierRouteGroup } from '@/modules/catering/supplier/ecoQuantityTypes'
 import { buildSbbSupplierRow } from '@/modules/catering/supplier/sbbBuilder'
 import {
   parseEcoRouteRuleDataset,
@@ -395,13 +396,14 @@ export function buildPlannerWorkspace(
   flightInput: unknown,
   ecoRouteRules: unknown,
   sbbLookups: unknown,
+  routeGroups: SupplierRouteGroup[] = [],
 ): PlannerWorkspace {
   const inputs = parsePlannerFlights(flightInput)
   const parsedEcoRules = cachedEcoRules(ecoRouteRules)
   const parsedSbbLookups = cachedSbbLookups(sbbLookups)
   const flights = inputs.map((input): PlannerFlight => {
     const eco = buildEcoSupplierRow(toEcoInput(input), parsedEcoRules)
-    const sbb = buildSbbSupplierRow(input, parsedSbbLookups)
+    const sbb = buildSbbSupplierRow(input, parsedSbbLookups, routeGroups)
     return {
       key: eco.key,
       input,

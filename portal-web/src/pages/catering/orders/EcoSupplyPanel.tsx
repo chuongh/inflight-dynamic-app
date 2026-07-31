@@ -22,6 +22,7 @@ export const GROUP_STYLE: Record<EcoSupplyGroupId, { color: string }> = {
   drink: { color: MEAL_CATEGORY_STYLE.drink.color },
   snack: { color: MEAL_CATEGORY_STYLE.snack.color },
   condiment: { color: MEAL_CATEGORY_STYLE.condiment.color },
+  commercial: { color: '#B45309' },
   amenity: { color: '#4338CA' },
   amenity_composition: { color: '#4338CA' },
   other: { color: '#4338CA' },
@@ -33,6 +34,7 @@ export function groupLabel(t: TFunction, group: EcoSupplyGroupId | string): stri
   if (normalized === 'amenity_composition') {
     return t('catering.orders.supply.group.amenity_composition')
   }
+  if (normalized === 'commercial') return t('catering.orders.supply.group.commercial')
   if (normalized === 'other') return t('catering.orders.supply.group.other')
   return t(`catering.catalog.category.${normalized}`)
 }

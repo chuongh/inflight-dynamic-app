@@ -30,6 +30,8 @@ export type EcoSupplyGroupId =
   | 'drink'
   | 'snack'
   | 'condiment'
+  /** Commercial upsell items (bánh mì / trà sữa quota) — not prebook or hotmeal dishes. */
+  | 'commercial'
   | 'amenity'
   | 'amenity_composition'
   | 'other'
@@ -82,8 +84,12 @@ export interface EcoSupplyFlightBreakdown {
   legs: EcoSupplyFlightLeg[]
   /** field key → qty summed across the group's legs (0 omitted) */
   cells: Record<string, number>
-  /** Commercial (economy sales) quota summed across the group's legs. */
+  /** Commercial hotmeal quota summed across the group's legs. */
   quotaCommercial?: number
+  /** Commercial bánh mì quota summed across the group's legs. */
+  quotaBanhMi?: number
+  /** Commercial trà sữa quota summed across the group's legs. */
+  quotaTraSua?: number
   /** Amenity packages assigned across the group's legs. */
   amenityPackages?: EcoSupplyFlightAmenityPackage[]
 }

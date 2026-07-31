@@ -64,6 +64,8 @@ function lookupCatalog(
     productCode: string | null
     catalogItemId?: string | null
     catalog: 'meal' | 'amenity' | 'none'
+    /** Overrides the linked catalog item's own cabinScopes — see EcoSupplyFieldDef. */
+    cabinScopeOverride?: Array<'ECO' | 'SBB'>
   },
   meals: MealCatalogItem[],
   amenities: AmenityCatalogItem[],
@@ -76,7 +78,7 @@ function lookupCatalog(
   /** ECO/SBB catalog(s) this item belongs to; empty for amenity items (cross-cabin). */
   cabinScopes: Array<'ECO' | 'SBB'>
 } {
-  const { productCode, catalogItemId, catalog } = def
+  const { productCode, catalogItemId, catalog, cabinScopeOverride } = def
   if (catalog === 'none') {
     return { catalogItemId: null, name: '', unit: null, productCode, group: null, cabinScopes: [] }
   }
@@ -95,7 +97,7 @@ function lookupCatalog(
         unit: hit.unit,
         productCode: hit.productCode ?? productCode,
         group: fromMeal && 'category' in hit ? (hit as MealCatalogItem).category : 'amenity',
-        cabinScopes: fromMeal ? mealCabinScopes(hit as MealCatalogItem) : [],
+        cabinScopes: cabinScopeOverride ?? (fromMeal ? mealCabinScopes(hit as MealCatalogItem) : []),
       }
     }
   }
@@ -111,7 +113,7 @@ function lookupCatalog(
         unit: hit.unit,
         productCode: hit.productCode,
         group: fromMeal && 'category' in hit ? (hit as MealCatalogItem).category : 'amenity',
-        cabinScopes: fromMeal ? mealCabinScopes(hit as MealCatalogItem) : [],
+        cabinScopes: cabinScopeOverride ?? (fromMeal ? mealCabinScopes(hit as MealCatalogItem) : []),
       }
     }
   }
@@ -171,6 +173,8 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
     legs: EcoSupplyFlightLeg[]
     cells: Record<string, number>
     quotaCommercial: number
+    quotaBanhMi: number
+    quotaTraSua: number
     packageCounts: Map<number, number>
   }
   const dynamicTotals = new Map<string, { qty: number; sources: string[] }>()
@@ -181,6 +185,8 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
       {
         ...input,
         quotaCommercial: input.quotaCommercial ?? null,
+        quotaBanhMi: input.quotaBanhMi ?? null,
+        quotaTraSua: input.quotaTraSua ?? null,
         totalPrebook: input.totalPrebook ?? null,
         skybossEco: input.skybossEco ?? null,
         boiledEggs: input.boiledEggs ?? null,
@@ -196,6 +202,8 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
       legs: [],
       cells: {},
       quotaCommercial: 0,
+      quotaBanhMi: 0,
+      quotaTraSua: 0,
       packageCounts: new Map(),
     }
     bucket.legs.push({ flightNo: row.flightNo, dep: row.dep, arr: row.arr })
@@ -215,6 +223,8 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
       }
     }
     bucket.quotaCommercial += input.quotaCommercial ?? 0
+    bucket.quotaBanhMi += input.quotaBanhMi ?? 0
+    bucket.quotaTraSua += input.quotaTraSua ?? 0
     for (const packageId of row.amenityPackageIds) {
       bucket.packageCounts.set(packageId, (bucket.packageCounts.get(packageId) ?? 0) + 1)
     }
@@ -250,6 +260,8 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
     legs: bucket.legs,
     cells: bucket.cells,
     quotaCommercial: bucket.quotaCommercial,
+    quotaBanhMi: bucket.quotaBanhMi,
+    quotaTraSua: bucket.quotaTraSua,
     amenityPackages: [...bucket.packageCounts].map(([id, count]) => ({
       id,
       label: packageLabel(id),
@@ -282,7 +294,10 @@ export function buildEcoSupplySnapshot(args: BuildEcoSupplyArgs): EcoSupplySnaps
     lines.push({
       id: `eco-${def.field}`,
       field: def.field,
-      group: def.group === 'other' ? def.group : (cat.group ?? def.group),
+      group:
+        def.group === 'other' || def.group === 'commercial'
+          ? def.group
+          : (cat.group ?? def.group),
       catalogItemId: cat.catalogItemId,
       productCode: cat.productCode ?? def.productCode,
       name: cat.name || def.fallbackNameVi,

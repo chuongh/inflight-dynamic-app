@@ -1,9 +1,10 @@
+import type { TFunction } from 'i18next'
 import type {
   AmenityCatalogItem,
   MealCatalogItem,
   MealItemCategory,
 } from '@/modules/catering/catalogTypes'
-import type { RuleCatalogCategory } from '@/modules/catering/mealCategoryMeta'
+import { ruleCategoryLabel, type RuleCatalogCategory } from '@/modules/catering/mealCategoryMeta'
 import { ECO_QUANTITY_TARGET_COLUMNS, ECO_SUPPLY_FIELDS } from '@/modules/catering/supplier/ecoSupplyRegistry'
 import type {
   EcoAmenityConfig,
@@ -146,7 +147,6 @@ const METRIC_LABELS: Record<string, string> = {
   totalPrebook: 'Tổng Prebook',
   quotaCommercial: 'Quota thương mại',
   skybossEco: 'Số khách SkyBoss',
-  breadPrebook: 'Prebook Bánh mì',
 }
 
 const UPLIFT_LABELS: Record<EcoUpliftType, string> = {
@@ -170,10 +170,17 @@ export type ValueSourceGroup = {
   options: Array<{ value: string; label: string }>
 }
 
+/** Category label for a supply-registry group, for the unlinked-legacy-field fallback. */
+function groupLabelFor(group: string, t: TFunction): string {
+  const normalized = group === 'amenity_composition' ? 'amenity' : group
+  return ruleCategoryLabel(normalized as RuleCatalogCategory, t)
+}
+
 /** Catalog-first source options; values retain the linked ECO cell key for evaluation. */
 function catalogColumnOptions(
   mealCatalog: MealCatalogItem[],
   amenityCatalog: AmenityCatalogItem[],
+  t: TFunction,
 ): Array<{ value: string; label: string }> {
   const byCatalogId = new Map(
     ECO_SUPPLY_FIELDS.filter((field) => field.catalogItemId).map((field) => [
@@ -196,9 +203,16 @@ function catalogColumnOptions(
         (item.productCode ? byProductCode.get(item.productCode) : undefined)
       if (!field || seen.has(field)) return []
       seen.add(field)
+      // Amenity catalog items have no `category` of their own — fall back to
+      // the supply-registry field's group (e.g. amenity/amenity_composition).
+      const category =
+        'category' in item
+          ? ruleCategoryLabel((item as MealCatalogItem).category, t)
+          : groupLabelFor('amenity', t)
+      const name = item.productCode ? `${item.name.vi} · ${item.productCode}` : item.name.vi
       return [{
         value: `column:${field}`,
-        label: item.productCode ? `${item.name.vi} · ${item.productCode}` : item.name.vi,
+        label: `${name} · ${category}`,
       }]
     })
     .sort((a, b) => a.label.localeCompare(b.label, 'vi'))
@@ -206,7 +220,10 @@ function catalogColumnOptions(
   // Keep unlinked legacy fields editable when their catalog record is absent.
   for (const field of ECO_SUPPLY_FIELDS) {
     if (!seen.has(field.field)) {
-      options.push({ value: `column:${field.field}`, label: field.fallbackNameVi })
+      options.push({
+        value: `column:${field.field}`,
+        label: `${field.fallbackNameVi} · ${groupLabelFor(field.group, t)}`,
+      })
     }
   }
   return options
@@ -216,6 +233,7 @@ function catalogColumnOptions(
 export function buildValueSourceGroups(
   mealCatalog: MealCatalogItem[],
   amenityCatalog: AmenityCatalogItem[],
+  t: TFunction,
 ): ValueSourceGroup[] {
   return [
     {
@@ -223,14 +241,13 @@ export function buildValueSourceGroups(
       options: [
         { value: 'metric:quotaCommercial', label: 'Quota thương mại' },
         { value: 'metric:totalPrebook', label: 'Tổng Prebook' },
-        { value: 'metric:breadPrebook', label: 'Prebook Bánh mì' },
         { value: 'metric:skybossEco', label: 'Số khách SkyBoss' },
         { value: 'hotmeal_total', label: 'Tổng suất ăn nóng' },
       ],
     },
     {
       label: 'Sản phẩm khác',
-      options: catalogColumnOptions(mealCatalog, amenityCatalog),
+      options: catalogColumnOptions(mealCatalog, amenityCatalog, t),
     },
   ]
 }
@@ -413,7 +430,7 @@ export function newEcoQuantityRule(targetColumn: string): EcoQuantityRule {
   }
 }
 
-const METRIC_IDS = new Set(['totalPrebook', 'quotaCommercial', 'skybossEco', 'breadPrebook'])
+const METRIC_IDS = new Set(['totalPrebook', 'quotaCommercial', 'skybossEco'])
 const WHEN_KEYS: Array<keyof EcoQuantityWhen> = [
   'routeGroups',
   'routePairs',

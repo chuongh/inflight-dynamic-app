@@ -74,20 +74,20 @@ function addSbbLookupSheets(
   const generalRows = (
     ['VIET-HAN-NHAT', 'CHAY(VIỆT-HÀN-NHẬT)', 'ẤN'] as SbbRouteSheet[]
   ).flatMap((sheet) =>
-    lookup.sheets[sheet].map((row) => ({ ...row, sheet })),
+    (lookup.sheets[sheet] ?? []).map((row) => ({ ...row, sheet })),
   )
   addLookupSheet(workbook, 'QUY TẮC C', generalRows, lookup.source)
   addLookupSheet(
     workbook,
     'QUY TẮC C ÚC&KAZ',
-    lookup.sheets['ÚC&KAZ'].map((row) => ({ ...row, sheet: 'ÚC&KAZ' as const })),
+    lookup.sheets['ÚC&KAZ']?.map((row) => ({ ...row, sheet: 'ÚC&KAZ' as const })) ?? [],
     lookup.source,
   )
   addLookupSheet(
     workbook,
     'QUY TẮC SGN-PQC',
-    [],
-    `${lookup.source} The current JSON contains no verified SGN-PQC lookup rows; schema retained without fabricated values.`,
+    lookup.sheets['SGN-PQC']?.map((row) => ({ ...row, sheet: 'SGN-PQC' as const })) ?? [],
+    lookup.source,
   )
 }
 

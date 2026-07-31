@@ -105,6 +105,7 @@ export function OrderDetailPage() {
       inputs,
       activeRules.ecoRouteRules,
       activeRules.sbbLookups,
+      activeRules.ecoAmenity?.routeGroups ?? [],
     )
     return applySupplierEdits(base, current?.supplierEdits)
   }, [inputs, activeRules, current?.supplierEdits])
@@ -661,7 +662,8 @@ function applyByFlightEditsToLines(
 }
 
 function computeMealStats(lines: EcoSupplyLine[], inputs: SupplierFlightInput[]) {
-  const hotmealBread = lines
+  // Hotmeal dishes = main + vegetarian + bread (supply-line groups), distinct from commercial quota.
+  const hotmealDishes = lines
     .filter((l) => l.group === 'main' || l.group === 'vegetarian' || l.group === 'bread')
     .reduce((s, l) => s + l.qty, 0)
   const prebook = lines.find((l) => l.field === 'prebook')?.qty ?? 0
@@ -671,7 +673,7 @@ function computeMealStats(lines: EcoSupplyLine[], inputs: SupplierFlightInput[])
   const quotaCommercial =
     inputs.reduce((s, i) => s + (i.quotaCommercial ?? 0), 0) ||
     (lines.find((l) => l.field === 'quotaCommercial')?.qty ?? 0)
-  const totalMeals = hotmealBread + crew
+  const totalMeals = hotmealDishes + quotaCommercial + crew
   return { totalMeals, prebook, skyboss, skybossBusiness, crew, quotaCommercial }
 }
 

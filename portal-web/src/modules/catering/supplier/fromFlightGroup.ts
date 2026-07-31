@@ -44,6 +44,8 @@ function mapLegToInput(
     flightKind: s.flightKind ?? null,
     amenityOverride: s.amenityOverride ?? null,
     quotaCommercial: s.quotaCommercial ?? leg.salesQuota?.hotmeal ?? null,
+    quotaBanhMi: s.quotaBanhMi ?? leg.salesQuota?.banhMi ?? null,
+    quotaTraSua: s.quotaTraSua ?? leg.salesQuota?.traSua ?? null,
     totalPrebook: s.totalPrebook ?? leg.premeal ?? null,
     skybossEco: s.skybossEco,
     businessPax: s.businessPax,

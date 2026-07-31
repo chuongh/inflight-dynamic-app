@@ -1,108 +1,553 @@
 {
   "effectiveFrom": "08/07/2026",
   "effectiveTo": "31/12/2026",
-  "source": "GC-SGN C 08 JUL VER 01.xlsx · QUY TẮC C ÚC&KAZ + QUY TẮC C (pax 1–12; Phở/Bún cùng cột Phở bò/Bún bò)",
+  "source": "GC-SGN C 08 JUL VER 01.xlsx · QUY TẮC C + QUY TẮC C ÚC&KAZ + QUY TẮC SGN-PQC",
   "sheets": {
     "VIET-HAN-NHAT": [
       {
         "businessPax": 1,
         "items": {
-          "bread": 1,
           "pho": 1,
-          "stickyRice": 1
+          "stickyRice": 1,
+          "bread": 1
         }
       },
       {
         "businessPax": 2,
         "items": {
-          "bread": 1,
           "pho": 2,
-          "stickyRice": 1
+          "stickyRice": 1,
+          "bread": 1
         }
       },
       {
         "businessPax": 3,
         "items": {
-          "bread": 1,
           "pho": 2,
-          "stickyRice": 2
+          "stickyRice": 2,
+          "bread": 1
         }
       },
       {
         "businessPax": 4,
         "items": {
-          "bread": 2,
           "pho": 2,
-          "stickyRice": 2
+          "stickyRice": 2,
+          "bread": 2
         }
       },
       {
         "businessPax": 5,
         "items": {
-          "bread": 2,
           "pho": 3,
-          "stickyRice": 2
+          "stickyRice": 2,
+          "bread": 2
         }
       },
       {
         "businessPax": 6,
         "items": {
-          "bread": 2,
           "pho": 3,
-          "stickyRice": 3
+          "stickyRice": 3,
+          "bread": 2
         }
       },
       {
         "businessPax": 7,
         "items": {
-          "bread": 3,
           "pho": 3,
-          "stickyRice": 3
+          "stickyRice": 3,
+          "bread": 3
         }
       },
       {
         "businessPax": 8,
         "items": {
-          "bread": 3,
           "pho": 4,
-          "stickyRice": 3
+          "stickyRice": 3,
+          "bread": 3
         }
       },
       {
         "businessPax": 9,
         "items": {
-          "bread": 3,
           "pho": 4,
-          "stickyRice": 4
+          "stickyRice": 4,
+          "bread": 3
         }
       },
       {
         "businessPax": 10,
         "items": {
-          "bread": 4,
           "pho": 4,
-          "stickyRice": 4
+          "stickyRice": 4,
+          "bread": 4
         }
       },
       {
         "businessPax": 11,
         "items": {
-          "bread": 4,
           "pho": 5,
-          "stickyRice": 4
+          "stickyRice": 4,
+          "bread": 4
         }
       },
       {
         "businessPax": 12,
         "items": {
-          "bread": 4,
           "pho": 5,
-          "stickyRice": 5
+          "stickyRice": 5,
+          "bread": 4
+        }
+      },
+      {
+        "businessPax": 13,
+        "items": {
+          "pho": 5,
+          "stickyRice": 5,
+          "bread": 5
+        }
+      },
+      {
+        "businessPax": 14,
+        "items": {
+          "pho": 6,
+          "stickyRice": 5,
+          "bread": 5
+        }
+      },
+      {
+        "businessPax": 15,
+        "items": {
+          "pho": 6,
+          "stickyRice": 6,
+          "bread": 5
+        }
+      },
+      {
+        "businessPax": 16,
+        "items": {
+          "pho": 6,
+          "stickyRice": 6,
+          "bread": 6
+        }
+      },
+      {
+        "businessPax": 17,
+        "items": {
+          "pho": 7,
+          "stickyRice": 6,
+          "bread": 6
+        }
+      },
+      {
+        "businessPax": 18,
+        "items": {
+          "pho": 7,
+          "stickyRice": 7,
+          "bread": 6
+        }
+      },
+      {
+        "businessPax": 19,
+        "items": {
+          "pho": 7,
+          "stickyRice": 7,
+          "bread": 7
+        }
+      },
+      {
+        "businessPax": 20,
+        "items": {
+          "pho": 8,
+          "stickyRice": 7,
+          "bread": 7
+        }
+      },
+      {
+        "businessPax": 21,
+        "items": {
+          "pho": 8,
+          "stickyRice": 8,
+          "bread": 7
+        }
+      },
+      {
+        "businessPax": 22,
+        "items": {
+          "pho": 8,
+          "stickyRice": 8,
+          "bread": 8
+        }
+      },
+      {
+        "businessPax": 23,
+        "items": {
+          "pho": 9,
+          "stickyRice": 8,
+          "bread": 8
+        }
+      },
+      {
+        "businessPax": 24,
+        "items": {
+          "pho": 9,
+          "stickyRice": 9,
+          "bread": 8
+        }
+      },
+      {
+        "businessPax": 25,
+        "items": {
+          "pho": 9,
+          "stickyRice": 9,
+          "bread": 9
+        }
+      },
+      {
+        "businessPax": 26,
+        "items": {
+          "pho": 10,
+          "stickyRice": 9,
+          "bread": 9
+        }
+      },
+      {
+        "businessPax": 27,
+        "items": {
+          "pho": 10,
+          "stickyRice": 10,
+          "bread": 9
+        }
+      },
+      {
+        "businessPax": 28,
+        "items": {
+          "pho": 10,
+          "stickyRice": 10,
+          "bread": 10
+        }
+      },
+      {
+        "businessPax": 29,
+        "items": {
+          "pho": 11,
+          "stickyRice": 10,
+          "bread": 10
+        }
+      },
+      {
+        "businessPax": 30,
+        "items": {
+          "pho": 11,
+          "stickyRice": 11,
+          "bread": 10
+        }
+      },
+      {
+        "businessPax": 31,
+        "items": {
+          "pho": 11,
+          "stickyRice": 11,
+          "bread": 11
+        }
+      },
+      {
+        "businessPax": 32,
+        "items": {
+          "pho": 12,
+          "stickyRice": 11,
+          "bread": 11
+        }
+      },
+      {
+        "businessPax": 33,
+        "items": {
+          "pho": 12,
+          "stickyRice": 12,
+          "bread": 11
+        }
+      },
+      {
+        "businessPax": 34,
+        "items": {
+          "pho": 12,
+          "stickyRice": 12,
+          "bread": 12
+        }
+      },
+      {
+        "businessPax": 35,
+        "items": {
+          "pho": 13,
+          "stickyRice": 12,
+          "bread": 12
+        }
+      },
+      {
+        "businessPax": 36,
+        "items": {
+          "pho": 13,
+          "stickyRice": 13,
+          "bread": 12
         }
       }
     ],
     "CHAY(VIỆT-HÀN-NHẬT)": [],
-    "ẤN": [],
+    "ẤN": [
+      {
+        "businessPax": 1,
+        "items": {
+          "chickenGravy": 1,
+          "bread": 1
+        }
+      },
+      {
+        "businessPax": 2,
+        "items": {
+          "chickenGravy": 2,
+          "bread": 2
+        }
+      },
+      {
+        "businessPax": 3,
+        "items": {
+          "chickenGravy": 2,
+          "bread": 2
+        }
+      },
+      {
+        "businessPax": 4,
+        "items": {
+          "chickenGravy": 2,
+          "bread": 3
+        }
+      },
+      {
+        "businessPax": 5,
+        "items": {
+          "chickenGravy": 3,
+          "bread": 3
+        }
+      },
+      {
+        "businessPax": 6,
+        "items": {
+          "chickenGravy": 3,
+          "bread": 4
+        }
+      },
+      {
+        "businessPax": 7,
+        "items": {
+          "chickenGravy": 3,
+          "bread": 4
+        }
+      },
+      {
+        "businessPax": 8,
+        "items": {
+          "chickenGravy": 4,
+          "bread": 5
+        }
+      },
+      {
+        "businessPax": 9,
+        "items": {
+          "chickenGravy": 4,
+          "bread": 5
+        }
+      },
+      {
+        "businessPax": 10,
+        "items": {
+          "chickenGravy": 4,
+          "bread": 6
+        }
+      },
+      {
+        "businessPax": 11,
+        "items": {
+          "chickenGravy": 5,
+          "bread": 6
+        }
+      },
+      {
+        "businessPax": 12,
+        "items": {
+          "chickenGravy": 5,
+          "bread": 7
+        }
+      },
+      {
+        "businessPax": 13,
+        "items": {
+          "chickenGravy": 5,
+          "bread": 7
+        }
+      },
+      {
+        "businessPax": 14,
+        "items": {
+          "chickenGravy": 6,
+          "bread": 8
+        }
+      },
+      {
+        "businessPax": 15,
+        "items": {
+          "chickenGravy": 6,
+          "bread": 8
+        }
+      },
+      {
+        "businessPax": 16,
+        "items": {
+          "chickenGravy": 6,
+          "bread": 9
+        }
+      },
+      {
+        "businessPax": 17,
+        "items": {
+          "chickenGravy": 7,
+          "bread": 9
+        }
+      },
+      {
+        "businessPax": 18,
+        "items": {
+          "chickenGravy": 7,
+          "bread": 10
+        }
+      },
+      {
+        "businessPax": 19,
+        "items": {
+          "chickenGravy": 7,
+          "bread": 10
+        }
+      },
+      {
+        "businessPax": 20,
+        "items": {
+          "chickenGravy": 8,
+          "bread": 11
+        }
+      },
+      {
+        "businessPax": 21,
+        "items": {
+          "chickenGravy": 8,
+          "bread": 11
+        }
+      },
+      {
+        "businessPax": 22,
+        "items": {
+          "chickenGravy": 8,
+          "bread": 12
+        }
+      },
+      {
+        "businessPax": 23,
+        "items": {
+          "chickenGravy": 9,
+          "bread": 12
+        }
+      },
+      {
+        "businessPax": 24,
+        "items": {
+          "chickenGravy": 9,
+          "bread": 13
+        }
+      },
+      {
+        "businessPax": 25,
+        "items": {
+          "chickenGravy": 9,
+          "bread": 13
+        }
+      },
+      {
+        "businessPax": 26,
+        "items": {
+          "chickenGravy": 10,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 27,
+        "items": {
+          "chickenGravy": 10,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 28,
+        "items": {
+          "chickenGravy": 10,
+          "bread": 15
+        }
+      },
+      {
+        "businessPax": 29,
+        "items": {
+          "chickenGravy": 11,
+          "bread": 15
+        }
+      },
+      {
+        "businessPax": 30,
+        "items": {
+          "chickenGravy": 11,
+          "bread": 16
+        }
+      },
+      {
+        "businessPax": 31,
+        "items": {
+          "chickenGravy": 11,
+          "bread": 16
+        }
+      },
+      {
+        "businessPax": 32,
+        "items": {
+          "chickenGravy": 12,
+          "bread": 17
+        }
+      },
+      {
+        "businessPax": 33,
+        "items": {
+          "chickenGravy": 12,
+          "bread": 17
+        }
+      },
+      {
+        "businessPax": 34,
+        "items": {
+          "chickenGravy": 12,
+          "bread": 18
+        }
+      },
+      {
+        "businessPax": 35,
+        "items": {
+          "chickenGravy": 13,
+          "bread": 18
+        }
+      },
+      {
+        "businessPax": 36,
+        "items": {
+          "chickenGravy": 13,
+          "bread": 19
+        }
+      }
+    ],
     "ÚC&KAZ": [
       {
         "businessPax": 1,
@@ -236,26 +681,183 @@
           "chickenGravy": 5
         }
       }
+    ],
+    "SGN-PQC": [
+      {
+        "businessPax": 1,
+        "items": {
+          "basa": 1,
+          "chickenGravy": 1,
+          "bread": 4
+        }
+      },
+      {
+        "businessPax": 2,
+        "items": {
+          "basa": 2,
+          "chickenGravy": 2,
+          "bread": 6
+        }
+      },
+      {
+        "businessPax": 3,
+        "items": {
+          "basa": 2,
+          "chickenGravy": 3,
+          "bread": 10
+        }
+      },
+      {
+        "businessPax": 4,
+        "items": {
+          "basa": 2,
+          "chickenGravy": 3,
+          "bread": 12
+        }
+      },
+      {
+        "businessPax": 5,
+        "items": {
+          "basa": 2,
+          "chickenGravy": 3,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 6,
+        "items": {
+          "basa": 3,
+          "chickenGravy": 3,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 7,
+        "items": {
+          "basa": 3,
+          "chickenGravy": 3,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 8,
+        "items": {
+          "basa": 3,
+          "chickenGravy": 4,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 9,
+        "items": {
+          "basa": 4,
+          "chickenGravy": 4,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 10,
+        "items": {
+          "basa": 4,
+          "chickenGravy": 4,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 11,
+        "items": {
+          "basa": 4,
+          "chickenGravy": 5,
+          "bread": 14
+        }
+      },
+      {
+        "businessPax": 12,
+        "items": {
+          "basa": 5,
+          "chickenGravy": 6,
+          "bread": 14
+        }
+      }
     ]
   },
+  "sheetDefs": [
+    {
+      "id": "ẤN",
+      "label": "Ấn",
+      "routeGroupIds": [
+        "IN"
+      ],
+      "priority": 10
+    },
+    {
+      "id": "ÚC&KAZ",
+      "label": "Úc & KAZ",
+      "routeGroupIds": [
+        "AU",
+        "KAZ"
+      ],
+      "priority": 20
+    },
+    {
+      "id": "SGN-PQC",
+      "label": "SGN–PQC",
+      "routeGroupIds": [],
+      "routePairs": [
+        "SGN-PQC"
+      ],
+      "priority": 30
+    },
+    {
+      "id": "VIET-HAN-NHAT",
+      "label": "Việt · Hàn · Nhật",
+      "routeGroupIds": [
+        "KR_JP"
+      ],
+      "priority": 50,
+      "fallback": true
+    },
+    {
+      "id": "CHAY(VIỆT-HÀN-NHẬT)",
+      "label": "Chay",
+      "routeGroupIds": [],
+      "vegetarian": true,
+      "priority": 0
+    }
+  ],
   "sheetBindings": {
     "ẤN": {
-      "airports": ["AMD", "BLR", "BOM", "COK", "DEL", "HYD"],
+      "routeGroupIds": [
+        "IN"
+      ],
       "priority": 10,
-      "note": "DEP hoặc ARR thuộc Ấn Độ → sheet ẤN"
+      "note": "QUY TẮC C · MÓN CHÍNH ẤN"
     },
     "ÚC&KAZ": {
-      "airports": ["ADL", "ALA", "BNE", "MEL", "NQZ", "PER", "SYD"],
+      "routeGroupIds": [
+        "AU",
+        "KAZ"
+      ],
       "priority": 20,
-      "note": "DEP hoặc ARR thuộc Úc / KAZ → sheet ÚC&KAZ"
+      "note": "QUY TẮC C ÚC&KAZ"
+    },
+    "SGN-PQC": {
+      "routeGroupIds": [],
+      "routePairs": [
+        "SGN-PQC"
+      ],
+      "priority": 30,
+      "note": "QUY TẮC SGN-PQC"
     },
     "VIET-HAN-NHAT": {
-      "airports": [],
-      "priority": 100,
-      "note": "Fallback khi không khớp Ấn / Úc&KAZ"
+      "routeGroupIds": [
+        "KR_JP"
+      ],
+      "priority": 50,
+      "note": "QUY TẮC C · MÓN CHÍNH + fallback"
     },
     "CHAY(VIỆT-HÀN-NHẬT)": {
-      "airports": [],
+      "routeGroupIds": [],
       "priority": 0,
       "note": "Chọn theo mealType = vegetarian"
     }

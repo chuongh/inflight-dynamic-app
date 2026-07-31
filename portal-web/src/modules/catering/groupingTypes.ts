@@ -19,6 +19,10 @@ import type {
 /** ECO/SBB quantities carried on a leg for the supplier order review. */
 export interface SupplierLegExtension extends EcoAmenityOpsInput, EcoSnackOpsInput {
   quotaCommercial?: number | null
+  /** Commercial bánh mì upsell; falls back to `leg.salesQuota.banhMi`. */
+  quotaBanhMi?: number | null
+  /** Commercial trà sữa upsell; falls back to `leg.salesQuota.traSua`. */
+  quotaTraSua?: number | null
   /** Falls back to `leg.premeal` when absent. */
   totalPrebook?: number | null
   skybossEco?: number | null

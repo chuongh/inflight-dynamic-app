@@ -1,5 +1,5 @@
 {
-  "seedVersion": "2026-07-30-catalog-v18",
+  "seedVersion": "2026-07-30-catalog-v19",
   "versions": [
     {
       "id": "m1",
@@ -21,8 +21,9 @@
           "cabinScopes": [
             "ECO"
           ],
-          "active": true,
-          "needsCode": false
+          "active": false,
+          "needsCode": false,
+          "note": "Retired — superseded by sku-sbb12 (Bánh mì Việt Nam), the real prebook dish name shared with SBB. Kept for record only, no longer linked to any rule."
         },
         {
           "id": "sku-40000403",
@@ -705,10 +706,41 @@
           "unit": null,
           "category": "bread",
           "cabinScopes": [
+            "ECO",
             "SBB"
           ],
           "active": true,
           "needsCode": false
+        },
+        {
+          "id": "meal-banh-mi-commercial",
+          "productCode": "SBB12",
+          "name": {
+            "vi": "Bánh mì Việt Nam (thương mại)"
+          },
+          "unit": null,
+          "category": "bread",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": false,
+          "note": "Commercial upsell bánh mì from Team Commercial quota (salesQuota.banhMi). Same physical SKU as sku-sbb12; qty stream is separate from prebook."
+        },
+        {
+          "id": "meal-tra-sua-commercial",
+          "productCode": "TSA",
+          "name": {
+            "vi": "Trà sữa (thương mại)"
+          },
+          "unit": "ly",
+          "category": "drink",
+          "cabinScopes": [
+            "ECO"
+          ],
+          "active": true,
+          "needsCode": true,
+          "note": "Commercial upsell trà sữa from Team Commercial quota (salesQuota.traSua). Cup/lid/straw accessories stay in amenity catalog."
         },
         {
           "id": "sku-sbb22",

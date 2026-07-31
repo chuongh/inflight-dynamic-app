@@ -140,8 +140,8 @@ export function EcoQuantityValueEditor({
   const { t } = useTranslation()
   const uiKind = uiKindOf(value)
   const sourceGroups = useMemo(
-    () => buildValueSourceGroups(mealCatalog, amenityCatalog),
-    [mealCatalog, amenityCatalog],
+    () => buildValueSourceGroups(mealCatalog, amenityCatalog, t),
+    [mealCatalog, amenityCatalog, t],
   )
 
   return (

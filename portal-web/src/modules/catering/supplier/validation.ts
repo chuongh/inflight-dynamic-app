@@ -6,9 +6,11 @@ import type {
   SbbLookupDataset,
   SbbLookupItem,
   SbbLookupRow,
+  SbbLookupSheetDef,
   SbbRouteSheet,
   SbbSheetRouteBinding,
 } from './types'
+import { DEFAULT_SBB_SHEET_DEFS } from './sbbRules'
 
 export type ParseResult<T> =
   | { ok: true; value: T }
@@ -20,12 +22,7 @@ const ECO_ROUTE_FIELDS: EcoRoutePolicyField[] = [
   'australiaSkybossYogurt',
   'australiaRoundBread',
 ]
-const SBB_SHEETS: SbbRouteSheet[] = [
-  'VIET-HAN-NHAT',
-  'CHAY(VIỆT-HÀN-NHẬT)',
-  'ẤN',
-  'ÚC&KAZ',
-]
+const SBB_SHEETS: SbbRouteSheet[] = DEFAULT_SBB_SHEET_DEFS.map((d) => d.id)
 const SBB_ITEMS: SbbLookupItem[] = [
   'bread',
   'basa',
@@ -148,8 +145,11 @@ function parseSbbLookupDatasetUncached(value: unknown): ParseResult<SbbLookupDat
     return { ok: false, error: 'SBB lookup source and sheets are required' }
   }
 
-  const sheets = {} as Record<SbbRouteSheet, SbbLookupRow[]>
-  for (const sheet of SBB_SHEETS) {
+  const sheetDefs = parseSbbSheetDefs(value.sheetDefs)
+  const requiredSheets = sheetDefs?.map((d) => d.id) ?? SBB_SHEETS
+  const sheets: Record<string, SbbLookupRow[]> = {}
+
+  for (const sheet of requiredSheets) {
     const rawRows = value.sheets[sheet]
     if (!Array.isArray(rawRows)) {
       return { ok: false, error: `Missing SBB sheet ${sheet}` }
@@ -178,6 +178,41 @@ function parseSbbLookupDatasetUncached(value: unknown): ParseResult<SbbLookupDat
     sheets[sheet] = rows
   }
 
+  // Keep any extra sheet tables that aren't in sheetDefs yet (editing drafts).
+  for (const [sheet, rawRows] of Object.entries(value.sheets)) {
+    if (sheets[sheet] || !Array.isArray(rawRows)) continue
+    const seen = new Set<number>()
+    const rows: SbbLookupRow[] = []
+    let valid = true
+    for (const rawRow of rawRows) {
+      if (
+        !isRecord(rawRow) ||
+        !isValidQuantity(rawRow.businessPax) ||
+        rawRow.businessPax === 0 ||
+        seen.has(rawRow.businessPax) ||
+        !isRecord(rawRow.items)
+      ) {
+        valid = false
+        break
+      }
+      const items: Partial<Record<SbbLookupItem, number | null>> = {}
+      for (const [item, quantity] of Object.entries(rawRow.items)) {
+        if (
+          !SBB_ITEMS.includes(item as SbbLookupItem) ||
+          (quantity !== null && !isValidQuantity(quantity))
+        ) {
+          valid = false
+          break
+        }
+        items[item as SbbLookupItem] = quantity as number | null
+      }
+      if (!valid) break
+      seen.add(rawRow.businessPax)
+      rows.push({ businessPax: rawRow.businessPax, items })
+    }
+    if (valid) sheets[sheet] = rows
+  }
+
   return {
     ok: true,
     value: {
@@ -185,9 +220,42 @@ function parseSbbLookupDatasetUncached(value: unknown): ParseResult<SbbLookupDat
       effectiveTo: range.value.effectiveTo,
       source: value.source,
       sheets,
+      sheetDefs,
       sheetBindings: parseSbbSheetBindings(value.sheetBindings),
     },
   }
+}
+
+function parseSbbSheetDefs(raw: unknown): SbbLookupSheetDef[] | undefined {
+  if (!Array.isArray(raw) || raw.length === 0) return undefined
+  const defs: SbbLookupSheetDef[] = []
+  for (const entry of raw) {
+    if (!isRecord(entry) || typeof entry.id !== 'string' || !entry.id.trim()) continue
+    if (typeof entry.label !== 'string' || !entry.label.trim()) continue
+    const routeGroupIds = Array.isArray(entry.routeGroupIds)
+      ? entry.routeGroupIds.filter(
+          (id): id is string => typeof id === 'string' && id.trim().length > 0,
+        )
+      : []
+    const routePairs = Array.isArray(entry.routePairs)
+      ? entry.routePairs.filter(
+          (p): p is string => typeof p === 'string' && p.trim().length > 0,
+        )
+      : undefined
+    defs.push({
+      id: entry.id,
+      label: entry.label,
+      routeGroupIds,
+      routePairs,
+      vegetarian: entry.vegetarian === true,
+      fallback: entry.fallback === true,
+      priority:
+        typeof entry.priority === 'number' && Number.isFinite(entry.priority)
+          ? entry.priority
+          : undefined,
+    })
+  }
+  return defs.length > 0 ? defs : undefined
 }
 
 function parseSbbSheetBindings(
@@ -195,14 +263,18 @@ function parseSbbSheetBindings(
 ): Partial<Record<SbbRouteSheet, SbbSheetRouteBinding>> | undefined {
   if (!isRecord(raw)) return undefined
   const result: Partial<Record<SbbRouteSheet, SbbSheetRouteBinding>> = {}
-  for (const sheet of SBB_SHEETS) {
-    const entry = raw[sheet]
+  for (const [sheet, entry] of Object.entries(raw)) {
     if (!isRecord(entry)) continue
     const airports = Array.isArray(entry.airports)
       ? entry.airports
           .filter((a): a is string => typeof a === 'string' && a.trim().length > 0)
           .map(normalizeAirport)
-      : []
+      : undefined
+    const routeGroupIds = Array.isArray(entry.routeGroupIds)
+      ? entry.routeGroupIds.filter(
+          (id): id is string => typeof id === 'string' && id.trim().length > 0,
+        )
+      : undefined
     const routePairs = Array.isArray(entry.routePairs)
       ? entry.routePairs.filter(
           (p): p is string => typeof p === 'string' && p.trim().length > 0,
@@ -213,7 +285,7 @@ function parseSbbSheetBindings(
         ? entry.priority
         : undefined
     const note = typeof entry.note === 'string' ? entry.note : undefined
-    result[sheet] = { airports, routePairs, priority, note }
+    result[sheet] = { airports, routeGroupIds, routePairs, priority, note }
   }
   return Object.keys(result).length > 0 ? result : undefined
 }

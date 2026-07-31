@@ -60,13 +60,13 @@ describe('ECO_SUPPLY_FIELDS ↔ catalog master data', () => {
     expect(missing, `quantity targets without catalog: ${missing.join(', ')}`).toEqual([])
   })
 
-  it('bread ECO field points at sku-40000294 (Bánh mì)', () => {
+  it('bread ECO field points at sku-sbb12 (Bánh mì Việt Nam, shared with SBB)', () => {
     const bread = ECO_SUPPLY_FIELDS.find((f) => f.field === 'bread')
-    expect(bread?.productCode).toBe('40000294')
-    expect(bread?.catalogItemId).toBe('sku-40000294')
-    const item = mealItems.find((i) => i.id === 'sku-40000294')
-    expect(item?.name?.vi).toBe('Bánh mì')
-    expect(item?.productCode).toBe('40000294')
+    expect(bread?.productCode).toBe('SBB12')
+    expect(bread?.catalogItemId).toBe('sku-sbb12')
+    const item = mealItems.find((i) => i.id === 'sku-sbb12')
+    expect(item?.name?.vi).toBe('Bánh mì Việt Nam')
+    expect(item?.productCode).toBe('SBB12')
     expect(item?.category).toBe('bread')
   })
 

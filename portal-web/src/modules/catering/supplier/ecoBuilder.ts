@@ -117,6 +117,14 @@ export function buildEcoSupplierRow(
     input.quotaCommercial,
     sourceRefs.quotaCommercial ?? 'Commercial quota source',
   )
+  const banhMiCommercial = inputCell(
+    input.quotaBanhMi,
+    sourceRefs.quotaBanhMi ?? 'Commercial quota · bánh mì (salesQuota.banhMi)',
+  )
+  const traSuaCommercial = inputCell(
+    input.quotaTraSua,
+    sourceRefs.quotaTraSua ?? 'Commercial quota · trà sữa (salesQuota.traSua)',
+  )
   const breadPrebook = inputCell(
     input.breadPrebook,
     sourceRefs.breadPrebook ?? 'Ungrouped flight premeal breakdown; Bánh mì',
@@ -133,6 +141,12 @@ export function buildEcoSupplierRow(
     spaghetti: hotmealCells.spaghetti.value,
     skyboss: skyboss.value,
     prebook: prebook.value,
+    // Bánh mì's raw prebook count — seeded here (not as a "metric") so a
+    // formula can reference it as `column: 'bread'`, same as any other dish.
+    // Overwritten below with the rule-computed final quantity once the bread
+    // rule itself has run, so *later* rules that reference bread see the
+    // final output, not the raw prebook count.
+    bread: breadPrebook.value,
   }
 
   const evalCtx: EcoQuantityEvalContext = {
@@ -141,7 +155,6 @@ export function buildEcoSupplierRow(
       quotaCommercial: quota.value,
       totalPrebook: prebook.value,
       skybossEco: skyboss.value,
-      breadPrebook: breadPrebook.value,
     },
     hotmealTotal: hotmealTotalValue,
     dep: identity.dep,
@@ -175,7 +188,7 @@ export function buildEcoSupplierRow(
       `${sourceRefs.workbookReferenceBread ?? 'Workbook bread column'}; workbookReferenceBread`,
     )
   } else {
-    bread = resolveRuleCell('bread', 'quotaCommercial + breadPrebook')
+    bread = resolveRuleCell('bread', 'breadPrebook')
   }
 
   const ketchup = resolveRuleCell('ketchup', 'J spaghetti quantity')
@@ -282,6 +295,8 @@ export function buildEcoSupplierRow(
   const cells: EcoCells = {
     ...hotmealCells,
     bread,
+    banhMiCommercial,
+    traSuaCommercial,
     boiledEggs,
     skybossEggs,
     totalEggs: ecoCell(

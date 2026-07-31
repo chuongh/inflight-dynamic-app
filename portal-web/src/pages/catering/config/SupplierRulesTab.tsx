@@ -4,14 +4,12 @@ import {
   Button,
   Collapse,
   Input,
-  InputNumber,
   Segmented,
-  Select,
   Spin,
   Tabs,
   Tag,
 } from 'antd'
-import { Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Search } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -23,8 +21,6 @@ import {
 } from '@/modules/catering/supplierRuleConfig'
 import type {
   SbbLookupDataset,
-  SbbLookupItem,
-  SbbLookupRow,
   SbbRouteSheet,
 } from '@/modules/catering/supplier/types'
 import { DEFAULT_ECO_AMENITY_CONFIG } from '@/modules/catering/supplier/amenityDefaults'
@@ -37,11 +33,7 @@ import type {
   EcoQuantityRule,
   SupplierRouteGroup,
 } from '@/modules/catering/supplier/ecoQuantityTypes'
-import {
-  DEFAULT_SBB_SHEET_BINDINGS,
-  resolveSbbSheetBindings,
-  selectSbbRouteSheet,
-} from '@/modules/catering/supplier/sbbRules'
+import { DEFAULT_SBB_SHEET_DEFS, DEFAULT_SBB_SHEET_BINDINGS } from '@/modules/catering/supplier/sbbRules'
 import { activeCatalogVersion } from '@/modules/catering/catalog'
 import {
   useAmenityCatalogData,
@@ -63,6 +55,8 @@ import { ConfigPublishBar } from './ConfigPublishBar'
 import { ConfigVersionBar } from './ConfigVersionBar'
 import { EcoQuantityRuleCard } from './EcoQuantityRuleCard'
 import { EcoQuantityRuleEditorDrawer } from './EcoQuantityRuleEditorDrawer'
+import { RouteGroupsSection } from './RouteGroupsSection'
+import { SbbLookupSection } from './SbbLookupSection'
 import {
   displayNameFor,
   newEcoQuantityRule,
@@ -72,24 +66,7 @@ import {
   validateEcoQuantityRules,
 } from './ecoQuantityRuleMeta'
 
-const SBB_SHEETS: SbbRouteSheet[] = [
-  'VIET-HAN-NHAT',
-  'CHAY(VIỆT-HÀN-NHẬT)',
-  'ẤN',
-  'ÚC&KAZ',
-]
-
-const SBB_ITEMS: SbbLookupItem[] = [
-  'bread',
-  'basa',
-  'pho',
-  'bunBo',
-  'stickyRice',
-  'chickenGravy',
-  'blanket',
-]
-
-type ConfigSection = 'eco' | 'amenity' | 'routeHourList' | 'sbb'
+type ConfigSection = 'eco' | 'routeGroups' | 'amenity' | 'routeHourList' | 'sbb'
 
 function dmyToNum(dmy: string): number {
   const [d, m, y] = dmy.split('/')
@@ -131,9 +108,6 @@ export function SupplierRulesTab({ onEditAction }: Props) {
   const [section, setSection] = useState<ConfigSection>('eco')
   const [ecoCategory, setEcoCategory] = useState<RuleCatalogCategory | null>(null)
   const [ruleQuery, setRuleQuery] = useState('')
-  const [trialDep, setTrialDep] = useState('SGN')
-  const [trialArr, setTrialArr] = useState('MEL')
-  const [trialMeal, setTrialMeal] = useState<'standard' | 'vegetarian'>('standard')
 
   const versions = useMemo(
     () => supplierRuleVersionsNewestFirst(data?.versions ?? []),
@@ -194,6 +168,9 @@ export function SupplierRulesTab({ onEditAction }: Props) {
   const startEdit = () => {
     if (!viewing) return
     const cloned = cloneSbb(viewing.sbbLookups)
+    if (!cloned.sheetDefs?.length) {
+      cloned.sheetDefs = structuredClone(DEFAULT_SBB_SHEET_DEFS)
+    }
     if (!cloned.sheetBindings) {
       cloned.sheetBindings = structuredClone(DEFAULT_SBB_SHEET_BINDINGS)
     }
@@ -244,10 +221,6 @@ export function SupplierRulesTab({ onEditAction }: Props) {
   }
 
   const sbb = editing && workingSbb ? workingSbb : viewing.sbbLookups
-  const rows = sbb.sheets[sheet] ?? []
-  const sheetBindings = resolveSbbSheetBindings(sbb.sheetBindings)
-  const currentBinding = sheetBindings[sheet]
-  const trialSheet = selectSbbRouteSheet(trialDep, trialArr, trialMeal, sheetBindings)
 
   const updateQuantityRule = (id: string, patch: Partial<EcoQuantityRule>) => {
     if (!workingQuantityRules) return
@@ -318,68 +291,6 @@ export function SupplierRulesTab({ onEditAction }: Props) {
     setWorkingAmenityConfig({
       ...workingAmenityConfig,
       routeGroups: [...workingAmenityConfig.routeGroups, created],
-    })
-  }
-
-  const updateRow = (index: number, patch: Partial<SbbLookupRow>) => {
-    if (!workingSbb) return
-    const nextRows = [...(workingSbb.sheets[sheet] ?? [])]
-    nextRows[index] = { ...nextRows[index], ...patch }
-    setWorkingSbb({
-      ...workingSbb,
-      sheets: { ...workingSbb.sheets, [sheet]: nextRows },
-    })
-  }
-
-  const updateItem = (index: number, item: SbbLookupItem, value: number | null) => {
-    if (!workingSbb) return
-    const nextRows = [...(workingSbb.sheets[sheet] ?? [])]
-    const row = nextRows[index]
-    nextRows[index] = {
-      ...row,
-      items: { ...row.items, [item]: value },
-    }
-    setWorkingSbb({
-      ...workingSbb,
-      sheets: { ...workingSbb.sheets, [sheet]: nextRows },
-    })
-  }
-
-  const addRow = () => {
-    if (!workingSbb) return
-    const existing = workingSbb.sheets[sheet] ?? []
-    const maxPax = existing.reduce((m, r) => Math.max(m, r.businessPax), 0)
-    const next: SbbLookupRow = { businessPax: maxPax + 1, items: {} }
-    setWorkingSbb({
-      ...workingSbb,
-      sheets: { ...workingSbb.sheets, [sheet]: [...existing, next] },
-    })
-  }
-
-  const removeRow = (index: number) => {
-    if (!workingSbb) return
-    const nextRows = (workingSbb.sheets[sheet] ?? []).filter((_, i) => i !== index)
-    setWorkingSbb({
-      ...workingSbb,
-      sheets: { ...workingSbb.sheets, [sheet]: nextRows },
-    })
-  }
-
-  const setSheetAirports = (airports: string[]) => {
-    if (!workingSbb) return
-    const normalized = airports.map((a) => a.trim().toUpperCase()).filter(Boolean)
-    const prev = resolveSbbSheetBindings(workingSbb.sheetBindings)
-    setWorkingSbb({
-      ...workingSbb,
-      sheetBindings: {
-        ...prev,
-        [sheet]: {
-          ...prev[sheet],
-          airports: normalized,
-          note: prev[sheet]?.note,
-          priority: prev[sheet]?.priority,
-        },
-      },
     })
   }
 
@@ -454,12 +365,23 @@ export function SupplierRulesTab({ onEditAction }: Props) {
           onChange={(key) => setSection(key as ConfigSection)}
           items={[
             { key: 'eco', label: t('catering.config.supplier.sectionEco') },
+            { key: 'routeGroups', label: t('catering.config.supplier.sectionRouteGroups') },
             { key: 'amenity', label: t('catering.config.supplier.sectionAmenity') },
             { key: 'routeHourList', label: t('catering.config.supplier.sectionRouteHourList') },
             { key: 'sbb', label: t('catering.config.supplier.sectionSbb') },
           ]}
         />
       </div>
+
+      {section === 'routeGroups' ? (
+        <RouteGroupsSection
+          routeGroups={amenityConfig.routeGroups}
+          editing={editing}
+          onUpdate={updateRouteGroup}
+          onRemove={removeRouteGroup}
+          onAdd={addRouteGroup}
+        />
+      ) : null}
 
       {section === 'eco' ? (
         <>
@@ -566,75 +488,6 @@ export function SupplierRulesTab({ onEditAction }: Props) {
                 ),
               },
               {
-                key: 'routeGroups',
-                label: t('catering.config.supplier.routeGroupsTitle'),
-                children: (
-                  <>
-                    <p className="text-text-muted mb-3 text-[12.5px]">
-                      {t('catering.config.supplier.routeGroupsDesc')}
-                    </p>
-                    <div className="flex flex-col gap-3">
-                      {amenityConfig.routeGroups.map((group) =>
-                        editing ? (
-                          <div
-                            key={group.id}
-                            className="border-border flex flex-col gap-2 rounded-lg border px-3 py-2.5 sm:flex-row sm:items-start"
-                          >
-                            <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
-                              <label className="flex flex-col gap-1 text-[12px] font-bold">
-                                {t('catering.config.supplier.routeGroupLabel')}
-                                <Input
-                                  value={group.label}
-                                  onChange={(e) =>
-                                    updateRouteGroup(group.id, { label: e.target.value })
-                                  }
-                                />
-                              </label>
-                              <label className="flex flex-col gap-1 text-[12px] font-bold">
-                                {t('catering.config.supplier.routeGroupAirports')}
-                                <Select
-                                  mode="tags"
-                                  className="w-full"
-                                  tokenSeparators={[',', ' ']}
-                                  value={group.airports}
-                                  onChange={(airports) =>
-                                    updateRouteGroup(group.id, {
-                                      airports: airports.map((a) => String(a).toUpperCase()),
-                                    })
-                                  }
-                                  placeholder="BNE, MEL, SYD"
-                                />
-                              </label>
-                            </div>
-                            <Button
-                              type="text"
-                              danger
-                              size="small"
-                              className="sm:mt-6"
-                              icon={<Trash2 size={14} />}
-                              aria-label={t('catering.config.supplier.removeRouteGroup')}
-                              onClick={() => removeRouteGroup(group.id)}
-                            />
-                          </div>
-                        ) : (
-                          <div key={group.id} className="flex flex-wrap items-center gap-2">
-                            <span className="min-w-16 text-[13px] font-semibold">{group.label}</span>
-                            {group.airports.map((a) => (
-                              <Tag key={a}>{a}</Tag>
-                            ))}
-                          </div>
-                        ),
-                      )}
-                      {editing ? (
-                        <Button type="dashed" icon={<Plus size={15} />} onClick={addRouteGroup}>
-                          {t('catering.config.supplier.addRouteGroup')}
-                        </Button>
-                      ) : null}
-                    </div>
-                  </>
-                ),
-              },
-              {
                 key: 'composition',
                 label: t('catering.config.supplier.compositionTitle'),
                 children: (
@@ -671,151 +524,18 @@ export function SupplierRulesTab({ onEditAction }: Props) {
       ) : null}
 
       {section === 'sbb' ? (
-        <div className="flex flex-col gap-4">
-          <section className="config-section-surface">
-            <h3 className="config-section-title">{t('catering.config.supplier.sbbRouteTitle')}</h3>
-            <p className="config-section-desc">{t('catering.config.supplier.sbbRouteDesc')}</p>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <label className="flex flex-col gap-1 text-[12px] font-bold">
-                {t('catering.config.supplier.trialDep')}
-                <Input
-                  value={trialDep}
-                  onChange={(e) => setTrialDep(e.target.value.toUpperCase())}
-                  maxLength={4}
-                />
-              </label>
-              <label className="flex flex-col gap-1 text-[12px] font-bold">
-                {t('catering.config.supplier.trialArr')}
-                <Input
-                  value={trialArr}
-                  onChange={(e) => setTrialArr(e.target.value.toUpperCase())}
-                  maxLength={4}
-                />
-              </label>
-              <label className="flex flex-col gap-1 text-[12px] font-bold">
-                {t('catering.config.supplier.trialMeal')}
-                <Segmented<'standard' | 'vegetarian'>
-                  value={trialMeal}
-                  onChange={setTrialMeal}
-                  options={[
-                    { value: 'standard', label: t('catering.config.supplier.mealStandard') },
-                    { value: 'vegetarian', label: t('catering.config.supplier.mealVegetarian') },
-                  ]}
-                />
-              </label>
-            </div>
-            <div className="bg-background border-border mt-3 rounded-lg border px-3 py-2.5 text-[13px]">
-              <span className="text-text-muted">{t('catering.config.supplier.trialResult')} </span>
-              <span className="font-semibold">{trialSheet}</span>
-              <span className="text-text-muted">
-                {' '}
-                · {trialDep || '—'} → {trialArr || '—'}
-              </span>
-            </div>
-          </section>
-
-          <section className="config-section-surface">
-            <h3 className="config-section-title">{t('catering.config.supplier.sbbTitle')}</h3>
-            <p className="config-section-desc">{t('catering.config.supplier.sbbDesc')}</p>
-            <div className="config-tab-scroll mb-3">
-              <Segmented<SbbRouteSheet>
-                value={sheet}
-                onChange={setSheet}
-                options={SBB_SHEETS.map((s) => ({ value: s, label: s }))}
-              />
-            </div>
-
-            <div className="border-border bg-background mb-3 rounded-lg border p-3">
-              <div className="mb-1 text-[12px] font-bold">
-                {t('catering.config.supplier.sbbAirports')}
-              </div>
-              <p className="text-text-muted mb-2 text-[12px]">
-                {sheet === 'CHAY(VIỆT-HÀN-NHẬT)'
-                  ? t('catering.config.supplier.sbbChayNote')
-                  : sheet === 'VIET-HAN-NHAT'
-                    ? t('catering.config.supplier.sbbFallbackNote')
-                    : (currentBinding?.note ?? t('catering.config.supplier.sbbAirportsHint'))}
-              </p>
-              {sheet === 'CHAY(VIỆT-HÀN-NHẬT)' || sheet === 'VIET-HAN-NHAT' ? null : (
-                <Select
-                  mode="tags"
-                  className="w-full"
-                  tokenSeparators={[',', ' ']}
-                  value={currentBinding?.airports ?? []}
-                  disabled={!editing}
-                  onChange={(airports) => setSheetAirports(airports.map(String))}
-                  placeholder="MEL, BNE, SYD, …"
-                />
-              )}
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-[13px]">
-                <thead>
-                  <tr className="text-text-secondary [&>th]:border-border [&>th]:border-b [&>th]:px-2 [&>th]:py-2 [&>th]:text-left [&>th]:text-[11px] [&>th]:font-extrabold [&>th]:uppercase">
-                    <th scope="col">Pax</th>
-                    {SBB_ITEMS.map((item) => (
-                      <th key={item} scope="col">
-                        {t(`catering.config.supplier.item.${item}`)}
-                      </th>
-                    ))}
-                    {editing ? <th scope="col" /> : null}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, index) => (
-                    <tr key={`${sheet}-${row.businessPax}-${index}`} className="[&>td]:border-border [&>td]:border-b [&>td]:px-2 [&>td]:py-1.5">
-                      <td>
-                        <InputNumber
-                          min={1}
-                          value={row.businessPax}
-                          disabled={!editing}
-                          onChange={(v) =>
-                            updateRow(index, { businessPax: typeof v === 'number' ? v : row.businessPax })
-                          }
-                        />
-                      </td>
-                      {SBB_ITEMS.map((item) => (
-                        <td key={item}>
-                          <InputNumber
-                            min={0}
-                            value={row.items[item] ?? null}
-                            disabled={!editing}
-                            onChange={(v) =>
-                              updateItem(index, item, typeof v === 'number' ? v : null)
-                            }
-                          />
-                        </td>
-                      ))}
-                      {editing ? (
-                        <td>
-                          <Button
-                            type="text"
-                            danger
-                            size="small"
-                            icon={<Trash2 size={14} />}
-                            aria-label={t('catering.config.supplier.removeRow')}
-                            onClick={() => removeRow(index)}
-                          />
-                        </td>
-                      ) : null}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {editing ? (
-              <Button className="mt-3" type="dashed" icon={<Plus size={14} />} onClick={addRow}>
-                {t('catering.config.supplier.addRow')}
-              </Button>
-            ) : null}
-            {rows.length === 0 ? (
-              <div className="text-text-muted mt-3 text-center text-[12.5px]">
-                {t('catering.config.supplier.emptySheet')}
-              </div>
-            ) : null}
-          </section>
-        </div>
+        <SbbLookupSection
+          sbb={sbb}
+          sheet={sheet}
+          onSheetChange={setSheet}
+          editing={editing}
+          routeGroups={amenityConfig.routeGroups}
+          mealCatalog={mealCatalog}
+          amenityCatalog={amenityCatalog}
+          onChange={(next) => {
+            if (editing) setWorkingSbb(next)
+          }}
+        />
       ) : null}
 
       {editing ? (

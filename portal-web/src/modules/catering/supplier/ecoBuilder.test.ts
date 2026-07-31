@@ -3,6 +3,7 @@ import ecoRouteRulesJson from '../../../mock-data/catering/supplier/eco-route-ru
 import supplierFlightsJson from '../../../mock-data/catering/supplier/flights-2026-07-08.json'
 import { DEFAULT_ECO_AMENITY_CONFIG } from './amenityDefaults'
 import { buildEcoSupplierRow } from './ecoBuilder'
+import { DEFAULT_ECO_QUANTITY_RULES } from './ecoQuantityEval'
 import type { EcoRouteRuleDataset, EcoSupplierInput } from './types'
 
 const vj81Input = supplierFlightsJson.find(
@@ -76,11 +77,13 @@ describe('buildEcoSupplierRow', () => {
     expect(row.cells.hotmealTotal.value).not.toBe(602)
   })
 
-  it('computes bread as quotaCommercial + breadPrebook (not the flight-wide totalPrebook) when workbook bread is absent', () => {
+  it('computes bread as breadPrebook only (commercial bánh mì is separate) when workbook bread is absent', () => {
     const withQuota = buildEco({
       ...vj81Input,
       workbookReferenceBread: null,
       quotaCommercial: 4,
+      quotaBanhMi: 3,
+      quotaTraSua: 2,
       breadPrebook: 6,
       totalPrebook: 282,
     })
@@ -88,13 +91,19 @@ describe('buildEcoSupplierRow', () => {
       ...vj81Input,
       workbookReferenceBread: null,
       quotaCommercial: null,
+      quotaBanhMi: null,
+      quotaTraSua: null,
       breadPrebook: null,
     })
 
-    // 4 + 6, not 4 + 282 — totalPrebook covers every dish, breadPrebook is Bánh mì only.
-    expect(withQuota.cells.bread.value).toBe(10)
+    // Prebook only — not 4 + 6. Commercial hotmeal / bánh mì / trà sữa stay separate.
+    expect(withQuota.cells.bread.value).toBe(6)
     expect(withQuota.cells.bread.source).toContain('ECO.S.bread')
+    expect(withQuota.cells.banhMiCommercial.value).toBe(3)
+    expect(withQuota.cells.traSuaCommercial.value).toBe(2)
     expect(neither.cells.bread.value).toBeNull()
+    expect(neither.cells.banhMiCommercial.value).toBeNull()
+    expect(neither.cells.traSuaCommercial.value).toBeNull()
   })
 
   it('resolves prebookCashews via the quantity rule engine', () => {
@@ -163,7 +172,7 @@ describe('buildEcoSupplierRow', () => {
     expect(row.cells.reserveCrewWater.source).toContain('Suối')
   })
 
-  it('leaves amenity / ops null when not provided', () => {
+  it('leaves amenity / ops null when not provided (except fields with a quantity rule fallback)', () => {
     const row = buildEco({
       ...vj81Input,
       reserveCrewWater: null,
@@ -180,7 +189,10 @@ describe('buildEcoSupplierRow', () => {
         reserveCrewWater: undefined,
       },
     })
-    expect(row.cells.reserveCrewWater.value).toBeNull()
+    // No manual reserveCrewWater — falls back to the (unconfirmed) rule preview.
+    // VJ81 is AU (MEL) but not A330, so no branch matches; fallback const = 0.
+    expect(row.cells.reserveCrewWater.value).toBe(0)
+    // highlift has no quantity rule at all, so it genuinely stays null.
     expect(row.cells.highlift.value).toBeNull()
   })
 
@@ -260,8 +272,19 @@ describe('buildEcoSupplierRow', () => {
   })
 
   it('keeps derived cells null when a required input is missing', () => {
-    const row = buildEco({ ...vj81Input, boiledEggs: null })
+    // Manual boiledEggs missing AND its quantity-rule fallback disabled, so the
+    // cell is genuinely null (not just falling back to a rule preview) —
+    // exercises derivedFrom's strict null-propagation for totalEggs.
+    const quantityRules = DEFAULT_ECO_QUANTITY_RULES.map((r) =>
+      r.targetColumn === 'boiledEggs' ? { ...r, enabled: false } : r,
+    )
+    const row = buildEcoSupplierRow(
+      { ...vj81Input, boiledEggs: null },
+      routeRules,
+      { amenity: DEFAULT_ECO_AMENITY_CONFIG, quantityRules },
+    )
 
+    expect(row.cells.boiledEggs.value).toBeNull()
     expect(row.cells.totalEggs.value).toBeNull()
   })
 

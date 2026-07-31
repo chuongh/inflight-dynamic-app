@@ -35,6 +35,8 @@ export interface SupplierSourceRefs {
   arr?: string
   hotmealItems?: string
   quotaCommercial?: string
+  quotaBanhMi?: string
+  quotaTraSua?: string
   totalPrebook?: string
   skybossEco?: string
   businessPax?: string
@@ -91,6 +93,10 @@ export interface SupplierFlightInput
   /** Owning FlightGroup (rotation) id — lets downstream builders merge legs of the same group. */
   groupId?: string
   quotaCommercial?: number | null
+  /** Commercial bánh mì upsell from Team Commercial quota (`salesQuota.banhMi`). */
+  quotaBanhMi?: number | null
+  /** Commercial trà sữa upsell from Team Commercial quota (`salesQuota.traSua`). */
+  quotaTraSua?: number | null
   totalPrebook?: number | null
   skybossEco?: number | null
   businessPax?: number | null
@@ -125,6 +131,8 @@ export interface EcoSupplierInput
     EcoAmenityOpsInput,
     EcoSnackOpsInput {
   quotaCommercial: number | null
+  quotaBanhMi?: number | null
+  quotaTraSua?: number | null
   totalPrebook: number | null
   skybossEco: number | null
   boiledEggs: number | null
@@ -177,6 +185,10 @@ export interface EcoCells {
   vegetarianYangzhouRice: SupplierCell<number>
   vegetarianBasmatiCurry: SupplierCell<number>
   bread: SupplierCell<number>
+  /** Commercial bánh mì upsell (salesQuota.banhMi) — distinct from prebook bread. */
+  banhMiCommercial: SupplierCell<number>
+  /** Commercial trà sữa upsell (salesQuota.traSua). */
+  traSuaCommercial: SupplierCell<number>
   boiledEggs: SupplierCell<number>
   skybossEggs: SupplierCell<number>
   totalEggs: SupplierCell<number>
@@ -230,24 +242,47 @@ export interface EcoSupplierRow extends FlightIdentity {
   amenityPackageIds: number[]
 }
 
-export type SbbRouteSheet =
-  | 'VIET-HAN-NHAT'
-  | 'CHAY(VIỆT-HÀN-NHẬT)'
-  | 'ẤN'
-  | 'ÚC&KAZ'
+/** Lookup sheet id — historically fixed labels; new sheets may use any id. */
+export type SbbRouteSheet = string
+
+export const KNOWN_SBB_SHEETS = [
+  'VIET-HAN-NHAT',
+  'CHAY(VIỆT-HÀN-NHẬT)',
+  'ẤN',
+  'ÚC&KAZ',
+] as const
 
 /**
- * Connects a SkyBoss Business lookup sheet to flights via STD/ARR.
- * Match when DEP or ARR is in `airports` (or an optional explicit route pair).
+ * Editable sheet definition — drives SkyBoss lookup tabs dynamically.
+ * Route-group links replace hardcoded sheet↔airport tables.
  */
-export interface SbbSheetRouteBinding {
-  /** IATA airports — sheet applies when DEP or ARR matches. */
-  airports: string[]
-  /** Optional explicit pairs e.g. "SGN-PQC". */
+export interface SbbLookupSheetDef {
+  id: SbbRouteSheet
+  /** Tab label in config UI. */
+  label: string
+  /** EcoAmenityConfig.routeGroups ids this sheet covers. */
+  routeGroupIds: string[]
+  /** Optional explicit route pairs e.g. "SGN-PQC" (match either direction). */
   routePairs?: string[]
+  /** When true, selected by mealType = vegetarian (ignores route groups). */
+  vegetarian?: boolean
+  /** Catch-all when no other standard sheet matches. */
+  fallback?: boolean
   /** Lower runs first when several sheets could match. */
   priority?: number
-  /** Human note shown in config UI. */
+}
+
+/**
+ * Connects a SkyBoss Business lookup sheet to flights via route groups / STD/ARR.
+ * Prefer `routeGroupIds` (shared with ECO amenity config). `airports` remains as a
+ * legacy/override list — resolved airports = union(route-group airports, airports).
+ * @deprecated Prefer SbbLookupSheetDef; kept for backward-compatible mock data.
+ */
+export interface SbbSheetRouteBinding {
+  routeGroupIds?: string[]
+  airports?: string[]
+  routePairs?: string[]
+  priority?: number
   note?: string
 }
 
@@ -269,9 +304,11 @@ export interface SbbLookupDataset {
   effectiveFrom: string
   effectiveTo: string
   source: string
-  sheets: Record<SbbRouteSheet, SbbLookupRow[]>
-  /** STD/ARR → sheet mapping. When absent, engine uses built-in defaults. */
-  sheetBindings?: Partial<Record<SbbRouteSheet, SbbSheetRouteBinding>>
+  sheets: Record<string, SbbLookupRow[]>
+  /** Dynamic sheet tabs + route-group bindings. When absent, engine uses defaults. */
+  sheetDefs?: SbbLookupSheetDef[]
+  /** @deprecated Prefer sheetDefs. */
+  sheetBindings?: Partial<Record<string, SbbSheetRouteBinding>>
 }
 
 export interface SbbCells {

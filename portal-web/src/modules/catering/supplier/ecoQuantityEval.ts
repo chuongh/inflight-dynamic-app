@@ -147,6 +147,12 @@ function migrateValue(value: unknown): EcoQuantityValue {
   if (!value || typeof value !== 'object') return { kind: 'const', value: 0 }
   const v = value as { kind?: string; parts?: unknown[]; [key: string]: unknown }
   if (v.kind === 'manual') return { kind: 'const', value: 0 }
+  // Legacy: breadPrebook used to be a one-off "metric", duplicating what the
+  // catalog's own per-dish prebook column already provides — self-heal any
+  // already-persisted rule still referencing it into the proper column form.
+  if (v.kind === 'metric' && v.metricId === 'breadPrebook') {
+    return { kind: 'column', columnId: 'bread', coef: (v.coef as number | undefined) ?? 1 }
+  }
   if (v.kind === 'sum' && Array.isArray(v.parts)) {
     return {
       kind: 'sum',
@@ -201,7 +207,7 @@ export function migrateEcoQuantityRule(raw: unknown): EcoQuantityRule {
         ...b,
         value: migrateValue(b.value),
       })),
-      fallback,
+      fallback: migrateBreadFallback(rule.targetColumn, fallback),
       confirmed: typeof rule.confirmed === 'boolean' ? rule.confirmed : true,
     }
   }
@@ -216,9 +222,27 @@ export function migrateEcoQuantityRule(raw: unknown): EcoQuantityRule {
       ...b,
       value: migrateValue(b.value),
     })),
-    fallback: migrateValue(rule.fallback ?? { kind: 'const', value: 0 }),
+    fallback: migrateBreadFallback(
+      rule.targetColumn,
+      migrateValue(rule.fallback ?? { kind: 'const', value: 0 }),
+    ),
     confirmed: typeof rule.confirmed === 'boolean' ? rule.confirmed : true,
   }
+}
+
+/** Drop legacy bread = quotaCommercial + prebook; commercial bánh mì is its own line now. */
+function migrateBreadFallback(targetColumn: string, fallback: EcoQuantityValue): EcoQuantityValue {
+  if (targetColumn !== 'bread' || fallback.kind !== 'sum' || !Array.isArray(fallback.parts)) {
+    return fallback
+  }
+  const hasQuota = fallback.parts.some(
+    (p) => p.kind === 'metric' && p.metricId === 'quotaCommercial',
+  )
+  const breadPart = fallback.parts.find((p) => p.kind === 'column' && p.columnId === 'bread')
+  if (hasQuota && breadPart && breadPart.kind === 'column') {
+    return { kind: 'column', columnId: 'bread', coef: breadPart.coef ?? 1 }
+  }
+  return fallback
 }
 
 export function migrateEcoQuantityRules(rules: unknown[]): EcoQuantityRule[] {
@@ -326,12 +350,11 @@ export const DEFAULT_ECO_QUANTITY_RULES: EcoQuantityRule[] = [
     docRef: '§1.3 S',
     branches: [],
     fallback: {
-      kind: 'sum',
-      parts: [
-        { kind: 'metric', metricId: 'quotaCommercial', coef: 1 },
-        // Bánh mì's own prebook from the ungrouped flight file — not totalPrebook (all dishes).
-        { kind: 'metric', metricId: 'breadPrebook', coef: 1 },
-      ],
+      // Prebook bánh mì only. Commercial bánh mì is `banhMiCommercial`
+      // (salesQuota.banhMi); commercial hotmeal stays on `quotaCommercial`.
+      kind: 'column',
+      columnId: 'bread',
+      coef: 1,
     },
   },
   {

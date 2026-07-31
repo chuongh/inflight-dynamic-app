@@ -1,3 +1,4 @@
+import type { SupplierRouteGroup } from './ecoQuantityTypes'
 import {
   createFlightJoinKey,
   normalizeFlightIdentity,
@@ -7,6 +8,7 @@ import {
   isDateWithinRange,
   isOutboundAustraliaKazakhstan,
   selectSbbRouteSheet,
+  sheetCoversAustraliaKazakhstan,
 } from './sbbRules'
 import type {
   SbbCells,
@@ -38,18 +40,19 @@ function lookupCell(
 export function buildSbbSupplierRow(
   input: SupplierFlightInput,
   lookupInput: unknown,
+  routeGroups: SupplierRouteGroup[] = [],
 ): SbbSupplierRow | null {
   const parsedDate = parseProjectDate(input.operatingDate)
   const identity = normalizeFlightIdentity(input)
   const effectiveDate = parsedDate ?? input.operatingDate.trim()
   const parsedLookup = parseSbbLookupDataset(lookupInput)
   const lookup = parsedLookup.ok ? parsedLookup.value : null
-  const sheetBindings = lookup?.sheetBindings
   const sheet = selectSbbRouteSheet(
     identity.dep,
     identity.arr,
     input.sbbMealType,
-    sheetBindings,
+    lookup,
+    routeGroups,
   )
   const businessPaxValue = input.businessPax ?? null
 
@@ -79,11 +82,12 @@ export function buildSbbSupplierRow(
       : undefined
   const lookupSource = lookup?.source ?? 'SBB lookup unavailable'
 
-  const australiaKazakhstan = sheet === 'ÚC&KAZ'
+  const australiaKazakhstan = sheetCoversAustraliaKazakhstan(sheet, lookup)
   const outbound = isOutboundAustraliaKazakhstan(
     identity.dep,
     identity.arr,
-    sheetBindings,
+    lookup,
+    routeGroups,
   )
   const amenityValue = australiaKazakhstan
     ? businessPaxValue + (outbound ? 1 : 0)

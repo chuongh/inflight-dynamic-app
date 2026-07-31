@@ -245,4 +245,27 @@ describe('flightGroupsToSupplierInputs', () => {
       sourceRefs: { flightNo: 'ref' },
     })
   })
+
+  it('maps salesQuota.banhMi and traSua onto commercial quota inputs', () => {
+    const day = dayOf([
+      group({
+        id: 'g1',
+        confirmed: true,
+        legs: [
+          leg({
+            flightNo: 'VJ120',
+            dep: 'SGN',
+            arr: 'HAN',
+            salesQuota: { hotmeal: 5, banhMi: 2, traSua: 1 },
+          }),
+        ],
+      }),
+    ])
+    const { inputs } = flightGroupsToSupplierInputs(day, 'SGN')
+    expect(inputs[0]).toMatchObject({
+      quotaCommercial: 5,
+      quotaBanhMi: 2,
+      quotaTraSua: 1,
+    })
+  })
 })

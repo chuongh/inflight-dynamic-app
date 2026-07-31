@@ -217,6 +217,7 @@ describe('SBB XLSX workbook', () => {
           items: { bread: 3, chickenGravy: 2, blanket: 6 },
         }],
         'ÚC&KAZ': sbbLookups.sheets['ÚC&KAZ'],
+        'SGN-PQC': sbbLookups.sheets['SGN-PQC'] ?? [],
       },
     }
     const rows = [

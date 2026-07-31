@@ -76,10 +76,10 @@ export const DEFAULT_ROUTE_HOUR_CLASSES: RouteHourClass[] = [
 ]
 
 export const DEFAULT_ROUTE_GROUPS: SupplierRouteGroup[] = [
-  { id: 'AU', label: 'Úc', airports: ['BNE', 'MEL', 'SYD'] },
+  { id: 'AU', label: 'Úc', airports: ['ADL', 'BNE', 'MEL', 'PER', 'SYD'] },
   { id: 'KAZ', label: 'KAZ', airports: ['ALA', 'NQZ'] },
   { id: 'IN', label: 'Ấn', airports: ['AMD', 'BLR', 'BOM', 'COK', 'DEL', 'HYD'] },
-  { id: 'KR_JP', label: 'Hàn/Nhật', airports: ['ICN', 'NRT', 'KIX', 'HND', 'PUS'] },
+  { id: 'KR_JP', label: 'Hàn/Nhật', airports: ['ICN', 'KIX', 'NRT', 'PUS'] },
   { id: 'RU', label: 'Nga', airports: ['SVO', 'VVO', 'OVB'] },
 ]
 

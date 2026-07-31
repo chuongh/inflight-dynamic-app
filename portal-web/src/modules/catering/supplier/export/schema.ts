@@ -169,7 +169,7 @@ const commonSbb = [
 ] as const
 
 export const SBB_COLUMNS: Record<
-  SbbRouteSheet,
+  string,
   readonly ExportColumn<keyof SbbCells>[]
 > = {
   'VIET-HAN-NHAT': withLetters([
@@ -289,7 +289,7 @@ export const SBB_COLUMNS: Record<
 }
 
 export const SBB_EXPORTED_FIELDS_BY_SHEET: Record<
-  SbbRouteSheet,
+  string,
   readonly (keyof SbbCells)[]
 > = {
   'VIET-HAN-NHAT': [

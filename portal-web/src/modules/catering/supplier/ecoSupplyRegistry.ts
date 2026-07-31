@@ -9,9 +9,10 @@
 import type { MealItemCategory } from '../catalogTypes'
 import type { EcoCells } from './types'
 
-/** Supply section id — meal catalog categories + amenity / composition / misc. */
+/** Supply section id — meal catalog categories + commercial upsell + amenity / misc. */
 export type EcoSupplyGroupId =
   | MealItemCategory
+  | 'commercial'
   | 'amenity'
   | 'amenity_composition'
   | 'other'
@@ -34,6 +35,15 @@ export interface EcoSupplyFieldDef {
   catalog: 'meal' | 'amenity' | 'none'
   /** Emit a 0-qty line so ops can enter values on the order. */
   includeZero?: boolean
+  /**
+   * Force which cabin bucket(s) this field displays under, overriding the
+   * linked catalog item's own cabinScopes. Needed when a field's quantity is
+   * computed for one cabin only (e.g. ECO's own quantity rule) but the SKU it
+   * links to is a real product also used by another cabin's own, unrelated
+   * pipeline (e.g. SBB's pax-lookup tables) — without this, the same computed
+   * number would incorrectly also render under that other cabin's section.
+   */
+  cabinScopeOverride?: Array<'ECO' | 'SBB'>
 }
 
 /** Ordered fields shown on the ECO supply page. */
@@ -177,13 +187,36 @@ export const ECO_SUPPLY_FIELDS: readonly EcoSupplyFieldDef[] = [
 
   {
     field: 'bread',
-    productCode: '40000294',
-    catalogItemId: 'sku-40000294',
-    fallbackNameVi: 'Bánh mì',
-    // Bánh mì is a prebook hotmeal, but is displayed in the Bread & pastry
-    // catalog category. Its quantity rule remains commercial + bread prebook.
+    productCode: 'SBB12',
+    catalogItemId: 'sku-sbb12',
+    fallbackNameVi: 'Bánh mì Việt Nam (prebook)',
+    // Prebook bánh mì only — commercial bánh mì is `banhMiCommercial`.
+    // Hotmeal mains stay in main/vegetarian. Real prebook data names this
+    // dish "Bánh mì Việt Nam" (sku-sbb12).
     group: 'bread',
     catalog: 'meal',
+    // sku-sbb12 carries cabinScopes ['ECO','SBB'], but THIS field is ECO's
+    // prebook quantity — SBB's order for the same product comes from its
+    // separate pax-lookup pipeline.
+    cabinScopeOverride: ['ECO'],
+  },
+  {
+    field: 'banhMiCommercial',
+    productCode: 'SBB12',
+    catalogItemId: 'meal-banh-mi-commercial',
+    fallbackNameVi: 'Bánh mì Việt Nam (thương mại)',
+    group: 'commercial',
+    catalog: 'meal',
+    cabinScopeOverride: ['ECO'],
+  },
+  {
+    field: 'traSuaCommercial',
+    productCode: 'TSA',
+    catalogItemId: 'meal-tra-sua-commercial',
+    fallbackNameVi: 'Trà sữa (thương mại)',
+    group: 'commercial',
+    catalog: 'meal',
+    cabinScopeOverride: ['ECO'],
   },
   {
     field: 'australiaRoundBread',
@@ -474,7 +507,8 @@ export const ECO_SUPPLY_FIELDS: readonly EcoSupplyFieldDef[] = [
     group: 'other',
     catalog: 'meal',
   },
-  // quotaCommercial is overview-only (StatStrip), not an ECO supply line.
+  // quotaCommercial (hotmeal upsell) is overview-only (StatStrip), not an ECO supply line.
+  // Commercial bánh mì / trà sữa are supply lines under group `commercial`.
 ] as const
 
 /** EcoCells keys selectable as quantity-rule targets — each must have catalogItemId. */
@@ -552,6 +586,7 @@ export const ECO_SUPPLY_GROUP_ORDER: readonly EcoSupplyGroupId[] = [
   'drink',
   'snack',
   'condiment',
+  'commercial',
   'amenity',
   'amenity_composition',
   'other',
